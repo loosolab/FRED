@@ -1,0 +1,21 @@
+project:
+  id: 'mandatory'
+  project_name: 'mandatory'
+  date: 'mandatory'
+  owner:
+    name: 'mandatory'
+    ldap_name: 'mandatory'
+    department: 'mandatory'
+    email: 'mandatory'
+    address: 'optional'
+    telephone: 'optional'
+  nerd:
+    name: 'optional'
+    ldap_name: 'optional'
+    department: 'optional'
+    email: 'optional'
+    address: 'optional'
+    telephone: 'optional'
+  description: 'optional'
+  further_description: 'optional'
+  graphical_abstract: 'optional'    
