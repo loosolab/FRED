@@ -1,6 +1,6 @@
 import os
 from src.utils import read_in_yaml
-from src import test_yaml
+from src import validate_yaml
 
 # The following functions were inspired by Mampok and slightly customized
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/
@@ -26,7 +26,7 @@ def iterate_dir_metafiles(path_metafiles):
             for file in files:
 
                 #TODO: add exceptions
-                #TODO: add test for whitelist
+                #TODO: validation for whitelists
 
                 # add files with suffix '_metadata.y(a)ml'
                 if file.lower().endswith("_metadata.yaml") or file.lower().endswith('_metadata.yml'):
@@ -34,7 +34,7 @@ def iterate_dir_metafiles(path_metafiles):
                     # read these yaml as dict and append to metafile-list:
                     metafile = read_in_yaml(ypath)
                     # test if metafile is valid
-                    valid = test_yaml.test_for_mandatory(metafile)
+                    valid = validate_yaml.test_for_mandatory(metafile)
                     if not valid:
                         print('Missing mandatory key!')
                     # add path to dic
