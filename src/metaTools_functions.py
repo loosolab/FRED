@@ -18,41 +18,59 @@ def find(dir_path, search, return_dict):
     value=dictionary or path depending on return_dict
     """
 
-    # split parameters linked via or into list
-    search_parameters = search.split(' or ')
-
-    for i in range(len(search_parameters)):
-
-        # split parameters linked via 'and' within the 'or-list' -> nested list
-        search_parameters[i] = search_parameters[i].split(' and ')
-
-        for j in range(len(search_parameters[i])):
-
-            # parameter to declare if search parameter should occur
-            # set to False if 'not' was declared for the search parameter
-            # appended to the search parameter with ':' as delimiter
-            should_be_in = True
-            if 'not ' in search_parameters[i][j]:
-                should_be_in = False
-                search_parameters[i][j] = search_parameters[i][j]. \
-                    replace('not ', '')
-            search_parameters[i][j] = search_parameters[i][j].strip() + (
-                        ':' + str(should_be_in))
-
     # read in all *_metadata.yaml(yml) within the path
     metafiles = file_reading.iterate_dir_metafiles([dir_path])
+    search = '(' + search + ')'
 
-    # search for matches within the yaml
-    result = find_metafiles.find_projects(metafiles, search_parameters,
-                                          return_dict)
+    result = []
+
+    for metafile in metafiles:
+
+        print('searching file ' + metafile['path'])
+
+        sub_list = ''
+        sub = ''
+        for letter in search:
+            if letter == '(':
+                sub_list += sub
+                sub = ''
+            elif letter == ')':
+                if sub != '':
+                    res = find_metafiles.find_projects(metafile, sub, return_dict)
+                    sub_list += str(True) if res else str(False)
+                if sub_list != ('True' or 'False'):
+                    res = find_metafiles.find_projects(metafile, sub_list, return_dict)
+                    sub_list = str(True) if res else str(False)
+                sub = ''
+            else:
+                sub += letter
+        if sub_list == 'True':
+            result.append({metafile['project']['id']: metafile['path'] if
+            return_dict == False else metafile})
     return result
 
 
 def add(file_path, add_parameters):
-    # TODO: add function
-    # TODO: test for validity
+    metafile = file_reading.iterate_dir_metafiles([file_path])
+    for i in range(len(add_parameters)):
+        add_parameters[i] = add_parameters[i].split(':')
+    for param in add_parameters:
+        return test(metafile, param[:-1], param[-1])
 
-    return 'TBA'
+
+
+def test(metafile, param, value):
+    if len(param)==1:
+        metafile[param[0]] = value
+    else:
+        if param[0] in metafile:
+            r = metafile[param[0]]
+            if isinstance(r,list):
+                if len(r) == 1:
+                    metafile[param[0]][0] = test(metafile[param[0]][0], param[1:],  value)
+            else:
+                metafile[param[0]] = test(metafile[param[0]], param[1:], value)
+    return metafile
 
 
 def generate(file_path, meta_dict):

@@ -1,15 +1,16 @@
 import re
 from src import utils
+from itertools import chain
 
 # This scripts implements functions to find metadata files that contain given
 # values
 
 
-def find_projects(metafiles_list, search_parameters, return_dict):
+def find_projects(metafile, search, return_dict):
     """
     iterate through a list of dictionaries containing information of yaml
     files  and return a dictionary containing matches
-    :param metafiles_list: a list of read in yaml files (as dictionaries)
+    :param metafile: a read in yaml file (as dictionary)
     :param search_parameters: a nested list - elements in outer list are linked
     via 'or' and the elements within the inner lists are linked via 'and';
     e.g. [['id:pul47','name:Jasmin Walter'],['id:shu27']] means
@@ -19,44 +20,134 @@ def find_projects(metafiles_list, search_parameters, return_dict):
     :return: a dictionary containing all matches, key=id, value=dictionary or
     path depending on return_dict
     """
-    matches = []
-    for metafile in metafiles_list:
-        or_found = []
-        print('searching file ' + metafile['path'])
+    # split parameters linked via or into list
 
-        # iterate through outer list -> or
-        for or_param in search_parameters:
-            and_found = []
+    sub_list = ''
+    sub = ''
+    list_name = []
+    depth = -1
+    for letter in search:
+        if letter == '[':
+            depth +=1
+            list_name.append(sub.split(' ')[-1])
+            sub = sub.replace(list_name[depth], '')
+            sub_list += sub
+            sub = ''
+        elif letter == ']':
+            if sub != '':
+                res = parse_search_parameters(metafile, sub, list_name[depth] if depth != -1 else None)
+                sub_list += str(True) if res else str(False)
+            depth -= 1
+            if sub_list != ('True' or 'False'):
+                res = parse_search_parameters(metafile, sub_list, list_name[depth] if depth != -1 else None)
+                sub_list = str(True) if res else str(False)
+            sub = ''
+        else:
+            sub += letter
 
-            # iterate through inner list -> and
-            for and_param in or_param:
+    if sub_list == '':
+        res = parse_search_parameters(metafile, sub, None)
+        sub_list += str(True) if res else str(False)
 
-                # split search parameter at ':'
-                # last element in list saved in 'should-be_found'
-                # -> False if 'not' was specified for the parameter
-                params = and_param.split(':')
-                should_be_found = params[-1]
+    if sub_list != ('True' or 'False'):
+        sub_list = parse_search_parameters(metafile, sub_list, None)
 
+    if sub_list == 'True':
+        return True
+    else:
+        return False
+
+
+def parse_search_parameters(metafile, search, list_element = None):
+
+    if list_element:
+        metafile = list(utils.find_keys(metafile, list_element))
+
+    search_parameters = search.split(' or ')
+
+    for i in range(len(search_parameters)):
+
+        # split parameters linked via 'and' within the 'or-list' -> nested list
+        search_parameters[i] = search_parameters[i].split(' and ')
+
+        for j in range(len(search_parameters[i])):
+
+            # parameter to declare if search parameter should occur
+            # set to False if 'not' was declared for the search parameter
+            # appended to the search parameter with ':' as delimiter
+
+            if search_parameters[i][j] != 'True' or 'False':
+                search_parameters[i][j] = get_should_be_in(search_parameters[i][j])
+
+    results = get_matches(metafile, search_parameters)
+    if True in results:
+        result = True
+    else:
+        result = False
+
+    return result
+
+def get_matches (metafile, search_parameters):
+    results = []
+    if isinstance(metafile, list):
+        for x in metafile:
+            results += get_matches(x, search_parameters)
+    else:
+        results += [calculate_match(metafile, search_parameters)]
+    return results
+
+def calculate_match(metafile, search_parameters):
+
+    or_found = []
+    # iterate through outer list -> or
+    for or_param in search_parameters:
+        and_found = []
+
+        # iterate through inner list -> and
+        for and_param in or_param:
+
+            # split search parameter at ':'
+            # last element in list saved in 'should-be_found'
+            # -> False if 'not' was specified for the parameter
+
+            params = and_param.split(':')
+            should_be_found = params[-1]
+
+            if len(params) == 2 and params[0] == 'True':
+                match = True
+            elif len(params) == 2 and params[0] == 'False':
+                match = False
+            else:
                 # call find_entry to get match
                 match = find_entry(metafile, params[0:-2], params[-2])
+            # test if match was found and if it should be found
+            if (match and should_be_found == 'True') or \
+                    ( not match and should_be_found == 'False'):
+                and_found.append(True)
+            else:
+                and_found.append(False)
+        # test if all parameters for 'and' are True
+        if False not in and_found:
+            or_found.append(True)
+        else:
+            or_found.append(False)
 
-                # test if match was found and if it should be found
-                if (match and should_be_found == 'True') or \
-                        (not match and should_be_found == 'False'):
-                    and_found.append(True)
-                else:
-                    and_found.append(False)
+    # test if one parameter for 'or' is True
+    return True if True in or_found else False
 
-            # test if all parameters for 'and' are True
-            if False not in and_found:
-                or_found.append(True)
 
-        # test if one parameter for 'or' is True
-        if True in or_found:
-            match_dict = {metafile['project']['id']: metafile['path'] if return_dict==False else metafile}
-            matches.append(match_dict)
-
-    return matches
+def get_should_be_in(param):
+    if isinstance(param, list):
+        p = []
+        for x in param:
+            p.append(get_should_be_in(x))
+    else:
+        should_be_in = True
+        if 'not ' in param:
+            should_be_in = False
+            param = param.replace('not ', '')
+        p = param.strip() + (':' + str(should_be_in))
+    return p
 
 
 def find_entry(metafile, targets, target_value):
@@ -69,7 +160,7 @@ def find_entry(metafile, targets, target_value):
     :return: True if match was found, else None
     """
     # iterate through keys in 'targets' and search for match
-    if len(targets)>=1:
+    if len(targets) >= 1:
         result = [metafile]
         for key in targets:
             r2 = []
@@ -79,7 +170,8 @@ def find_entry(metafile, targets, target_value):
     # iterate through whole dictionary if no key was specified in 'targets'
     else:
         result = list(utils.find_values(metafile, target_value))
-
     # test if target_value was found
-    if target_value in result:
-        return True
+    for value in result:
+        if str(target_value) == str(value):
+            return True
+    return False
