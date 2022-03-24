@@ -71,16 +71,50 @@ def find_values(node, kv):
             for x in find_values(j, kv):
                 yield x
 
+def get_keys_as_list(node, nested, pre=''):
+    """
+    generator to return all keys in dictionary that fit a given key value
+    :param node: a dictionary to be searched
+    :param kv: the key value to search for
+    """
+    if isinstance(node, list):
+        test = []
+        is_list_or_dict = False
+        for i in node:
+            if isinstance(i, list) or isinstance(i, dict):
+                is_list_or_dict = True
+                for x in get_keys_as_list(i, nested):
+                    if nested:
+                        test.append(pre + str(x))
+                    else:
+                        yield pre + str(x)
+                if nested:
+                    yield test
+        if not is_list_or_dict:
+            yield pre + str(node)
+    elif isinstance(node, dict):
+        for j in list(node.keys()):
+            for x in get_keys_as_list(node[j], nested, pre + j + ':'):
+                yield x
+    else:
+        yield pre + str(node)
 
-def get_keys_as_list(d):
-    """
-    generator to return all keys of dictionary as list of strings
-    format: 'key1:key2:value'
-    :param d: a dictionary to be parsed
-    """
-    for key in d:
-        if isinstance(d[key], dict):
-            for a in list(get_keys_as_list(d[key])):
-                yield key + ':' + a
-        else:
-            yield key + ':' + str(d[key])
+
+# split string of list into list
+def split_str(s):
+    splitted = s.split(':')
+    keys = ':'.join(splitted[0:-1])
+    value = splitted[-1].replace('[','').replace(']','').replace('\'','').split(',')
+    return keys, value
+
+
+# parse list to dictionary for webinterface
+def parse_list_to_dict(node):
+    if isinstance(node, list):
+        for i in range(len(node)):
+            node[i] = parse_list_to_dict(node[i])
+        node = {'title': 'Information ' + node[0]['position'].split(':')[-2], 'desc' : 'TBA', 'input_fields': node}
+    else:
+        keys, value = split_str(node)
+        node={'position': keys, 'value': value, 'whitelist': None, 'displayName': keys.split(':')[-1], 'desc': 'TBA'}
+    return node
