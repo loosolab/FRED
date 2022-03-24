@@ -1,21 +1,194 @@
 project:
-  id: 'mandatory'
-  project_name: 'mandatory'
-  date: 'mandatory'
+  id: 
+    - mandatory
+  project_name: 
+    - mandatory
+  date: 
+    - mandatory
   owner:
-    name: 'mandatory'
-    ldap_name: 'mandatory'
-    department: 'mandatory'
-    email: 'mandatory'
-    address: 'optional'
-    telephone: 'optional'
+    - 
+      name: 
+        - mandatory
+      ldap_name: 
+        - mandatory
+      department: 
+        - mandatory
+      email: 
+        - mandatory
+      address: 
+        - optional
+      telephone: 
+        - optional
   nerd:
-    name: 'optional'
-    ldap_name: 'optional'
-    department: 'optional'
-    email: 'optional'
-    address: 'optional'
-    telephone: 'optional'
-  description: 'optional'
-  further_description: 'optional'
-  graphical_abstract: 'optional'    
+    - 
+      name: 
+        - optional
+      ldap_name: 
+        - optional
+      department: 
+        - optional
+      email: 
+        - optional
+      address: 
+        - optional
+      telephone: 
+        - optional
+  description: 
+    - optional
+  further_description: 
+    - optional
+  graphical_abstract: 
+    - optional
+
+experimental_setting:
+  -
+    organism:
+      organism_name:
+        - mandatory   
+      taxonomy_id:
+        - mandatory
+    experimental_factors:
+      -
+        factor: 
+          - mandatory
+        value:
+          - mandatory
+    conditions:
+      -
+        condition_name:
+          - mandatory
+        biological_replicates:
+          count: 
+            - optional
+          concentrations:
+            - optional
+          samples:
+            -
+              sample_name:
+                - mandatory
+              pooled:
+                - mandatory
+              genotype:
+                - optional
+              gender:
+                - optional
+              life_stage:
+                - optional
+              age:
+                - optional
+              ethnicity:
+                - optional
+              tissue:
+                - optional
+              cell_type:
+                - optional
+              gene:
+                - optional
+              disease_information:
+                healthy:
+                  - mandatory
+                disease:
+                  -
+                    status:
+                      - optional
+                    type:
+                      - optional
+                    stage:
+                      - optional
+              treatment_information:
+                treated:
+                  - mandatory
+                treatment:
+                  -
+                    status:
+                      - optional
+                    type:
+                      - optional
+                    duration:
+                      duration_unit:
+                        - optional
+                      duration_value:
+                        - optional
+              time_point:
+                - optional
+              flow:
+                - optional
+              donor_count:
+                - mandatory
+        technical_replicates:
+          count: 
+            - optional
+          concentrations:
+            - optional
+          samples:
+            -
+              sample_name:
+                - mandatory
+              pooled:
+                - mandatory
+              genotype:
+                - optional
+              gender:
+                - optional
+              life_stage:
+                - optional
+              age:
+                - optional
+              ethnicity:
+                - optional
+              tissue:
+                - optional
+              cell_type:
+                - optional
+              gene:
+                - optional
+              disease_information:
+                healthy:
+                  - mandatory
+                disease:
+                  -
+                    status:
+                      - optional
+                    type:
+                      - optional
+                    stage:
+                      - optional
+              treatment_information:
+                treated:
+                  - mandatory
+                treatment:
+                  -
+                    status:
+                      - optional
+                    type:
+                      - optional
+                    duration:
+                      duration_unit:
+                        - optional
+                      duration_value:
+                        - optional
+              time_point:
+                - optional
+              flow:
+                - optional
+              donor_count:
+                - mandatory
+
+experiment:
+  technique:
+    - mandatory
+  analysis:
+    sample_preparation:
+      - optional
+    further_description:
+      - optional
+    runs:
+      -
+        date:
+          - optional
+        reference_genome:
+          - optional
+        parameters:
+          - optional
+        output:
+          - optional
