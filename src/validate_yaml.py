@@ -1,6 +1,4 @@
 from src import utils
-from src import find_metafiles
-
 
 # This script includes functions for the validation of metadata yaml files
 
@@ -12,16 +10,50 @@ def test_for_mandatory(metafile):
     :return: bool: True if all mandatory keys are found, False if one is missing
     """
     key_yaml = utils.read_in_yaml('keys.yaml')
-    mandatory_keys = [x.replace(':mandatory', '').split(':') for x in
-                      list(utils.get_keys_as_list(key_yaml)) if
-                      'mandatory' in x]
+    all_keys = list(utils.get_keys_as_list(key_yaml, True))
+    mandatory_keys = []
+    for x in all_keys:
+        res = parse_nested(x)
+        if res:
+            mandatory_keys.append(res)
+
+    res = []
     for a_key in mandatory_keys:
-        result = [metafile]
-        for key in a_key:
-            r2 = []
-            for item in result:
-                r2 += list(utils.find_keys(item, key))
-            result = r2
-            if len(result) == 0:
-                return False
-    return True
+        res.append(find_key(metafile,a_key))
+
+    if False in res:
+        return False
+    else:
+        return True
+
+
+# test if key is in dictionary + if key is in every list element within dict
+def find_key(item, key):
+    if isinstance(key, list):
+        r = []
+        for x in key:
+            r.append(find_key(item, x))
+        if not any(len(r[0]) != len(i) for i in r):
+            return True
+    else:
+        r = item
+        for k in key.split(':'):
+            r = list(utils.find_keys(r, k))
+        return r
+    return False
+
+
+# returns key with value 'mandatory' within nested list
+def parse_nested(keys):
+    if isinstance(keys, list):
+        test = []
+        for x in keys:
+            res = parse_nested(x)
+            if res:
+                test.append(res)
+        if len(test) > 0:
+            return test
+    else:
+        key, value = utils.split_str(keys)
+        if 'mandatory' in value:
+            return key
