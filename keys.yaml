@@ -43,8 +43,14 @@ project:
 experimental_setting:
   -
     organism:
+      # title 
       organism_name:
-        - mandatory   
+        - mandatory 
+        #- plain_decription text
+        # plain description name
+        # data type html 
+        # input type 
+        # whitelist bool    
       taxonomy_id:
         - mandatory
     experimental_factors:
