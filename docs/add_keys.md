@@ -10,9 +10,9 @@ Position | Description | Value
 -------- | -------- | --------
 1   | A boolean value indicating weather the key is mandatory   | True/False
 2   | A boolean value indicating weather the key is a list   | True/False
-3   | A name to describe the key    |  '\<name>' or '' if there is no name
-4   | A text to descripe the key    |  '\<description>' or '' if there is no description
-5   | A default value to the key    |  '\<value>' or None or \<key>:\<value> if the value is a dictionary
+3   | A name to describe the key    |  '[name]' or '' if there is no name
+4   | A text to descripe the key    |  '[description]' or '' if there is no description
+5   | A default value to the key    |  '[value]' or None or [key]:[value] if the value is a dictionary
 6   | A boolean value indicating whether there is a whitelist of allowed values for the value of the key | True/False
 7   | The HTML input type for the key value | input type
 8   | The HTML data type for the key value | data type
