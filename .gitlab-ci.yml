@@ -10,6 +10,7 @@ pages:
     - cp -r ./* .public
     - rm -rf public
     - mv .public public
+    - mkdocs build --strict --verbose
   artifacts:
     paths:
       - public
