@@ -1,0 +1,845 @@
+# Information per parameter:
+# - 'mandatory' / 'optional' 							# is it mandatory?
+# - True / False 										# is it a list?
+# - '<name>'											# description name
+# - '<description>'										# description text
+# - <value> / None / <parameters if isDict or isList>	# default value
+# - True / False										# whitelist (only if leaf)
+# - input type											# input type (only if leaf)
+# - data type											# data type (only if leaf)
+
+
+project:
+  - 'mandatory'
+  - False
+  - 'Project'
+  - ''
+  - id:
+      - 'mandatory'
+      - False
+      - 'ID'
+      - ''
+      - None
+      - False
+      - input type
+      - data type
+    project_name:
+      - 'mandatory'
+      - False
+      - 'Project Name'
+      - ''
+      - None
+      - False
+      - input type
+      - data type
+    date:
+      - 'mandatory'
+      - False
+      - 'Date'
+      - ''
+      - None
+      - False
+      - input type
+      - data type
+    owner:
+      - 'mandatory'
+      - True
+      - 'Owner'
+      - ''
+      - name:
+          - 'mandatory'
+          - False
+          - 'Name'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        ldap_name:
+          - 'mandatory'
+          - False
+          - 'LDAP Name'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        department:
+          - 'mandatory'
+          - False
+          - 'Department'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        email:
+          - 'mandatory'
+          - False
+          - 'E-Mail'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        address:
+          - 'optional'
+          - False
+          - 'Address'
+          - ''
+          - None
+          - False
+          - input type
+          - data type
+        telephone:
+          - 'optional'
+          - False
+          - 'Telephone'
+          - ''
+          - None
+          - False
+          - input type
+          - data type
+    nerd:
+      - 'optional'
+      - True
+      - 'Nerd'
+      - ''
+      - name:
+          - 'mandatory'
+          - False
+          - 'Name'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        ldap_name:
+          - 'mandatory'
+          - False
+          - 'LDAP Name'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        department:
+          - 'mandatory'
+          - False
+          - 'Department'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        email:
+          - 'mandatory'
+          - False
+          - 'E-Mail'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        address:
+          - 'optional'
+          - False
+          - 'Address'
+          - ''
+          - None
+          - False
+          - input type
+          - data type
+        telephone:
+          - 'optional'
+          - False
+          - 'Telephone'
+          - ''
+          - None
+          - False
+          - input type
+          - data type
+    description:
+      - 'mandatory'
+      - False
+      - 'Description'
+      - ''
+      - None
+      - False
+      - input type
+      - data type
+    further_description:
+      - 'optional'
+      - True
+      - 'Further Description'
+      - ''
+      - None
+      - False
+      - input type
+      - data type
+    graphical_abstract:
+      - 'optional'
+      - True
+      - 'Graphical Abstract'
+      - ''
+      - None
+      - False
+      - input type
+      - data type
+
+experimental_setting:
+  - 'mandatory'
+  - True
+  - 'Experimental setting'
+  - ''
+  - organism:
+      - 'mandatory'
+      - False
+      - 'Organism'
+      - ''
+      - organism_name:
+          - 'mandatory'
+          - False
+          - 'Organism Name'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        taxonomy_id:
+          - 'mandatory'
+          - False
+          - 'Taxonomy ID'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+    experimental_factors:
+      - 'mandatory'
+      - True
+      - 'Experimental Factors'
+      - ''
+      - factor:
+          - 'mandatory'
+          - False
+          - 'Factor'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+        value:
+          - 'mandatory'
+          - False
+          - 'Value'
+          - ''
+          - None
+          - True
+          - input type
+          - data type
+    conditions:
+      - 'mandatory'
+      - True
+      - 'Conditions'
+      - ''
+      - condition_name:
+          - 'mandatory'
+          - False
+          - 'Condition Name'
+          - ''
+          - None
+          - False
+          - input type
+          - data type
+        biological_replicates:
+          - 'optional'
+          - False
+          - 'Biological Replicates'
+          - ''
+          - count:
+              - 'optional'
+              - False
+              - 'Count'
+              - ''
+              - None
+              - False
+              - input type
+              - data type
+            samples:
+              - 'optional'
+              - True
+              - 'Samples'
+              - ''
+              - sample_name:
+                  - 'mandatory'
+                  - False
+                  - 'Sample Name'
+                  - ''
+                  - None
+                  - False
+                  - input type
+                  - data type
+                pooled:
+                  - 'mandatory'
+                  - False
+                  - 'Pooled'
+                  - ''
+                  - False
+                  - False
+                  - input type
+                  - data type
+                genotype:
+                  - 'optional'
+                  - False
+                  - 'Genotype'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                gender:
+                  - 'optional'
+                  - False
+                  - 'Gender'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                life_stage:
+                  - 'optional'
+                  - False
+                  - 'Life stage'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                age:
+                  - 'optional'
+                  - False
+                  - 'Age'
+                  - ''
+                  - None
+                  - False
+                  - input type
+                  - data type
+                ethnicity:
+                  - 'optional'
+                  - False
+                  - 'Ethnicity'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                tissue:
+                  - 'optional'
+                  - False
+                  - 'Tissue'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                cell_type:
+                  - 'optional'
+                  - False
+                  - 'Cell type'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                gene:
+                  - 'optional'
+                  - False
+                  - 'Gene'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                disease_information:
+                  - 'optional'
+                  - False
+                  - 'Disease Information'
+                  - ''
+                  - healthy:
+                      - 'optional'
+                      - False
+                      - 'Healthy'
+                      - ''
+                      - True
+                      - False
+                      - input type
+                      - data type
+                    disease:
+                      - 'optional'
+                      - True
+                      - 'Disease'
+                      - ''
+                      - status:
+                          - 'optional'
+                          - False
+                          - 'Status'
+                          - ''
+                          - None
+                          - True
+                          - input type
+                          - data type
+                        type:
+                          - 'optional'
+                          - False
+                          - 'Type'
+                          - ''
+                          - None
+                          - True
+                          - input type
+                          - data type
+                        duration:
+                          - 'optional'
+                          - False
+                          - 'Duration'
+                          - ''
+                          - duration_unit:
+                              - 'optional'
+                              - False
+                              - 'Unit'
+                              - ''
+                              - None
+                              - True
+                              - input type
+                              - data type
+                            duration_value:
+                              - 'optional'
+                              - False
+                              - 'Value'
+                              - ''
+                              - None
+                              - False
+                              - input type
+                              - data type
+                treatment_information:
+                  - 'optional'
+                  - False
+                  - 'Treatment Information'
+                  - ''
+                  - treated:
+                      - 'optional'
+                      - False
+                      - 'Treated'
+                      - ''
+                      - False
+                      - False
+                      - input type
+                      - data type
+                    treatment:
+                      - 'optional'
+                      - True
+                      - 'Treatment'
+                      - ''
+                      - status:
+                          - 'optional'
+                          - False
+                          - 'Status'
+                          - ''
+                          - None
+                          - True
+                          - input type
+                          - data type
+                        type:
+                          - 'optional'
+                          - False
+                          - 'Type'
+                          - ''
+                          - None
+                          - True
+                          - input type
+                          - data type
+                        duration:
+                          - 'optional'
+                          - False
+                          - 'Duration'
+                          - ''
+                          - duration_unit:
+                              - 'optional'
+                              - False
+                              - 'Unit'
+                              - ''
+                              - None
+                              - True
+                              - input type
+                              - data type
+                            duration_value:
+                              - 'optional'
+                              - False
+                              - 'Value'
+                              - ''
+                              - None
+                              - False
+                              - input type
+                              - data type
+                time_point:
+                  - 'optional'
+                  - False
+                  - 'Time Point'
+                  - ''
+                  - None
+                  - False
+                  - input type
+                  - data type
+                flow:
+                  - 'optional'
+                  - False
+                  - 'Flow'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                donor_count:
+                  - 'mandatory'
+                  - False
+                  - 'Donor Count'
+                  - ''
+                  - 1
+                  - False
+                  - input type
+                  - data type
+        technical_replicates:
+          - 'optional'
+          - False
+          - 'Biological Replicates'
+          - ''
+          - count:
+              - 'optional'
+              - False
+              - 'Count'
+              - ''
+              - None
+              - False
+              - input type
+              - data type
+            samples:
+              - 'optional'
+              - True
+              - 'Samples'
+              - ''
+              - sample_name:
+                  - 'mandatory'
+                  - False
+                  - 'Sample Name'
+                  - ''
+                  - None
+                  - False
+                  - input type
+                  - data type
+                pooled:
+                  - 'mandatory'
+                  - False
+                  - 'Pooled'
+                  - ''
+                  - False
+                  - False
+                  - input type
+                  - data type
+                genotype:
+                  - 'optional'
+                  - False
+                  - 'Genotype'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                gender:
+                  - 'optional'
+                  - False
+                  - 'Gender'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                life_stage:
+                  - 'optional'
+                  - False
+                  - 'Life stage'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                age:
+                  - 'optional'
+                  - False
+                  - 'Age'
+                  - ''
+                  - None
+                  - False
+                  - input type
+                  - data type
+                ethnicity:
+                  - 'optional'
+                  - False
+                  - 'Ethnicity'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                tissue:
+                  - 'optional'
+                  - False
+                  - 'Tissue'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                cell_type:
+                  - 'optional'
+                  - False
+                  - 'Cell type'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                gene:
+                  - 'optional'
+                  - False
+                  - 'Gene'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                disease_information:
+                  - 'optional'
+                  - False
+                  - 'Disease Information'
+                  - ''
+                  - healthy:
+                      - 'optional'
+                      - False
+                      - 'Healthy'
+                      - ''
+                      - True
+                      - False
+                      - input type
+                      - data type
+                    disease:
+                      - 'optional'
+                      - True
+                      - 'Disease'
+                      - ''
+                      - status:
+                          - 'optional'
+                          - False
+                          - 'Status'
+                          - ''
+                          - None
+                          - True
+                          - input type
+                          - data type
+                        type:
+                          - 'optional'
+                          - False
+                          - 'Type'
+                          - ''
+                          - None
+                          - True
+                          - input type
+                          - data type
+                        duration:
+                          - 'optional'
+                          - False
+                          - 'Duration'
+                          - ''
+                          - duration_unit:
+                              - 'optional'
+                              - False
+                              - 'Unit'
+                              - ''
+                              - None
+                              - True
+                              - input type
+                              - data type
+                            duration_value:
+                              - 'optional'
+                              - False
+                              - 'Value'
+                              - ''
+                              - None
+                              - False
+                              - input type
+                              - data type
+                treatment_information:
+                  - 'optional'
+                  - False
+                  - 'Treatment Information'
+                  - ''
+                  - treated:
+                      - 'optional'
+                      - False
+                      - 'Treated'
+                      - ''
+                      - False
+                      - False
+                      - input type
+                      - data type
+                    treatment:
+                      - 'optional'
+                      - True
+                      - 'Treatment'
+                      - ''
+                      - status:
+                          - 'optional'
+                          - False
+                          - 'Status'
+                          - ''
+                          - None
+                          - True
+                          - input type
+                          - data type
+                        type:
+                          - 'optional'
+                          - False
+                          - 'Type'
+                          - ''
+                          - None
+                          - True
+                          - input type
+                          - data type
+                        duration:
+                          - 'optional'
+                          - False
+                          - 'Duration'
+                          - ''
+                          - duration_unit:
+                              - 'optional'
+                              - False
+                              - 'Unit'
+                              - ''
+                              - None
+                              - True
+                              - input type
+                              - data type
+                            duration_value:
+                              - 'optional'
+                              - False
+                              - 'Value'
+                              - ''
+                              - None
+                              - False
+                              - input type
+                              - data type
+                time_point:
+                  - 'optional'
+                  - False
+                  - 'Time Point'
+                  - ''
+                  - None
+                  - False
+                  - input type
+                  - data type
+                flow:
+                  - 'optional'
+                  - False
+                  - 'Flow'
+                  - ''
+                  - None
+                  - True
+                  - input type
+                  - data type
+                donor_count:
+                  - 'mandatory'
+                  - False
+                  - 'Donor Count'
+                  - ''
+                  - 1
+                  - False
+                  - input type
+                  - data type
+
+experiment:
+  - 'mandatory'
+  - False
+  - 'Experiment'
+  - ''
+  - technique:
+      - 'mandatory'
+      - False
+      - 'Technique'
+      - ''
+      - None
+      - True
+      - input type
+      - data type
+    analysis:
+      - 'optional'
+      - False
+      - 'Analysis'
+      - ''
+      - sample_preparation:
+          - 'optional'
+          - True
+          - 'Sample preparation'
+          - ''
+          - None
+          - False
+          - input type
+          - data type
+        further_description:
+          - 'optional'
+          - True
+          - 'Further description'
+          - ''
+          - None
+          - False
+          - input type
+          - data type
+        runs:
+          - 'optional'
+          - True
+          - 'Runs'
+          - ''
+          - date:
+              - 'optional'
+              - False
+              - 'Date'
+              - ''
+              - None
+              - False
+              - input type
+              - data type
+            reference_genome:
+              - 'optional'
+              - False
+              - 'Reference Genome'
+              - ''
+              - None
+              - True
+              - input type
+              - data type
+            parameters:
+              - 'optional'
+              - True
+              - 'Parameters'
+              - ''
+              - None
+              - False
+              - input type
+              - data type
+            output:
+              - 'optional'
+              - False
+              - 'Output'
+              - ''
+              - None
+              - False
+              - input type
+              - data type
