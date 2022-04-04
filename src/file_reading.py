@@ -37,6 +37,9 @@ def iterate_dir_metafiles(path_metafiles):
                     valid = validate_yaml.test_for_mandatory(metafile)
                     if not valid:
                         print('Missing mandatory key!')
+                    valid_keys = validate_yaml.test_for_valid_keys(metafile)
+                    if not valid_keys:
+                        print('Invalid key found')
                     # add path to dic
                     metafile['path'] = ypath
                     if metafile:
