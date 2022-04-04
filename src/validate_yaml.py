@@ -1,4 +1,5 @@
 from src import utils
+import itertools
 
 # This script includes functions for the validation of metadata yaml files
 
@@ -10,38 +11,26 @@ def test_for_mandatory(metafile):
     :return: bool: True if all mandatory keys are found, False if one is missing
     """
     key_yaml = utils.read_in_yaml('keys.yaml')
-    all_keys = list(utils.get_keys_as_list(key_yaml, True))
     mandatory_keys = []
-    for x in all_keys:
-        res = parse_nested(x)
-        if res:
-            mandatory_keys.append(res)
-
-    res = []
-    for a_key in mandatory_keys:
-        res.append(find_key(metafile,a_key))
-
-    if False in res:
+    for key in key_yaml:
+        mandatory_keys += get_mandatory_keys(key_yaml[key],metafile, key, [])
+    if False in mandatory_keys:
         return False
     else:
         return True
 
 
 # test if key is in dictionary + if key is in every list element within dict
-def find_key(item, key):
-    if isinstance(key, list):
-        r = []
-        for x in key:
-            r.append(find_key(item, x))
-        if not any(len(r[0]) != len(i) for i in r):
-            return True
-    else:
-        r = item
-        for k in key.split(':'):
-            r = list(utils.find_keys(r, k))
-        return r
-    return False
-
+def find_key(item, key, is_list):
+    for k in key.split(':'):
+        item = list(utils.find_keys(item, k))
+    if len(item) == 0:
+        return False
+    if is_list:
+        if any(len(item[0][0]) != len(i) for i in item[0]):
+            print(key)
+            return False
+    return True
 
 # returns key with value 'mandatory' within nested list
 def parse_nested(keys):
@@ -57,3 +46,22 @@ def parse_nested(keys):
         key, value = utils.split_str(keys)
         if 'mandatory' in value:
             return key
+
+def get_mandatory_keys(node, metafile, pre='', mandatory=[]):
+    """
+    generator to return all keys in dictionary that fit a given key value
+    :param node: a dictionary to be searched
+    :param kv: the key value to search for
+    """
+    if node[0] == 'mandatory':
+        mandatory.append(find_key(metafile, pre, node[1]))
+        if isinstance(node[4], dict):
+            for key in node[4]:
+                mandatory = get_mandatory_keys(node[4][key], metafile, pre + ':' + key, mandatory)
+    else:
+        if find_key(metafile, pre, node[1]):
+            if isinstance(node[4], dict):
+                for key in node[4]:
+                    mandatory = get_mandatory_keys(node[4][key], metafile,
+                                                   pre + ':' + key, mandatory)
+    return mandatory
