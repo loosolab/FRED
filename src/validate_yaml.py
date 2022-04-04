@@ -19,6 +19,17 @@ def test_for_mandatory(metafile):
     else:
         return True
 
+def test_for_valid_keys(metafile):
+    key_yaml = utils.read_in_yaml('keys.yaml')
+    file_keys = [':'.join(x.split(':')[:-1]) for x in list(utils.get_keys_as_list(metafile, False))]
+    for key in file_keys:
+        item = key_yaml
+        for k in key.split(':'):
+            item = list(utils.find_keys(item,k))
+            if len(item) == 0:
+                print(k + ' is not a valid key')
+                return False
+    return True
 
 # test if key is in dictionary + if key is in every list element within dict
 def find_key(item, key, is_list):
@@ -65,3 +76,4 @@ def get_mandatory_keys(node, metafile, pre='', mandatory=[]):
                     mandatory = get_mandatory_keys(node[4][key], metafile,
                                                    pre + ':' + key, mandatory)
     return mandatory
+

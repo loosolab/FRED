@@ -1,5 +1,5 @@
 import yaml
-
+import os
 
 # The following functions were copied from Mampok
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/utils.py
@@ -97,7 +97,7 @@ def get_keys_as_list(node, nested, pre=''):
             for x in get_keys_as_list(node[j], nested, pre + j + ':'):
                 yield x
     else:
-        yield pre + str(node)
+        yield pre #+ str(node)
 
 
 # split string of list into list
@@ -118,3 +118,8 @@ def parse_list_to_dict(node):
         keys, value = split_str(node)
         node={'position': keys, 'value': value, 'whitelist': None, 'displayName': keys.split(':')[-1], 'desc': 'TBA'}
     return node
+
+# read in whitelists
+def read_whitelist(key):
+    whitelist = open(os.path.join('whitelists', key)).read().splitlines()
+    return whitelist
