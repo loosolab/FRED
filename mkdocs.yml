@@ -1,7 +1,3 @@
-site_name: 'Metadata Organizer'
-site_description: 'TBA'
-site_author: 'Jasmin Walter'
-repo_url: 'https://gitlab.gwdg.de/loosolab/software/metadata-organizer'
-repo_name: 'GitLab'
-pages:
-- Home: 'index.md'
+site_name: MetaTools
+site_url: https://pages.gitlab.io/MetaTools
+site_dir: public
