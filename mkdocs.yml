@@ -1,3 +1,9 @@
 site_name: MetaTools
 site_url: https://loosolab.pages.gwdg.de/software/metadata-organizer/
 site_dir: public
+
+nav:
+    - Home: index.md
+    - Data structure: add_keys.md
+
+theme: readthedocs
