@@ -1,6 +1,7 @@
 import yaml
 import os
 
+
 # The following functions were copied from Mampok
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/utils.py
 
@@ -71,6 +72,7 @@ def find_values(node, kv):
             for x in find_values(j, kv):
                 yield x
 
+
 def get_keys_as_list(node, nested, pre=''):
     """
     generator to return all keys in dictionary that fit a given key value
@@ -87,7 +89,7 @@ def get_keys_as_list(node, nested, pre=''):
                     if nested:
                         test.append(pre + str(x))
                     else:
-                        yield pre + str(x)
+                        yield pre #+ str(x)
                 if nested:
                     yield test
         if not is_list_or_dict:
@@ -97,14 +99,31 @@ def get_keys_as_list(node, nested, pre=''):
             for x in get_keys_as_list(node[j], nested, pre + j + ':'):
                 yield x
     else:
-        yield pre #+ str(node)
+        yield pre #+ str(values)
+
+
+def get_keys_in_dict(node, res={}, pre=''):
+    if isinstance(node, dict):
+        for key in node:
+            res = get_keys_in_dict(node[key], res, pre + ':' + key if pre != '' else key)
+    elif isinstance(node, list):
+        for elem in node:
+            res = get_keys_in_dict(elem, res, pre)
+    else:
+        if pre in res:
+            res[pre].append(str(node))
+        else:
+            res[pre] = [str(node)]
+    return res
 
 
 # split string of list into list
 def split_str(s):
     splitted = s.split(':')
     keys = ':'.join(splitted[0:-1])
-    value = splitted[-1].replace('[','').replace(']','').replace('\'','').split(',')
+    value = splitted[-1].replace('[', '').replace(']', '').replace('\'',
+                                                                   '').split(
+        ',')
     return keys, value
 
 
@@ -113,13 +132,26 @@ def parse_list_to_dict(node):
     if isinstance(node, list):
         for i in range(len(node)):
             node[i] = parse_list_to_dict(node[i])
-        node = {'title': 'Information ' + node[0]['position'].split(':')[-2], 'desc' : 'TBA', 'input_fields': node}
+        node = {'title': 'Information ' + node[0]['position'].split(':')[-2],
+                'desc': 'TBA', 'input_fields': node}
     else:
         keys, value = split_str(node)
-        node={'position': keys, 'value': value, 'whitelist': None, 'displayName': keys.split(':')[-1], 'desc': 'TBA'}
+        node = {'position': keys, 'value': value, 'whitelist': None,
+                'displayName': keys.split(':')[-1], 'desc': 'TBA'}
     return node
+
 
 # read in whitelists
 def read_whitelist(key):
-    whitelist = open(os.path.join('whitelists', key)).read().splitlines()
+    try:
+        whitelist = open(os.path.join('whitelists', key)).read().splitlines()
+    except FileNotFoundError:
+        #print('No whitelist file for ' + key)
+        whitelist = None
     return whitelist
+
+
+def find_list_key(item, l):
+    for k in l.split(':'):
+        item = list(find_keys(item, k))
+    return item
