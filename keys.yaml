@@ -3,7 +3,7 @@
 # - True / False 										# is it a list?
 # - '<name>'											# description name
 # - '<description>'										# description text
-# - <value> / None / <parameters if isDict or isList>	# default value
+# - <value> / null / <parameters if isDict or isList>	# default value
 # - True / False										# whitelist (only if leaf)
 # - input type											# input type (only if leaf)
 # - data type											# data type (only if leaf)
@@ -19,7 +19,7 @@ project:
       - False
       - 'ID'
       - ''
-      - None
+      - null
       - False
       - input type
       - data type
@@ -28,7 +28,7 @@ project:
       - False
       - 'Project Name'
       - ''
-      - None
+      - null
       - False
       - input type
       - data type
@@ -37,7 +37,7 @@ project:
       - False
       - 'Date'
       - ''
-      - None
+      - null
       - False
       - input type
       - data type
@@ -51,7 +51,7 @@ project:
           - False
           - 'Name'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -60,7 +60,7 @@ project:
           - False
           - 'LDAP Name'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -69,7 +69,7 @@ project:
           - False
           - 'Department'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -78,7 +78,7 @@ project:
           - False
           - 'E-Mail'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -87,7 +87,7 @@ project:
           - False
           - 'Address'
           - ''
-          - None
+          - null
           - False
           - input type
           - data type
@@ -96,7 +96,7 @@ project:
           - False
           - 'Telephone'
           - ''
-          - None
+          - null
           - False
           - input type
           - data type
@@ -110,7 +110,7 @@ project:
           - False
           - 'Name'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -119,7 +119,7 @@ project:
           - False
           - 'LDAP Name'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -128,7 +128,7 @@ project:
           - False
           - 'Department'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -137,7 +137,7 @@ project:
           - False
           - 'E-Mail'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -146,7 +146,7 @@ project:
           - False
           - 'Address'
           - ''
-          - None
+          - null
           - False
           - input type
           - data type
@@ -155,7 +155,7 @@ project:
           - False
           - 'Telephone'
           - ''
-          - None
+          - null
           - False
           - input type
           - data type
@@ -164,7 +164,7 @@ project:
       - False
       - 'Description'
       - ''
-      - None
+      - null
       - False
       - input type
       - data type
@@ -173,7 +173,7 @@ project:
       - True
       - 'Further Description'
       - ''
-      - None
+      - null
       - False
       - input type
       - data type
@@ -182,7 +182,7 @@ project:
       - True
       - 'Graphical Abstract'
       - ''
-      - None
+      - null
       - False
       - input type
       - data type
@@ -202,7 +202,7 @@ experimental_setting:
           - False
           - 'Organism Name'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -211,7 +211,7 @@ experimental_setting:
           - False
           - 'Taxonomy ID'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -225,7 +225,7 @@ experimental_setting:
           - False
           - 'Factor'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -234,7 +234,7 @@ experimental_setting:
           - False
           - 'Value'
           - ''
-          - None
+          - null
           - True
           - input type
           - data type
@@ -248,7 +248,7 @@ experimental_setting:
           - False
           - 'Condition Name'
           - ''
-          - None
+          - null
           - False
           - input type
           - data type
@@ -262,7 +262,7 @@ experimental_setting:
               - False
               - 'Count'
               - ''
-              - None
+              - null
               - False
               - input type
               - data type
@@ -276,7 +276,7 @@ experimental_setting:
                   - False
                   - 'Sample Name'
                   - ''
-                  - None
+                  - null
                   - False
                   - input type
                   - data type
@@ -294,7 +294,7 @@ experimental_setting:
                   - False
                   - 'Genotype'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -303,7 +303,7 @@ experimental_setting:
                   - False
                   - 'Gender'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -312,7 +312,7 @@ experimental_setting:
                   - False
                   - 'Life stage'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -321,7 +321,7 @@ experimental_setting:
                   - False
                   - 'Age'
                   - ''
-                  - None
+                  - null
                   - False
                   - input type
                   - data type
@@ -330,7 +330,7 @@ experimental_setting:
                   - False
                   - 'Ethnicity'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -339,7 +339,7 @@ experimental_setting:
                   - False
                   - 'Tissue'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -348,7 +348,7 @@ experimental_setting:
                   - False
                   - 'Cell type'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -357,7 +357,7 @@ experimental_setting:
                   - False
                   - 'Gene'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -380,47 +380,33 @@ experimental_setting:
                       - True
                       - 'Disease'
                       - ''
-                      - status:
+                      - disease_status:
                           - 'optional'
                           - False
                           - 'Status'
                           - ''
-                          - None
+                          - null
                           - True
                           - input type
                           - data type
-                        type:
+                        disease_type:
                           - 'optional'
                           - False
                           - 'Type'
                           - ''
-                          - None
+                          - null
                           - True
                           - input type
                           - data type
-                        duration:
+                        stage:
                           - 'optional'
                           - False
-                          - 'Duration'
+                          - 'Stage'
                           - ''
-                          - duration_unit:
-                              - 'optional'
-                              - False
-                              - 'Unit'
-                              - ''
-                              - None
-                              - True
-                              - input type
-                              - data type
-                            duration_value:
-                              - 'optional'
-                              - False
-                              - 'Value'
-                              - ''
-                              - None
-                              - False
-                              - input type
-                              - data type
+                          - null
+                          - True
+                          - input type
+                          - data type
                 treatment_information:
                   - 'optional'
                   - False
@@ -440,21 +426,21 @@ experimental_setting:
                       - True
                       - 'Treatment'
                       - ''
-                      - status:
+                      - treatment_status:
                           - 'optional'
                           - False
                           - 'Status'
                           - ''
-                          - None
+                          - null
                           - True
                           - input type
                           - data type
-                        type:
+                        treatment_type:
                           - 'optional'
                           - False
                           - 'Type'
                           - ''
-                          - None
+                          - null
                           - True
                           - input type
                           - data type
@@ -468,7 +454,7 @@ experimental_setting:
                               - False
                               - 'Unit'
                               - ''
-                              - None
+                              - null
                               - True
                               - input type
                               - data type
@@ -477,7 +463,7 @@ experimental_setting:
                               - False
                               - 'Value'
                               - ''
-                              - None
+                              - null
                               - False
                               - input type
                               - data type
@@ -486,7 +472,7 @@ experimental_setting:
                   - False
                   - 'Time Point'
                   - ''
-                  - None
+                  - null
                   - False
                   - input type
                   - data type
@@ -495,7 +481,7 @@ experimental_setting:
                   - False
                   - 'Flow'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -518,7 +504,7 @@ experimental_setting:
               - False
               - 'Count'
               - ''
-              - None
+              - null
               - False
               - input type
               - data type
@@ -532,7 +518,7 @@ experimental_setting:
                   - False
                   - 'Sample Name'
                   - ''
-                  - None
+                  - null
                   - False
                   - input type
                   - data type
@@ -550,7 +536,7 @@ experimental_setting:
                   - False
                   - 'Genotype'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -559,7 +545,7 @@ experimental_setting:
                   - False
                   - 'Gender'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -568,7 +554,7 @@ experimental_setting:
                   - False
                   - 'Life stage'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -577,7 +563,7 @@ experimental_setting:
                   - False
                   - 'Age'
                   - ''
-                  - None
+                  - null
                   - False
                   - input type
                   - data type
@@ -586,7 +572,7 @@ experimental_setting:
                   - False
                   - 'Ethnicity'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -595,7 +581,7 @@ experimental_setting:
                   - False
                   - 'Tissue'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -604,7 +590,7 @@ experimental_setting:
                   - False
                   - 'Cell type'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -613,7 +599,7 @@ experimental_setting:
                   - False
                   - 'Gene'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -636,47 +622,33 @@ experimental_setting:
                       - True
                       - 'Disease'
                       - ''
-                      - status:
+                      - disease_status:
                           - 'optional'
                           - False
                           - 'Status'
                           - ''
-                          - None
+                          - null
                           - True
                           - input type
                           - data type
-                        type:
+                        disease_type:
                           - 'optional'
                           - False
                           - 'Type'
                           - ''
-                          - None
+                          - null
                           - True
                           - input type
                           - data type
-                        duration:
+                        stage:
                           - 'optional'
                           - False
-                          - 'Duration'
+                          - 'Stage'
                           - ''
-                          - duration_unit:
-                              - 'optional'
-                              - False
-                              - 'Unit'
-                              - ''
-                              - None
-                              - True
-                              - input type
-                              - data type
-                            duration_value:
-                              - 'optional'
-                              - False
-                              - 'Value'
-                              - ''
-                              - None
-                              - False
-                              - input type
-                              - data type
+                          - null
+                          - True
+                          - input type
+                          - data type
                 treatment_information:
                   - 'optional'
                   - False
@@ -696,21 +668,21 @@ experimental_setting:
                       - True
                       - 'Treatment'
                       - ''
-                      - status:
+                      - treatment_status:
                           - 'optional'
                           - False
                           - 'Status'
                           - ''
-                          - None
+                          - null
                           - True
                           - input type
                           - data type
-                        type:
+                        treatment_type:
                           - 'optional'
                           - False
                           - 'Type'
                           - ''
-                          - None
+                          - null
                           - True
                           - input type
                           - data type
@@ -724,7 +696,7 @@ experimental_setting:
                               - False
                               - 'Unit'
                               - ''
-                              - None
+                              - null
                               - True
                               - input type
                               - data type
@@ -733,7 +705,7 @@ experimental_setting:
                               - False
                               - 'Value'
                               - ''
-                              - None
+                              - null
                               - False
                               - input type
                               - data type
@@ -742,7 +714,7 @@ experimental_setting:
                   - False
                   - 'Time Point'
                   - ''
-                  - None
+                  - null
                   - False
                   - input type
                   - data type
@@ -751,7 +723,7 @@ experimental_setting:
                   - False
                   - 'Flow'
                   - ''
-                  - None
+                  - null
                   - True
                   - input type
                   - data type
@@ -775,7 +747,7 @@ experiment:
       - False
       - 'Technique'
       - ''
-      - None
+      - null
       - True
       - input type
       - data type
@@ -789,7 +761,7 @@ experiment:
           - True
           - 'Sample preparation'
           - ''
-          - None
+          - null
           - False
           - input type
           - data type
@@ -798,7 +770,7 @@ experiment:
           - True
           - 'Further description'
           - ''
-          - None
+          - null
           - False
           - input type
           - data type
@@ -812,7 +784,7 @@ experiment:
               - False
               - 'Date'
               - ''
-              - None
+              - null
               - False
               - input type
               - data type
@@ -821,7 +793,7 @@ experiment:
               - False
               - 'Reference Genome'
               - ''
-              - None
+              - null
               - True
               - input type
               - data type
@@ -830,7 +802,7 @@ experiment:
               - True
               - 'Parameters'
               - ''
-              - None
+              - null
               - False
               - input type
               - data type
@@ -839,7 +811,7 @@ experiment:
               - False
               - 'Output'
               - ''
-              - None
+              - null
               - False
               - input type
               - data type
