@@ -21,8 +21,8 @@ project:
       - ''
       - null
       - False
-      - input type
-      - data type
+      - short_text
+      - str
     project_name:
       - 'mandatory'
       - False
@@ -30,8 +30,8 @@ project:
       - ''
       - null
       - False
-      - input type
-      - data type
+      - short_text
+      - str
     date:
       - 'mandatory'
       - False
@@ -39,8 +39,8 @@ project:
       - ''
       - null
       - False
-      - input type
-      - data type
+      - date
+      - date
     owner:
       - 'mandatory'
       - True
@@ -53,8 +53,8 @@ project:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         ldap_name:
           - 'mandatory'
           - False
@@ -62,8 +62,8 @@ project:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         department:
           - 'mandatory'
           - False
@@ -71,8 +71,8 @@ project:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         email:
           - 'mandatory'
           - False
@@ -80,8 +80,8 @@ project:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         address:
           - 'optional'
           - False
@@ -89,8 +89,8 @@ project:
           - ''
           - null
           - False
-          - input type
-          - data type
+          - short_text
+          - str
         telephone:
           - 'optional'
           - False
@@ -98,8 +98,8 @@ project:
           - ''
           - null
           - False
-          - input type
-          - data type
+          - short_text
+          - str
     nerd:
       - 'optional'
       - True
@@ -112,8 +112,8 @@ project:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         ldap_name:
           - 'mandatory'
           - False
@@ -121,8 +121,8 @@ project:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         department:
           - 'mandatory'
           - False
@@ -130,8 +130,8 @@ project:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         email:
           - 'mandatory'
           - False
@@ -139,8 +139,8 @@ project:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         address:
           - 'optional'
           - False
@@ -148,8 +148,8 @@ project:
           - ''
           - null
           - False
-          - input type
-          - data type
+          - short_text
+          - str
         telephone:
           - 'optional'
           - False
@@ -157,8 +157,8 @@ project:
           - ''
           - null
           - False
-          - input type
-          - data type
+          - short_text
+          - str
     description:
       - 'mandatory'
       - False
@@ -166,8 +166,8 @@ project:
       - ''
       - null
       - False
-      - input type
-      - data type
+      - long_text
+      - str
     further_description:
       - 'optional'
       - True
@@ -175,8 +175,8 @@ project:
       - ''
       - null
       - False
-      - input type
-      - data type
+      - short_text
+      - str
     graphical_abstract:
       - 'optional'
       - True
@@ -184,8 +184,8 @@ project:
       - ''
       - null
       - False
-      - input type
-      - data type
+      - short_text
+      - str
 
 experimental_setting:
   - 'mandatory'
@@ -204,8 +204,8 @@ experimental_setting:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         taxonomy_id:
           - 'mandatory'
           - False
@@ -213,8 +213,8 @@ experimental_setting:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
     experimental_factors:
       - 'mandatory'
       - True
@@ -227,8 +227,8 @@ experimental_setting:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
         value:
           - 'mandatory'
           - False
@@ -236,8 +236,8 @@ experimental_setting:
           - ''
           - null
           - True
-          - input type
-          - data type
+          - short_text
+          - str
     conditions:
       - 'mandatory'
       - True
@@ -250,8 +250,8 @@ experimental_setting:
           - ''
           - null
           - False
-          - input type
-          - data type
+          - short_text
+          - str
         biological_replicates:
           - 'optional'
           - False
@@ -264,8 +264,8 @@ experimental_setting:
               - ''
               - null
               - False
-              - input type
-              - data type
+              - number
+              - int
             samples:
               - 'optional'
               - True
@@ -278,8 +278,8 @@ experimental_setting:
                   - ''
                   - null
                   - False
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 pooled:
                   - 'mandatory'
                   - False
@@ -287,8 +287,8 @@ experimental_setting:
                   - ''
                   - False
                   - False
-                  - input type
-                  - data type
+                  - short_text
+                  - bool
                 genotype:
                   - 'optional'
                   - False
@@ -296,8 +296,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 gender:
                   - 'optional'
                   - False
@@ -305,8 +305,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 life_stage:
                   - 'optional'
                   - False
@@ -314,8 +314,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 age:
                   - 'optional'
                   - False
@@ -323,8 +323,8 @@ experimental_setting:
                   - ''
                   - null
                   - False
-                  - input type
-                  - data type
+                  - number
+                  - int
                 ethnicity:
                   - 'optional'
                   - False
@@ -332,8 +332,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 tissue:
                   - 'optional'
                   - False
@@ -341,8 +341,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 cell_type:
                   - 'optional'
                   - False
@@ -350,8 +350,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 gene:
                   - 'optional'
                   - False
@@ -359,8 +359,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 disease_information:
                   - 'optional'
                   - False
@@ -373,8 +373,8 @@ experimental_setting:
                       - ''
                       - True
                       - False
-                      - input type
-                      - data type
+                      - short_text
+                      - bool
                     disease:
                       - 'optional'
                       - True
@@ -387,8 +387,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                         disease_type:
                           - 'optional'
                           - False
@@ -396,8 +396,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                         stage:
                           - 'optional'
                           - False
@@ -405,8 +405,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                 treatment_information:
                   - 'optional'
                   - False
@@ -419,8 +419,8 @@ experimental_setting:
                       - ''
                       - False
                       - False
-                      - input type
-                      - data type
+                      - short_text
+                      - bool
                     treatment:
                       - 'optional'
                       - True
@@ -433,8 +433,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                         treatment_type:
                           - 'optional'
                           - False
@@ -442,8 +442,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                         duration:
                           - 'optional'
                           - False
@@ -456,8 +456,8 @@ experimental_setting:
                               - ''
                               - null
                               - True
-                              - input type
-                              - data type
+                              - short_text
+                              - str
                             duration_value:
                               - 'optional'
                               - False
@@ -465,8 +465,8 @@ experimental_setting:
                               - ''
                               - null
                               - False
-                              - input type
-                              - data type
+                              - number
+                              - int
                 time_point:
                   - 'optional'
                   - False
@@ -474,8 +474,8 @@ experimental_setting:
                   - ''
                   - null
                   - False
-                  - input type
-                  - data type
+                  - number
+                  - float
                 flow:
                   - 'optional'
                   - False
@@ -483,8 +483,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 donor_count:
                   - 'mandatory'
                   - False
@@ -492,8 +492,8 @@ experimental_setting:
                   - ''
                   - 1
                   - False
-                  - input type
-                  - data type
+                  - number
+                  - int
         technical_replicates:
           - 'optional'
           - False
@@ -506,8 +506,8 @@ experimental_setting:
               - ''
               - null
               - False
-              - input type
-              - data type
+              - number
+              - int
             samples:
               - 'optional'
               - True
@@ -520,8 +520,8 @@ experimental_setting:
                   - ''
                   - null
                   - False
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 pooled:
                   - 'mandatory'
                   - False
@@ -529,8 +529,8 @@ experimental_setting:
                   - ''
                   - False
                   - False
-                  - input type
-                  - data type
+                  - short_text
+                  - bool
                 genotype:
                   - 'optional'
                   - False
@@ -538,8 +538,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 gender:
                   - 'optional'
                   - False
@@ -547,8 +547,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 life_stage:
                   - 'optional'
                   - False
@@ -556,8 +556,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 age:
                   - 'optional'
                   - False
@@ -565,8 +565,8 @@ experimental_setting:
                   - ''
                   - null
                   - False
-                  - input type
-                  - data type
+                  - number
+                  - int
                 ethnicity:
                   - 'optional'
                   - False
@@ -574,8 +574,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 tissue:
                   - 'optional'
                   - False
@@ -583,8 +583,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 cell_type:
                   - 'optional'
                   - False
@@ -592,8 +592,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 gene:
                   - 'optional'
                   - False
@@ -601,8 +601,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 disease_information:
                   - 'optional'
                   - False
@@ -615,8 +615,8 @@ experimental_setting:
                       - ''
                       - True
                       - False
-                      - input type
-                      - data type
+                      - short_text
+                      - bool
                     disease:
                       - 'optional'
                       - True
@@ -629,8 +629,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                         disease_type:
                           - 'optional'
                           - False
@@ -638,8 +638,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                         stage:
                           - 'optional'
                           - False
@@ -647,8 +647,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                 treatment_information:
                   - 'optional'
                   - False
@@ -661,8 +661,8 @@ experimental_setting:
                       - ''
                       - False
                       - False
-                      - input type
-                      - data type
+                      - short_text
+                      - bool
                     treatment:
                       - 'optional'
                       - True
@@ -675,8 +675,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                         treatment_type:
                           - 'optional'
                           - False
@@ -684,8 +684,8 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - input type
-                          - data type
+                          - short_text
+                          - str
                         duration:
                           - 'optional'
                           - False
@@ -698,8 +698,8 @@ experimental_setting:
                               - ''
                               - null
                               - True
-                              - input type
-                              - data type
+                              - short_text
+                              - str
                             duration_value:
                               - 'optional'
                               - False
@@ -707,8 +707,8 @@ experimental_setting:
                               - ''
                               - null
                               - False
-                              - input type
-                              - data type
+                              - number
+                              - int
                 time_point:
                   - 'optional'
                   - False
@@ -716,8 +716,8 @@ experimental_setting:
                   - ''
                   - null
                   - False
-                  - input type
-                  - data type
+                  - number
+                  - float
                 flow:
                   - 'optional'
                   - False
@@ -725,8 +725,8 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - input type
-                  - data type
+                  - short_text
+                  - str
                 donor_count:
                   - 'mandatory'
                   - False
@@ -734,8 +734,8 @@ experimental_setting:
                   - ''
                   - 1
                   - False
-                  - input type
-                  - data type
+                  - number
+                  - int
 
 experiment:
   - 'mandatory'
@@ -749,8 +749,8 @@ experiment:
       - ''
       - null
       - True
-      - input type
-      - data type
+      - short_text
+      - str
     analysis:
       - 'optional'
       - False
@@ -763,8 +763,8 @@ experiment:
           - ''
           - null
           - False
-          - input type
-          - data type
+          - short_text
+          - str
         further_description:
           - 'optional'
           - True
@@ -772,8 +772,8 @@ experiment:
           - ''
           - null
           - False
-          - input type
-          - data type
+          - short_text
+          - str
         runs:
           - 'optional'
           - True
@@ -786,8 +786,8 @@ experiment:
               - ''
               - null
               - False
-              - input type
-              - data type
+              - date
+              - date
             reference_genome:
               - 'optional'
               - False
@@ -795,8 +795,8 @@ experiment:
               - ''
               - null
               - True
-              - input type
-              - data type
+              - short_text
+              - str
             parameters:
               - 'optional'
               - True
@@ -804,8 +804,8 @@ experiment:
               - ''
               - null
               - False
-              - input type
-              - data type
+              - short_text
+              - str
             output:
               - 'optional'
               - False
@@ -813,5 +813,5 @@ experiment:
               - ''
               - null
               - False
-              - input type
-              - data type
+              - short_text
+              - str
