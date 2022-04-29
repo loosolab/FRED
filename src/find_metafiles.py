@@ -13,11 +13,11 @@ def find_projects(metafile, search, return_dict):
     :param metafile: a read in yaml file (as dictionary)
     :param search_parameters: a nested list - elements in outer list are linked
     via 'or' and the elements within the inner lists are linked via 'and';
-    e.g. [['id:pul47','name:Jasmin Walter'],['id:shu27']] means
-    ('id:pul47' and 'name:Jasmin Walter') or 'id:shu27
+    e.g. [['input_id:pul47','name:Jasmin Walter'],['input_id:shu27']] means
+    ('input_id:pul47' and 'name:Jasmin Walter') or 'input_id:shu27
     :param return_dict: bool: if True, whole dictionary is returned,
     if False path of dictionary is returned
-    :return: a dictionary containing all matches, key=id, value=dictionary or
+    :return: a dictionary containing all matches, key=input_id, value=dictionary or
     path depending on return_dict
     """
     # split parameters linked via or into list
