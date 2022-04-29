@@ -1,7 +1,7 @@
 import argparse
 import pathlib
 from src import metaTools_functions
-
+from src import generate
 
 def find(args):
     """
@@ -20,7 +20,7 @@ def add(args):
 
 
 def create(args):
-    print('TBA')
+    generate.generate_file(args.id, args.name, args.mandatory_only)
 
 
 def main():
@@ -50,6 +50,12 @@ def main():
                                                  'create a metadata file.')
     create_function.add_argument('-p', '--path', type=pathlib.Path,
                                  help='The path to save the yaml')
+    create_function.add_argument('-id', '--id', type=str,
+                                 help='The ID of the experiment')
+    create_function.add_argument('-n', '--name', type=str,
+                                 help='The name of the experiment')
+    create_function.add_argument('-mo', '--mandatory_only', default=False, action='store_true',
+                                 help='If True, only mandatory keys will be filled out')
     add_function.add_argument('-d', '--dict', type=str, nargs='+',
                               help='The dictionary to be saved as yaml')
     create_function.set_defaults(func=create)

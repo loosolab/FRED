@@ -14,7 +14,7 @@ def find(dir_path, search, return_dict):
     and 'not'
     :param return_dict: bool: if True, whole dictionary is returned,
     if False path of dictionary is returned
-    :return: result: a dictionary containing all matches, key=id,
+    :return: result: a dictionary containing all matches, key=input_id,
     value=dictionary or path depending on return_dict
     """
 
@@ -45,7 +45,7 @@ def find(dir_path, search, return_dict):
             else:
                 sub += letter
         if sub_list == 'True':
-            result.append({metafile['project']['id']: metafile['path'] if
+            result.append({metafile['project']['input_id']: metafile['path'] if
             return_dict == False else metafile})
     return result
 
