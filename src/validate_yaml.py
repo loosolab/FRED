@@ -46,7 +46,7 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     :param invalid_values:
     """
     try:
-        id = metafile['project']['id']
+        id = metafile['project']['input_id']
     except KeyError:
         id = 'missing'
     invalid_entries = '\n- '.join(invalid_keys)
