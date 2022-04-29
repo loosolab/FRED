@@ -8,7 +8,6 @@
 # - input type											# input type (only if leaf)
 # - data type											# data type (only if leaf)
 
-
 project:
   - 'mandatory'
   - False
@@ -43,7 +42,7 @@ project:
       - date
     owner:
       - 'mandatory'
-      - True
+      - False
       - 'Owner'
       - ''
       - name:
