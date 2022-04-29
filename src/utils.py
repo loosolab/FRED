@@ -143,13 +143,22 @@ def parse_list_to_dict(node):
 
 # read in whitelists
 def read_whitelist(key):
+    if key == 'value':
+        whitelist = {}
+        factors = read_in_whitelist('factor')
+        for factor in factors:
+            whitelist[factor] = read_in_whitelist(factor)
+    else:
+        whitelist = read_in_whitelist(key)
+    return whitelist
+
+def read_in_whitelist(key):
     try:
         whitelist = open(os.path.join('whitelists', key)).read().splitlines()
     except FileNotFoundError:
         #print('No whitelist file for ' + key)
         whitelist = None
     return whitelist
-
 
 def find_list_key(item, l):
     for k in l.split(':'):
