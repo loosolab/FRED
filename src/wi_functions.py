@@ -1,5 +1,5 @@
-from src import utils
-from src import generate
+import utils
+import generate
 # This script contains all functions for generation of objects for the web
 # interface
 
