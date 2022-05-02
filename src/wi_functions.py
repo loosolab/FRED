@@ -1,5 +1,5 @@
-import utils
-import generate
+import metadata-organizer/src/utils
+import metadata-organizer/src/generate
 # This script contains all functions for generation of objects for the web
 # interface
 
