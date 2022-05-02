@@ -1,5 +1,5 @@
-from metadata-organizer/src import utils
-from metadata-organizer/src import generate
+from metadata-organizer.src import utils
+from metadata-organizer.src import generate
 # This script contains all functions for generation of objects for the web
 # interface
 
