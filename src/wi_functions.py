@@ -1,3 +1,5 @@
+import sys
+sys.path.append('metadata-organizer')
 import src.utils as utils
 import src.generate as generate
 # This script contains all functions for generation of objects for the web
