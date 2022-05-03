@@ -1,12 +1,9 @@
 import src.utils as utils
-from src import validate_yaml
+import src.validate_yaml as validate_yaml
 import datetime
 
-project_id = ''
-project_name = ''
-pooled = False
 factor = []
-not_editable = ['sample_name', 'pooled', 'donor_count']
+not_editable = ['id', 'project_name', 'sample_name', 'pooled', 'donor_count']
 
 
 # TODO test if file exists for ID
@@ -20,59 +17,98 @@ def generate_file(input_id, name, mandatory_mode):
     :param name: the name of the experiment
     :param mandatory_mode: if True only mandatory files are filled out
     """
-    global project_id
-    project_id = input_id
-    global project_name
-    project_name = name
+
     key_yaml = utils.read_in_yaml('keys.yaml')
-    result_dict = {}
+    result_dict = {'project': {'id': input_id, 'project_name': name}}
 
     for item in key_yaml:
-        result_dict[item] = generate_part(key_yaml[item], item, {}, False, mandatory_mode)
-    print(result_dict)
+        if item in result_dict:
+            result_dict[item] = {**result_dict[item],
+                                 **get_redo_value(key_yaml[item], item, False,
+                                                  mandatory_mode)}
+        else:
+            result_dict[item] = get_redo_value(key_yaml[item], item, False,
+                                               mandatory_mode)
+    #valid, missing_mandatory_keys, invalid_keys, \
+    #invalid_entries = validate_yaml.validate_file(result_dict)
+    #if not valid:
+    #    validate_yaml.print_validation_report(
+    #        result_dict, missing_mandatory_keys, invalid_keys,
+    #        invalid_entries)
+    utils.save_as_yaml(result_dict, f'{input_id}_metadata.yaml')
 
 
 def generate_part(node, key, return_dict, optional, mandatory_mode):
-
-    if key == 'id':
-        return project_id
-    elif key == 'project_name':
-        return project_name
-    #elif key == 'donor_count':
-    #    if pooled:
-    #        return(enter_information(node, key, return_dict, optional, mandatory_mode))
-    #    else:
-    #        return 1
-
-    elif isinstance(node, dict):
+    if isinstance(node, dict):
         optionals = []
         for item in node:
             optional = False
             if item == 'conditions':
-                return_dict[item] = get_conditions(return_dict['experimental_factors'], node[item][4], mandatory_mode)
+                return_dict[item] = get_conditions(
+                    return_dict['experimental_factors'], node[item][4],
+                    mandatory_mode)
             elif item == 'experimental_factors':
-                return_dict[item] = get_experimental_factors()
-            elif node[item][0] == 'mandatory' and item not in not_editable:
-                return_dict[item] = get_redo_value(node[item], item, optional, mandatory_mode)
-            else:
-                if item not in factor and item not in not_editable:
-                    optionals.append(item)
+                return_dict[item] = get_experimental_factors(node)
+            elif item not in not_editable:
+                if node[item][0] == 'mandatory':
+                    return_dict[item] = get_redo_value(node[item], item,
+                                                       optional,
+                                                       mandatory_mode)
+                else:
+                    if item not in factor:
+                        optionals.append(item)
         if len(optionals) > 0 and mandatory_mode == False:
             optional = True
-            print_optionals = "\n".join([f"{i+1}: {optionals[i]}" for i in range(len(optionals))])
-            print(f'Do you want to add any of the following optional keys? (1,...,{len(optionals)} or n)\n'
-                  f'{print_optionals}')
-            o = input()
-            if o != 'n':
-                options = [optionals[int(i.strip()) - 1] for i in o.split(',')]
+            print(
+                f'Do you want to add any of the following optional keys? '
+                f'(1,...,{len(optionals)} or n)\n')
+            print_option_list(optionals)
+            options = parse_input_list(optionals, True)
+            if options:
                 for option in options:
-                    return_dict[option] = get_redo_value(node[option], option, optional, mandatory_mode)
-            print("I'm done!")
+                    return_dict[option] = get_redo_value(node[option], option,
+                                                         optional,
+                                                         mandatory_mode)
     else:
         if node[0] == 'mandatory' or optional:
-            value = enter_information(node, key, return_dict, optional, mandatory_mode)
+            value = enter_information(node, key, return_dict, optional,
+                                      mandatory_mode)
             return value
     return return_dict
+
+
+def print_option_list(options):
+    print_options = "\n".join(
+                [f"{i + 1}: {options[i]}" for i in range(len(options))])
+    print(f'{print_options}')
+
+
+def parse_input_list(options, terminable):
+    input_list = input()
+    if terminable and input_list.lower() == 'n':
+        return None
+    else:
+        if isinstance(options, list):
+            try:
+                input_list = [options[int(i.strip())-1] for i in
+                              input_list.split(',')]
+            except (IndexError, ValueError) as e:
+                print(f'Invalid entry, try again:')
+                input_list = parse_input_list(options, terminable)
+        else:
+            try:
+                input_list = [x.strip() for x in input_list.split(',')]
+                if options == 'int':
+                    for i in range(len(input_list)):
+                        input_list[i] = int(input_list[i])
+                elif options == 'float':
+                    for i in range(len(input_list)):
+                        input_list[i] = float(input_list[i])
+            except (ValueError, IndexError) as e:
+                print(f'Invalid entry. Please enter {options} numbers divided '
+                      f'by comma.')
+                input_list = parse_input_list(options, terminable)
+    return input_list
 
 
 def get_redo_value(node, item, optional, mandatory_mode):
@@ -80,44 +116,56 @@ def get_redo_value(node, item, optional, mandatory_mode):
         redo = True
         value = []
         while redo:
-            print('I\'m on!')
             value.append(
                 generate_part(node, item, {}, optional, mandatory_mode))
-            print(f'Do you want to add another {item}? (y/n)')
-            redo = True if input() == 'y' else False
+            print(f'Do you want to add another {item}?')
+            print_option_list(['Yes', 'No'])
+            redo = parse_list_choose_one([True, False])
     else:
         value = generate_part(node, item, {}, optional, mandatory_mode)
     return value
 
-# TODO: test for input
-def get_experimental_factors():
+
+def get_experimental_factors(node):
     factor_list = utils.read_whitelist('factor')
-    factors = '\n'.join([f'{i+1}: {factor_list[i]}' for i in range(len(factor_list))])
-    print(f'Please select the analyzed experimental factors (1-{len(factor_list)}) divided by comma:\n'
-          f'{factors}')
-    used_factors = input()
+    print(
+        f'Please select the analyzed experimental factors '
+        f'(1-{len(factor_list)}) divided by comma:\n')
+    print_option_list(factor_list)
+    used_factors = parse_input_list(factor_list, False)
+
     experimental_factors = []
-    for i in used_factors.split(','):
-        factor_value = {'factor': factor_list[int(i.strip()) - 1]}
-        value_list = utils.read_whitelist(factor_value['factor'])
-        values = '\n'.join([f'{i+1}: {value_list[i]}' for i in range(len(value_list))])
-        print(
-            f'Please select the values for experimental factor {factor_value["factor"]} (1-{len(value_list)}) divided by comma:\n'
-            f'{values}')
-        used_values = [value_list[int(i.strip())-1] for i in input().split(',')]
+    for fac in used_factors:
+        factor_value = {'factor': fac}
+        fac_node = list(utils.find_keys(node, fac))[0]
+        if fac_node[5]:
+            value_list = utils.read_whitelist(fac)
+            print(
+                f'Please select the values for experimental factor '
+                f'{factor_value["factor"]} (1-{len(value_list)}) divided by '
+                f'comma:\n')
+            print_option_list(value_list)
+            used_values = parse_input_list(value_list, False)
+        else:
+            value_type = fac_node[7]
+            print(f'Please enter a list of {value_type} values divided by '
+                  f'comma:\n')
+            used_values = parse_input_list(value_type, False)
         factor_value['value'] = used_values
         experimental_factors.append(factor_value)
+
     global factor
-    factor = [x['factor'] for x in experimental_factors]
+    factor = used_factors
     return experimental_factors
 
 
 def get_conditions(factors, node, mandatory_mode):
     combinations = get_condition_combinations(factors)
-    print_combinations = '\n'.join([f'{i+1}: {combinations[i]}' for i in range(len(combinations))])
-    print(f'Please select the analyzed combinations of experimental factors (1-{len(combinations)}) divided by comma:\n'
-          f'{print_combinations}')
-    used_combinations = [combinations[int(i.strip()) - 1] for i in input().split(',')]
+    print(
+        f'Please select the analyzed combinations of experimental factors '
+        f'(1-{len(combinations)}) divided by comma:\n')
+    print_option_list(combinations)
+    used_combinations = parse_input_list(combinations, False)
     conditions = get_replicate_count(used_combinations, node, mandatory_mode)
     return conditions
 
@@ -128,36 +176,43 @@ def get_replicate_count(conditions, node, mandatory_mode):
     for condition in conditions:
         print(f'{"".center(80, "_")}\n\n'
               f'{f"Condition: {condition}".center(80, " ")}\n'
-              f'{"".center(80, "_")}\n'
+              f'{"".center(80, "_")}\n\n'
               f'Please enter the number of replicates:')
-        bio = int(input('biological replicates: '))
-        tech = int(input('technical replicates: '))
+        bio = parse_input_value('biological replicates', False, 'int')
+        tech = parse_input_value('technical replicates', False, 'int')
         if bio > 0 or tech > 0:
-            print(f'Are the samples pooled? (y/n)')
-            input_pooled = True if input() == 'y' else False
-        condition_infos.append(get_replicates(condition, bio, tech, input_pooled, node, mandatory_mode))
+            print(f'Are the samples pooled?')
+            print_option_list(['Yes', 'No'])
+            input_pooled = parse_list_choose_one([True, False])
+        condition_infos.append(
+            get_replicates(condition, bio, tech, input_pooled, node,
+                           mandatory_mode))
     return condition_infos
 
-# TODO: technical replicates
-# TODO: test for input
-# TODO: Node rau + extra Funktion für replicates
+
 def get_replicates(condition, bio, tech, input_pooled, node, mandatory_mode):
     replicates = {'condition_name': condition}
 
     if bio > 0:
-        print(f'{"".center(80,"_")}\n\n'
-              f'\033[1m{"Biological Replicates".center(80," ")}\033[0m\n')
-        replicates['biological_replicates'] = fill_replicates('biological_replicates', condition, 1, bio+1, input_pooled, node, mandatory_mode)
+        print(f'{"".center(80, "_")}\n\n'
+              f'\033[1m{"Biological Replicates".center(80, " ")}\033[0m\n')
+        replicates['biological_replicates'] = fill_replicates(
+            'biological_replicates', condition, 1, bio + 1, input_pooled, node,
+            mandatory_mode)
 
     if tech > 0:
         print(f'{"".center(80, "_")}\n\n'
               f'\033[1m{"Technical Replicates".center(80, " ")}\033[0m\n')
-        replicates['technical_replicates'] = fill_replicates('technical_replicates', condition, bio+1, bio+tech+1, input_pooled, node, mandatory_mode)
+        replicates['technical_replicates'] = fill_replicates(
+            'technical_replicates', condition, bio + 1, bio + tech + 1,
+            input_pooled, node, mandatory_mode)
     return replicates
 
-def fill_replicates(type, condition, start, end, input_pooled, node, mandatory_mode):
+
+def fill_replicates(type, condition, start, end, input_pooled, node,
+                    mandatory_mode):
     conditions = condition.split('-')
-    replicates = {'count': end-start, 'samples': []}
+    replicates = {'count': end - start, 'samples': []}
     for i in range(start, end):
         samples = {}
         sample_name = f'{condition}_{i}'
@@ -165,16 +220,19 @@ def fill_replicates(type, condition, start, end, input_pooled, node, mandatory_m
         print(f'{f"Sample: {sample_name}".center(80, "-")}\n')
         samples['pooled'] = input_pooled
         if input_pooled:
-            donor_count = input('donor_count:')
+            donor_count = parse_input_value('donor_count', False, 'int')
         else:
             donor_count = 1
         samples['donor_count'] = donor_count
         for cond in conditions:
             key_val = cond.split(':')
             samples[key_val[0]] = key_val[1]
-        samples = {**samples, **generate_part(node[type][4]['samples'][4], 'samples', {}, False, mandatory_mode)}
+        samples = {**samples,
+                   **generate_part(node[type][4]['samples'][4], 'samples', {},
+                                   False, mandatory_mode)}
         replicates['samples'].append(samples)
     return replicates
+
 
 def get_condition_combinations(factors):
     """
@@ -187,7 +245,7 @@ def get_condition_combinations(factors):
     for i in range(len(factors)):
         for value in factors[i]['value']:
             combinations.append(f'{factors[i]["factor"]}:{value}')
-            for j in range(i+1,len(factors)):
+            for j in range(i + 1, len(factors)):
                 comb = get_condition_combinations(factors[j:])
                 for c in comb:
                     combinations.append(f'{factors[i]["factor"]}:{value}-{c}')
@@ -197,47 +255,56 @@ def get_condition_combinations(factors):
 def enter_information(node, key, return_dict, optional, mandatory_mode):
     if isinstance(node[4], dict):
         print(f'Please enter information about the {key}')
-        return generate_part(node[4], key, return_dict, optional, mandatory_mode)
+        return generate_part(node[4], key, return_dict, optional,
+                             mandatory_mode)
     else:
-        return get_input(key, node[5], node[1], node[7])
+        return parse_input_value(key, node[5], node[7])
 
 
-def get_input(key, whitelist, bool_list, type):
-    value = user_input(key, whitelist, type)
+def parse_list_choose_one(whitelist):
+    try:
+        value = whitelist[int(input())-1]
+    except (IndexError, ValueError) as e:
+        print(f'Invalid entry. Please enter a number between 1 and '
+              f'{len(whitelist)}')
+        value = parse_list_choose_one(whitelist)
     return value
 
 
-def user_input(key, whitelist, type):
+def parse_input_value(key, whitelist, value_type):
     whites = None
     if whitelist:
         whites = utils.read_whitelist(key)
     if whites:
-        w_list = '\n'.join([f'{i+1}: {whites[i]}' for i in range(len(whites))])
-        print(f'{key}:\n'
-              f'{w_list}')
-        value = whites[int(input())-1]
+        print_option_list(whites)
+        input_value = parse_list_choose_one(whites)
     else:
-        value = input(f'{key}: ')
-    value, invalid = test_for_value(value, type)
-    if invalid:
-        print(f'Invalid entry')
-        value = user_input(key, whitelist, type)
-    return value
-
-
-def test_for_value(value, type):
-    invalid = None
-    if type == 'int':
-        value = int(value)
-    elif type == 'float':
-        value = float(value)
-    elif type == 'date':
-        try:
-            input_date = value.split('.')
-            if len(input_date)!=3:
-                raise SyntaxError
-            value = datetime.date(int(input_date[2]),int(input_date[1]), int(input_date[0]))
-            value = value.strftime("%d.%m.%Y")
-        except IndexError and ValueError and SyntaxError:
-            invalid = 'Invalid entry for date'
-    return value, invalid
+        input_value = input(f'{key}: ')
+        if input_value == '':
+            print(f'Please enter something.')
+            input_value = parse_input_value(key, whitelist, value_type)
+        if value_type == 'int':
+            try:
+                input_value = int(input_value)
+            except ValueError:
+                print(f'Input must be of type int. Try again.')
+                input_value = parse_input_value(key, whitelist, value_type)
+        elif value_type == 'float':
+            try:
+                input_value = float(input_value)
+            except ValueError:
+                print(f'Input must be of type float. Try again.')
+                input_value = parse_input_value(key, whitelist, value_type)
+        elif value_type == 'date':
+            try:
+                input_date = input_value.split('.')
+                if len(input_date) != 3:
+                    raise SyntaxError
+                input_value = datetime.date(int(input_date[2]),
+                                            int(input_date[1]),
+                                            int(input_date[0]))
+                input_value = input_value.strftime("%d.%m.%Y")
+            except (IndexError, ValueError, SyntaxError) as e:
+                print(f'Input must be of type \'DD.MM.YYYY\'.')
+                input_value = parse_input_value(key, whitelist, value_type)
+    return input_value
