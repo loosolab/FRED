@@ -46,9 +46,9 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     :param invalid_values:
     """
     try:
-        id = metafile['project']['input_id']
+        input_id = metafile['project']['id']
     except KeyError:
-        id = 'missing'
+        input_id = 'missing'
     invalid_entries = '\n- '.join(invalid_keys)
     missing = '\n- '.join(missing_mandatory_keys)
     values = ''
@@ -57,7 +57,7 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
         entry = ', '.join(v[1])
         values += entry + ' in ' + key + '\n'
     print(f'{"INVALID FILE".center(80, "-")}\n'
-          f'Project ID: {id}\n'
+          f'Project ID: {input_id}\n'
           f'Path: {metafile["path"]}\n\n'
           f'Report:\n')
     if len(invalid_keys) > 0:
