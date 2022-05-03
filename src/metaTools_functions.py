@@ -45,7 +45,7 @@ def find(dir_path, search, return_dict):
             else:
                 sub += letter
         if sub_list == 'True':
-            result.append({metafile['project']['input_id']: metafile['path'] if
+            result.append({metafile['project']['id']: metafile['path'] if
             return_dict == False else metafile})
     return result
 
