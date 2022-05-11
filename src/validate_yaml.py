@@ -21,12 +21,13 @@ def validate_file(metafile):
     """
     valid = True
     key_yaml = utils.read_in_yaml('keys.yaml')
-    invalid_keys, invalid_entries = test_for_valid_keys(metafile, key_yaml)
+    invalid_keys, invalid_entries = new_test(metafile, key_yaml, [], '', [], [])
+    # invalid_keys, invalid_entries = test_for_valid_keys(metafile, key_yaml)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
                                                 [x.split(':')[-1] for x in
                                                  invalid_keys])
     if len(missing_mandatory_keys) > 0 or len(invalid_keys) > 0 or len(
-            invalid_entries) > 0:
+           invalid_entries) > 0:
         valid = False
     return valid, missing_mandatory_keys, invalid_keys, invalid_entries
 
@@ -51,11 +52,11 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
         input_id = 'missing'
     invalid_entries = '\n- '.join(invalid_keys)
     missing = '\n- '.join(missing_mandatory_keys)
-    values = ''
+    values = []
     for v in invalid_values:
-        key = v[0]
-        entry = ', '.join(v[1])
-        values += entry + ' in ' + key + '\n'
+        key = ':'.join(v.split(':')[:-1])
+        entry = v.split(':')[-1]
+        values.append(entry + ' in ' + key + '\n')
     print(f'{"INVALID FILE".center(80, "-")}\n'
           f'Project ID: {input_id}\n'
           f'Path: {metafile["path"]}\n\n'
@@ -68,12 +69,56 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
               f'- {missing}\n')
     if len(invalid_values) > 0:
         print(f'The following values are invalid:\n'
-              f'- {values}')
+              f'- {"- ".join(values)}')
     print(f'{"".center(80, "-")}')
 
 
 # ---------------------------------UTILITIES------------------------------------
 
+def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys, invalid_entry):
+    if isinstance(metafile, dict):
+        for key in metafile:
+            if key not in key_yaml:
+                invalid_keys.append(key)
+            else:
+                res_keys, res_entries = new_test(metafile[key], key_yaml[key][4], sub_lists, f'{key_name}:{key}' if key_name != '' else key, invalid_keys, invalid_entry)
+                invalid_keys = res_keys
+    elif isinstance(metafile, list):
+        for item in metafile:
+            sub_lists.append(item)
+            res_keys, res_entries = new_test(item, key_yaml, sub_lists, key_name, invalid_keys, invalid_entry)
+            invalid_keys = res_keys
+            sub_lists = sub_lists[:-1]
+    else:
+        invalid = new_test_for_whitelist(key_name.split(':')[-1], metafile, sub_lists)
+        if invalid:
+            invalid_entry.append(f'{key_name}:{metafile}')
+    return invalid_keys, invalid_entry
+
+def new_test_for_whitelist(entry_key, entry_value, sublists):
+    whitelist, dependable = utils.read_whitelist(entry_key)
+    while dependable:
+        whitelist_key = whitelist['ident_key']
+        for i in reversed(range(len(sublists))):
+
+            value = list(utils.find_keys(sublists[i], whitelist_key))
+
+            if len(value) > 0:
+                if len(value) == 1:
+                    break
+                else:
+                    print("ERROR: multiple values")
+                    break
+
+        if value[0] in whitelist:
+            whitelist = whitelist[value[0]]
+            dependable = False
+        else:
+            whitelist, dependable = utils.read_whitelist(value[0])
+
+    if whitelist and entry_value not in whitelist:
+        return True
+    return False
 
 def test_for_valid_keys(metafile, key_yaml):
     """
@@ -170,7 +215,7 @@ def find_key(metafile, key, is_list, values, invalid_keys):
         metafile = list(utils.find_keys(metafile, k))
     if len(metafile) == 0:
         missing_keys.append(key)
-    elif is_list:
+    elif is_list and isinstance(values, list):
         for entry in metafile[0]:
             for value in entry:
                 if value not in invalid_keys:
