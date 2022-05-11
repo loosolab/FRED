@@ -108,7 +108,13 @@ def get_keys_in_dict(node, res={}, pre=''):
             res = get_keys_in_dict(node[key], res, pre + ':' + key if pre != '' else key)
     elif isinstance(node, list):
         for elem in node:
-            res = get_keys_in_dict(elem, res, pre)
+            if not isinstance(elem, dict):
+                if pre in res:
+                    res[pre].append(node)
+                else:
+                    res[pre] = [node]
+            else:
+                res = get_keys_in_dict(elem, res, pre)
     else:
         if pre in res:
             res[pre].append(str(node))
@@ -142,23 +148,28 @@ def parse_list_to_dict(node):
 
 
 # read in whitelists
-def read_whitelist(key):
-    if key == 'value':
-        whitelist = {}
-        factors = read_in_whitelist('factor')
-        for factor in factors:
-            whitelist[factor] = read_in_whitelist(factor)
-    else:
-        whitelist = read_in_whitelist(key)
-    return whitelist
+#def read_whitelist(key):
+#    if key == 'value':
+#        whitelist = {}
+#        factors = read_in_whitelist('factor')
+#        for factor in factors:
+#            whitelist[factor] = read_in_whitelist(factor)
+#    else:
+#        whitelist = read_in_whitelist(key)
+#    return whitelist
 
-def read_in_whitelist(key):
+def read_whitelist(key):
+    dependable = False
     try:
-        whitelist = open(os.path.join('whitelists', key)).read().splitlines()
-    except FileNotFoundError:
-        #print('No whitelist file for ' + key)
-        whitelist = None
-    return whitelist
+        whitelist = read_in_yaml(os.path.join('whitelists', key))
+        dependable = True
+    except (AttributeError, FileNotFoundError):
+        try:
+            whitelist = open(os.path.join('whitelists', key)).read().splitlines()
+        except FileNotFoundError:
+            #print('No whitelist file for ' + key)
+            whitelist = None
+    return whitelist, dependable
 
 def find_list_key(item, l):
     for k in l.split(':'):
