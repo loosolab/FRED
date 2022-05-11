@@ -1,4 +1,4 @@
-ident_key: organism
+ident_key: organism_name
 human:
     - CYP19A1_ENSG00000137869
     - CETP_ENSG00000087237
