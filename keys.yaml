@@ -51,7 +51,7 @@ project:
           - 'Name'
           - ''
           - null
-          - True
+          - False
           - short_text
           - str
         ldap_name:
@@ -60,7 +60,7 @@ project:
           - 'LDAP Name'
           - ''
           - null
-          - True
+          - False
           - short_text
           - str
         department:
@@ -78,7 +78,7 @@ project:
           - 'E-Mail'
           - ''
           - null
-          - True
+          - False
           - short_text
           - str
         address:
