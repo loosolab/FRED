@@ -79,7 +79,7 @@ def parse_empty(node, pre):
 
 def get_samples(condition):
     conds = condition.split('-')
-    key_yaml = utils.read_in_yaml('keys.yaml')
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
     samples = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
                           ['biological_replicates'][4]['samples'],
                           'experimental_setting:conditions:biological_'
