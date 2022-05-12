@@ -3,6 +3,7 @@ import sys
 sys.path.append('metadata-organizer')
 import src.utils as utils
 import src.generate as generate
+import os
 
 
 # This script contains all functions for generation of objects for the web
@@ -10,7 +11,7 @@ import src.generate as generate
 
 
 def get_empty_wi_object():
-    key_yaml = utils.read_in_yaml('keys.yaml')
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
     result = []
     for key in key_yaml:
         result.append(parse_empty(key_yaml[key], key))
