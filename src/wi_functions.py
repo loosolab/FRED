@@ -46,12 +46,15 @@ def parse_empty(node, pre):
     return res
 
 
-def get_samples():
+def get_samples(condition):
     key_yaml = utils.read_in_yaml('keys.yaml')
     samples = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
                           ['biological_replicates'][4]['samples'],
                           'experimental_setting:conditions:biological_'
                           'replicates:samples')['input_fields']
+    for i in range(len(samples)):
+        if samples[i]['position'] == 'experimental_setting:conditions:biological_replicates:samples:sample_name':
+            samples[i]['value'] = condition
     return samples
 
 
@@ -66,11 +69,11 @@ def get_conditions(factors):
     :return: a list containing all combinations of conditions
     """
     conditions = generate.get_condition_combinations(factors)
-    samples = get_samples()
     condition_object = []
     for cond in conditions:
+        sample = get_samples(cond)
         d = {'title': cond, 'position': 'experimental_setting:condition',
              'list': True, 'mandatory': True, 'list_value': [],
-             'editable': True, 'input_fields': samples}
+             'editable': True, 'input_fields': sample}
         condition_object.append(d)
     return condition_object
