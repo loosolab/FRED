@@ -320,10 +320,24 @@ experimental_setting:
                   - False
                   - 'Age'
                   - ''
-                  - null
-                  - False
-                  - number
-                  - int
+                  - value:
+                      - 'optional'
+                      - False
+                      - 'Value'
+                      - ''
+                      - null
+                      - False
+                      - number
+                      - int
+                    unit:
+                      - 'optional'
+                      - False
+                      - 'Unit'
+                      - ''
+                      - null
+                      - True
+                      - select
+                      - str
                 ethnicity:
                   - 'optional'
                   - False
@@ -448,16 +462,7 @@ experimental_setting:
                           - False
                           - 'Duration'
                           - ''
-                          - unit:
-                              - 'optional'
-                              - False
-                              - 'Unit'
-                              - ''
-                              - null
-                              - True
-                              - select
-                              - str
-                            value:
+                          - value:
                               - 'optional'
                               - False
                               - 'Value'
@@ -466,15 +471,38 @@ experimental_setting:
                               - False
                               - number
                               - int
+                            unit:
+                              - 'optional'
+                              - False
+                              - 'Unit'
+                              - ''
+                              - null
+                              - True
+                              - select
+                              - str
                 time_point:
                   - 'optional'
                   - False
                   - 'Time Point'
                   - ''
-                  - null
-                  - False
-                  - number
-                  - float
+                  - value:
+                      - 'optional'
+                      - False
+                      - 'Value'
+                      - ''
+                      - null
+                      - False
+                      - number
+                      - int
+                    unit:
+                      - 'optional'
+                      - False
+                      - 'Unit'
+                      - ''
+                      - null
+                      - True
+                      - select
+                      - str
                 flow:
                   - 'optional'
                   - False
