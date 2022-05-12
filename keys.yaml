@@ -70,7 +70,7 @@ project:
           - ''
           - null
           - True
-          - short_text
+          - select
           - str
         email:
           - 'mandatory'
@@ -110,7 +110,7 @@ project:
           - 'Name'
           - ''
           - null
-          - True
+          - False
           - short_text
           - str
         ldap_name:
@@ -119,7 +119,7 @@ project:
           - 'LDAP Name'
           - ''
           - null
-          - True
+          - False
           - short_text
           - str
         department:
@@ -129,7 +129,7 @@ project:
           - ''
           - null
           - True
-          - short_text
+          - select
           - str
         email:
           - 'mandatory'
@@ -137,7 +137,7 @@ project:
           - 'E-Mail'
           - ''
           - null
-          - True
+          - False
           - short_text
           - str
         address:
@@ -203,7 +203,7 @@ experimental_setting:
           - ''
           - null
           - True
-          - short_text
+          - select
           - str
         taxonomy_id:
           - 'mandatory'
@@ -212,7 +212,7 @@ experimental_setting:
           - ''
           - null
           - True
-          - short_text
+          - select
           - str
     experimental_factors:
       - 'mandatory'
@@ -226,7 +226,7 @@ experimental_setting:
           - ''
           - null
           - True
-          - short_text
+          - select
           - str
         value:
           - 'mandatory'
@@ -235,7 +235,7 @@ experimental_setting:
           - ''
           - null
           - True
-          - short_text
+          - select
           - str
     conditions:
       - 'mandatory'
@@ -295,7 +295,7 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - short_text
+                  - select
                   - str
                 gender:
                   - 'optional'
@@ -304,7 +304,7 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - short_text
+                  - select
                   - str
                 life_stage:
                   - 'optional'
@@ -313,7 +313,7 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - short_text
+                  - select
                   - str
                 age:
                   - 'optional'
@@ -331,7 +331,7 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - short_text
+                  - select
                   - str
                 tissue:
                   - 'optional'
@@ -340,7 +340,7 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - short_text
+                  - select
                   - str
                 cell_type:
                   - 'optional'
@@ -349,7 +349,7 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - short_text
+                  - select
                   - str
                 gene:
                   - 'optional'
@@ -358,7 +358,7 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - short_text
+                  - select
                   - str
                 disease_information:
                   - 'optional'
@@ -386,7 +386,7 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - short_text
+                          - select
                           - str
                         disease_type:
                           - 'optional'
@@ -395,7 +395,7 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - short_text
+                          - select
                           - str
                         stage:
                           - 'optional'
@@ -404,7 +404,7 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - short_text
+                          - select
                           - str
                 treatment_information:
                   - 'optional'
@@ -432,7 +432,7 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - short_text
+                          - select
                           - str
                         treatment_type:
                           - 'optional'
@@ -441,23 +441,23 @@ experimental_setting:
                           - ''
                           - null
                           - True
-                          - short_text
+                          - select
                           - str
                         duration:
                           - 'optional'
                           - False
                           - 'Duration'
                           - ''
-                          - duration_unit:
+                          - unit:
                               - 'optional'
                               - False
                               - 'Unit'
                               - ''
                               - null
                               - True
-                              - short_text
+                              - select
                               - str
-                            duration_value:
+                            value:
                               - 'optional'
                               - False
                               - 'Value'
@@ -482,7 +482,7 @@ experimental_setting:
                   - ''
                   - null
                   - True
-                  - short_text
+                  - select
                   - str
                 donor_count:
                   - 'mandatory'
@@ -529,7 +529,7 @@ experiment:
       - ''
       - null
       - True
-      - short_text
+      - select
       - str
     analysis:
       - 'optional'
@@ -575,7 +575,7 @@ experiment:
               - ''
               - null
               - True
-              - short_text
+              - select
               - str
             parameters:
               - 'optional'
