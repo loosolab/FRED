@@ -47,6 +47,7 @@ def parse_empty(node, pre):
 
 
 def get_samples(condition):
+    conds = condition.split('-')
     key_yaml = utils.read_in_yaml('keys.yaml')
     samples = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
                           ['biological_replicates'][4]['samples'],
@@ -55,6 +56,10 @@ def get_samples(condition):
     for i in range(len(samples)):
         if samples[i]['position'] == 'experimental_setting:conditions:biological_replicates:samples:sample_name':
             samples[i]['value'] = condition
+        for c in conds:
+            if samples[i]['position'] == f'experimental_setting:conditions:biological_replicates:samples:{c.split(":")[0]}':
+                samples[i]['value'] = c.split(":")[1]
+                samples[i]['editable'] = False
     return samples
 
 
