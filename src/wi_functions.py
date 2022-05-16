@@ -12,13 +12,10 @@ import os
 
 def get_empty_wi_object():
     key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
-    result = []
+    result = {}
     for key in key_yaml:
-        result.append(parse_empty(key_yaml[key], key))
-    project = result[0]
-    experimental_setting = result[1]
-    experiment = result[2]
-    return project, experimental_setting, experiment
+        result[key] = parse_empty(key_yaml[key], key)
+    return result
 
 
 def parse_empty(node, pre):
