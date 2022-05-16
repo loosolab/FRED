@@ -286,7 +286,7 @@ experimental_setting:
                   - ''
                   - False
                   - False
-                  - short_text
+                  - select
                   - bool
                 genotype:
                   - 'optional'
@@ -386,7 +386,7 @@ experimental_setting:
                       - ''
                       - True
                       - False
-                      - short_text
+                      - select
                       - bool
                     disease:
                       - 'optional'
@@ -432,7 +432,7 @@ experimental_setting:
                       - ''
                       - False
                       - False
-                      - short_text
+                      - select
                       - bool
                     treatment:
                       - 'optional'
