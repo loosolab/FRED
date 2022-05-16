@@ -161,11 +161,11 @@ def parse_list_to_dict(node):
 def read_whitelist(key):
     dependable = False
     try:
-        whitelist = read_in_yaml(os.path.join('whitelists', key))
+        whitelist = read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key))
         dependable = True
     except (AttributeError, FileNotFoundError):
         try:
-            whitelist = open(os.path.join('whitelists', key)).read().splitlines()
+            whitelist = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key)).read().splitlines()
         except FileNotFoundError:
             #print('No whitelist file for ' + key)
             whitelist = None
