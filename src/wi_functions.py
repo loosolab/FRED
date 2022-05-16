@@ -22,7 +22,7 @@ def get_empty_wi_object():
 
 
 def parse_empty(node, pre):
-    editable = True if pre.split(':')[-1] not in ['id', 'project_name',
+    input_disabled = True if pre.split(':')[-1] in ['id', 'project_name',
                                                   'condition_name',
                                                   'sample_name'] else False
     if isinstance(node[4], dict):
@@ -46,12 +46,12 @@ def parse_empty(node, pre):
                    'list': node[1], 'displayName': node[2], 'desc': node[3],
                    'value':None, 'value_unit': None,
                    'whitelist': unit_whitelist, 'input_type': 'value_unit',
-                   'editable': editable}
+                   'input_disabled': input_disabled}
         else:
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
                    'list': node[1], 'title': node[2], 'desc': node[3],
-                   'input_fields': input_fields, 'editable': editable}
+                   'input_fields': input_fields, 'input_disabled': input_disabled}
         if node[1]:
             res['list_value'] = []
     else:
@@ -76,7 +76,7 @@ def parse_empty(node, pre):
                'mandatory': True if node[0] == 'mandatory' else False,
                'list': node[1], 'displayName': node[2], 'desc': node[3],
                'value': node[4], 'whitelist': whitelist, 'input_type': node[6],
-               'data_type': node[7], 'editable': editable}
+               'data_type': node[7], 'input_disabled': input_disabled}
         if node[1]:
             res['list_value'] = []
     return res
@@ -97,7 +97,7 @@ def get_samples(condition):
             if samples[i][
                 'position'] == f'experimental_setting:conditions:biological_replicates:samples:{c.split(":")[0]}':
                 samples[i]['value'] = c.split(":")[1]
-                samples[i]['editable'] = False
+                samples[i]['input_disabled'] = True
     return samples
 
 
@@ -117,6 +117,6 @@ def get_conditions(factors):
         sample = get_samples(cond)
         d = {'title': cond, 'position': 'experimental_setting:condition',
              'list': True, 'mandatory': True, 'list_value': [],
-             'editable': True, 'input_fields': sample}
+             'input_disabled': False, 'input_fields': sample}
         condition_object.append(d)
     return condition_object
