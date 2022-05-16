@@ -15,7 +15,10 @@ def get_empty_wi_object():
     result = []
     for key in key_yaml:
         result.append(parse_empty(key_yaml[key], key))
-    return result
+    project = result[0]
+    experimental_setting = result[1]
+    experiment = result[2]
+    return project, experimental_setting, experiment
 
 
 def parse_empty(node, pre):
@@ -65,6 +68,8 @@ def parse_empty(node, pre):
                         w, d = utils.read_whitelist(key)
                         new_white[key] = w
                 whitelist = new_white
+        elif node[7] == 'bool':
+            whitelist = [True, False]
         else:
             whitelist = None
         res = {'position': pre,
