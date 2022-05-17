@@ -20,7 +20,7 @@ def add(args):
 
 
 def create(args):
-    generate.generate_file(args.id, args.name, args.mandatory_only)
+    generate.generate_file(args.path, args.id, args.name, args.mandatory_only)
 
 
 def main():
