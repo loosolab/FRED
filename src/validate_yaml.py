@@ -76,7 +76,7 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
 # ---------------------------------UTILITIES------------------------------------
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys, invalid_entry):
-    if isinstance(metafile, dict):
+    if isinstance(metafile, dict) and not ('value' in metafile and 'unit' in metafile):
         for key in metafile:
             if key not in key_yaml:
                 invalid_keys.append(key)
