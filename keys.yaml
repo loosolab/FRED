@@ -228,10 +228,10 @@ experimental_setting:
           - True
           - select
           - str
-        value:
+        values:
           - 'mandatory'
           - False
-          - 'Value'
+          - 'Values'
           - ''
           - null
           - True
@@ -321,7 +321,7 @@ experimental_setting:
                   - 'Age'
                   - ''
                   - value:
-                      - 'optional'
+                      - 'mandatory'
                       - False
                       - 'Value'
                       - ''
@@ -330,7 +330,7 @@ experimental_setting:
                       - number
                       - int
                     unit:
-                      - 'optional'
+                      - 'mandatory'
                       - False
                       - 'Unit'
                       - ''
@@ -463,7 +463,7 @@ experimental_setting:
                           - 'Duration'
                           - ''
                           - value:
-                              - 'optional'
+                              - 'mandatory'
                               - False
                               - 'Value'
                               - ''
@@ -472,7 +472,7 @@ experimental_setting:
                               - number
                               - int
                             unit:
-                              - 'optional'
+                              - 'mandatory'
                               - False
                               - 'Unit'
                               - ''
@@ -486,7 +486,7 @@ experimental_setting:
                   - 'Time Point'
                   - ''
                   - value:
-                      - 'optional'
+                      - 'mandatory'
                       - False
                       - 'Value'
                       - ''
@@ -495,7 +495,7 @@ experimental_setting:
                       - number
                       - int
                     unit:
-                      - 'optional'
+                      - 'mandatory'
                       - False
                       - 'Unit'
                       - ''
