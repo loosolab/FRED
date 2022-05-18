@@ -11,21 +11,24 @@ import os
 
 
 def get_empty_wi_object():
-    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
+    key_yaml = utils.read_in_yaml(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
     result = {}
     for key in key_yaml:
-        result[key] = parse_empty(key_yaml[key], key)
+        result[key] = parse_empty(key_yaml[key], key, None)
     return result
 
 
-def parse_empty(node, pre):
+def parse_empty(node, pre, organism_name):
     input_disabled = True if pre.split(':')[-1] in ['id', 'project_name',
-                                                  'condition_name',
-                                                  'sample_name'] else False
+                                                    'condition_name',
+                                                    'sample_name'] else False
     if isinstance(node[4], dict):
         input_fields = []
         for key in node[4]:
-            input_fields.append(parse_empty(node[4][key], pre + ':' + key))
+            input_fields.append(parse_empty(node[4][key], pre + ':' + key,
+                                            organism_name))
         unit = False
         value = False
         unit_whitelist = []
@@ -41,14 +44,15 @@ def parse_empty(node, pre):
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
                    'list': node[1], 'displayName': node[2], 'desc': node[3],
-                   'value':None, 'value_unit': None,
+                   'value': None, 'value_unit': None,
                    'whitelist': unit_whitelist, 'input_type': 'value_unit',
                    'input_disabled': input_disabled}
         else:
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
                    'list': node[1], 'title': node[2], 'desc': node[3],
-                   'input_fields': input_fields, 'input_disabled': input_disabled}
+                   'input_fields': input_fields,
+                   'input_disabled': input_disabled}
         if node[1]:
             res['list_value'] = []
     else:
@@ -64,6 +68,8 @@ def parse_empty(node, pre):
                     else:
                         w, d = utils.read_whitelist(key)
                         new_white[key] = w
+                if organism_name and organism_name in new_white:
+                    new_white = new_white[organism_name]
                 whitelist = new_white
         elif node[7] == 'bool':
             whitelist = [True, False]
@@ -79,39 +85,43 @@ def parse_empty(node, pre):
     return res
 
 
-def get_samples(condition):
+def get_samples(condition, organism_name):
     conds = condition.split('-')
-    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
+    key_yaml = utils.read_in_yaml(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
     samples = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
                           ['biological_replicates'][4]['samples'],
                           'experimental_setting:conditions:biological_'
-                          'replicates:samples')['input_fields']
+                          'replicates:samples', organism_name)['input_fields']
     for i in range(len(samples)):
         if samples[i][
-            'position'] == 'experimental_setting:conditions:biological_replicates:samples:sample_name':
+            'position'] == 'experimental_setting:conditions:biological_' \
+                           'replicates:samples:sample_name':
             samples[i]['value'] = condition
         for c in conds:
             if samples[i][
-                'position'] == f'experimental_setting:conditions:biological_replicates:samples:{c.split(":")[0]}':
+                'position'] == f'experimental_setting:conditions:biological_' \
+                               f'replicates:samples:{c.split(":")[0]}':
                 samples[i]['value'] = c.split(":")[1]
                 samples[i]['input_disabled'] = True
     return samples
 
 
-def get_conditions(factors):
+def get_conditions(factors, organism_name):
     """
     This functions returns all possible combinations for experimental factors
     and their values.
     :param factors: multiple dictionaries containing the keys 'factor' and
     'value' with their respective values grouped in a list
-    e.g. [{'factor': 'gender', 'value': ['male', 'female']},
-          {'factor: 'life_stage', 'value': ['child', 'adult']}]
+    e.g. [{'factor': 'gender', 'values': ['male', 'female']},
+          {'factor: 'life_stage', 'values': ['child', 'adult']}]
     :return: a list containing all combinations of conditions
     """
     conditions = generate.get_condition_combinations(factors)
     condition_object = []
     for cond in conditions:
-        sample = get_samples(cond)
+        sample = get_samples(cond, organism_name)
         d = {'title': cond, 'position': 'experimental_setting:condition',
              'list': True, 'mandatory': True, 'list_value': [],
              'input_disabled': False, 'input_fields': sample}
