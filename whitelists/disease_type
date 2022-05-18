@@ -1,2 +1,22 @@
-lung cancer
-breast cancer
+lung:
+  - lung cancer
+  - COPD
+  - PH
+  - PAH
+  - Asthma
+  - pneumonia
+  - pulmonary edema
+  - bronchitis
+  - pneumothorax
+  - pulmonary embolus
+  - Covid
+  - Influenca
+heart:
+  - Coronary heart disease CHD
+  - Angina
+  - Blood pressure
+  - Heart failure
+  - Bypass surgery
+other:
+  - breast cancer
+  - prostate cancer
