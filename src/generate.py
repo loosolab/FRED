@@ -23,7 +23,7 @@ def generate_file(path, input_id, name, mandatory_mode):
             os.path.join(path, f'{input_id}_metadata.yaml')) or os.path.exists(
             os.path.join(path, f'{input_id}_metadata.yml')):
         sys.exit(
-            f'The metadata file for project {name} with ID {input_id} already exists.')
+            f'The metadata file for ID {input_id} already exists.')
 
     key_yaml = utils.read_in_yaml('keys.yaml')
     result_dict = {'project': {'id': input_id, 'project_name': name}}
