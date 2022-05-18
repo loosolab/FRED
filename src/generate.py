@@ -73,8 +73,8 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
     if isinstance(node, dict):
         if len(node.keys()) == 2 and 'value' in node.keys() and 'unit' in node.keys():
             value_unit = {
-                'unit': parse_input_value('unit', True, str, result_dict),
-                'value': parse_input_value('value', False, int, result_dict)}
+                'unit': parse_input_value('unit', '', True, str, result_dict),
+                'value': parse_input_value('value', '', False, int, result_dict)}
             return value_unit
         else:
             optionals = []
@@ -181,8 +181,8 @@ def get_experimental_factors(node, result_dict):
         if isinstance(fac_node[4], dict) and 'unit' in fac_node[4] and 'value' in fac_node[4]:
             used_values = []
             print(f'Please enter the unit for factor {fac}:')
-            unit = parse_input_value('unit', True, 'str', result_dict)
-            print(f'Please enter int values for factor {fac} in unit {unit} '
+            unit = parse_input_value('unit', '', True, 'str', result_dict)
+            print(f'Please enter int values for factor {fac} (in {unit}) '
                   f'divided by comma:')
             values = parse_input_list('int', False)
             for val in values:
@@ -242,7 +242,7 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict):
               f'{f"Condition: {condition}".center(80, " ")}\n'
               f'{"".center(80, "_")}\n\n'
               f'Please enter the number of biological replicates:')
-        bio = parse_input_value('count', False, 'int',
+        bio = parse_input_value('count', '', False, 'int',
                                 result_dict)
         if bio > 0:
             input_pooled = parse_list_choose_one([True, False],
@@ -277,7 +277,7 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
         print(f'{f"Sample: {sample_name}".center(80, "-")}\n')
         samples['pooled'] = input_pooled
         if input_pooled:
-            donor_count = parse_input_value('donor_count', False, 'int',
+            donor_count = parse_input_value('donor_count', '', False, 'int',
                                             result_dict)
         else:
             donor_count = 1
@@ -299,10 +299,10 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
 
 def get_technical_replicates(sample_name):
     print(f'Please enter the number of technical replicates:')
-    count = parse_input_value('count', False, 'int', [])
+    count = parse_input_value('count', '', False, 'int', [])
     while count < 1:
         print(f'The number of technical replicates has to be at least 1.')
-        count = parse_input_value('count', False, 'int', [])
+        count = parse_input_value('count', '', False, 'int', [])
     samples = []
     for i in range(count):
         samples.append(f'{sample_name}_t{i + 1}')
@@ -333,10 +333,12 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
                       result_dict):
     if isinstance(node[4], dict):
         print(f'Please enter information about the {key}')
+        if node[3] != '':
+            print(node[3])
         return generate_part(node[4], key, return_dict, optional,
                              mandatory_mode, result_dict)
     else:
-        return parse_input_value(key, node[5], node[7], result_dict)
+        return parse_input_value(key, node[3], node[5], node[7], result_dict)
 
 
 def parse_list_choose_one(whitelist, header):
@@ -351,7 +353,7 @@ def parse_list_choose_one(whitelist, header):
     return value
 
 
-def parse_input_value(key, whitelist, value_type, result_dict):
+def parse_input_value(key, desc, whitelist, value_type, result_dict):
     whites = None
     if whitelist:
         whites, dependable = utils.read_whitelist(key)
@@ -371,24 +373,30 @@ def parse_input_value(key, whitelist, value_type, result_dict):
     if whites and len(whites) > 0:
         input_value = parse_list_choose_one(whites, f'{key}:')
     else:
-        input_value = input(f'{key}: ')
-        if input_value == '':
-            print(f'Please enter something.')
-            input_value = parse_input_value(key, whitelist, value_type,
-                                            result_dict)
+        if desc != '':
+            print(desc)
+        if value_type == 'bool':
+            input_value = parse_list_choose_one([True, False],
+                                                f'Is the sample {key}')
+        else:
+            input_value = input(f'{key}: ')
+            if input_value == '':
+                print(f'Please enter something.')
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type, result_dict)
         if value_type == 'int':
             try:
                 input_value = int(input_value)
             except ValueError:
                 print(f'Input must be of type int. Try again.')
-                input_value = parse_input_value(key, whitelist, value_type,
+                input_value = parse_input_value(key, desc, whitelist, value_type,
                                                 result_dict)
         elif value_type == 'float':
             try:
                 input_value = float(input_value)
             except ValueError:
                 print(f'Input must be of type float. Try again.')
-                input_value = parse_input_value(key, whitelist, value_type,
+                input_value = parse_input_value(key, desc, whitelist, value_type,
                                                 result_dict)
         elif value_type == 'date':
             try:
@@ -402,6 +410,6 @@ def parse_input_value(key, whitelist, value_type, result_dict):
                 input_value = input_value.strftime("%d.%m.%Y")
             except (IndexError, ValueError, SyntaxError) as e:
                 print(f'Input must be of type \'DD.MM.YYYY\'.')
-                input_value = parse_input_value(key, whitelist, value_type,
+                input_value = parse_input_value(key, desc, whitelist, value_type,
                                                 result_dict)
     return input_value
