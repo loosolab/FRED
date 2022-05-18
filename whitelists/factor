@@ -1,10 +1,12 @@
 genotype
+tissue
+cell_type
+knockdown_siRNA
+Knockdown_morpholino
 gender
 life_stage
 age
 ethnicity
-tissue
-cell_type
 gene
 healthy
 disease_status
@@ -16,3 +18,4 @@ treatment_type
 duration
 time_point
 flow
+
