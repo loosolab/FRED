@@ -12,7 +12,7 @@ project:
   - 'mandatory'
   - False
   - 'Project'
-  - ''
+  - 'The project part contains general information about the project.'
   - id:
       - 'mandatory'
       - False
@@ -35,7 +35,7 @@ project:
       - 'mandatory'
       - False
       - 'Date'
-      - ''
+      - 'The date has the format dd.mm.yyyy'
       - null
       - False
       - date
@@ -44,7 +44,7 @@ project:
       - 'mandatory'
       - False
       - 'Owner'
-      - ''
+      - 'The owner manages the project and acts as the first point of contact for questions.'
       - name:
           - 'mandatory'
           - False
@@ -103,7 +103,7 @@ project:
       - 'optional'
       - True
       - 'Nerd'
-      - ''
+      - 'A nerd is a person assigned to the project to perform analysis.'
       - name:
           - 'mandatory'
           - False
@@ -162,7 +162,7 @@ project:
       - 'mandatory'
       - False
       - 'Description'
-      - ''
+      - 'Here you need to enter a detailed description of the project.'
       - null
       - False
       - long_text
@@ -171,7 +171,7 @@ project:
       - 'optional'
       - True
       - 'Further Description'
-      - ''
+      - 'Here you can insert links to files that contain further information. This can be a presentation or a paper, for example.'
       - null
       - False
       - short_text
@@ -180,7 +180,7 @@ project:
       - 'optional'
       - True
       - 'Graphical Abstract'
-      - ''
+      - 'Here you can insert links to files containing a graphical abstract.'
       - null
       - False
       - short_text
@@ -591,7 +591,7 @@ experiment:
               - 'optional'
               - False
               - 'Date'
-              - ''
+              - 'The date has the format dd.mm.yyyy'
               - null
               - False
               - date
