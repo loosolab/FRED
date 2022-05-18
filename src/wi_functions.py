@@ -59,7 +59,7 @@ def parse_empty(node, pre, organism_name):
         if node[5]:
             whitelist, depend = utils.read_whitelist(pre.split(':')[-1])
             if depend:
-                new_white = {}
+                new_white = {'ident_key': whitelist['ident_key']}
                 possible_input, depend = utils.read_whitelist(
                     whitelist['ident_key'])
                 for key in possible_input:
