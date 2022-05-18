@@ -1,0 +1,16 @@
+human:
+  - hg38
+  - hg19
+mouse:
+  - mm10
+  - mm9
+  - mm38
+zebrafish:
+  - danrer11
+  - danrer10
+rat:
+pig:
+medaka:
+chicken:
+drosophila:
+yeast:
