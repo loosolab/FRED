@@ -16,11 +16,11 @@ def get_empty_wi_object():
                      'keys.yaml'))
     result = {}
     for key in key_yaml:
-        result[key] = parse_empty(key_yaml[key], key, None)
+        result[key] = parse_empty(key_yaml[key], key, None, key_yaml)
     return result
 
 
-def parse_empty(node, pre, organism_name):
+def parse_empty(node, pre, organism_name, key_yaml):
     input_disabled = True if pre.split(':')[-1] in ['id', 'project_name',
                                                     'condition_name',
                                                     'sample_name'] else False
@@ -28,7 +28,7 @@ def parse_empty(node, pre, organism_name):
         input_fields = []
         for key in node[4]:
             input_fields.append(parse_empty(node[4][key], pre + ':' + key,
-                                            organism_name))
+                                            organism_name, key_yaml))
         unit = False
         value = False
         unit_whitelist = []
@@ -59,15 +59,7 @@ def parse_empty(node, pre, organism_name):
         if node[5]:
             whitelist, depend = utils.read_whitelist(pre.split(':')[-1])
             if depend:
-                new_white = {'ident_key': whitelist['ident_key']}
-                possible_input, depend = utils.read_whitelist(
-                    whitelist['ident_key'])
-                for key in possible_input:
-                    if key in whitelist:
-                        new_white[key] = whitelist[key]
-                    else:
-                        w, d = utils.read_whitelist(key)
-                        new_white[key] = w
+                new_white = dependable(whitelist, key_yaml)
                 if organism_name and organism_name in new_white:
                     new_white = new_white[organism_name]
                 whitelist = new_white
@@ -75,15 +67,47 @@ def parse_empty(node, pre, organism_name):
             whitelist = [True, False]
         else:
             whitelist = None
+        input_type = 'dependable_select' if isinstance(whitelist, dict) else \
+            node[6]
         res = {'position': pre,
                'mandatory': True if node[0] == 'mandatory' else False,
                'list': node[1], 'displayName': node[2], 'desc': node[3],
-               'value': node[4], 'whitelist': whitelist, 'input_type': node[6],
-               'data_type': node[7], 'input_disabled': input_disabled}
+               'value': node[4], 'whitelist': whitelist,
+               'input_type': input_type, 'data_type': node[7],
+               'input_disabled': input_disabled}
         if node[1]:
             res['list_value'] = []
     return res
 
+def dependable(whitelist, key_yaml):
+    new_white = {'ident_key': whitelist['ident_key']}
+    possible_input, depend = utils.read_whitelist(
+        whitelist['ident_key'])
+    for key in possible_input:
+        input_type = 'select'
+        if key in whitelist:
+            new_white[key] = {'whitelist': whitelist[key],
+                              'input_type': input_type}
+        else:
+            input_type = list(utils.find_keys(key_yaml, key))
+            if len(input_type) > 0:
+                if isinstance(input_type[0][4], dict) and len(
+                        input_type[0][4].keys()) == 2 and 'value' in \
+                        input_type[0][4] and 'unit' in input_type[0][4]:
+                    input_type = 'value_unit'
+                else:
+                    input_type = input_type[0][6]
+            else:
+                input_type = 'short_text'
+            if input_type == 'value_unit':
+                w, d = utils.read_whitelist('unit')
+            else:
+                w, d = utils.read_whitelist(key)
+            if d:
+                w = dependable(w, key_yaml)
+                input_type = 'dependable_select'
+            new_white[key] = {'whitelist': w, 'input_type': input_type}
+    return new_white
 
 def get_samples(condition, organism_name):
     conds = condition.split('-')
@@ -93,7 +117,7 @@ def get_samples(condition, organism_name):
     samples = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
                           ['biological_replicates'][4]['samples'],
                           'experimental_setting:conditions:biological_'
-                          'replicates:samples', organism_name)['input_fields']
+                          'replicates:samples', organism_name, key_yaml)['input_fields']
     for i in range(len(samples)):
         if samples[i][
             'position'] == 'experimental_setting:conditions:biological_' \
