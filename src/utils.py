@@ -165,7 +165,7 @@ def read_whitelist(key):
         dependable = True
     except (AttributeError, FileNotFoundError):
         try:
-            whitelist = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key)).read().splitlines()
+            whitelist = [w for w in open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key)).read().splitlines() if w.strip()]
         except FileNotFoundError:
             #print('No whitelist file for ' + key)
             whitelist = None
