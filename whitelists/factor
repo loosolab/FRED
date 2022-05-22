@@ -11,7 +11,7 @@ gene
 healthy
 disease_status
 disease_type
-stage
+disease_stage
 treated
 treatment_status
 treatment_type
