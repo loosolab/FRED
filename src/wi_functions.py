@@ -110,7 +110,7 @@ def dependable(whitelist, key_yaml):
     return new_white
 
 def get_samples(condition, organism_name):
-    conds = condition.split('-')
+    conds = generate.split_cond(condition)
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
@@ -126,8 +126,8 @@ def get_samples(condition, organism_name):
         for c in conds:
             if samples[i][
                 'position'] == f'experimental_setting:conditions:biological_' \
-                               f'replicates:samples:{c.split(":")[0]}':
-                samples[i]['value'] = c.split(":")[1]
+                               f'replicates:samples:{c[0]}':
+                samples[i]['value'] = c[1]
                 samples[i]['input_disabled'] = True
     return samples
 
