@@ -1,3 +1,4 @@
+ident_key: organism_name
 human:
   - hg38
   - hg19
