@@ -1,8 +1,7 @@
 genotype
 tissue
 cell_type
-knockdown_siRNA
-Knockdown_morpholino
+knockdown
 gender
 life_stage
 age
