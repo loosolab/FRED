@@ -96,13 +96,13 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                                            return_dict)
                     else:
                         if item not in factor:
-                            optionals.append(item)
+                            optionals.append((item, node[item][3]))
             if len(optionals) > 0 and mandatory_mode == False:
                 optional = True
                 print(
                     f'Do you want to add any of the following optional keys? '
                     f'(1,...,{len(optionals)} or n)\n')
-                print_option_list(optionals)
+                print_option_list(optionals, True)
                 options = parse_input_list(optionals, True)
                 if options:
                     for option in options:
@@ -119,10 +119,12 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
     return return_dict
 
 
-def print_option_list(options):
-    print_options = "\n".join(
-        [f"{i + 1}: {options[i]}" for i in range(len(options))])
-    print(f'{print_options}')
+def print_option_list(options, desc):
+    for i in range(len(options)):
+        if desc:
+            print(str(i+1) + ': ' + '{:<20} {:<60}'.format(*options[i]))
+        else:
+            print(f'{i + 1}: {options[i]}')
 
 
 def parse_input_list(options, terminable):
@@ -174,7 +176,7 @@ def get_experimental_factors(node, result_dict):
     print(
         f'Please select the analyzed experimental factors '
         f'(1-{len(factor_list)}) divided by comma:\n')
-    print_option_list(factor_list)
+    print_option_list(factor_list, False)
     used_factors = parse_input_list(factor_list, False)
 
     experimental_factors = []
@@ -210,7 +212,7 @@ def get_experimental_factors(node, result_dict):
                 f'Please select the values for experimental factor '
                 f'{factor_value["factor"]} (1-{len(value_list)}) divided by '
                 f'comma:\n')
-            print_option_list(value_list)
+            print_option_list(value_list, False)
             used_values = parse_input_list(value_list, False)
         else:
             value_type = fac_node[7]
@@ -231,7 +233,7 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
     print(
         f'Please select the analyzed combinations of experimental factors '
         f'(1-{len(combinations)}) divided by comma:\n')
-    print_option_list(combinations)
+    print_option_list(combinations, False)
     used_combinations = parse_input_list(combinations, False)
     conditions = get_replicate_count(used_combinations, node, mandatory_mode,
                                      result_dict)
@@ -401,7 +403,7 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
 def parse_list_choose_one(whitelist, header):
     try:
         print(header)
-        print_option_list(whitelist)
+        print_option_list(whitelist, False)
         value = whitelist[int(input()) - 1]
     except (IndexError, ValueError) as e:
         print(f'Invalid entry. Please enter a number between 1 and '
