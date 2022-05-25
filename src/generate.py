@@ -1,5 +1,5 @@
 import sys
-
+from columnar import columnar
 import src.utils as utils
 import src.validate_yaml as validate_yaml
 import datetime
@@ -79,6 +79,7 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
             return value_unit
         else:
             optionals = []
+            desc = []
             for item in node:
                 optional = False
                 if item == 'conditions':
@@ -96,13 +97,14 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                                            return_dict)
                     else:
                         if item not in factor:
-                            optionals.append((item, node[item][3]))
+                            optionals.append(item)
+                            desc.append(node[item][3])
             if len(optionals) > 0 and mandatory_mode == False:
                 optional = True
                 print(
                     f'Do you want to add any of the following optional keys? '
                     f'(1,...,{len(optionals)} or n)\n')
-                print_option_list(optionals, True)
+                print_option_list(optionals, desc)
                 options = parse_input_list(optionals, True)
                 if options:
                     for option in options:
@@ -120,10 +122,12 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
 
 
 def print_option_list(options, desc):
-    for i in range(len(options)):
-        if desc:
-            print(str(i+1) + ': ' + '{:<20} {:<60}'.format(*options[i]))
-        else:
+    if desc:
+        data = [[f'{i+1}: {options[i]}', desc[i]] for i in range(len(options))]
+        table = columnar(data, no_borders=True)
+        print(table)
+    else:
+        for i in range(len(options)):
             print(f'{i + 1}: {options[i]}')
 
 
@@ -441,6 +445,10 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
             input_value = input(f'{key}: ')
             if input_value == '':
                 print(f'Please enter something.')
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type, result_dict)
+            elif '\"' in input_value:
+                print(f'Ivalid symbol \". Please try again.')
                 input_value = parse_input_value(key, desc, whitelist,
                                                 value_type, result_dict)
         if value_type == 'int':
