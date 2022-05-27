@@ -72,7 +72,7 @@ def parse_empty(node, pre, organism_name, key_yaml):
         res = {'position': pre,
                'mandatory': True if node[0] == 'mandatory' else False,
                'list': node[1], 'displayName': node[2], 'desc': node[3],
-               'value': node[4], 'whitelist': whitelist,
+               'value': node[4], 'whitelist': sorted(whitelist) if isinstance(whitelist, list) else whitelist,
                'input_type': input_type, 'data_type': node[7],
                'input_disabled': input_disabled}
         if node[1]:
@@ -86,7 +86,7 @@ def dependable(whitelist, key_yaml):
     for key in possible_input:
         input_type = 'select'
         if key in whitelist:
-            new_white[key] = {'whitelist': whitelist[key],
+            new_white[key] = {'whitelist': sorted(whitelist[key]) if isinstance(whitelist[key], list) else whitelist[key],
                               'input_type': input_type}
         else:
             input_type = list(utils.find_keys(key_yaml, key))
@@ -110,7 +110,7 @@ def dependable(whitelist, key_yaml):
     return new_white
 
 def get_samples(condition, organism_name):
-    conds = condition.split('-')
+    conds = generate.split_cond(condition)
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
@@ -126,8 +126,8 @@ def get_samples(condition, organism_name):
         for c in conds:
             if samples[i][
                 'position'] == f'experimental_setting:conditions:biological_' \
-                               f'replicates:samples:{c.split(":")[0]}':
-                samples[i]['value'] = c.split(":")[1]
+                               f'replicates:samples:{c[0]}':
+                samples[i]['value'] = c[1]
                 samples[i]['input_disabled'] = True
     return samples
 

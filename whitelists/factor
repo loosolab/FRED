@@ -1,8 +1,7 @@
 genotype
 tissue
 cell_type
-knockdown_siRNA
-Knockdown_morpholino
+knockdown
 gender
 life_stage
 age
@@ -11,7 +10,7 @@ gene
 healthy
 disease_status
 disease_type
-stage
+disease_stage
 treated
 treatment_status
 treatment_type

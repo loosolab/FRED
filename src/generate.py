@@ -1,5 +1,5 @@
 import sys
-
+from columnar import columnar
 import src.utils as utils
 import src.validate_yaml as validate_yaml
 import datetime
@@ -21,7 +21,7 @@ def generate_file(path, input_id, name, mandatory_mode):
 
     if os.path.exists(
             os.path.join(path, f'{input_id}_metadata.yaml')) or os.path.exists(
-            os.path.join(path, f'{input_id}_metadata.yml')):
+        os.path.join(path, f'{input_id}_metadata.yml')):
         sys.exit(
             f'The metadata file for ID {input_id} already exists.')
 
@@ -74,10 +74,12 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
         if len(node.keys()) == 2 and 'value' in node.keys() and 'unit' in node.keys():
             value_unit = {
                 'unit': parse_input_value('unit', '', True, str, result_dict),
-                'value': parse_input_value('value', '', False, int, result_dict)}
+                'value': parse_input_value('value', '', False, int,
+                                           result_dict)}
             return value_unit
         else:
             optionals = []
+            desc = []
             for item in node:
                 optional = False
                 if item == 'conditions':
@@ -85,29 +87,32 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                         return_dict['experimental_factors'], node[item][4],
                         mandatory_mode, return_dict)
                 elif item == 'experimental_factors':
-                    return_dict[item] = get_experimental_factors(node, return_dict)
+                    return_dict[item] = get_experimental_factors(node,
+                                                                 return_dict)
                 elif item not in not_editable:
                     if node[item][0] == 'mandatory':
                         return_dict[item] = get_redo_value(node[item], item,
-                                                       optional,
-                                                       mandatory_mode,
-                                                       return_dict)
+                                                           optional,
+                                                           mandatory_mode,
+                                                           return_dict)
                     else:
                         if item not in factor:
                             optionals.append(item)
+                            desc.append(node[item][3])
             if len(optionals) > 0 and mandatory_mode == False:
                 optional = True
                 print(
                     f'Do you want to add any of the following optional keys? '
                     f'(1,...,{len(optionals)} or n)\n')
-                print_option_list(optionals)
+                print_option_list(optionals, desc)
                 options = parse_input_list(optionals, True)
                 if options:
                     for option in options:
-                        return_dict[option] = get_redo_value(node[option], option,
-                                                         optional,
-                                                         mandatory_mode,
-                                                         result_dict)
+                        return_dict[option] = get_redo_value(node[option],
+                                                             option,
+                                                             optional,
+                                                             mandatory_mode,
+                                                             result_dict)
     else:
         if node[0] == 'mandatory' or optional:
             value = enter_information(node, key, return_dict, optional,
@@ -116,10 +121,14 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
     return return_dict
 
 
-def print_option_list(options):
-    print_options = "\n".join(
-        [f"{i + 1}: {options[i]}" for i in range(len(options))])
-    print(f'{print_options}')
+def print_option_list(options, desc):
+    if desc:
+        data = [[f'{i+1}: {options[i]}', desc[i]] for i in range(len(options))]
+        table = columnar(data, no_borders=True)
+        print(table)
+    else:
+        for i in range(len(options)):
+            print(f'{i + 1}: {options[i]}')
 
 
 def parse_input_list(options, terminable):
@@ -171,14 +180,15 @@ def get_experimental_factors(node, result_dict):
     print(
         f'Please select the analyzed experimental factors '
         f'(1-{len(factor_list)}) divided by comma:\n')
-    print_option_list(factor_list)
+    print_option_list(factor_list, False)
     used_factors = parse_input_list(factor_list, False)
 
     experimental_factors = []
     for fac in used_factors:
         factor_value = {'factor': fac}
         fac_node = list(utils.find_keys(node, fac))[0]
-        if isinstance(fac_node[4], dict) and 'unit' in fac_node[4] and 'value' in fac_node[4]:
+        if isinstance(fac_node[4], dict) and 'unit' in fac_node[
+            4] and 'value' in fac_node[4]:
             used_values = []
             print(f'Please enter the unit for factor {fac}:')
             unit = parse_input_value('unit', '', True, 'str', result_dict)
@@ -206,7 +216,7 @@ def get_experimental_factors(node, result_dict):
                 f'Please select the values for experimental factor '
                 f'{factor_value["factor"]} (1-{len(value_list)}) divided by '
                 f'comma:\n')
-            print_option_list(value_list)
+            print_option_list(value_list, False)
             used_values = parse_input_list(value_list, False)
         else:
             value_type = fac_node[7]
@@ -227,7 +237,7 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
     print(
         f'Please select the analyzed combinations of experimental factors '
         f'(1-{len(combinations)}) divided by comma:\n')
-    print_option_list(combinations)
+    print_option_list(combinations, False)
     used_combinations = parse_input_list(combinations, False)
     conditions = get_replicate_count(used_combinations, node, mandatory_mode,
                                      result_dict)
@@ -268,7 +278,7 @@ def get_replicates(condition, bio, input_pooled, node, mandatory_mode,
 
 def fill_replicates(type, condition, start, end, input_pooled, node,
                     mandatory_mode, result_dict):
-    conditions = condition.split('-')
+    conditions = split_cond(condition)
     replicates = {'count': end - start, 'samples': []}
     for i in range(start, end):
         samples = {}
@@ -284,17 +294,69 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
         samples['donor_count'] = donor_count
         samples['technical_replicates'] = get_technical_replicates(sample_name)
         for cond in conditions:
-            key_val = cond.split(':')
-            if key_val[0] in ['age', 'time_point', 'duration']:
-                unit = key_val[1].lstrip('0123456789')
-                value = key_val[1][:len(key_val[1])-len(unit)]
-                key_val[1] = {'unit': unit, 'value': int(value)}
-            samples[key_val[0]] = key_val[1]
-        samples = {**samples,
-                   **generate_part(node[type][4]['samples'][4], 'samples', {},
-                                   False, mandatory_mode, result_dict)}
+            sub = cond[0].split('_')[0]
+            if sub == 'disease' or sub == 'treatment':
+                if f'{sub}_information' not in samples:
+                    samples[f'{sub}_information'] = {}
+                if f'{sub}' in samples[f'{sub}_information']:
+                    samples[f'{sub}_information'][f'{sub}'][0][cond[0]] = cond[1]
+                else:
+                    samples[f'{sub}_information'] = {
+                        f'{sub}': [{cond[0]: cond[1]}]}
+            else:
+                if cond[0] in ['age', 'time_point', 'duration']:
+                    unit = cond[1].lstrip('0123456789')
+                    value = cond[1][:len(cond[1]) - len(unit)]
+                    cond[1] = {'unit': unit, 'value': int(value)}
+                samples[cond[0]] = cond[1]
+
+        samples = merge_dicts(samples,
+                              generate_part(node[type][4]['samples'][4],
+                                            'samples', {},
+                                            False, mandatory_mode,
+                                            result_dict))
         replicates['samples'].append(samples)
     return replicates
+
+
+def split_cond(condition):
+    conditions = []
+    key = ''
+    value = ''
+    count = 0
+    start = 0
+    for i in range(len(condition)):
+        if condition[i] == '\"':
+            count += 1
+            if count % 2 == 0:
+                value = condition[start:i]
+            else:
+                key = condition[start:i].rstrip(':')
+                start = i+1
+        elif condition[i] == '-' and count % 2 == 0:
+            conditions.append((key, value))
+            start = i+1
+    conditions.append((key, value))
+    return conditions
+
+
+def merge_dicts(a, b):
+    if isinstance(a, list):
+        res = []
+        for i in range(len(a)):
+            res.append(merge_dicts(a[i], b[i]))
+    else:
+        b_keys = list(b.keys())
+        res = {}
+        for key in a.keys():
+            if key in b_keys:
+                res[key] = merge_dicts(a[key], b[key])
+                b_keys.remove(key)
+            else:
+                res[key] = a[key]
+        for key in b_keys:
+            res[key] = b[key]
+    return res
 
 
 def get_technical_replicates(sample_name):
@@ -319,13 +381,14 @@ def get_condition_combinations(factors):
     combinations = []
     for i in range(len(factors)):
         for value in factors[i]['values']:
-            if isinstance(value, dict) and 'value' in value and 'unit' in value:
+            if isinstance(value,
+                          dict) and 'value' in value and 'unit' in value:
                 value = f'{value["value"]}{value["unit"]}'
-            combinations.append(f'{factors[i]["factor"]}:{value}')
+            combinations.append(f'{factors[i]["factor"]}:"{value}"')
             for j in range(i + 1, len(factors)):
                 comb = get_condition_combinations(factors[j:])
                 for c in comb:
-                    combinations.append(f'{factors[i]["factor"]}:{value}-{c}')
+                    combinations.append(f'{factors[i]["factor"]}:"{value}"-{c}')
     return combinations
 
 
@@ -344,7 +407,7 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
 def parse_list_choose_one(whitelist, header):
     try:
         print(header)
-        print_option_list(whitelist)
+        print_option_list(whitelist, False)
         value = whitelist[int(input()) - 1]
     except (IndexError, ValueError) as e:
         print(f'Invalid entry. Please enter a number between 1 and '
@@ -384,19 +447,25 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
                 print(f'Please enter something.')
                 input_value = parse_input_value(key, desc, whitelist,
                                                 value_type, result_dict)
+            elif '\"' in input_value:
+                print(f'Ivalid symbol \". Please try again.')
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type, result_dict)
         if value_type == 'int':
             try:
                 input_value = int(input_value)
             except ValueError:
                 print(f'Input must be of type int. Try again.')
-                input_value = parse_input_value(key, desc, whitelist, value_type,
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type,
                                                 result_dict)
         elif value_type == 'float':
             try:
                 input_value = float(input_value)
             except ValueError:
                 print(f'Input must be of type float. Try again.')
-                input_value = parse_input_value(key, desc, whitelist, value_type,
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type,
                                                 result_dict)
         elif value_type == 'date':
             try:
@@ -410,6 +479,7 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
                 input_value = input_value.strftime("%d.%m.%Y")
             except (IndexError, ValueError, SyntaxError) as e:
                 print(f'Input must be of type \'DD.MM.YYYY\'.')
-                input_value = parse_input_value(key, desc, whitelist, value_type,
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type,
                                                 result_dict)
     return input_value
