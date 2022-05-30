@@ -1,4 +1,4 @@
-ident_key: tissue
+whitelist_type: group
 lung:
   - lung cancer
   - COPD
