@@ -162,7 +162,15 @@ def read_whitelist(key):
     dependable = False
     try:
         whitelist = read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key))
-        dependable = True
+        if whitelist['whitelist_type'] == 'depend':
+            dependable = True
+        else:
+            w = []
+            for key in whitelist:
+                if key != 'whitelist_type':
+                    w += whitelist[key]
+            whitelist = w
+            dependable = False
     except (AttributeError, FileNotFoundError):
         try:
             whitelist = [w for w in open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key)).read().splitlines() if w.strip()]
