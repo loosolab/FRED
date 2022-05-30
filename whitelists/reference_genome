@@ -1,4 +1,5 @@
-ident_key: organism_name
+whitelist_type: depend
+ident_key: organism
 human:
   - hg38
   - hg19
