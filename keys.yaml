@@ -12,7 +12,7 @@ project:
   - 'mandatory'
   - False
   - 'Project'
-  - 'The project part contains general information about the project.'
+  - 'This part contains general information about the project.'
   - id:
       - 'mandatory'
       - False
@@ -170,8 +170,8 @@ project:
     further_description:
       - 'optional'
       - True
-      - 'Further Description'
-      - 'Here you can insert links to files that contain further information. This can be a presentation or a paper, for example.'
+      - 'Further Description / Additional Info'
+      - 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
       - null
       - False
       - short_text
@@ -190,30 +190,16 @@ experimental_setting:
   - 'mandatory'
   - True
   - 'Experimental setting'
-  - 'The experimental setting part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for different organisms.'
+  - 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for different organisms.'
   - organism:
       - 'mandatory'
       - False
       - 'Organism'
       - ''
-      - organism_name:
-          - 'mandatory'
-          - False
-          - 'Organism Name'
-          - ''
-          - null
-          - True
-          - select
-          - str
-        taxonomy_id:
-          - 'mandatory'
-          - False
-          - 'Taxonomy ID'
-          - ''
-          - null
-          - True
-          - select
-          - str
+      - null
+      - True
+      - select
+      - str
     experimental_factors:
       - 'mandatory'
       - True
@@ -554,11 +540,11 @@ experimental_setting:
                       - short_text
                       - str
 
-experiment:
+technical_details:
   - 'mandatory'
   - False
-  - 'Experiment'
-  - 'The experiment part contains all technical details of the experiment including an analysis part that stores additional information e.g. about runs.'
+  - 'Technical Details'
+  - 'This part contains all technical details of the experiment including an analysis part that stores additional information e.g. about runs.'
   - technique:
       - 'mandatory'
       - False
