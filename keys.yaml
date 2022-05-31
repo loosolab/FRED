@@ -540,7 +540,7 @@ experimental_setting:
                       - short_text
                       - str
 
-technical_details:
+experiment:
   - 'mandatory'
   - False
   - 'Technical Details'
