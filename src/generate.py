@@ -208,6 +208,12 @@ def get_experimental_factors(node, result_dict):
 
                 if value[0] in value_list:
                     value_list = value_list[value[0]]
+                    if not isinstance(value_list, list) and os.path.isfile(
+                            os.path.join(
+                                    os.path.dirname(os.path.abspath(__file__)),
+                                    '..', 'whitelists', value_list)):
+                        w, d = utils.read_whitelist(value_list)
+                        value_list = w
                     dependable = False
                 else:
                     value_list, dependable = utils.read_whitelist(value[0])
@@ -429,6 +435,9 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
 
             if value[0] in whites:
                 whites = whites[value[0]]
+                if not isinstance(whites, list) and os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', whites)):
+                    w, d = utils.read_whitelist(whites)
+                    whites = w
                 dependable = False
             else:
                 whites, dependable = utils.read_whitelist(value[0])
