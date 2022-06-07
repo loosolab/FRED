@@ -36,7 +36,7 @@ The possible elements of the 'ident_key' (the values in the whitelist for the 'i
 
 __Example:__
 
-<table style="width:100%">
+<table style="width:80px;"">
 <tr>
 <th>
 whitelists/reference_genome
