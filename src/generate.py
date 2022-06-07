@@ -313,7 +313,7 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                 if cond[0] in ['age', 'time_point', 'duration']:
                     unit = cond[1].lstrip('0123456789')
                     value = cond[1][:len(cond[1]) - len(unit)]
-                    cond[1] = {'unit': unit, 'value': int(value)}
+                    list(cond)[1] = {'unit': unit, 'value': int(value)}
                 samples[cond[0]] = cond[1]
 
         samples = merge_dicts(samples,
