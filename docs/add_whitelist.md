@@ -46,6 +46,22 @@ whitelists/organism
 </th>
 </tr>
 <tr>
+<td> 
+The whitelist for the reference<br> 
+genome depends on the organism.<br>
+For this reason, the 'ident_key' <br>
+is assigned 'organism'.<br>
+The organisms are the keys whose <br>
+values are the whitelists.
+</td> 
+<td> 
+The whitelist for 'organism' contains<br> 
+all allowed organisms as values. <br>
+These form the keys in the dependent <br>
+whitelist 'reference_genome'.
+</td>
+</tr>
+<tr>
 <td>
 
 ```yaml
