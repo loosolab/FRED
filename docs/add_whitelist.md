@@ -14,9 +14,12 @@ Finally, whitelists can be made dependent on input for other keys using the whit
 
 This type of whitelist is the simplest, as it contains all values in plain text format. One line of the text document corresponds to one value in the whitelist.
 
-#### Example
-
-TBA
+__Example: whitelists/gender__
+```text
+male
+female
+mixed
+```
 
 ### Type 2: group
 
@@ -29,15 +32,170 @@ The whitelist is organized here using a yaml file. Each whitelist of type 'depen
 The 'whitelist_type' is set with the value 'depend'. This identifies how the whitelist must be read within the metadata tool.
 The key 'ident_key' names the key on whose input the whitelist should depend. For example, if you want to make the whitelist for genes dependent on the examined organism, you set the value for 'ident key' to 'organism'.
 
-The possible elements of the 'ident_key' are then specified as further keys. For the 'ident_key' 'organism' possible keys would be 'human', 'mouse', 'zebrafish' etc. For each of these keys the whitelist can be entered as a list.
+The possible elements of the 'ident_key' (the values in the whitelist for the 'ident_key' are then specified as further keys. For the 'ident_key' 'organism' possible keys would be 'human_9606', 'mouse_10090', 'zebrafish_7955' etc. For each of these keys the whitelist can be entered as a list.
+
+__Example:__
+
+<table>
+<tr>
+<td> 
+
+__whitelists/reference_genome__
+
+The whitelist for the reference genome depends on the organism. For this reason, the 'ident_key' is assigned 'organism'.
+The organisms are the keys whose values are the whitelists.
+
+</td> 
+<td> 
+
+__whitelists/organism__
+
+The whitelist for 'organism' contains all allowed organisms as values. These form the keys in the dependent whitelist 'reference_genome'.
+
+</td>
+</tr>
+<tr>
+<td>
+
+```yaml
+whitelist_type: depend
+ident_key: organism
+human_9606:
+  - hg38
+  - hg19
+mouse_10090:
+  - mm10
+  - mm9
+  - mm38
+zebrafish_7955:
+  - danrer11
+  - danrer10
+...
+```
+
+</td>
+<td>
+
+```text
+human_9606
+mouse_10090
+zebrafish_7955
+...
+```
+</td>
+</tr>
+</table>
+
+
 If the whitelists per key are very long, it makes sense to separate them into individual files. In this case the path to the whitelist within the folder 'whitelists' is specified as value instead of the whitelist itself. Since the path to the whitelist is specified explicitly, the naming of the whitelist can differ from the key and be chosen by the user. The whitelists can also be organized in subfolders.
 
-If independent whitelist files already exist for the keys, those keys can be omitted and the metadata tool reads the existing files as whitelist. This is e.g. the case for the whitelist 'value'. The key 'value' in the metadata structure contains the examined values of the examined experimental factor. So the whitelist for 'value' depends on the whitelist 'factor'. Since each experimental factor has its own whitelist, the keys for the experimental factors in the whitelist for 'value' can be omitted. Thus, the existing files are read in as whitelist.
+__Example:__
 
 
-#### Example
+<table>
+<tr>
+<td> 
 
-TBA
+__whitelists/gene__
+
+The whitelists for the genes per organism are very long, which is why they are outsourced to individual files. The keys are named after the organisms and the path to the respective whitelist is given as value. 
+
+</td> 
+<td> 
+
+__whitelists/genes/human__
+
+For the whitelists per organism a new folder 'genes' was created. The whitelists are named after the organism for which they contain the genes. The naming of the files does not follow any fixed rule but is subject to personal preference. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+```yaml
+whitelist_type: depend
+ident_key: organism
+human_9606: genes/human
+mouse_10090: genes/mouse
+zebrafish_7955: genes/zebrafish
+...
+```
+
+</td>
+<td>
+
+```text
+TSPAN6_ENSG00000000003
+TNMD_ENSG00000000005
+DPM1_ENSG00000000419
+SCYL3_ENSG00000000457
+C1orf112_ENSG00000000460
+...
+```
+</td>
+</tr>
+</table>
+
+If independent whitelist files already exist for the keys and the files are located in the folder whitelists and named exatly like the respective key, those keys can be omitted and the metadata tool reads the existing files as whitelist. This is e.g. the case for the whitelist 'values'. The key 'values' in the metadata structure contains the examined values of the examined experimental factor. So the whitelist for 'values' depends on the whitelist 'factor'. Since each experimental factor has its own whitelist, the keys for the experimental factors in the whitelist for 'value' can be omitted. Thus, the existing files are read in as whitelist.
+
+__Example:__
+
+
+<table>
+<tr>
+<td> 
+
+__whitelists/values__
+
+The whitelist for values depends on the entered 'factor'. The value 'factor' is therefore assigned to the 'ident_key'.
+
+</td> 
+<td> 
+
+__whitelists/factor__
+
+The key 'factor' also has a whitelist. All values specified in the whitelist 'factor' form possible keys in the whitelist 'values'.
+
+</td>
+<td> 
+
+__whitelists/genotype__
+
+For the values in the whitelist 'factor' (e.g. genotype) there are separate whitelists named after the respective value. The values therefore no longer have to be specified as keys in the whitelist 'values'. The metadata tool reads the already existing files as whitelist.
+
+</td> 
+</tr>
+<tr>
+<td>
+
+```yaml
+whitelist_type: depend
+ident_key: factor
+```
+
+</td>
+<td>
+
+```text
+genotype
+tissue
+cell_type
+knockdown
+gender
+...
+```
+</td>
+
+<td>
+
+```text
+Mut
+WT
+```
+</td>
+</tr>
+</table>
+
 
 # Adding values to a whitelist
 
