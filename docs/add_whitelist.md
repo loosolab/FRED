@@ -36,7 +36,7 @@ The possible elements of the 'ident_key' (the values in the whitelist for the 'i
 
 __Example:__
 
-<table style="width:800px;">
+<table>
 <tr>
 <th>
 whitelists/reference_genome
@@ -44,14 +44,6 @@ whitelists/reference_genome
 <th>
 whitelists/organism
 </th>
-</tr>
-<tr>
-<td> 
-The whitelist for the reference genome depends on the organism. For this reason, the 'ident_key' is assigned 'organism'. The organisms are the keys whose values are the whitelists.
-</td> 
-<td> 
-The whitelist for 'organism' contains all allowed organisms as values. These form the keys in the dependent whitelist 'reference_genome'.
-</td>
 </tr>
 <tr>
 <td>
