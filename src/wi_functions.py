@@ -67,8 +67,12 @@ def parse_empty(node, pre, organism_name, key_yaml):
             whitelist = [True, False]
         else:
             whitelist = None
-        input_type = 'dependable_select' if isinstance(whitelist, dict) else \
-            node[6]
+        if isinstance(whitelist, dict):
+            input_type = 'dependable_select'
+        elif len(whitelist) > 50:
+            input_type = 'searchable_select'
+        else:
+            input_type = node[6]
         res = {'position': pre,
                'mandatory': True if node[0] == 'mandatory' else False,
                'list': node[1], 'displayName': node[2], 'desc': node[3],
@@ -118,7 +122,6 @@ def dependable(whitelist, key_yaml, organism_name):
                     input_type = input_type[0][6]
             else:
                 input_type = 'short_text'
-            print(input_type)
             if input_type == 'value_unit':
                 w, d = utils.read_whitelist('unit')
             elif input_type == 'bool':
@@ -131,7 +134,6 @@ def dependable(whitelist, key_yaml, organism_name):
                 w = dependable(w, key_yaml, organism_name)
                 if organism_name and organism_name in w:
                     w = w[organism_name]
-                    print(w)
                     if os.path.isfile(os.path.join(
                             os.path.dirname(os.path.abspath(__file__)), '..',
                             'whitelists', w['whitelist'])):
@@ -141,6 +143,8 @@ def dependable(whitelist, key_yaml, organism_name):
                         w = w['whitelist']
                 else:
                     input_type = 'dependable_select'
+            if len(w) > 50:
+                input_type = 'searchable_select'
             new_white[key] = {'whitelist': w, 'input_type': input_type}
     return new_white
 
