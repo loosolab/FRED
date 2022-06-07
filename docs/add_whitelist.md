@@ -38,11 +38,19 @@ __Example:__
 
 <table style="width:100%">
 <tr>
+<th>
+whitelists/reference_genome
+</th>
+<th>
+whitelists/organism
+</th>
+</tr>
+<tr>
 <td> 
-<b>whitelists/reference_genome</b><br>The whitelist for the reference genome depends on the organism. For this reason, the 'ident_key' is assigned 'organism'. The organisms are the keys whose values are the whitelists.
+The whitelist for the reference genome depends on the organism. For this reason, the 'ident_key' is assigned 'organism'. The organisms are the keys whose values are the whitelists.
 </td> 
 <td> 
-<b>whitelists/organism</b><br>The whitelist for 'organism' contains all allowed organisms as values. These form the keys in the dependent whitelist 'reference_genome'.
+The whitelist for 'organism' contains all allowed organisms as values. These form the keys in the dependent whitelist 'reference_genome'.
 </td>
 </tr>
 <tr>
