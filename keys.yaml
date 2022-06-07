@@ -443,7 +443,7 @@ experimental_setting:
                           - True
                           - select
                           - str
-                        duration:
+                        treatment_duration:
                           - 'optional'
                           - False
                           - 'Duration'

@@ -14,7 +14,7 @@ disease_stage
 treated
 treatment_status
 treatment_type
-duration
+treatment_duration
 time_point
 flow
 
