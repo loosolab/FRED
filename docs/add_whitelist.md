@@ -47,18 +47,16 @@ whitelists/organism
 </tr>
 <tr>
 <td> 
-The whitelist for the reference<br> 
-genome depends on the organism.<br>
-For this reason, the 'ident_key' <br>
-is assigned 'organism'.<br>
-The organisms are the keys whose <br>
-values are the whitelists.
+<div>
+The whitelist for the reference genome depends on the organism.
+For this reason, the 'ident_key' is assigned 'organism'. The organisms are the keys whose values are the whitelists.
+</div>
 </td> 
 <td> 
-The whitelist for 'organism' contains<br> 
-all allowed organisms as values. <br>
-These form the keys in the dependent <br>
-whitelist 'reference_genome'.
+<div>
+The whitelist for 'organism' contains all allowed organisms as values. 
+These form the keys in the dependent whitelist 'reference_genome'.
+</div>
 </td>
 </tr>
 <tr>
