@@ -59,9 +59,8 @@ def parse_empty(node, pre, organism_name, key_yaml):
         if node[5]:
             whitelist, depend = utils.read_whitelist(pre.split(':')[-1])
             if depend:
-                new_white = dependable(whitelist, key_yaml)
+                new_white = dependable(whitelist, key_yaml, organism_name)
                 if organism_name and organism_name in new_white:
-                    print(new_white[organism_name])
                     new_white = new_white[organism_name]['whitelist']
                 whitelist = new_white
         elif node[7] == 'bool':
@@ -84,7 +83,18 @@ def parse_empty(node, pre, organism_name, key_yaml):
     return res
 
 
-def dependable(whitelist, key_yaml):
+def get_factors(organism):
+    key_yaml = utils.read_in_yaml(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
+    factor_value={}
+    factor_value['factor'], d = utils.read_whitelist('factor')
+    values = parse_empty(key_yaml['experimental_setting'][4]['experimental_factors'][4]['values'],'experimental_setting:experimental_factors:values', organism, key_yaml)['whitelist']
+    factor_value['values'] = values
+    return factor_value
+
+
+def dependable(whitelist, key_yaml, organism_name):
     new_white = {'ident_key': whitelist['ident_key']}
     possible_input, depend = utils.read_whitelist(
         whitelist['ident_key'])
@@ -102,17 +112,35 @@ def dependable(whitelist, key_yaml):
                         input_type[0][4].keys()) == 2 and 'value' in \
                         input_type[0][4] and 'unit' in input_type[0][4]:
                     input_type = 'value_unit'
+                elif input_type[0][7] == 'bool':
+                    input_type = 'bool'
                 else:
                     input_type = input_type[0][6]
             else:
                 input_type = 'short_text'
+            print(input_type)
             if input_type == 'value_unit':
                 w, d = utils.read_whitelist('unit')
+            elif input_type == 'bool':
+                w = [True, False]
+                d = False
+                input_type = 'select'
             else:
                 w, d = utils.read_whitelist(key)
             if d:
-                w = dependable(w, key_yaml)
-                input_type = 'dependable_select'
+                w = dependable(w, key_yaml, organism_name)
+                if organism_name and organism_name in w:
+                    w = w[organism_name]
+                    print(w)
+                    if os.path.isfile(os.path.join(
+                            os.path.dirname(os.path.abspath(__file__)), '..',
+                            'whitelists', w['whitelist'])):
+                        w['whitelist'], d = utils.read_whitelist(
+                            w['whitelist'])
+                        input_type = w['input_type']
+                        w = w['whitelist']
+                else:
+                    input_type = 'dependable_select'
             new_white[key] = {'whitelist': w, 'input_type': input_type}
     return new_white
 
