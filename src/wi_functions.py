@@ -56,6 +56,7 @@ def parse_empty(node, pre, organism_name, key_yaml):
         if node[1]:
             res['list_value'] = []
     else:
+        input_type = ''
         if node[5]:
             whitelist, depend = utils.read_whitelist(pre.split(':')[-1])
             if depend:
@@ -63,16 +64,24 @@ def parse_empty(node, pre, organism_name, key_yaml):
                 if organism_name and organism_name in new_white:
                     new_white = new_white[organism_name]['whitelist']
                 whitelist = new_white
+            elif 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'group':
+                new_w = []
+                for key in whitelist:
+                    if key != 'whitelist_type':
+                        new_w.append({'title': key, 'whitelist': whitelist[key]})
+                input_type = 'group_select'
+                whitelist = new_w
         elif node[7] == 'bool':
             whitelist = [True, False]
         else:
             whitelist = None
-        if isinstance(whitelist, dict):
-            input_type = 'dependable_select'
-        elif len(whitelist) > 50:
-            input_type = 'searchable_select'
-        else:
-            input_type = node[6]
+        if input_type != 'group_select':
+            if isinstance(whitelist, dict):
+                input_type = 'dependable_select'
+            elif len(whitelist) > 50:
+                input_type = 'searchable_select'
+            else:
+                input_type = node[6]
         res = {'position': pre,
                'mandatory': True if node[0] == 'mandatory' else False,
                'list': node[1], 'displayName': node[2], 'desc': node[3],
@@ -143,7 +152,14 @@ def dependable(whitelist, key_yaml, organism_name):
                         w = w['whitelist']
                 else:
                     input_type = 'dependable_select'
-            if len(w) > 50:
+            elif 'whitelist_type' in w and w['whitelist_type'] == 'group':
+                new_w = []
+                for w_key in w:
+                    if w_key != 'whitelist_type':
+                        new_w.append({'title': w_key, 'whitelist': w[w_key]})
+                input_type = 'group_select'
+                w = new_w
+            if len(w) > 50 and input_type != 'group_select':
                 input_type = 'searchable_select'
             new_white[key] = {'whitelist': w, 'input_type': input_type}
     return new_white

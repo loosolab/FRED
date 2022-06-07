@@ -164,6 +164,8 @@ def read_whitelist(key):
         whitelist = read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key))
         if whitelist['whitelist_type'] == 'depend':
             dependable = True
+        elif whitelist['whitelist_type'] == 'group':
+            dependable = False
         else:
             w = []
             for key in whitelist:
