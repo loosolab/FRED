@@ -78,8 +78,8 @@ def parse_empty(node, pre, organism_name, key_yaml):
         if input_type != 'group_select':
             if isinstance(whitelist, dict):
                 input_type = 'dependable_select'
-            elif len(whitelist) > 50:
-                input_type = 'searchable_select'
+            #elif len(whitelist) > 50:
+            #    input_type = 'searchable_select'
             else:
                 input_type = node[6]
         res = {'position': pre,
@@ -159,8 +159,8 @@ def dependable(whitelist, key_yaml, organism_name):
                         new_w.append({'title': w_key, 'whitelist': w[w_key]})
                 input_type = 'group_select'
                 w = new_w
-            if len(w) > 50 and input_type != 'group_select':
-                input_type = 'searchable_select'
+            #if len(w) > 50 and input_type != 'group_select':
+            #    input_type = 'searchable_select'
             new_white[key] = {'whitelist': w, 'input_type': input_type}
     return new_white
 
