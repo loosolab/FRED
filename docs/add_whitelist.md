@@ -36,12 +36,12 @@ The possible elements of the 'ident_key' (the values in the whitelist for the 'i
 
 __Example:__
 
-<table>
+<table style="width:800px;">
 <tr>
-<th style="width:50%">
+<th>
 whitelists/reference_genome
 </th>
-<th style="width:50%">
+<th>
 whitelists/organism
 </th>
 </tr>
