@@ -36,22 +36,13 @@ The possible elements of the 'ident_key' (the values in the whitelist for the 'i
 
 __Example:__
 
-<table>
+<table style="width:100%">
 <tr>
 <td> 
-
-__whitelists/reference_genome__
-
-The whitelist for the reference genome depends on the organism. For this reason, the 'ident_key' is assigned 'organism'.
-The organisms are the keys whose values are the whitelists.
-
+<b>whitelists/reference_genome</b><br>The whitelist for the reference genome depends on the organism. For this reason, the 'ident_key' is assigned 'organism'. The organisms are the keys whose values are the whitelists.
 </td> 
 <td> 
-
-__whitelists/organism__
-
-The whitelist for 'organism' contains all allowed organisms as values. These form the keys in the dependent whitelist 'reference_genome'.
-
+<b>whitelists/organism</b><br>The whitelist for 'organism' contains all allowed organisms as values. These form the keys in the dependent whitelist 'reference_genome'.
 </td>
 </tr>
 <tr>
@@ -92,21 +83,13 @@ If the whitelists per key are very long, it makes sense to separate them into in
 __Example:__
 
 
-<table>
+<table style="width:100%">
 <tr>
 <td> 
-
-__whitelists/gene__
-
-The whitelists for the genes per organism are very long, which is why they are outsourced to individual files. The keys are named after the organisms and the path to the respective whitelist is given as value. 
-
+<b>whitelists/gene</b><br>The whitelists for the genes per organism are very long, which is why they are outsourced to individual files. The keys are named after the organisms and the path to the respective whitelist is given as value. 
 </td> 
 <td> 
-
-__whitelists/genes/human__
-
-For the whitelists per organism a new folder 'genes' was created. The whitelists are named after the organism for which they contain the genes. The naming of the files does not follow any fixed rule but is subject to personal preference. 
-
+<b>whitelists/genes/human</b><br>For the whitelists per organism a new folder 'genes' was created. The whitelists are named after the organism for which they contain the genes. The naming of the files does not follow any fixed rule but is subject to personal preference. 
 </td>
 </tr>
 <tr>
@@ -141,28 +124,16 @@ If independent whitelist files already exist for the keys and the files are loca
 __Example:__
 
 
-<table>
+<table style="width:100%">
 <tr>
 <td> 
-
-__whitelists/values__
-
-The whitelist for values depends on the entered 'factor'. The value 'factor' is therefore assigned to the 'ident_key'.
-
+<b>whitelists/values</b><br>The whitelist for values depends on the entered 'factor'. The value 'factor' is therefore assigned to the 'ident_key'.
 </td> 
 <td> 
-
-__whitelists/factor__
-
-The key 'factor' also has a whitelist. All values specified in the whitelist 'factor' form possible keys in the whitelist 'values'.
-
+<b>whitelists/factor</b><br>The key 'factor' also has a whitelist. All values specified in the whitelist 'factor' form possible keys in the whitelist 'values'.
 </td>
 <td> 
-
-__whitelists/genotype__
-
-For the values in the whitelist 'factor' (e.g. genotype) there are separate whitelists named after the respective value. The values therefore no longer have to be specified as keys in the whitelist 'values'. The metadata tool reads the already existing files as whitelist.
-
+<b>whitelists/genotype</b><br>For the values in the whitelist 'factor' (e.g. genotype) there are separate whitelists named after the respective value. The values therefore no longer have to be specified as keys in the whitelist 'values'. The metadata tool reads the already existing files as whitelist.
 </td> 
 </tr>
 <tr>
