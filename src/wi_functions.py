@@ -78,7 +78,7 @@ def parse_empty(node, pre, organism_name, key_yaml):
         if input_type != 'group_select':
             if isinstance(whitelist, dict):
                 input_type = 'dependable_select'
-            #elif len(whitelist) > 50:
+            #elif whitelist and len(whitelist) > 50:
             #    input_type = 'searchable_select'
             else:
                 input_type = node[6]
@@ -86,9 +86,7 @@ def parse_empty(node, pre, organism_name, key_yaml):
                'mandatory': True if node[0] == 'mandatory' else False,
                'list': node[1], 'displayName': node[2], 'desc': node[3],
                'value': node[4],
-               'whitelist': sorted(whitelist) if isinstance(whitelist,
-                                                            list) else
-               whitelist,
+               'whitelist': whitelist,
                'input_type': input_type, 'data_type': node[7],
                'input_disabled': input_disabled}
         if node[1]:
@@ -152,14 +150,14 @@ def dependable(whitelist, key_yaml, organism_name):
                         w = w['whitelist']
                 else:
                     input_type = 'dependable_select'
-            elif 'whitelist_type' in w and w['whitelist_type'] == 'group':
+            elif w and 'whitelist_type' in w and w['whitelist_type'] == 'group':
                 new_w = []
                 for w_key in w:
                     if w_key != 'whitelist_type':
                         new_w.append({'title': w_key, 'whitelist': w[w_key]})
                 input_type = 'group_select'
                 w = new_w
-            #if len(w) > 50 and input_type != 'group_select':
+            #if w and len(w) > 50 and input_type != 'group_select':
             #    input_type = 'searchable_select'
             new_white[key] = {'whitelist': w, 'input_type': input_type}
     return new_white
