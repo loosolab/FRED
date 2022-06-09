@@ -63,6 +63,9 @@ def parse_empty(node, pre, organism_name, key_yaml):
                 new_white = dependable(whitelist, key_yaml, organism_name)
                 if organism_name and organism_name in new_white:
                     new_white = new_white[organism_name]['whitelist']
+                    if os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists', new_white)):
+                        w, d = utils.read_whitelist(new_white)
+                        new_white = w
                 whitelist = new_white
             elif 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'group':
                 new_w = []
