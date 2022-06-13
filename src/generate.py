@@ -256,7 +256,7 @@ def get_experimental_factors(node, result_dict):
                     if input_value in value_list:
                         used_values.append(input_value)
                         redo = parse_list_choose_one([True, False],
-                                         f'Do you want to add another {factor_value["factor"]}?')
+                                         f'\nDo you want to add another {factor_value["factor"]}?')
                     else:
                         print(f'The value you entered does not match the '
                               f'whitelist. Try tab for autocomplete.')
