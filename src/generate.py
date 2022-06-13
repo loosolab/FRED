@@ -445,7 +445,16 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
     if whitelist:
         whites = utils.get_whitelist(key, result_dict)
     if whites:
-        if len(whites) > 30:
+        if isinstance(whites, dict):
+            w = [x for xs in list(whites.values()) for x in xs]
+            if len(w) > 30:
+                completer = WhitelistCompleter(w)
+                readline.set_completer(completer.complete)
+                readline.set_completer_delims('')
+                input_value = input(f'{key}: ')
+            else:
+                input_value = parse_group_choose_one(whites, w, f'{key}:')
+        elif len(whites) > 30:
             completer = WhitelistCompleter(whites)
             readline.set_completer(completer.complete)
             readline.set_completer_delims('')
@@ -500,3 +509,20 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
                                                 value_type,
                                                 result_dict)
     return input_value
+
+
+def parse_group_choose_one(whitelist, w, header):
+    try:
+        print(header)
+        i = 1
+        for key in whitelist:
+            print(f'\033[1m{key}\033[0m')
+            for value in whitelist[key]:
+                print(f'{i}: {value}')
+                i += 1
+        value = w[int(input()) - 1]
+    except (IndexError, ValueError) as e:
+        print(f'Invalid entry. Please enter a number between 1 and '
+              f'{len(whitelist)}')
+        value = parse_list_choose_one(whitelist, header)
+    return value
