@@ -149,6 +149,8 @@ def get_whitelist_with_type(key, key_yaml, organism):
             whitelist = utils.read_depend_whitelist(whitelist, organism)
     # if whitelist and len(whitelist) > 30:
     #    input_type = 'searchable_select'
+    if key == 'gene':
+        input_type = 'unique'
     return whitelist, input_type
 
 
@@ -219,6 +221,8 @@ def get_whitelist_object(item, organism_name, whitelists):
             whitelist = utils.read_whitelist('unit')
         else:
             whitelist = None
+        if item['position'].split(':')[-1] == 'gene':
+            input_type = 'unique'
         item['input_type'] = input_type
         if whitelist:
             whitelists[item['position'].split(':')[-1]] = whitelist
