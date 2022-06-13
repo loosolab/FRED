@@ -7,9 +7,7 @@ import os
 import readline
 import re
 
-readline.parse_and_bind("tab: complete")
-readline.parse_and_bind("set show-all-if-ambiguous On")
-readline.parse_and_bind("set show-all-if-unmodified On")
+size = os.get_terminal_size()
 factor = []
 not_editable = ['id', 'project_name', 'sample_name', 'pooled', 'donor_count',
                 'technical_replicates']
@@ -48,15 +46,15 @@ def generate_file(path, input_id, name, mandatory_mode):
         if item in result_dict:
             result_dict[item] = {**result_dict[item],
                                  **get_redo_value(key_yaml[item], item, False,
-                                                  mandatory_mode, result_dict)}
+                                                  mandatory_mode, result_dict, True)}
         else:
             result_dict[item] = get_redo_value(key_yaml[item], item, False,
-                                               mandatory_mode, result_dict)
-    print(f'{"".center(80, "-")}\n'
-          f'{"SUMMARY".center(80, " ")}\n')
+                                               mandatory_mode, result_dict, True)
+    print(f'{"".center(size.columns, "-")}\n'
+          f'{"SUMMARY".center(size.columns, " ")}\n')
     print_summary(result_dict, '')
     print(f'\n\n')
-    print(f'{"".center(80, "-")}\n')
+    print(f'{"".center(size.columns, "-")}\n')
     # valid, missing_mandatory_keys, invalid_keys, \
     # invalid_entries = validate_yaml.validate_file(result_dict)
     # if not valid:
@@ -85,7 +83,7 @@ def print_summary(result, pre):
 
 
 def generate_part(node, key, return_dict, optional, mandatory_mode,
-                  result_dict):
+                  result_dict, first_node):
     if isinstance(node, dict):
         if len(node.keys()) == 2 and 'value' in node.keys() and 'unit' in node.keys():
             value_unit = {
@@ -110,7 +108,7 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                         return_dict[item] = get_redo_value(node[item], item,
                                                            optional,
                                                            mandatory_mode,
-                                                           return_dict)
+                                                           return_dict, False)
                     else:
                         if item not in factor:
                             optionals.append(item)
@@ -118,8 +116,8 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
             if len(optionals) > 0 and mandatory_mode == False:
                 optional = True
                 print(
-                    f'Do you want to add any of the following optional keys? '
-                    f'(1,...,{len(optionals)} or n)\n')
+                    f'\nDo you want to add any of the following optional keys? '
+                    f'(1,...,{len(optionals)} or n)')
                 print_option_list(optionals, desc)
                 options = parse_input_list(optionals, True)
                 if options:
@@ -128,11 +126,11 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                                              option,
                                                              optional,
                                                              mandatory_mode,
-                                                             result_dict)
+                                                             result_dict, False)
     else:
         if node[0] == 'mandatory' or optional:
             value = enter_information(node, key, return_dict, optional,
-                                      mandatory_mode, result_dict)
+                                      mandatory_mode, result_dict, first_node)
             return value
     return return_dict
 
@@ -175,26 +173,26 @@ def parse_input_list(options, terminable):
     return input_list
 
 
-def get_redo_value(node, item, optional, mandatory_mode, result_dict):
+def get_redo_value(node, item, optional, mandatory_mode, result_dict, first_node):
     if node[1]:
         redo = True
         value = []
         while redo:
             value.append(
                 generate_part(node, item, {}, optional, mandatory_mode,
-                              result_dict))
+                              result_dict, first_node))
             redo = parse_list_choose_one([True, False],
-                                         f'Do you want to add another {item}?')
+                                         f'\nDo you want to add another {item}?')
     else:
         value = generate_part(node, item, {}, optional, mandatory_mode,
-                              result_dict)
+                              result_dict, first_node)
     return value
 
 
 def get_experimental_factors(node, result_dict):
     factor_list = utils.get_whitelist('factor', result_dict)
     print(
-        f'Please select the analyzed experimental factors '
+        f'\nPlease select the analyzed experimental factors '
         f'(1-{len(factor_list)}) divided by comma:\n')
     print_option_list(factor_list, False)
     used_factors = parse_input_list(factor_list, False)
@@ -206,9 +204,9 @@ def get_experimental_factors(node, result_dict):
         if isinstance(fac_node[4], dict) and 'unit' in fac_node[
             4] and 'value' in fac_node[4]:
             used_values = []
-            print(f'Please enter the unit for factor {fac}:')
+            print(f'\nPlease enter the unit for factor {fac}:')
             unit = parse_input_value('unit', '', True, 'str', result_dict)
-            print(f'Please enter int values for factor {fac} (in {unit}) '
+            print(f'\nPlease enter int values for factor {fac} (in {unit}) '
                   f'divided by comma:')
             values = parse_input_list('int', False)
             for val in values:
@@ -221,25 +219,22 @@ def get_experimental_factors(node, result_dict):
                 if len(w) > 30:
                     redo = True
                     print(
-                        f'Please enter the values for experimental factor '
+                        f'\nPlease enter the values for experimental factor '
                         f'{factor_value["factor"]}. Press tab once for autofill if'
                         f' possible or to get a list of up to'
                         f' 30 possible input values.\n')
                     while redo:
-                        completer = WhitelistCompleter(value_list)
-                        readline.set_completer(completer.complete)
-                        readline.set_completer_delims('')
-                        input_value = input(f'{factor_value["factor"]}: ')
+                        input_value = complete_input(w, factor_value["factor"])
                         if input_value in value_list:
                             used_values.append(input_value)
                             redo = parse_list_choose_one([True, False],
-                                                         f'Do you want to add another {factor_value["factor"]}?')
+                                                         f'\nDo you want to add another {factor_value["factor"]}?')
                         else:
                             print(f'The value you entered does not match the '
                                   f'whitelist. Try tab for autocomplete.')
                 else:
                     print(
-                        f'Please select the values for experimental factor '
+                        f'\nPlease select the values for experimental factor '
                         f'{factor_value["factor"]} (1-{len(w)}) divided by '
                         f'comma:\n')
                     i = 1
@@ -252,15 +247,12 @@ def get_experimental_factors(node, result_dict):
             elif len(value_list) > 30:
                 redo = True
                 print(
-                    f'Please enter the values for experimental factor '
+                    f'\nPlease enter the values for experimental factor '
                     f'{factor_value["factor"]}. Press tab once for autofill if'
                     f' possible or to get a list of up to'
                     f' 30 possible input values.\n')
                 while redo:
-                    completer = WhitelistCompleter(value_list)
-                    readline.set_completer(completer.complete)
-                    readline.set_completer_delims('')
-                    input_value = input(f'{factor_value["factor"]}: ')
+                    input_value = complete_input(value_list, factor_value["factor"])
                     if input_value in value_list:
                         used_values.append(input_value)
                         redo = parse_list_choose_one([True, False],
@@ -270,7 +262,7 @@ def get_experimental_factors(node, result_dict):
                               f'whitelist. Try tab for autocomplete.')
             else:
                 print(
-                    f'Please select the values for experimental factor '
+                    f'\nPlease select the values for experimental factor '
                     f'{factor_value["factor"]} (1-{len(value_list)}) divided by '
                     f'comma:\n')
                 print_option_list(value_list, False)
@@ -278,7 +270,7 @@ def get_experimental_factors(node, result_dict):
         else:
             value_type = fac_node[7]
             print(
-                f'Please enter a list of {value_type} values for experimental'
+                f'\nPlease enter a list of {value_type} values for experimental'
                 f' factor {factor_value["factor"]} divided by comma:\n')
             used_values = parse_input_list(value_type, False)
         factor_value['values'] = used_values
@@ -292,7 +284,7 @@ def get_experimental_factors(node, result_dict):
 def get_conditions(factors, node, mandatory_mode, result_dict):
     combinations = get_condition_combinations(factors)
     print(
-        f'Please select the analyzed combinations of experimental factors '
+        f'\nPlease select the analyzed combinations of experimental factors '
         f'(1-{len(combinations)}) divided by comma:\n')
     print_option_list(combinations, False)
     used_combinations = parse_input_list(combinations, False)
@@ -305,15 +297,15 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict):
     condition_infos = []
     input_pooled = None
     for condition in conditions:
-        print(f'{"".center(80, "_")}\n\n'
-              f'{f"Condition: {condition}".center(80, " ")}\n'
-              f'{"".center(80, "_")}\n\n'
+        print(f'{"".center(size.columns, "_")}\n\n'
+              f'{f"Condition: {condition}".center(size.columns, " ")}\n'
+              f'{"".center(size.columns, "_")}\n\n'
               f'Please enter the number of biological replicates:')
         bio = parse_input_value('count', '', False, 'int',
                                 result_dict)
         if bio > 0:
             input_pooled = parse_list_choose_one([True, False],
-                                                 f'Are the samples pooled?')
+                                                 f'\nAre the samples pooled?')
         condition_infos.append(
             get_replicates(condition, bio, input_pooled, node,
                            mandatory_mode, result_dict))
@@ -325,8 +317,8 @@ def get_replicates(condition, bio, input_pooled, node, mandatory_mode,
     replicates = {'condition_name': condition}
 
     if bio > 0:
-        print(f'{"".center(80, "_")}\n\n'
-              f'\033[1m{"Biological Replicates".center(80, " ")}\033[0m\n')
+        print(f'{"".center(size.columns, "_")}\n\n'
+              f'\033[1m{"Biological Replicates".center(size.columns, " ")}\033[0m\n')
         replicates['biological_replicates'] = fill_replicates(
             'biological_replicates', condition, 1, bio + 1, input_pooled, node,
             mandatory_mode, result_dict)
@@ -341,7 +333,7 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
         samples = {}
         sample_name = f'{condition}_{i}'
         samples['sample_name'] = sample_name
-        print(f'{f"Sample: {sample_name}".center(80, "-")}\n')
+        print(f'{f"Sample: {sample_name}".center(size.columns, "-")}\n')
         samples['pooled'] = input_pooled
         if input_pooled:
             donor_count = parse_input_value('donor_count', '', False, 'int',
@@ -371,7 +363,7 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                               generate_part(node[type][4]['samples'][4],
                                             'samples', {},
                                             False, mandatory_mode,
-                                            result_dict))
+                                            result_dict, False))
         replicates['samples'].append(samples)
     return replicates
 
@@ -417,7 +409,7 @@ def merge_dicts(a, b):
 
 
 def get_technical_replicates(sample_name):
-    print(f'Please enter the number of technical replicates:')
+    print(f'\nPlease enter the number of technical replicates:')
     count = parse_input_value('count', '', False, 'int', [])
     while count < 1:
         print(f'The number of technical replicates has to be at least 1.')
@@ -450,20 +442,28 @@ def get_condition_combinations(factors):
 
 
 def enter_information(node, key, return_dict, optional, mandatory_mode,
-                      result_dict):
+                      result_dict, first_node):
     if isinstance(node[4], dict):
-        print(f'Please enter information about the {key}')
+        if first_node:
+            print(f'{"".center(size.columns, "_")}\n\n'
+                  f'{f"{node[2]}".center(size.columns, " ")}\n'
+                  f'{"".center(size.columns, "_")}\n')
+        else:
+            print(f'\n'
+                  f'{"".center(size.columns, "-")}\n'
+                  f'{f"{node[2]}".center(size.columns, " ")}\n'
+                  f'{"".center(size.columns, "-")}\n')
         if node[3] != '':
-            print(node[3])
+            print(f'{node[3]}\n')
         return generate_part(node[4], key, return_dict, optional,
-                             mandatory_mode, result_dict)
+                             mandatory_mode, result_dict, False)
     else:
         return parse_input_value(key, node[3], node[5], node[7], result_dict)
 
 
 def parse_list_choose_one(whitelist, header):
     try:
-        print(header)
+        print(f'{header}')
         print_option_list(whitelist, False)
         value = whitelist[int(input()) - 1]
     except (IndexError, ValueError) as e:
@@ -481,22 +481,16 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
         if isinstance(whites, dict):
             w = [x for xs in list(whites.values()) for x in xs]
             if len(w) > 30:
-                completer = WhitelistCompleter(w)
-                readline.set_completer(completer.complete)
-                readline.set_completer_delims('')
-                input_value = input(f'{key}: ')
+                input_value = complete_input(w, key)
             else:
                 input_value = parse_group_choose_one(whites, w, f'{key}:')
         elif len(whites) > 30:
-            completer = WhitelistCompleter(whites)
-            readline.set_completer(completer.complete)
-            readline.set_completer_delims('')
-            input_value = input(f'{key}: ')
+            input_value = complete_input(whites, key)
         elif len(whites) > 0:
             input_value = parse_list_choose_one(whites, f'{key}:')
     else:
         if desc != '':
-            print(desc)
+            print(f'\n{desc}')
         if value_type == 'bool':
             input_value = parse_list_choose_one([True, False],
                                                 f'Is the sample {key}')
@@ -546,7 +540,7 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
 
 def parse_group_choose_one(whitelist, w, header):
     try:
-        print(header)
+        print(f'{header}\n')
         i = 1
         for key in whitelist:
             print(f'\033[1m{key}\033[0m')
@@ -559,3 +553,15 @@ def parse_group_choose_one(whitelist, w, header):
               f'{len(whitelist)}')
         value = parse_list_choose_one(whitelist, header)
     return value
+
+
+def complete_input(whitelist, key):
+    readline.parse_and_bind("tab: complete")
+    readline.parse_and_bind("set show-all-if-ambiguous On")
+    readline.parse_and_bind("set show-all-if-unmodified On")
+    completer = WhitelistCompleter(whitelist)
+    readline.set_completer(completer.complete)
+    readline.set_completer_delims('')
+    input_value = input(f'{key}: ')
+    readline.parse_and_bind('tab: self-insert')
+    return input_value
