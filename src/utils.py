@@ -147,39 +147,55 @@ def parse_list_to_dict(node):
     return node
 
 
-# read in whitelists
-#def read_whitelist(key):
-#    if key == 'value':
-#        whitelist = {}
-#        factors = read_in_whitelist('factor')
-#        for factor in factors:
-#            whitelist[factor] = read_in_whitelist(factor)
-#    else:
-#        whitelist = read_in_whitelist(key)
-#    return whitelist
-
 def read_whitelist(key):
-    dependable = False
     try:
         whitelist = read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key))
-        if whitelist['whitelist_type'] == 'depend':
-            dependable = True
-        elif whitelist['whitelist_type'] == 'group':
-            dependable = False
-        else:
-            w = []
-            for key in whitelist:
-                if key != 'whitelist_type':
-                    w += whitelist[key]
-            whitelist = w
-            dependable = False
     except (AttributeError, FileNotFoundError):
         try:
             whitelist = [w for w in open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key)).read().splitlines() if w.strip()]
         except FileNotFoundError:
-            #print('No whitelist file for ' + key)
             whitelist = None
-    return whitelist, dependable
+    return whitelist
+
+
+def read_grouped_whitelist(whitelist):
+    whitelist.pop('whitelist_type')
+    return whitelist
+
+
+def read_depend_whitelist(whitelist, depend):
+    if depend in whitelist:
+        whitelist = whitelist[depend]
+    elif os.path.isfile(os.path.join(os.path.dirname(
+            os.path.abspath(__file__)), '..', 'whitelists', depend)):
+        whitelist = read_whitelist(depend)
+    if not isinstance(whitelist, list) and not isinstance(whitelist, dict) \
+            and os.path.isfile(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists',
+            whitelist)):
+        whitelist = read_whitelist(whitelist)
+    return whitelist
+
+
+def get_whitelist(key, filled_object):
+    group = False
+    whitelist = None
+    while not isinstance(whitelist, list) and not group:
+        whitelist = read_whitelist(key)
+        if isinstance(whitelist, dict):
+            if whitelist['whitelist_type'] == 'group':
+                whitelist = read_grouped_whitelist(whitelist)
+                group = True
+            elif whitelist['whitelist_type'] == 'depend':
+                depend = list(find_keys(filled_object, whitelist['ident_key']))[0]
+                whitelist = read_depend_whitelist(whitelist, depend)
+    if group:
+        for key in whitelist:
+            whitelist[key] = sorted(whitelist[key])
+    else:
+        whitelist = sorted(whitelist)
+    return whitelist
+
 
 def find_list_key(item, l):
     for k in l.split(':'):
