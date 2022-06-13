@@ -105,10 +105,10 @@ def get_factors(organism):
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
     factor_value= {'factor': utils.read_whitelist('factor')}
-    values = []
+    values = {}
     for factor in factor_value['factor']:
         whitelist, input_type = get_whitelist_with_type(factor, key_yaml, organism)
-        values.append({factor: {'whitelist': whitelist, 'input_type': input_type}})
+        values[factor] = {'whitelist': whitelist, 'input_type': input_type}
     factor_value['values'] = values
     return factor_value
 
