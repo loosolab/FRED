@@ -4,7 +4,7 @@ sys.path.append('metadata-organizer')
 import src.utils as utils
 import src.generate as generate
 import os
-
+import copy
 
 # This script contains all functions for generation of objects for the web
 # interface
@@ -16,11 +16,11 @@ def get_empty_wi_object():
                      'keys.yaml'))
     result = {}
     for key in key_yaml:
-        result[key] = parse_empty(key_yaml[key], key, None, key_yaml)
+        result[key] = parse_empty(key_yaml[key], key, None, key_yaml, True)
     return result
 
 
-def parse_empty(node, pre, organism_name, key_yaml):
+def parse_empty(node, pre, key_yaml, get_whitelists):
     input_disabled = True if pre.split(':')[-1] in ['id', 'project_name',
                                                     'condition_name',
                                                     'sample_name'] else False
@@ -28,7 +28,7 @@ def parse_empty(node, pre, organism_name, key_yaml):
         input_fields = []
         for key in node[4]:
             input_fields.append(parse_empty(node[4][key], pre + ':' + key,
-                                            organism_name, key_yaml))
+                                            key_yaml, get_whitelists))
         unit = False
         value = False
         unit_whitelist = []
@@ -56,35 +56,38 @@ def parse_empty(node, pre, organism_name, key_yaml):
         if node[1]:
             res['list_value'] = []
     else:
-        input_type = ''
-        if node[5]:
-            whitelist, depend = utils.read_whitelist(pre.split(':')[-1])
-            if depend:
-                new_white = dependable(whitelist, key_yaml, organism_name)
-                if organism_name and organism_name in new_white:
-                    new_white = new_white[organism_name]['whitelist']
-                    if os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists', new_white)):
-                        w, d = utils.read_whitelist(new_white)
-                        new_white = w
-                whitelist = new_white
-            elif 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'group':
-                new_w = []
-                for key in whitelist:
-                    if key != 'whitelist_type':
-                        new_w.append({'title': key, 'whitelist': whitelist[key]})
-                input_type = 'group_select'
-                whitelist = new_w
-        elif node[7] == 'bool':
-            whitelist = [True, False]
-        else:
-            whitelist = None
-        if input_type != 'group_select':
-            if isinstance(whitelist, dict):
-                input_type = 'dependable_select'
-            #elif whitelist and len(whitelist) > 50:
-            #    input_type = 'searchable_select'
+        input_type = node[6]
+        if get_whitelists:
+            if node[5]:
+                whitelist = utils.read_whitelist(pre.split(':')[-1])
+                if 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'depend':
+                    whitelist = None
+                    input_type = 'dependable'
+                elif 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'group':
+                    new_w = []
+                    for key in whitelist:
+                        if key != 'whitelist_type':
+                            new_w.append({'title': key, 'whitelist': whitelist[key]})
+                    input_type = 'group_select'
+                    whitelist = new_w
+            elif node[7] == 'bool':
+                whitelist = [True, False]
+                input_type = 'select'
             else:
-                input_type = node[6]
+                whitelist = None
+            if input_type != 'group_select':
+                if isinstance(whitelist, dict):
+                    input_type = 'dependable_select'
+                #elif whitelist and len(whitelist) > 30:
+                #    input_type = 'searchable_select'
+        else:
+            if node[5]:
+                whitelist = pre.split(':')[-1]
+            else:
+                whitelist = None
+            if node[7] == 'bool':
+                input_type = 'bool'
+                whitelist = pre.split(':')[-1]
         res = {'position': pre,
                'mandatory': True if node[0] == 'mandatory' else False,
                'list': node[1], 'displayName': node[2], 'desc': node[3],
@@ -101,93 +104,68 @@ def get_factors(organism):
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
-    factor_value={}
-    factor_value['factor'], d = utils.read_whitelist('factor')
-    values = parse_empty(key_yaml['experimental_setting'][4]['experimental_factors'][4]['values'],'experimental_setting:experimental_factors:values', organism, key_yaml)['whitelist']
+    factor_value= {'factor': utils.read_whitelist('factor')}
+    values = []
+    for factor in factor_value['factor']:
+        whitelist, input_type = get_whitelist_with_type(factor, key_yaml, organism)
+        values.append({factor: {'whitelist': whitelist, 'input_type': input_type}})
     factor_value['values'] = values
     return factor_value
 
 
-def dependable(whitelist, key_yaml, organism_name):
-    new_white = {'ident_key': whitelist['ident_key']}
-    possible_input, depend = utils.read_whitelist(
-        whitelist['ident_key'])
-    for key in possible_input:
-        input_type = 'select'
-        if key in whitelist:
-            new_white[key] = {
-                'whitelist': sorted(whitelist[key]) if isinstance(
-                    whitelist[key], list) else whitelist[key],
-                'input_type': input_type}
+def get_whitelist_with_type(key, key_yaml, organism):
+    input_type = list(utils.find_keys(key_yaml, key))
+    if len(input_type) > 0:
+        if isinstance(input_type[0][4], dict) and len(
+                input_type[0][4].keys()) == 2 and 'value' in \
+                input_type[0][4] and 'unit' in input_type[0][4]:
+            input_type = 'value_unit'
+        elif input_type[0][7] == 'bool':
+            input_type = 'bool'
         else:
-            input_type = list(utils.find_keys(key_yaml, key))
-            if len(input_type) > 0:
-                if isinstance(input_type[0][4], dict) and len(
-                        input_type[0][4].keys()) == 2 and 'value' in \
-                        input_type[0][4] and 'unit' in input_type[0][4]:
-                    input_type = 'value_unit'
-                elif input_type[0][7] == 'bool':
-                    input_type = 'bool'
-                else:
-                    input_type = input_type[0][6]
-            else:
-                input_type = 'short_text'
-            if input_type == 'value_unit':
-                w, d = utils.read_whitelist('unit')
-            elif input_type == 'bool':
-                w = [True, False]
-                d = False
-                input_type = 'select'
-            else:
-                w, d = utils.read_whitelist(key)
-            if d:
-                w = dependable(w, key_yaml, organism_name)
-                if organism_name and organism_name in w:
-                    w = w[organism_name]
-                    if os.path.isfile(os.path.join(
-                            os.path.dirname(os.path.abspath(__file__)), '..',
-                            'whitelists', w['whitelist'])):
-                        w['whitelist'], d = utils.read_whitelist(
-                            w['whitelist'])
-                        input_type = w['input_type']
-                        w = w['whitelist']
-                else:
-                    input_type = 'dependable_select'
-            elif w and 'whitelist_type' in w and w['whitelist_type'] == 'group':
-                new_w = []
-                for w_key in w:
-                    if w_key != 'whitelist_type':
-                        new_w.append({'title': w_key, 'whitelist': w[w_key]})
-                input_type = 'group_select'
-                w = new_w
-            #if w and len(w) > 50 and input_type != 'group_select':
-            #    input_type = 'searchable_select'
-            new_white[key] = {'whitelist': w, 'input_type': input_type}
-    return new_white
+            input_type = input_type[0][6]
+    else:
+        input_type = 'short_text'
+
+    if input_type == 'value_unit':
+        whitelist = utils.read_whitelist('unit')
+    elif input_type == 'select':
+        whitelist = utils.read_whitelist(key)
+    elif input_type == 'bool':
+        whitelist = [True, False]
+        input_type = 'select'
+    else:
+        whitelist = None
+
+    if isinstance(whitelist, dict):
+        if whitelist['whitelist_type'] == 'group':
+            whitelist = utils.read_grouped_whitelist(whitelist)
+            new_w = []
+            for value in whitelist:
+                new_w.append({'title': value, 'whitelist': whitelist[value]})
+            whitelist = new_w
+            input_type = 'group_select'
+        elif whitelist['whitelist_type'] == 'depend':
+            whitelist = utils.read_depend_whitelist(whitelist, organism)
+    # if whitelist and len(whitelist) > 30:
+    #    input_type = 'searchable_select'
+    return whitelist, input_type
 
 
-def get_samples(condition, organism_name):
+def get_samples(condition, sample):
     conds = generate.split_cond(condition)
-    key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
-                     'keys.yaml'))
-    samples = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
-                          ['biological_replicates'][4]['samples'],
-                          'experimental_setting:conditions:biological_'
-                          'replicates:samples', organism_name, key_yaml)[
-        'input_fields']
-    for i in range(len(samples)):
-        if samples[i][
+    for i in range(len(sample)):
+        if sample[i][
             'position'] == 'experimental_setting:conditions:biological_' \
                            'replicates:samples:sample_name':
-            samples[i]['value'] = condition
+            sample[i]['value'] = condition
         for c in conds:
-            if samples[i][
+            if sample[i][
                 'position'] == f'experimental_setting:conditions:biological_' \
                                f'replicates:samples:{c[0]}':
-                samples[i]['value'] = c[1]
-                samples[i]['input_disabled'] = True
-    return samples
+                sample[i]['value'] = c[1]
+                sample[i]['input_disabled'] = True
+    return sample
 
 
 def get_conditions(factors, organism_name):
@@ -202,10 +180,49 @@ def get_conditions(factors, organism_name):
     """
     conditions = generate.get_condition_combinations(factors)
     condition_object = []
+
+    key_yaml = utils.read_in_yaml(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
+    sample = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
+                          ['biological_replicates'][4]['samples'],
+                          'experimental_setting:conditions:biological_'
+                          'replicates:samples', key_yaml, False)[
+    'input_fields']
+    whitelists = {}
+    for item in sample:
+        item, whitelists = get_whitelist_object(item, organism_name, whitelists)
+
     for cond in conditions:
-        sample = get_samples(cond, organism_name)
+        cond_sample = copy.deepcopy(sample)
+        cond_sample = get_samples(cond, cond_sample)
         d = {'title': cond, 'position': 'experimental_setting:condition',
              'list': True, 'mandatory': True, 'list_value': [],
-             'input_disabled': False, 'input_fields': sample}
+             'input_disabled': False, 'input_fields': copy.deepcopy(cond_sample)}
         condition_object.append(d)
-    return condition_object
+
+    return condition_object, whitelists
+
+
+def get_whitelist_object(item, organism_name, whitelists):
+    if 'input_type' in item:
+        input_type = item['input_type']
+        if input_type == 'select':
+            whitelist = utils.get_whitelist(item['position'].split(':')[-1],
+                                            {'organism': organism_name})
+            if isinstance(whitelist, dict):
+                input_type = 'group_select'
+        elif input_type == 'bool':
+            whitelist = [True, False]
+            input_type = 'select'
+        elif input_type == 'value_unit':
+            whitelist = utils.read_whitelist('unit')
+        else:
+            whitelist = None
+        item['input_type'] = input_type
+        if whitelist:
+            whitelists[item['position'].split(':')[-1]] = whitelist
+    elif 'input_fields' in item:
+        for i in item['input_fields']:
+            i, whitelists = get_whitelist_object(i, organism_name, whitelists)
+    return item, whitelists
