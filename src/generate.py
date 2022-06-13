@@ -4,10 +4,26 @@ import src.utils as utils
 import src.validate_yaml as validate_yaml
 import datetime
 import os
+import readline
+import re
 
+readline.parse_and_bind("tab: complete")
+readline.parse_and_bind("set show-all-if-ambiguous On")
+readline.parse_and_bind("set show-all-if-unmodified On")
 factor = []
 not_editable = ['id', 'project_name', 'sample_name', 'pooled', 'donor_count',
                 'technical_replicates']
+
+
+class WhitelistCompleter:
+    def __init__(self, whitelist):
+        self.whitelist = whitelist
+
+    def complete(self, text, state):
+        results = [x for x in self.whitelist if re.search(text, x, re.IGNORECASE) is not None] + [None]
+        if len(results) > 30:
+            results = results[:30]
+        return results[state]
 
 
 def generate_file(path, input_id, name, mandatory_mode):
@@ -176,7 +192,7 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict):
 
 
 def get_experimental_factors(node, result_dict):
-    factor_list, dependable = utils.read_whitelist('factor')
+    factor_list = utils.get_whitelist('factor', result_dict)
     print(
         f'Please select the analyzed experimental factors '
         f'(1-{len(factor_list)}) divided by comma:\n')
@@ -198,32 +214,34 @@ def get_experimental_factors(node, result_dict):
             for val in values:
                 used_values.append({'unit': unit, 'value': val})
         elif fac_node[5]:
-            value_list, dependable = utils.read_whitelist(fac)
-            while dependable:
-                whitelist_key = value_list['ident_key']
-                value = list(utils.find_keys(result_dict, whitelist_key))
-
-                if len(value) > 1:
-                    print("ERROR: multiple values")
-
-                if value[0] in value_list:
-                    value_list = value_list[value[0]]
-                    if not isinstance(value_list, list) and os.path.isfile(
-                            os.path.join(
-                                    os.path.dirname(os.path.abspath(__file__)),
-                                    '..', 'whitelists', value_list)):
-                        w, d = utils.read_whitelist(value_list)
-                        value_list = w
-                    dependable = False
-                else:
-                    value_list, dependable = utils.read_whitelist(value[0])
-
-            print(
-                f'Please select the values for experimental factor '
-                f'{factor_value["factor"]} (1-{len(value_list)}) divided by '
-                f'comma:\n')
-            print_option_list(value_list, False)
-            used_values = parse_input_list(value_list, False)
+            value_list = utils.get_whitelist(fac, result_dict)
+            used_values = []
+            if len(value_list) > 30:
+                redo = True
+                print(
+                    f'Please enter the values for experimental factor '
+                    f'{factor_value["factor"]}. Press tab once for autofill if'
+                    f' possible or to get a list of up to'
+                    f' 30 possible input values.\n')
+                while redo:
+                    completer = WhitelistCompleter(value_list)
+                    readline.set_completer(completer.complete)
+                    readline.set_completer_delims('')
+                    input_value = input(f'{factor_value["factor"]}: ')
+                    if input_value in value_list:
+                        used_values.append(input_value)
+                        redo = parse_list_choose_one([True, False],
+                                         f'Do you want to add another {factor_value["factor"]}?')
+                    else:
+                        print(f'The value you entered does not match the '
+                              f'whitelist. Try tab for autocomplete.')
+            else:
+                print(
+                    f'Please select the values for experimental factor '
+                    f'{factor_value["factor"]} (1-{len(value_list)}) divided by '
+                    f'comma:\n')
+                print_option_list(value_list, False)
+                used_values = parse_input_list(value_list, False)
         else:
             value_type = fac_node[7]
             print(
@@ -425,25 +443,15 @@ def parse_list_choose_one(whitelist, header):
 def parse_input_value(key, desc, whitelist, value_type, result_dict):
     whites = None
     if whitelist:
-        whites, dependable = utils.read_whitelist(key)
-        while dependable:
-            whitelist_key = whites['ident_key']
-            value = list(utils.find_keys(result_dict, whitelist_key))
-
-            if len(value) > 1:
-                print("ERROR: multiple values")
-
-            if value[0] in whites:
-                whites = whites[value[0]]
-                if not isinstance(whites, list) and os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', whites)):
-                    w, d = utils.read_whitelist(whites)
-                    whites = w
-                dependable = False
-            else:
-                whites, dependable = utils.read_whitelist(value[0])
-
-    if whites and len(whites) > 0:
-        input_value = parse_list_choose_one(whites, f'{key}:')
+        whites = utils.get_whitelist(key, result_dict)
+    if whites:
+        if len(whites) > 30:
+            completer = WhitelistCompleter(whites)
+            readline.set_completer(completer.complete)
+            readline.set_completer_delims('')
+            input_value = input(f'{key}: ')
+        elif len(whites) > 0:
+            input_value = parse_list_choose_one(whites, f'{key}:')
     else:
         if desc != '':
             print(desc)
