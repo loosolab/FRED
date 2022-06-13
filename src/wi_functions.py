@@ -16,7 +16,7 @@ def get_empty_wi_object():
                      'keys.yaml'))
     result = {}
     for key in key_yaml:
-        result[key] = parse_empty(key_yaml[key], key, None, key_yaml, True)
+        result[key] = parse_empty(key_yaml[key], key, key_yaml, True)
     return result
 
 
