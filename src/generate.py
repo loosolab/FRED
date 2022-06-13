@@ -216,7 +216,40 @@ def get_experimental_factors(node, result_dict):
         elif fac_node[5]:
             value_list = utils.get_whitelist(fac, result_dict)
             used_values = []
-            if len(value_list) > 30:
+            if isinstance(value_list, dict):
+                w = [x for xs in list(value_list.values()) for x in xs]
+                if len(w) > 30:
+                    redo = True
+                    print(
+                        f'Please enter the values for experimental factor '
+                        f'{factor_value["factor"]}. Press tab once for autofill if'
+                        f' possible or to get a list of up to'
+                        f' 30 possible input values.\n')
+                    while redo:
+                        completer = WhitelistCompleter(value_list)
+                        readline.set_completer(completer.complete)
+                        readline.set_completer_delims('')
+                        input_value = input(f'{factor_value["factor"]}: ')
+                        if input_value in value_list:
+                            used_values.append(input_value)
+                            redo = parse_list_choose_one([True, False],
+                                                         f'Do you want to add another {factor_value["factor"]}?')
+                        else:
+                            print(f'The value you entered does not match the '
+                                  f'whitelist. Try tab for autocomplete.')
+                else:
+                    print(
+                        f'Please select the values for experimental factor '
+                        f'{factor_value["factor"]} (1-{len(w)}) divided by '
+                        f'comma:\n')
+                    i = 1
+                    for w_key in value_list:
+                        print(f'\033[1m{w_key}\033[0m')
+                        for value in value_list[w_key]:
+                            print(f'{i}: {value}')
+                            i += 1
+                    used_values = parse_input_list(w, False)
+            elif len(value_list) > 30:
                 redo = True
                 print(
                     f'Please enter the values for experimental factor '
