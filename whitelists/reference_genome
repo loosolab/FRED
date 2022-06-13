@@ -1,18 +1,18 @@
 whitelist_type: depend
 ident_key: organism
-human:
+human_9606:
   - hg38
   - hg19
-mouse:
+mouse_10090:
   - mm10
   - mm9
   - mm38
-zebrafish:
+zebrafish_7955:
   - danrer11
   - danrer10
-rat:
-pig:
-medaka:
-chicken:
-drosophila:
-yeast:
+rat_10114:
+pig_9823:
+medaka_8090:
+chicken_9031:
+drosophila_7215:
+yeast_4932:
