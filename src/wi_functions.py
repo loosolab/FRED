@@ -203,7 +203,7 @@ def get_conditions(factors, organism_name):
              'input_disabled': False, 'input_fields': copy.deepcopy(cond_sample)}
         condition_object.append(d)
 
-    return condition_object, whitelists
+    return {'conditions': condition_object, 'whitelist_object': whitelists}
 
 
 def get_whitelist_object(item, organism_name, whitelists):
@@ -224,8 +224,14 @@ def get_whitelist_object(item, organism_name, whitelists):
         if item['position'].split(':')[-1] == 'gene':
             input_type = 'unique'
         item['input_type'] = input_type
+        if input_type == 'group_select':
+            w = []
+            for key in whitelist:
+                w.append({'title': key, 'whitelist': whitelist[key]})
+            whitelist = w
         if whitelist:
             whitelists[item['position'].split(':')[-1]] = whitelist
+
     elif 'input_fields' in item:
         for i in item['input_fields']:
             i, whitelists = get_whitelist_object(i, organism_name, whitelists)
