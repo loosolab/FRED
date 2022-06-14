@@ -127,7 +127,6 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
             and os.path.isfile(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists',
         whitelist)):
-        print(whitelist)
         whitelist = utils.read_whitelist(whitelist)
     if whitelist and entry_value not in whitelist:
         print(entry_value)
