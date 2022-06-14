@@ -1,5 +1,6 @@
 import re
 from src import utils
+from src import generate
 from itertools import chain
 
 # This scripts implements functions to find metadata files that contain given
@@ -87,6 +88,7 @@ def parse_search_parameters(metafile, search, list_element = None):
 
     return result
 
+
 def get_matches (metafile, search_parameters):
     results = []
     if isinstance(metafile, list):
@@ -95,6 +97,7 @@ def get_matches (metafile, search_parameters):
     else:
         results += [calculate_match(metafile, search_parameters)]
     return results
+
 
 def calculate_match(metafile, search_parameters):
 
@@ -109,10 +112,18 @@ def calculate_match(metafile, search_parameters):
             # split search parameter at ':'
             # last element in list saved in 'should-be_found'
             # -> False if 'not' was specified for the parameter
-
-            params = and_param.split(':')
-            should_be_found = params[-1]
-
+            if '"' in and_param:
+                params = []
+                should_be_found = and_param.split(':')[-1]
+                and_param.rstrip(f':{should_be_found}')
+                p = generate.split_cond(and_param)[0]
+                if p[0] != '':
+                    params = p[0].split(':')
+                params.append(p[1])
+                params.append(should_be_found)
+            else:
+                params = and_param.split(':')
+                should_be_found = params[-1]
             if len(params) == 2 and params[0] == 'True':
                 match = True
             elif len(params) == 2 and params[0] == 'False':
