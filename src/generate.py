@@ -50,18 +50,25 @@ def generate_file(path, input_id, name, mandatory_mode):
         else:
             result_dict[item] = get_redo_value(key_yaml[item], item, False,
                                                mandatory_mode, result_dict, True)
+
     print(f'{"".center(size.columns, "-")}\n'
-          f'{"SUMMARY".center(size.columns, " ")}\n')
-    print_summary(result_dict, '')
-    print(f'\n\n')
-    print(f'{"".center(size.columns, "-")}\n')
-    # valid, missing_mandatory_keys, invalid_keys, \
-    # invalid_entries = validate_yaml.validate_file(result_dict)
-    # if not valid:
-    #    validate_yaml.print_validation_report(
-    #        result_dict, missing_mandatory_keys, invalid_keys,
-    #        invalid_entries)
-    utils.save_as_yaml(result_dict, f'{input_id}_metadata.yaml')
+          f'{"FILE VALIDATION".center(size.columns, " ")}\n'
+          f'{"".center(size.columns, "-")}\n')
+    valid, missing_mandatory_keys, invalid_keys, \
+    invalid_entries = validate_yaml.validate_file(result_dict)
+    if not valid:
+        validate_yaml.print_validation_report(
+            result_dict, missing_mandatory_keys, invalid_keys,
+            invalid_entries)
+    else:
+        print(f'Validation complete. No errors found.\n')
+        print(f'{"".center(size.columns, "-")}\n'
+            f'{"SUMMARY".center(size.columns, " ")}\n'
+              f'{"".center(size.columns, "-")}\n')
+        print_summary(result_dict, '')
+        print(f'\n\n')
+        print(f'{"".center(size.columns, "-")}\n')
+        utils.save_as_yaml(result_dict, f'{input_id}_metadata.yaml')
 
 
 def print_summary(result, pre):
