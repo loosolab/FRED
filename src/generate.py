@@ -220,9 +220,7 @@ def get_experimental_factors(node, result_dict):
                     redo = True
                     print(
                         f'\nPlease enter the values for experimental factor '
-                        f'{factor_value["factor"]}. Press tab once for autofill if'
-                        f' possible or to get a list of up to'
-                        f' 30 possible input values.\n')
+                        f'{factor_value["factor"]}.')
                     while redo:
                         input_value = complete_input(w, factor_value["factor"])
                         if input_value in value_list:
@@ -248,9 +246,7 @@ def get_experimental_factors(node, result_dict):
                 redo = True
                 print(
                     f'\nPlease enter the values for experimental factor '
-                    f'{factor_value["factor"]}. Press tab once for autofill if'
-                    f' possible or to get a list of up to'
-                    f' 30 possible input values.\n')
+                    f'{factor_value["factor"]}.')
                 while redo:
                     input_value = complete_input(value_list, factor_value["factor"])
                     if input_value in value_list:
@@ -482,10 +478,19 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
             w = [x for xs in list(whites.values()) for x in xs]
             if len(w) > 30:
                 input_value = complete_input(w, key)
+                if input_value not in w:
+                    print(f'The value you entered does not match the '
+                          f'whitelist. Try tab for autocomplete.')
+                    parse_input_value(key, desc, whitelist, value_type, result_dict)
             else:
                 input_value = parse_group_choose_one(whites, w, f'{key}:')
         elif len(whites) > 30:
             input_value = complete_input(whites, key)
+            if input_value not in whites:
+                print(f'The value you entered does not match the '
+                      f'whitelist. Try tab for autocomplete.')
+                parse_input_value(key, desc, whitelist, value_type,
+                                  result_dict)
         elif len(whites) > 0:
             input_value = parse_list_choose_one(whites, f'{key}:')
     else:
@@ -495,7 +500,10 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
             input_value = parse_list_choose_one([True, False],
                                                 f'Is the sample {key}')
         else:
-            input_value = input(f'{key}: ')
+            if desc == '':
+                input_value = input(f'\n{key}: ')
+            else:
+                input_value = input(f'{key}: ')
             if input_value == '':
                 print(f'Please enter something.')
                 input_value = parse_input_value(key, desc, whitelist,
@@ -556,6 +564,9 @@ def parse_group_choose_one(whitelist, w, header):
 
 
 def complete_input(whitelist, key):
+    print(f'\nPress tab once for autofill if'
+          f' possible or to get a list of up to'
+          f' 30 possible input values.')
     readline.parse_and_bind("tab: complete")
     readline.parse_and_bind("set show-all-if-ambiguous On")
     readline.parse_and_bind("set show-all-if-unmodified On")
