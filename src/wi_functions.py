@@ -232,7 +232,8 @@ def get_whitelist_object(item, organism_name, whitelists):
             whitelist = w
         if whitelist:
             whitelists[item['position'].split(':')[-1]] = whitelist
-
+        if input_type == 'value_unit':
+            whitelists['unit'] = whitelist
     elif 'input_fields' in item:
         for i in item['input_fields']:
             i, whitelists = get_whitelist_object(i, organism_name, whitelists)
