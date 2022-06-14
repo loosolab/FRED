@@ -1,3 +1,5 @@
+import os.path
+
 from src import utils
 
 
@@ -78,7 +80,9 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys, invalid_entry):
     if isinstance(metafile, dict) and not ('value' in metafile and 'unit' in metafile):
         for key in metafile:
-            if key not in key_yaml:
+            if not key_yaml:
+                invalid_keys.append(key)
+            elif key not in key_yaml:
                 invalid_keys.append(key)
             else:
                 res_keys, res_entries = new_test(metafile[key], key_yaml[key][4], sub_lists, f'{key_name}:{key}' if key_name != '' else key, invalid_keys, invalid_entry)
@@ -95,28 +99,39 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys, invalid_entr
             invalid_entry.append(f'{key_name}:{metafile}')
     return invalid_keys, invalid_entry
 
+
 def new_test_for_whitelist(entry_key, entry_value, sublists):
-    whitelist, dependable = utils.read_whitelist(entry_key)
-    while dependable:
-        whitelist_key = whitelist['ident_key']
-        for i in reversed(range(len(sublists))):
+    whitelist = utils.read_whitelist(entry_key)
+    if isinstance(whitelist, dict):
+        while isinstance(whitelist, dict) and whitelist['whitelist_type'] == 'depend':
+            print(entry_value)
+            whitelist_key = whitelist['ident_key']
+            for i in reversed(range(len(sublists))):
 
-            value = list(utils.find_keys(sublists[i], whitelist_key))
+                value = list(utils.find_keys(sublists[i], whitelist_key))
 
-            if len(value) > 0:
-                if len(value) == 1:
-                    break
-                else:
-                    print("ERROR: multiple values")
-                    break
+                if len(value) > 0:
+                    if len(value) == 1:
+                        break
+                    else:
+                        print("ERROR: multiple values")
+                        break
 
-        if value[0] in whitelist:
-            whitelist = whitelist[value[0]]
-            dependable = False
-        else:
-            whitelist, dependable = utils.read_whitelist(value[0])
-
+            if value[0] in whitelist:
+                whitelist = whitelist[value[0]]
+            else:
+                whitelist = utils.read_whitelist(value[0])
+        if isinstance(whitelist, dict) and whitelist['whitelist_type'] == 'group':
+            whitelist = [x for xs in list(whitelist.values()) for x in xs]
+    if whitelist and not isinstance(whitelist, list) and not isinstance(whitelist, dict) \
+            and os.path.isfile(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists',
+        whitelist)):
+        print(whitelist)
+        whitelist = utils.read_whitelist(whitelist)
     if whitelist and entry_value not in whitelist:
+        print(entry_value)
+        print(whitelist)
         return True
     return False
 
