@@ -32,9 +32,9 @@ def main():
                                                'projects by searching the '
                                                'metadata files.')
 
-    find_function.add_argument('-p', '--path', type=pathlib.Path,
+    find_function.add_argument('-p', '--path', type=pathlib.Path, required=True,
                                help='The path to be searched')
-    find_function.add_argument('-s', '--search', type=str,
+    find_function.add_argument('-s', '--search', type=str, required=True,
                                help='The search parameters')
     find_function.set_defaults(func=find)
     add_function = subparsers.add_parser('add',
