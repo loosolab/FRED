@@ -104,7 +104,6 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
     whitelist = utils.read_whitelist(entry_key)
     if isinstance(whitelist, dict):
         while isinstance(whitelist, dict) and whitelist['whitelist_type'] == 'depend':
-            print(entry_value)
             whitelist_key = whitelist['ident_key']
             for i in reversed(range(len(sublists))):
 
@@ -129,8 +128,6 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
         whitelist)):
         whitelist = utils.read_whitelist(whitelist)
     if whitelist and entry_value not in whitelist:
-        print(entry_value)
-        print(whitelist)
         return True
     return False
 
