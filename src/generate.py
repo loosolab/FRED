@@ -7,7 +7,10 @@ import os
 import readline
 import re
 
-size = os.get_terminal_size()
+try:
+    size = os.get_terminal_size()
+except OSError:
+    size = 80
 factor = []
 not_editable = ['id', 'project_name', 'sample_name', 'pooled', 'donor_count',
                 'technical_replicates']
