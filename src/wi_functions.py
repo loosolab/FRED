@@ -218,6 +218,7 @@ def get_whitelist_object(item, organism_name, whitelists):
             whitelist = [True, False]
             input_type = 'select'
         elif input_type == 'value_unit':
+            item['value_unit'] = None
             whitelist = utils.read_whitelist('unit')
         else:
             whitelist = None
