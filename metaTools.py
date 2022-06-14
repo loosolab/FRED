@@ -45,14 +45,17 @@ def main():
     add_function.add_argument('-a', '--add', type=str, nargs='+',
                               help='The parameters to be added')
     add_function.set_defaults(func=add)
-    create_function = subparsers.add_parser('create',
+    create_function = subparsers.add_parser('generate',
                                             help='This command is used to '
                                                  'create a metadata file.')
     create_function.add_argument('-p', '--path', type=pathlib.Path,
+                                 required=True,
                                  help='The path to save the yaml')
     create_function.add_argument('-id', '--id', type=str,
+                                 required=True,
                                  help='The ID of the experiment')
     create_function.add_argument('-n', '--name', type=str,
+                                 required=True,
                                  help='The name of the experiment')
     create_function.add_argument('-mo', '--mandatory_only', default=False, action='store_true',
                                  help='If True, only mandatory keys will be filled out')
