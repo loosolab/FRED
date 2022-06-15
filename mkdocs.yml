@@ -4,12 +4,13 @@ site_dir: public
 
 nav:
     - Home:
-        - How to Install: index.md
-        - File Generation: generate.md
-        - File Searching: search.md
-    - Data structure: 
-        - General structure: structure.md
-        - Extend structure:
-            - Adding keys: add_keys.md
-            - whitelists : add_whitelist.md
+        - User Guide:
+            - How to Install: index.md
+            - File Generation: generate.md
+            - File Searching: search.md
+        - Data structure: 
+            - General structure: structure.md
+            - Extend structure:
+                - Adding keys: add_keys.md
+                - whitelists : add_whitelist.md
 theme: readthedocs
