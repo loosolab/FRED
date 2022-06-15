@@ -27,6 +27,6 @@ cd metadata-organizer
 
 MetaTools has two basic functions.
 
-Firstly, it has a function to generate metadata. More information about the usage of this function can be found under [File Generating](generate.md).
+Firstly, it has a function to generate metadata. More information about the usage of this function can be found under [File Generation](generate.md).
 
 Secondly, there is a function to search within a given path for all metafiles that contain a specified search string. Information about the call, parameters and the creation of a search string can be found under [File Searching](search.md).
