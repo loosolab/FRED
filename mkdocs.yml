@@ -3,8 +3,8 @@ site_url: https://loosolab.pages.gwdg.de/software/metadata-organizer/
 site_dir: public
 
 nav:
-    - Home: index.md
     - User Guide:
+        - How to Install: index.md
         - File Generation: generate.md
         - File Searching: search.md
     - Data structure: 
