@@ -1,4 +1,6 @@
-# Programm Call
+# File Searching
+
+## Programm Call
 
 MetaTools includes a function to find metadata files using a search string over a specified path.
 
@@ -17,7 +19,7 @@ To show the correct usage of the function, as well as all possible arguments in 
 
 `-h, --help` show help message
 
-# Defining a search string
+## Defining a search string
 
 The search string must be enclosed in single quotes. It contains the values to be searched for. The values can be linked via 'and', 'or' and 'not'.
 The link 'and' corresponds to a logical and, the link 'or' to a logical or. By placing a 'not' in front of the stated value, all values are searched for that do not correspond to the stated value.
