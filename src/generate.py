@@ -55,6 +55,13 @@ def generate_file(path, input_id, name, mandatory_mode):
                                                mandatory_mode, result_dict, True)
 
     print(f'{"".center(size.columns, "-")}\n'
+          f'{"SUMMARY".center(size.columns, " ")}\n'
+          f'{"".center(size.columns, "-")}\n')
+    print_summary(result_dict, '')
+    print(f'\n\n')
+    print(f'{"".center(size.columns, "-")}\n')
+
+    print(f'{"".center(size.columns, "-")}\n'
           f'{"FILE VALIDATION".center(size.columns, " ")}\n'
           f'{"".center(size.columns, "-")}\n')
     valid, missing_mandatory_keys, invalid_keys, \
@@ -65,12 +72,7 @@ def generate_file(path, input_id, name, mandatory_mode):
             invalid_entries)
     else:
         print(f'Validation complete. No errors found.\n')
-        print(f'{"".center(size.columns, "-")}\n'
-            f'{"SUMMARY".center(size.columns, " ")}\n'
-              f'{"".center(size.columns, "-")}\n')
-        print_summary(result_dict, '')
-        print(f'\n\n')
-        print(f'{"".center(size.columns, "-")}\n')
+
         utils.save_as_yaml(result_dict, f'{input_id}_metadata.yaml')
 
 
@@ -362,8 +364,9 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                 if cond[0] in ['age', 'time_point', 'duration']:
                     unit = cond[1].lstrip('0123456789')
                     value = cond[1][:len(cond[1]) - len(unit)]
-                    list(cond)[1] = {'unit': unit, 'value': int(value)}
-                samples[cond[0]] = cond[1]
+                    samples[cond[0]] = {'unit': unit, 'value': int(value)}
+                else:
+                    samples[cond[0]] = cond[1]
 
         samples = merge_dicts(samples,
                               generate_part(node[type][4]['samples'][4],
@@ -491,7 +494,7 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
                 if input_value not in w:
                     print(f'The value you entered does not match the '
                           f'whitelist. Try tab for autocomplete.')
-                    parse_input_value(key, desc, whitelist, value_type, result_dict)
+                    input_value = parse_input_value(key, desc, whitelist, value_type, result_dict)
             else:
                 input_value = parse_group_choose_one(whites, w, f'{key}:')
         elif len(whites) > 30:
@@ -499,7 +502,7 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
             if input_value not in whites:
                 print(f'The value you entered does not match the '
                       f'whitelist. Try tab for autocomplete.')
-                parse_input_value(key, desc, whitelist, value_type,
+                input_value = parse_input_value(key, desc, whitelist, value_type,
                                   result_dict)
         elif len(whites) > 0:
             input_value = parse_list_choose_one(whites, f'{key}:')
