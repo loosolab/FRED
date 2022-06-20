@@ -3,6 +3,7 @@ import sys
 sys.path.append('metadata-organizer')
 import src.utils as utils
 import src.generate as generate
+import src.validate_yaml as validate_yaml
 import os
 import copy
 
@@ -288,3 +289,10 @@ def parse_part(wi_object, factors):
                 if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None):
                     return_dict[wi_object[i]['position'].split(':')[-1]] = value
     return return_dict
+
+
+def validate_object(wi_object, factors):
+    metadata_dict = parse_object(wi_object, factors)
+    valid, missing_mandatory_keys, invalid_keys, \
+    invalid_entries = validate_yaml.validate_file(metadata_dict)
+    print(valid, missing_mandatory_keys, invalid_keys, invalid_entries)

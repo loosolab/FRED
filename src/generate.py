@@ -65,11 +65,11 @@ def generate_file(path, input_id, name, mandatory_mode):
           f'{"FILE VALIDATION".center(size.columns, " ")}\n'
           f'{"".center(size.columns, "-")}\n')
     valid, missing_mandatory_keys, invalid_keys, \
-    invalid_entries = validate_yaml.validate_file(result_dict)
+    invalid_entries, invalid_values = validate_yaml.validate_file(result_dict)
     if not valid:
         validate_yaml.print_validation_report(
             result_dict, missing_mandatory_keys, invalid_keys,
-            invalid_entries)
+            invalid_entries, invalid_values)
     else:
         print(f'Validation complete. No errors found.\n')
 

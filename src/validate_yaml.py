@@ -1,5 +1,5 @@
 import os.path
-
+import datetime
 from src import utils
 
 
@@ -23,22 +23,22 @@ def validate_file(metafile):
     """
     valid = True
     key_yaml = utils.read_in_yaml('keys.yaml')
-    invalid_keys, invalid_entries = new_test(metafile, key_yaml, [], '', [],
-                                             [])
+    invalid_keys, invalid_entries, invalid_value = new_test(metafile, key_yaml, [], '', [],
+                                             [], [], None)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
                                                 [x.split(':')[-1] for x in
                                                  invalid_keys])
     if len(missing_mandatory_keys) > 0 or len(invalid_keys) > 0 or len(
-            invalid_entries) > 0:
+            invalid_entries) > 0 or len(invalid_value) > 0:
         valid = False
-    return valid, missing_mandatory_keys, invalid_keys, invalid_entries
+    return valid, missing_mandatory_keys, invalid_keys, invalid_entries, invalid_value
 
 
 # -----------------------------------REPORT-------------------------------------
 
 
 def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
-                            invalid_values):
+                            invalid_values, invalid_value):
     """
     This function outputs a report on invalid files. The report contains the ID
      of the project, the path to the file, as well as the missing mandatory
@@ -58,11 +58,14 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
         path = 'missing'
     invalid_entries = '\n- '.join(invalid_keys)
     missing = '\n- '.join(missing_mandatory_keys)
-    values = []
+    whitelist_values = []
     for v in invalid_values:
         key = ':'.join(v.split(':')[:-1])
         entry = v.split(':')[-1]
-        values.append(entry + ' in ' + key + '\n')
+        whitelist_values.append(entry + ' in ' + key + '\n')
+    value = []
+    for v in invalid_value:
+        value.append(f'{v[0]}: {v[1]} -> {v[2]}')
     print(f'{"INVALID FILE".center(80, "-")}\n'
           f'Project ID: {input_id}\n'
           f'Path: {path}\n\n'
@@ -74,15 +77,18 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
         print(f'The following mandatory keys were missing:\n'
               f'- {missing}\n')
     if len(invalid_values) > 0:
+        print(f'The following values do not match the whitelist:\n'
+              f'- {"- ".join(whitelist_values)}')
+    if len(invalid_value) > 0:
         print(f'The following values are invalid:\n'
-              f'- {"- ".join(values)}')
+              f'- {"- ".join(value)}')
     print(f'{"".center(80, "-")}')
 
 
 # ---------------------------------UTILITIES------------------------------------
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
-             invalid_entry):
+             invalid_entry, invalid_value, input_type):
     if isinstance(metafile, dict) and not (
             'value' in metafile and 'unit' in metafile):
         for key in metafile:
@@ -91,18 +97,18 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             elif key not in key_yaml:
                 invalid_keys.append(key)
             else:
-                res_keys, res_entries = new_test(metafile[key],
+                res_keys, res_entries, res_values = new_test(metafile[key],
                                                  key_yaml[key][4], sub_lists,
                                                  f'{key_name}:{key}' if
                                                  key_name != '' else key,
-                                                 invalid_keys, invalid_entry)
+                                                 invalid_keys, invalid_entry, invalid_value, key_yaml[key][7] if len(key_yaml[key]) > 5 else None)
                 invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
             sub_lists.append(item)
-            res_keys, res_entries = new_test(item, key_yaml, sub_lists,
+            res_keys, res_entries, res_values = new_test(item, key_yaml, sub_lists,
                                              key_name, invalid_keys,
-                                             invalid_entry)
+                                             invalid_entry, invalid_value, input_type)
             invalid_keys = res_keys
             sub_lists = sub_lists[:-1]
     else:
@@ -110,7 +116,13 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                                          sub_lists)
         if invalid:
             invalid_entry.append(f'{key_name}:{metafile}')
-    return invalid_keys, invalid_entry
+
+        inv_value, message = validate_value(metafile, input_type)
+
+        if not inv_value:
+            invalid_value.append((key_name, metafile, message))
+
+    return invalid_keys, invalid_entry, invalid_value
 
 
 def new_test_for_whitelist(entry_key, entry_value, sublists):
@@ -212,3 +224,36 @@ def find_key(metafile, key, is_list, values, invalid_keys):
                             if value not in y:
                                 missing_keys.append(key + ':' + value)
     return missing_keys
+
+
+def validate_value(input_value, value_type):
+    valid = True
+    message = None
+    if value_type == 'bool':
+        if input_value not in [True, False]:
+            valid = False
+            message = 'The value has to be of type bool (True or False).'
+    elif value_type == 'int':
+        if not isinstance(input_value, int):
+            valid = False
+            message = 'The value has to be an integer.'
+    elif value_type == 'float':
+        if not isinstance(input_value, float):
+            valid = False
+            message = 'The value has to be a float.'
+    elif value_type == 'date':
+        try:
+            input_date = input_value.split('.')
+            if len(input_date) != 3 or len(input_date[0]) != 2 or len(
+                    input_date[1]) != 2 or len(input_date[2]) != 4:
+                raise SyntaxError
+            input_value = datetime.date(int(input_date[2]),
+                                            int(input_date[1]),
+                                            int(input_date[0]))
+        except (IndexError, ValueError, SyntaxError) as e:
+            valid = False
+            message = f'Input must be of type \'DD.MM.YYYY\'.'
+    elif input_value == 'str' and '\"' in input_value:
+        valid = False
+        message = 'The value contains an invalid character (\").'
+    return valid, message
