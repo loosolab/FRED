@@ -238,3 +238,53 @@ def get_whitelist_object(item, organism_name, whitelists):
         for i in item['input_fields']:
             i, whitelists = get_whitelist_object(i, organism_name, whitelists)
     return item, whitelists
+
+
+def parse_object(wi_object, factors):
+    result = {}
+    for key in wi_object:
+        result[key] = parse_part(wi_object[key], factors)
+    return result
+
+
+def parse_part(wi_object, factors):
+    return_dict = {}
+    if isinstance(wi_object, dict):
+        if wi_object['list']:
+            test = []
+            for elem in wi_object['list_value']:
+                test.append(parse_object(elem, factors))
+            return test
+        else:
+            if 'input_fields' in wi_object:
+                return parse_object(wi_object['input_fields'], factors)
+            else:
+                if wi_object['value'] and wi_object['input_type'] == 'value_unit':
+                    unit = wi_object['value'].lstrip('0123456789')
+                    value = wi_object['value'][:len(wi_object['value']) - len(unit)]
+                    return {'unit': unit, 'value': value}
+                else:
+                    return wi_object['value']
+    elif isinstance(wi_object, list):
+        for i in range(len(wi_object)):
+            if wi_object[i]['position'].split(':')[-1] == 'conditions':
+                test = []
+                for j in range(len(wi_object[i]['list_value'])):
+                    value = parse_object(wi_object[i]['list_value'][j], factors)
+                    if  ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None):
+                        test.append({'condition_name': wi_object[i]['list_value'][j]['title'], 'biological_replicates': {'count': len(value), 'samples': value}})
+                return_dict['conditions'] = test
+            elif wi_object[i]['position'].split(':')[-1] == 'technical_replicates':
+                technical_replicates = parse_object(wi_object[i], factors)
+                sample_name = []
+                for c in range(technical_replicates['count']):
+                    sample_name.append(f'{return_dict["sample_name"]}_t{c+1}')
+                technical_replicates['sample_name'] = sample_name
+                return_dict['technical_replicates'] = technical_replicates
+            elif wi_object[i]['position'].split(':')[-1] == 'experimental_factors':
+                return_dict['experimental_factors'] = factors
+            else:
+                value = parse_object(wi_object[i], factors)
+                if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None):
+                    return_dict[wi_object[i]['position'].split(':')[-1]] = value
+    return return_dict
