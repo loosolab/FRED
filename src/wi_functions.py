@@ -6,6 +6,8 @@ import src.generate as generate
 import src.validate_yaml as validate_yaml
 import os
 import copy
+import datetime
+
 
 # This script contains all functions for generation of objects for the web
 # interface
@@ -254,11 +256,11 @@ def parse_part(wi_object, factors):
         if wi_object['list']:
             test = []
             for elem in wi_object['list_value']:
-                test.append(parse_object(elem, factors))
+                test.append(parse_part(elem, factors))
             return test
         else:
             if 'input_fields' in wi_object:
-                return parse_object(wi_object['input_fields'], factors)
+                return parse_part(wi_object['input_fields'], factors)
             else:
                 if wi_object['value'] and wi_object['input_type'] == 'value_unit':
                     unit = wi_object['value'].lstrip('0123456789')
@@ -271,12 +273,12 @@ def parse_part(wi_object, factors):
             if wi_object[i]['position'].split(':')[-1] == 'conditions':
                 test = []
                 for j in range(len(wi_object[i]['list_value'])):
-                    value = parse_object(wi_object[i]['list_value'][j], factors)
-                    if  ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None):
+                    value = parse_part(wi_object[i]['list_value'][j], factors)
+                    if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None):
                         test.append({'condition_name': wi_object[i]['list_value'][j]['title'], 'biological_replicates': {'count': len(value), 'samples': value}})
                 return_dict['conditions'] = test
             elif wi_object[i]['position'].split(':')[-1] == 'technical_replicates':
-                technical_replicates = parse_object(wi_object[i], factors)
+                technical_replicates = parse_part(wi_object[i], factors)
                 sample_name = []
                 for c in range(technical_replicates['count']):
                     sample_name.append(f'{return_dict["sample_name"]}_t{c+1}')
@@ -285,8 +287,11 @@ def parse_part(wi_object, factors):
             elif wi_object[i]['position'].split(':')[-1] == 'experimental_factors':
                 return_dict['experimental_factors'] = factors
             else:
-                value = parse_object(wi_object[i], factors)
+                value = parse_part(wi_object[i], factors)
                 if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None):
+                    if 'input_type' in wi_object[i] and wi_object[i]['input_type'] == 'date':
+                        value = datetime.datetime.strptime(value,'%Y-%m-%dT%H:%M:%S.%f%z')
+                        value = value.strftime("%d.%m.%Y")
                     return_dict[wi_object[i]['position'].split(':')[-1]] = value
     return return_dict
 
