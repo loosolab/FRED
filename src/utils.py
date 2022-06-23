@@ -1,6 +1,6 @@
 import yaml
 import os
-import pandas as pd
+
 
 # The following functions were copied from Mampok
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/utils.py
@@ -152,7 +152,7 @@ def read_whitelist(key):
         whitelist = read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key))
     except (AttributeError, FileNotFoundError):
         try:
-            whitelist = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key), header=None, delimiter='\n')
+            whitelist = [w for w in open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key)).read().splitlines() if w.strip()]
         except FileNotFoundError:
             whitelist = None
     return whitelist
