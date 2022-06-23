@@ -17,19 +17,19 @@ The requirements can be installed via pip or with the help of a conda environmen
 
 The following steps show how to set up a conda environment:
 
-1. Create a conda environment with the name 'metadata'. Type 'y' when conda asks you to proceed.
+1\. Create a conda environment with the name 'metadata'. Type 'y' when conda asks you to proceed.
 
 ```bash
 conda create -n metadata
 ```
 
-2. Install the requirements into the 'metadata' environment. Type 'y' when conda asks you to proceed.
+2\. Install the requirements into the 'metadata' environment. Type 'y' when conda asks you to proceed.
 
 ```bash
 conda install -n metadata "pyyaml>=5.1" "tabulate>=0.8.10"
 ```
 
-3. Activate the 'metadata' environment to use the metadata tool.
+3\. Activate the 'metadata' environment to use the metadata tool.
 
 ```bash
 conda activate metadata
