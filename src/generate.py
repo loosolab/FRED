@@ -1,5 +1,5 @@
 import sys
-from columnar import columnar
+from tabulate import tabulate
 import src.utils as utils
 import src.validate_yaml as validate_yaml
 import datetime
@@ -150,8 +150,7 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
 def print_option_list(options, desc):
     if desc:
         data = [[f'{i+1}: {options[i]}', desc[i]] for i in range(len(options))]
-        table = columnar(data, no_borders=True)
-        print(table)
+        print(tabulate(data, tablefmt='plain', maxcolwidths=[None, size.columns/2]))
     else:
         for i in range(len(options)):
             print(f'{i + 1}: {options[i]}')
