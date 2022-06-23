@@ -31,6 +31,7 @@ def iterate_dir_metafiles(path_metafiles):
                         '_metadata.yml'):
                     ypath = os.path.join(subdir, file)
                     # read these yaml as dict and append to metafile-list:
+                    print('reading file ' + ypath)
                     metafile = read_in_yaml(ypath)
                     # test if metafile is valid
                     valid, missing_mandatory_keys, invalid_keys, \

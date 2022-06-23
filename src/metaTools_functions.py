@@ -26,8 +26,6 @@ def find(dir_path, search, return_dict):
 
     for metafile in metafiles:
 
-        print('searching file ' + metafile['path'])
-
         sub_list = ''
         sub = ''
         for letter in search:

@@ -294,10 +294,3 @@ def parse_part(wi_object, factors):
                         value = value.strftime("%d.%m.%Y")
                     return_dict[wi_object[i]['position'].split(':')[-1]] = value
     return return_dict
-
-
-def validate_object(wi_object, factors):
-    metadata_dict = parse_object(wi_object, factors)
-    valid, missing_mandatory_keys, invalid_keys, \
-    invalid_entries = validate_yaml.validate_file(metadata_dict)
-    print(valid, missing_mandatory_keys, invalid_keys, invalid_entries)

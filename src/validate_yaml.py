@@ -1,7 +1,7 @@
 import os.path
 import datetime
 from src import utils
-
+import pandas as pd
 
 # This script includes functions for the validation of metadata yaml files
 
@@ -149,13 +149,15 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
             whitelist = [x for xs in list(whitelist.values()) for x in xs]
-    if whitelist and not isinstance(whitelist, list) and not isinstance(
-            whitelist, dict) \
+        if isinstance(whitelist, list):
+            whitelist = pd.DataFrame(whitelist)
+    if whitelist is not None and not isinstance(whitelist, list) and not isinstance(
+            whitelist, dict) and not isinstance(whitelist, pd.DataFrame) \
             and os.path.isfile(os.path.join(
             os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists',
             whitelist)):
         whitelist = utils.read_whitelist(whitelist)
-    if whitelist and entry_value not in whitelist:
+    if whitelist is not None and entry_value not in whitelist[0].values:
         return True
     return False
 
