@@ -73,7 +73,7 @@ def generate_file(path, input_id, name, mandatory_mode):
     else:
         print(f'Validation complete. No errors found.\n')
 
-        utils.save_as_yaml(result_dict, f'{input_id}_metadata.yaml')
+        utils.save_as_yaml(result_dict, os.path.join(path, f'{input_id}_metadata.yaml'))
 
 
 def print_summary(result, pre):
