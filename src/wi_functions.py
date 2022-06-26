@@ -294,3 +294,28 @@ def parse_part(wi_object, factors):
                         value = value.strftime("%d.%m.%Y")
                     return_dict[wi_object[i]['position'].split(':')[-1]] = value
     return return_dict
+
+
+def validate_object(wi_object):
+    for elem in wi_object:
+        wi_object[elem] = validate_part(wi_object[elem])
+    return wi_object
+
+
+def validate_part(wi_object):
+    if isinstance(wi_object, dict):
+        if wi_object['list']:
+            wi_object['list_value'] = validate_part(wi_object['list_value'])
+        else:
+            if 'input_fields' in wi_object:
+                wi_object['input_fields'] = validate_part(wi_object['input_fields'])
+            else:
+                valid, message = validate_yaml.validate_value(wi_object['value'], wi_object['input_type'])
+                wi_object['error'] = not valid
+                wi_object['error_text'] = message
+    elif isinstance(wi_object, list):
+        for i in range(len(wi_object)):
+            wi_object[i] = validate_part(wi_object[i])
+    else:
+        print(wi_object)
+    return wi_object
