@@ -11,6 +11,6 @@ nav:
         - Data structure: 
             - General structure: structure.md
             - Extend structure:
-                - Adding keys: add_keys.md
                 - whitelists : add_whitelist.md
+                - Adding keys: add_keys.md
 theme: readthedocs
