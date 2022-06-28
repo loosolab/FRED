@@ -138,7 +138,7 @@ If independent whitelist files already exist for the keys and the files are loca
 __Example:__
 
 
-<table style="width:100%">
+<table style="width:80px">
 <tr>
 <td> 
 <b>whitelists/values</b><br>The whitelist for values depends on the entered 'factor'. The value 'factor' is therefore assigned to the 'ident_key'.
