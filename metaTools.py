@@ -15,10 +15,6 @@ def find(args):
     print(ids)
 
 
-def add(args):
-    print('TBA')
-
-
 def create(args):
     generate.generate_file(args.path, args.id, args.name, args.mandatory_only)
 
@@ -32,35 +28,29 @@ def main():
                                                'projects by searching the '
                                                'metadata files.')
 
-    find_function.add_argument('-p', '--path', type=pathlib.Path, required=True,
+    find_group = find_function.add_argument_group('mandatory arguments')
+    find_group.add_argument('-p', '--path', type=pathlib.Path, required=True,
                                help='The path to be searched')
-    find_function.add_argument('-s', '--search', type=str, required=True,
+    find_group.add_argument('-s', '--search', type=str, required=True,
                                help='The search parameters')
     find_function.set_defaults(func=find)
-    add_function = subparsers.add_parser('add',
-                                         help='This command is used to add '
-                                              'informtion to a metadata file.')
-    add_function.add_argument('-p', '--path', type=pathlib.Path,
-                              help='The path of the yaml')
-    add_function.add_argument('-a', '--add', type=str, nargs='+',
-                              help='The parameters to be added')
-    add_function.set_defaults(func=add)
+
     create_function = subparsers.add_parser('generate',
                                             help='This command is used to '
                                                  'create a metadata file.')
-    create_function.add_argument('-p', '--path', type=pathlib.Path,
+    create_group = create_function.add_argument_group('mandatory arguments')
+    create_group.add_argument('-p', '--path', type=pathlib.Path,
                                  required=True,
                                  help='The path to save the yaml')
-    create_function.add_argument('-id', '--id', type=str,
+    create_group.add_argument('-id', '--id', type=str,
                                  required=True,
                                  help='The ID of the experiment')
-    create_function.add_argument('-n', '--name', type=str,
+    create_group.add_argument('-n', '--name', type=str,
                                  required=True,
                                  help='The name of the experiment')
     create_function.add_argument('-mo', '--mandatory_only', default=False, action='store_true',
                                  help='If True, only mandatory keys will be filled out')
-    add_function.add_argument('-d', '--dict', type=str, nargs='+',
-                              help='The dictionary to be saved as yaml')
+
     create_function.set_defaults(func=create)
     args = parser.parse_args()
     args.func(args)
