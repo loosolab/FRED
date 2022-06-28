@@ -138,15 +138,15 @@ If independent whitelist files already exist for the keys and the files are loca
 __Example:__
 
 
-<table style="width:80px">
+<table>
 <tr>
-<td> 
+<td style="width:30%"> 
 <b>whitelists/values</b><br>The whitelist for values depends on the entered 'factor'. The value 'factor' is therefore assigned to the 'ident_key'.
 </td> 
-<td> 
+<td style="width:30%"> 
 <b>whitelists/factor</b><br>The key 'factor' also has a whitelist. All values specified in the whitelist 'factor' form possible keys in the whitelist 'values'.
 </td>
-<td> 
+<td style="width:30%"> 
 <b>whitelists/genotype</b><br>For the values in the whitelist 'factor' (e.g. genotype) there are separate whitelists named after the respective value. The values therefore no longer have to be specified as keys in the whitelist 'values'. The metadata tool reads the already existing files as whitelist.
 </td> 
 </tr>
