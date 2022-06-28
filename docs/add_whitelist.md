@@ -23,7 +23,50 @@ mixed
 
 ### Type 2: group
 
-TBA
+This whitelist type is used to group the values within the whitelist for better organization. The values are output in the same grouping as in the whitelist (as long as it is not longer than 30 values) when generating the metadata file. This is for better overview when creating and extending the whitelists, as well as when generating the metadata file. 
+
+With this whitelist type, the whitelist is represented in a yaml file. The key 'whitelist_type' is set with 'group'. Further keys in the whitelist serve as subheaders when displaying the whitelist values.
+
+__Example:__
+
+<table>
+<tr>
+<th>
+whitelists/disease_type
+</th>
+</tr>
+<tr>
+<td> 
+<div>
+The whitelist values for 'disease_type' were grouped based on the organs affected by the disease. This allows faster finding of diseases in the list, as well as a better overview.
+</div>
+</td> 
+</tr>
+<tr>
+<td>
+
+```yaml
+whitelist_type: group
+lung:
+  - lung cancer
+  - COPD
+  - PH
+  ...
+heart:
+  - Coronary heart disease CHD
+  - Angina
+  - Blood pressure
+  ...
+other:
+  - breast cancer
+  - prostate cancer
+```
+
+</td>
+</tr>
+</table>
+
+
 
 ### Type 3: depend
 
@@ -97,7 +140,7 @@ If the whitelists per key are very long, it makes sense to separate them into in
 __Example:__
 
 
-<table style="width:100%">
+<table>
 <tr>
 <td> 
 <b>whitelists/gene</b><br>The whitelists for the genes per organism are very long, which is why they are outsourced to individual files. The keys are named after the organisms and the path to the respective whitelist is given as value. 
@@ -140,13 +183,13 @@ __Example:__
 
 <table>
 <tr>
-<td style="width:30%"> 
+<td> 
 <b>whitelists/values</b><br>The whitelist for values depends on the entered 'factor'. The value 'factor' is therefore assigned to the 'ident_key'.
 </td> 
-<td style="width:30%"> 
+<td> 
 <b>whitelists/factor</b><br>The key 'factor' also has a whitelist. All values specified in the whitelist 'factor' form possible keys in the whitelist 'values'.
 </td>
-<td style="width:30%"> 
+<td> 
 <b>whitelists/genotype</b><br>For the values in the whitelist 'factor' (e.g. genotype) there are separate whitelists named after the respective value. The values therefore no longer have to be specified as keys in the whitelist 'values'. The metadata tool reads the already existing files as whitelist.
 </td> 
 </tr>
