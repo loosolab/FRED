@@ -24,8 +24,7 @@ def get_empty_wi_object():
 
 
 def parse_empty(node, pre, key_yaml, get_whitelists):
-    input_disabled = True if pre.split(':')[-1] in ['id', 'project_name',
-                                                    'condition_name',
+    input_disabled = True if pre.split(':')[-1] in ['condition_name',
                                                     'sample_name'] else False
     if isinstance(node[4], dict):
         input_fields = []
@@ -46,14 +45,14 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
 
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
-                   'list': node[1], 'displayName': node[2], 'desc': node[3],
+                   'list': node[1], 'displayName': node[2], 'desc': f'{node[3]}<strong>required</strong>' if node[0] == 'mandatory' else node[3],
                    'value': None, 'value_unit': None,
                    'whitelist': unit_whitelist, 'input_type': 'value_unit',
                    'input_disabled': input_disabled}
         else:
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
-                   'list': node[1], 'title': node[2], 'desc': node[3],
+                   'list': node[1], 'title': node[2], 'desc': f'{node[3]}<strong>required</strong>' if node[0] == 'mandatory' else node[3],
                    'input_fields': input_fields,
                    'input_disabled': input_disabled}
         if node[1]:
@@ -93,7 +92,7 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
                 whitelist = pre.split(':')[-1]
         res = {'position': pre,
                'mandatory': True if node[0] == 'mandatory' else False,
-               'list': node[1], 'displayName': node[2], 'desc': node[3],
+               'list': node[1], 'displayName': node[2], 'desc': f'{node[3]}<strong>required</strong>' if node[0] == 'mandatory' else node[3],
                'value': node[4],
                'whitelist': whitelist,
                'input_type': input_type, 'data_type': node[7],
