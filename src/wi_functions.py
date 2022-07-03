@@ -296,25 +296,48 @@ def parse_part(wi_object, factors):
 
 
 def validate_object(wi_object):
+    pooled = None
+    organisms = []
+    warn_count = 0
+    error_count = 0
     for elem in wi_object:
-        wi_object[elem] = validate_part(wi_object[elem])
-    return wi_object
+        wi_object[elem], pooled, organisms, warn_count, error_count = validate_part(wi_object[elem], pooled, organisms, warn_count, error_count)
+    validation_object = {'object': wi_object, 'errors': error_count, 'warnings': warn_count}
+    return validation_object
 
 
-def validate_part(wi_object):
+def validate_part(wi_object, pooled, organisms, warn_count, error_count):
     if isinstance(wi_object, dict):
         if wi_object['list']:
-            wi_object['list_value'] = validate_part(wi_object['list_value'])
+            wi_object['list_value'], pooled, organisms, warn_count, error_count = validate_part(wi_object['list_value'], pooled, organisms, warn_count, error_count)
         else:
             if 'input_fields' in wi_object:
-                wi_object['input_fields'] = validate_part(wi_object['input_fields'])
+                wi_object['input_fields'], pooled, organisms, warn_count, error_count = validate_part(wi_object['input_fields'], pooled, organisms, warn_count, error_count)
             else:
                 valid, message = validate_yaml.validate_value(wi_object['value'], wi_object['input_type'])
                 wi_object['error'] = not valid
+                if not valid:
+                    error_count += 1
+                    print(f'Error: {message}')
                 wi_object['error_text'] = message
+
+                warning = False
+                warn_text = None
+                key = wi_object['position']. split(':')[-1]
+                if key == 'pooled':
+                    pooled = wi_object['value']
+                elif key == 'donor_count':
+                    warning, warn_text = validate_yaml.validate_donor_count(pooled, wi_object['value'])
+                elif key == 'organism':
+                    organisms.append(wi_object['value'])
+                elif key == 'reference_genome':
+                    warning, warn_text = validate_yaml.validate_reference_genome(organisms, wi_object['value'])
+                wi_object['warning'] = warning
+                if warning:
+                    warn_count += 1
+                    print(f'Warning: {warn_text}')
+                wi_object['warn_text'] = warn_text
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
-            wi_object[i] = validate_part(wi_object[i])
-    else:
-        print(wi_object)
-    return wi_object
+            wi_object[i], pooled, organisms, warn_count, error_count = validate_part(wi_object[i], pooled, organisms, warn_count, error_count)
+    return wi_object, pooled, organisms, warn_count, error_count
