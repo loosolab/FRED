@@ -257,3 +257,28 @@ def validate_value(input_value, value_type):
         valid = False
         message = 'The value contains an invalid character (\").'
     return valid, message
+
+
+def validate_reference_genome(organisms, reference_genome):
+    invalid = False
+    message = None
+    ref_genome_whitelist = utils.get_whitelist('reference_genome', None)
+    if not any([reference_genome in ref_genome_whitelist[organism] for organism in organisms]):
+        invalid = True
+        organisms = [f'\'{organism}\'' for organism in organisms]
+        message = (f'The reference genome \'{reference_genome}\' does not match '
+                   f'the input organism ({", ".join(organisms)}).')
+    return invalid, message
+
+
+def validate_donor_count(pooled, donor_count):
+    invalid = False
+    message = None
+    if pooled and donor_count <= 1:
+        invalid = True
+        message = f'The donor count should be >1 for pooled samples.'
+    elif not pooled and donor_count > 1:
+        invalid = True
+        message = (f'The donor count should be 1 for samples that are not '
+                   f'pooled.')
+    return invalid, message
