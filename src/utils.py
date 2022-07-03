@@ -191,7 +191,8 @@ def get_whitelist(key, filled_object):
                 whitelist = read_depend_whitelist(whitelist, depend)
     if group:
         for key in whitelist:
-            whitelist[key] = sorted(whitelist[key])
+            if whitelist[key] is not None:
+                whitelist[key] = sorted(whitelist[key])
     else:
         whitelist = sorted(whitelist)
     return whitelist
