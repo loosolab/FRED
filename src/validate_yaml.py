@@ -31,7 +31,8 @@ def validate_file(metafile):
     if len(missing_mandatory_keys) > 0 or len(invalid_keys) > 0 or len(
             invalid_entries) > 0 or len(invalid_value) > 0:
         valid = False
-    return valid, missing_mandatory_keys, invalid_keys, invalid_entries, invalid_value
+    pool_warn, ref_genome_warn = validate_logic(metafile)
+    return valid, missing_mandatory_keys, invalid_keys, invalid_entries, invalid_value, pool_warn, ref_genome_warn
 
 
 # -----------------------------------REPORT-------------------------------------
@@ -66,7 +67,7 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     value = []
     for v in invalid_value:
         value.append(f'{v[0]}: {v[1]} -> {v[2]}')
-    print(f'{"INVALID FILE".center(80, "-")}\n'
+    print(f'{"ERROR".center(80, "-")}\n'
           f'Project ID: {input_id}\n'
           f'Path: {path}\n\n'
           f'Report:\n')
@@ -82,6 +83,28 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     if len(invalid_value) > 0:
         print(f'The following values are invalid:\n'
               f'- {"- ".join(value)}')
+    print(f'{"".center(80, "-")}')
+
+
+def print_warning(metafile, pool_warn, ref_genome_warn):
+    try:
+        input_id = metafile['project']['id']
+    except KeyError:
+        input_id = 'missing'
+    try:
+        path = metafile['path']
+    except KeyError:
+        path = 'missing'
+    print(f'{"WARNING".center(80, "-")}\n'
+          f'Project ID: {input_id}\n'
+          f'Path: {path}\n\n'
+          f'Report:\n')
+    if len(pool_warn) > 0:
+        for elem in pool_warn:
+            print(f'- Sample \'{elem[0]}\': {elem[1]}')
+    if len(ref_genome_warn) > 0:
+        for elem in ref_genome_warn:
+            print(f'- Run from {elem[0]}: {elem[1]}')
     print(f'{"".center(80, "-")}')
 
 
@@ -148,7 +171,8 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
                 whitelist = utils.read_whitelist(value[0])
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
-            whitelist = [x for xs in list(whitelist.values()) for x in xs]
+            whitelist = utils.read_grouped_whitelist(whitelist)
+            whitelist = [x for xs in list(whitelist.values()) if xs is not None for x in xs]
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \
             and os.path.isfile(os.path.join(
@@ -259,6 +283,26 @@ def validate_value(input_value, value_type):
     return valid, message
 
 
+def validate_logic(metafile):
+    pool_warn = []
+    ref_genome_warn = []
+    samples = list(utils.find_keys(metafile, 'samples'))
+    for cond in samples:
+        for sample in cond:
+            warning, warn_message = validate_donor_count(sample['pooled'], sample['donor_count'])
+            if warning:
+                pool_warn.append((sample['sample_name'], warn_message))
+    organisms = list(utils.find_keys(metafile, 'organism'))
+    runs = list(utils.find_keys(metafile, 'runs'))
+    if len(runs) > 0:
+        for run in runs[0]:
+            if 'reference_genome' in run:
+                warning, warn_message = validate_reference_genome(organisms, run['reference_genome'])
+                if warning:
+                    ref_genome_warn.append((run['date'], warn_message))
+    return pool_warn, ref_genome_warn
+
+
 def validate_reference_genome(organisms, reference_genome):
     invalid = False
     message = None
@@ -276,9 +320,10 @@ def validate_donor_count(pooled, donor_count):
     message = None
     if pooled and donor_count <= 1:
         invalid = True
-        message = f'The donor count should be >1 for pooled samples.'
+        message = (f'Found donor count {donor_count} for pooled sample. '
+                   f'The donor count should be greater than 1.')
     elif not pooled and donor_count > 1:
         invalid = True
-        message = (f'The donor count should be 1 for samples that are not '
-                   f'pooled.')
+        message = (f'Found donor count {donor_count} for sample that is not '
+                   f'pooled. The donor count should be 1.')
     return invalid, message

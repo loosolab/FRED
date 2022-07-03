@@ -35,14 +35,18 @@ def iterate_dir_metafiles(path_metafiles):
                     metafile = read_in_yaml(ypath)
                     # test if metafile is valid
                     valid, missing_mandatory_keys, invalid_keys, \
-                        invalid_entries, invalid_values = validate_yaml.validate_file(metafile)
+                        invalid_entries, invalid_values, pool_warn, ref_genome_warn = validate_yaml.validate_file(metafile)
                     # add path to dic
                     metafile['path'] = ypath
                     if not valid:
                         validate_yaml.print_validation_report(
                             metafile, missing_mandatory_keys, invalid_keys,
                             invalid_entries, invalid_values)
+                        if len(pool_warn) > 0 or len(ref_genome_warn) > 0:
+                            validate_yaml.print_warning(metafile, pool_warn, ref_genome_warn)
                     else:
+                        if len(pool_warn) > 0 or len(ref_genome_warn) > 0:
+                            validate_yaml.print_warning(metafile, pool_warn, ref_genome_warn)
                         if metafile:
                             metafile_list.append(metafile)
     return metafile_list
