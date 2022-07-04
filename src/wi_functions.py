@@ -48,7 +48,7 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
                    'list': node[1], 'displayName': node[2], 'desc': f'{node[3]}<strong>required</strong>' if node[0] == 'mandatory' else node[3],
                    'value': None, 'value_unit': None,
                    'whitelist': unit_whitelist, 'input_type': 'value_unit',
-                   'input_disabled': input_disabled}
+                   'data_type': 'value_unit', 'input_disabled': input_disabled}
         else:
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
@@ -289,55 +289,83 @@ def parse_part(wi_object, factors):
                 value = parse_part(wi_object[i], factors)
                 if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None):
                     if 'input_type' in wi_object[i] and wi_object[i]['input_type'] == 'date':
-                        value = datetime.datetime.strptime(value,'%Y-%m-%dT%H:%M:%S.%f%z')
-                        value = value.strftime("%d.%m.%Y")
+                        try:
+                            value = datetime.datetime.strptime(value,'%Y-%m-%dT%H:%M:%S.%f%z')
+                            value = value.strftime("%d.%m.%Y")
+                        except ValueError:
+                            value = value
                     return_dict[wi_object[i]['position'].split(':')[-1]] = value
     return return_dict
 
 
-def validate_object(wi_object):
+def validate_object(wi_object, factors):
     pooled = None
     organisms = []
-    warn_count = 0
     error_count = 0
+    warnings = []
     for elem in wi_object:
-        wi_object[elem], pooled, organisms, warn_count, error_count = validate_part(wi_object[elem], pooled, organisms, warn_count, error_count)
-    validation_object = {'object': wi_object, 'errors': error_count, 'warnings': warn_count}
+        wi_object[elem], pooled, organisms, warnings, error_count = validate_part(wi_object[elem], warnings, pooled, organisms, error_count)
+    warnings = get_warning_messages(warnings)
+
+    html_str = ''
+    yaml_object = parse_object(wi_object, factors)
+    for elem in yaml_object:
+        html_str = f'{html_str}<h3>{elem}</h3><br><br>{object_to_html(yaml_object[elem],0)}<br><br>'
+    validation_object = {'object': wi_object, 'errors': error_count, 'warnings': warnings, 'summary': html_str, 'yaml': yaml_object}
+    print(html_str)
     return validation_object
 
 
-def validate_part(wi_object, pooled, organisms, warn_count, error_count):
+def get_warning_messages(warnings):
+    message = '\n- '.join([f'{warning[0]}: {warning[1]}' for warning in warnings])
+    warnings = f'- {message}'
+    return warnings
+
+
+def validate_part(wi_object, warnings, pooled, organisms, error_count):
     if isinstance(wi_object, dict):
         if wi_object['list']:
-            wi_object['list_value'], pooled, organisms, warn_count, error_count = validate_part(wi_object['list_value'], pooled, organisms, warn_count, error_count)
+            wi_object['list_value'], pooled, organisms, warnings, error_count = validate_part(wi_object['list_value'], warnings, pooled, organisms, error_count)
         else:
             if 'input_fields' in wi_object:
-                wi_object['input_fields'], pooled, organisms, warn_count, error_count = validate_part(wi_object['input_fields'], pooled, organisms, warn_count, error_count)
+                wi_object['input_fields'], pooled, organisms, warnings, error_count = validate_part(wi_object['input_fields'], warnings, pooled, organisms, error_count)
             else:
-                valid, message = validate_yaml.validate_value(wi_object['value'], wi_object['input_type'])
-                wi_object['error'] = not valid
-                if not valid:
-                    error_count += 1
-                    print(f'Error: {message}')
-                wi_object['error_text'] = message
+                if wi_object['value'] is not None and wi_object['value'] != '':
+                    valid, message = validate_yaml.validate_value(wi_object['value'], wi_object['data_type'], wi_object['position'].split(':')[-1])
+                    wi_object['error'] = not valid
+                    if not valid:
+                        error_count += 1
+                    wi_object['error_text'] = message
 
-                warning = False
-                warn_text = None
-                key = wi_object['position']. split(':')[-1]
-                if key == 'pooled':
-                    pooled = wi_object['value']
-                elif key == 'donor_count':
-                    warning, warn_text = validate_yaml.validate_donor_count(pooled, wi_object['value'])
-                elif key == 'organism':
-                    organisms.append(wi_object['value'])
-                elif key == 'reference_genome':
-                    warning, warn_text = validate_yaml.validate_reference_genome(organisms, wi_object['value'])
-                wi_object['warning'] = warning
-                if warning:
-                    warn_count += 1
-                    print(f'Warning: {warn_text}')
-                wi_object['warn_text'] = warn_text
+                    warning = False
+                    warn_text = None
+                    key = wi_object['position']. split(':')[-1]
+                    if key == 'pooled':
+                        pooled = wi_object['value']
+                    elif key == 'donor_count':
+                        warning, warn_text = validate_yaml.validate_donor_count(pooled, wi_object['value'])
+                    elif key == 'organism':
+                        organisms.append(wi_object['value'])
+                    elif key == 'reference_genome':
+                        warning, warn_text = validate_yaml.validate_reference_genome(organisms, wi_object['value'])
+                    wi_object['warning'] = warning
+                    if warning:
+                        warnings.append((wi_object['position'], warn_text))
+                    wi_object['warn_text'] = warn_text
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
-            wi_object[i], pooled, organisms, warn_count, error_count = validate_part(wi_object[i], pooled, organisms, warn_count, error_count)
-    return wi_object, pooled, organisms, warn_count, error_count
+            wi_object[i], pooled, organisms, warnings, error_count = validate_part(wi_object[i], warnings, pooled, organisms, error_count)
+    return wi_object, pooled, organisms, warnings, error_count
+
+
+def object_to_html(yaml_object, margin):
+    html_str = ''
+    if isinstance(yaml_object, dict):
+        for key in yaml_object:
+            html_str = f'{html_str}<p style="margin-left: {margin}px">{key}: {object_to_html(yaml_object[key], margin + 40)}</p>'
+    elif isinstance(yaml_object, list):
+        for elem in yaml_object:
+            html_str = f'{html_str}<br>- {object_to_html(elem, margin)}'
+    else:
+        html_str = f'{html_str}{yaml_object}'
+    return html_str

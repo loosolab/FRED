@@ -7,6 +7,8 @@ from src import utils
 
 # ---------------------------------VALIDATION-----------------------------------
 
+generated = ['condition_name', 'sample_name']
+
 
 def validate_file(metafile):
     """
@@ -140,7 +142,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
         if invalid:
             invalid_entry.append(f'{key_name}:{metafile}')
 
-        inv_value, message = validate_value(metafile, input_type)
+        inv_value, message = validate_value(metafile, input_type, key_name.split(':')[-1])
 
         if not inv_value:
             invalid_value.append((key_name, metafile, message))
@@ -250,36 +252,37 @@ def find_key(metafile, key, is_list, values, invalid_keys):
     return missing_keys
 
 
-def validate_value(input_value, value_type):
+def validate_value(input_value, value_type, key):
     valid = True
     message = None
-    if value_type == 'bool':
-        if input_value not in [True, False]:
+    if input_value is not None:
+        if value_type == 'bool':
+            if input_value not in [True, False]:
+                valid = False
+                message = 'The value has to be of type bool (True or False).'
+        elif value_type == 'int':
+            if not isinstance(input_value, int):
+                valid = False
+                message = 'The value has to be an integer.'
+        elif value_type == 'float':
+            if not isinstance(input_value, float):
+                valid = False
+                message = 'The value has to be a float.'
+        elif value_type == 'date':
+            try:
+                input_date = input_value.split('.')
+                if len(input_date) != 3 or len(input_date[0]) != 2 or len(
+                        input_date[1]) != 2 or len(input_date[2]) != 4:
+                    raise SyntaxError
+                input_value = datetime.date(int(input_date[2]),
+                                                int(input_date[1]),
+                                                int(input_date[0]))
+            except (IndexError, ValueError, SyntaxError) as e:
+                valid = False
+                message = f'Input must be of type \'DD.MM.YYYY\'.'
+        elif value_type == 'str' and '\"' in input_value and key not in generated:
             valid = False
-            message = 'The value has to be of type bool (True or False).'
-    elif value_type == 'int':
-        if not isinstance(input_value, int):
-            valid = False
-            message = 'The value has to be an integer.'
-    elif value_type == 'float':
-        if not isinstance(input_value, float):
-            valid = False
-            message = 'The value has to be a float.'
-    elif value_type == 'date':
-        try:
-            input_date = input_value.split('.')
-            if len(input_date) != 3 or len(input_date[0]) != 2 or len(
-                    input_date[1]) != 2 or len(input_date[2]) != 4:
-                raise SyntaxError
-            input_value = datetime.date(int(input_date[2]),
-                                            int(input_date[1]),
-                                            int(input_date[0]))
-        except (IndexError, ValueError, SyntaxError) as e:
-            valid = False
-            message = f'Input must be of type \'DD.MM.YYYY\'.'
-    elif input_value == 'str' and '\"' in input_value:
-        valid = False
-        message = 'The value contains an invalid character (\").'
+            message = 'The value contains an invalid character (\").'
     return valid, message
 
 
