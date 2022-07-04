@@ -212,16 +212,75 @@ def get_experimental_factors(node, result_dict):
     for fac in used_factors:
         factor_value = {'factor': fac}
         fac_node = list(utils.find_keys(node, fac))[0]
-        if isinstance(fac_node[4], dict) and 'unit' in fac_node[
-            4] and 'value' in fac_node[4]:
+        if isinstance(fac_node[4], dict):
             used_values = []
-            print(f'\nPlease enter the unit for factor {fac}:')
-            unit = parse_input_value('unit', '', True, 'str', result_dict)
-            print(f'\nPlease enter int values for factor {fac} (in {unit}) '
-                  f'divided by comma:')
-            values = parse_input_list('int', False)
-            for val in values:
-                used_values.append({'unit': unit, 'value': val})
+            if 'unit' in fac_node[4] and 'value' in fac_node[4]:
+                print(f'\nPlease enter the unit for factor {fac}:')
+                unit = parse_input_value('unit', '', True, 'str', result_dict)
+                print(f'\nPlease enter int values for factor {fac} (in {unit}) '
+                      f'divided by comma:')
+                values = parse_input_list('int', False)
+                for val in values:
+                    used_values.append({'unit': unit, 'value': val})
+            else:
+                options = list(fac_node[4].keys())
+                print(
+                    f'\nPlease enter what information you want to add for '
+                    f'{fac} (1,...,{len(options)}).')
+                print_option_list(options, fac_node[3])
+                values = parse_input_list(options, False)
+                print(f'VALUES: {values}')
+                for value in values:
+                    value_list = utils.get_whitelist(value, result_dict)
+                    if isinstance(value_list, dict):
+                        w = [x for xs in list(value_list.values()) for x in xs]
+                        if len(w) > 30:
+                            redo = True
+                            print(
+                            f'\nPlease enter the values for '
+                            f'{value}.')
+                            while redo:
+                                input_value = complete_input(w, value)
+                                if input_value in value_list:
+                                    used_values.append({value:input_value})
+                                    redo = parse_list_choose_one([True, False],
+                                                         f'\nDo you want to add another {factor_value["factor"]}?')
+                                else:
+                                    print(f'The value you entered does not match the '
+                                          f'whitelist. Try tab for autocomplete.')
+                        else:
+                            print(
+                                f'\nPlease select the values for '
+                                f'{value} (1-{len(w)}) divided by '
+                                f'comma:\n')
+                            i = 1
+                            for w_key in value_list:
+                                print(f'\033[1m{w_key}\033[0m')
+                                for val in value_list[w_key]:
+                                    print(f'{i}: {val}')
+                                    i += 1
+                            used_values.append({value:parse_input_list(w, False)})
+                    elif len(value_list) > 30:
+                        redo = True
+                        print(
+                            f'\nPlease enter the values for '
+                            f'{value}.')
+                        while redo:
+                            input_value = complete_input(value_list, factor_value["factor"])
+                            if input_value in value_list:
+                                used_values.append({value:input_value})
+                                redo = parse_list_choose_one([True, False],
+                                         f'\nDo you want to add another {value}?')
+                            else:
+                                print(f'The value you entered does not match the '
+                                      f'whitelist. Try tab for autocomplete.')
+                    else:
+                        print(
+                            f'\nPlease select the values for '
+                            f'{value} (1-{len(value_list)}) divided by '
+                            f'comma:\n')
+                        print_option_list(value_list, False)
+                        used_values.append({value:parse_input_list(value_list, False)})
         elif fac_node[5]:
             value_list = utils.get_whitelist(fac, result_dict)
             used_values = []
@@ -282,6 +341,7 @@ def get_experimental_factors(node, result_dict):
             used_values = parse_input_list(value_type, False)
         factor_value['values'] = used_values
         experimental_factors.append(factor_value)
+        print(experimental_factors)
 
     global factor
     factor = used_factors
