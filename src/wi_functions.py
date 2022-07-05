@@ -369,3 +369,7 @@ def object_to_html(yaml_object, margin):
     else:
         html_str = f'{html_str}{yaml_object}'
     return html_str
+
+
+def save_object(dictionary, path):
+    utils.save_as_yaml(dictionary, path)
