@@ -365,19 +365,19 @@ experimental_setting:
                   - False
                   - 'Disease'
                   - ''
-                  - disease_status:
+                  - disease_type:
                       - 'optional'
                       - False
-                      - 'Status'
+                      - 'Type'
                       - ''
                       - null
                       - True
                       - select
                       - str
-                    disease_type:
+                    disease_status:
                       - 'optional'
                       - False
-                      - 'Type'
+                      - 'Status'
                       - ''
                       - null
                       - True
@@ -392,24 +392,25 @@ experimental_setting:
                       - True
                       - select
                       - str
+                  - 'disease_type'
                 treatment:
                   - 'optional'
                   - False
                   - 'Treatment'
                   - ''
-                  - treatment_status:
+                  - treatment_type:
                       - 'optional'
                       - False
-                      - 'Status'
+                      - 'Type'
                       - ''
                       - null
                       - True
                       - select
                       - str
-                    treatment_type:
+                    treatment_status:
                       - 'optional'
                       - False
-                      - 'Type'
+                      - 'Status'
                       - ''
                       - null
                       - True
@@ -438,6 +439,7 @@ experimental_setting:
                           - True
                           - select
                           - str
+                  - 'treatment_type'
                 time_point:
                   - 'optional'
                   - False
