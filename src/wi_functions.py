@@ -318,6 +318,8 @@ def validate_object(wi_object, factors):
     organisms = []
     warnings = []
     errors = []
+    factors = wi_object['all_factors']
+    wi_object.pop('all_factors')
     for elem in wi_object:
         wi_object[elem], pooled, organisms, warnings, errors = validate_part(wi_object[elem], warnings, pooled, organisms, errors)
 
