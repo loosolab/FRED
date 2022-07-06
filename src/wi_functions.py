@@ -243,7 +243,9 @@ def get_whitelist_object(item, organism_name, whitelists):
     return item, whitelists
 
 
-def parse_object(wi_object, factors):
+def parse_object(wi_object):
+    factors = wi_object['all_factors']
+    wi_object.pop('all_factors')
     result = {}
     for key in wi_object:
         result[key] = parse_part(wi_object[key], factors)
@@ -274,7 +276,7 @@ def parse_part(wi_object, factors):
                 test = []
                 for j in range(len(wi_object[i]['list_value'])):
                     value = parse_part(wi_object[i]['list_value'][j], factors)
-                    if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None):
+                    if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None and value != ''):
                         test.append({'condition_name': wi_object[i]['list_value'][j]['title'], 'biological_replicates': {'count': len(value), 'samples': value}})
                 return_dict['conditions'] = test
             elif wi_object[i]['position'].split(':')[-1] == 'technical_replicates':
@@ -302,7 +304,7 @@ def parse_part(wi_object, factors):
 
             else:
                 value = parse_part(wi_object[i], factors)
-                if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None):
+                if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None and value != ''):
                     if 'input_type' in wi_object[i] and wi_object[i]['input_type'] == 'date':
                         try:
                             value = datetime.datetime.strptime(value,'%Y-%m-%dT%H:%M:%S.%f%z')
@@ -313,7 +315,7 @@ def parse_part(wi_object, factors):
     return return_dict
 
 
-def validate_object(wi_object, factors):
+def validate_object(wi_object):
     pooled = None
     organisms = []
     warnings = []
@@ -322,14 +324,12 @@ def validate_object(wi_object, factors):
     wi_object.pop('all_factors')
     for elem in wi_object:
         wi_object[elem], pooled, organisms, warnings, errors = validate_part(wi_object[elem], warnings, pooled, organisms, errors)
-
+    wi_object['all_factors'] = factors
     html_str = ''
-    yaml_object = parse_object(wi_object, factors)
+    yaml_object = parse_object(wi_object)
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3><br><br>{object_to_html(yaml_object[elem],0)}<br><br>'
-    wi_object['all_factors'] = factors
     validation_object = {'object': wi_object, 'errors': errors, 'warnings': warnings, 'summary': html_str, 'yaml': yaml_object}
-    print(html_str)
     return validation_object
 
 
