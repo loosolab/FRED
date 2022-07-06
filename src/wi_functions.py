@@ -327,6 +327,7 @@ def validate_object(wi_object, factors):
     yaml_object = parse_object(wi_object, factors)
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3><br><br>{object_to_html(yaml_object[elem],0)}<br><br>'
+    wi_object['all_factors'] = factors
     validation_object = {'object': wi_object, 'errors': errors, 'warnings': warnings, 'summary': html_str, 'yaml': yaml_object}
     print(html_str)
     return validation_object
