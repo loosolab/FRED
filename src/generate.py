@@ -359,22 +359,33 @@ def get_combinations(values, key):
     else:
         multi = False
     if multi:
-        possible_values = []
+        possible_values = {}
+        disease_values = []
         ident_key = values['ident_key']
         depend = values[ident_key]
         values.pop(ident_key)
         values.pop('ident_key')
         for elem in depend:
+            possible_values[elem] = []
             value = f'{ident_key}:{elem}'
             for i in range(len(values.keys())):
                 for v in values[list(values.keys())[i]]:
                     if isinstance(v,
                                   dict) and 'value' in v and 'unit' in v:
                         v = f'{v["value"]}{v["unit"]}'
-                    possible_values.append(f'{value}|{list(values.keys())[i]}:{v}"')
+                    possible_values[elem].append(f'{value}|{list(values.keys())[i]}:{v}"')
             # TODO: second loop
-        print(possible_values)
-
+            for key in possible_values:
+                if key != elem:
+                    for x in possible_values[elem]:
+                        for y in possible_values[key]:
+                            disease_values.append(f'disease:{"{"}{x}{"}"}-disease:{"{"}{y}{"}"}')
+        print(
+            f'\nPlease select the analyzed combinations for {key} '
+            f'(1-{len(disease_values)}) divided by comma:\n')
+        print_option_list(disease_values, False)
+        used_values = parse_input_list(disease_values, False)
+    return used_values
 
 def get_conditions(factors, node, mandatory_mode, result_dict):
     combinations = get_condition_combinations(factors)
