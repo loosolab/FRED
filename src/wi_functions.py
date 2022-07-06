@@ -20,6 +20,7 @@ def get_empty_wi_object():
     result = {}
     for key in key_yaml:
         result[key] = parse_empty(key_yaml[key], key, key_yaml, True)
+    result['all_factors'] = []
     return result
 
 
