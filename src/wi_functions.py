@@ -61,7 +61,10 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
         if node[1]:
             res['list_value'] = []
     else:
-        input_type = node[6]
+        if pre.split(':')[-1] == 'organism':
+            input_type = 'organism_name'
+        else:
+            input_type = node[6]
         if get_whitelists:
             if node[5]:
                 whitelist = utils.read_whitelist(pre.split(':')[-1])
