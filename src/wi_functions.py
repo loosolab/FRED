@@ -214,7 +214,7 @@ def get_conditions(factors, organism_name):
              'input_disabled': False, 'input_fields': copy.deepcopy(cond_sample)}
         condition_object.append(d)
 
-    return {'conditions': condition_object, 'whitelist_object': whitelists}
+    return {'conditions': condition_object, 'whitelist_object': whitelists, 'organism': organism_name}
 
 
 def get_whitelist_object(item, organism_name, whitelists):
