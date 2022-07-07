@@ -168,7 +168,12 @@ def get_samples(condition, sample):
             if sample[i][
                 'position'] == f'experimental_setting:conditions:biological_' \
                                f'replicates:samples:{c[0]}':
-                sample[i]['value'] = c[1]
+                if c[0] in ['age', 'time_point', 'duration']:
+                    unit = c[1].lstrip('0123456789')
+                    value = c[1][:len(c[1]) - len(unit)]
+                    sample[i]['value'] = {'unit': unit, 'value': int(value)}
+                else:
+                    sample[i]['value'] = c[1]
                 sample[i]['input_disabled'] = True
     return sample
 
