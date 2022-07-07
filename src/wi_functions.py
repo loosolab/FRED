@@ -7,6 +7,8 @@ import src.validate_yaml as validate_yaml
 import os
 import copy
 import datetime
+import pytz
+from dateutil import parser
 
 
 # This script contains all functions for generation of objects for the web
@@ -312,11 +314,10 @@ def parse_part(wi_object, factors):
                 value = parse_part(wi_object[i], factors)
                 if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None and value != ''):
                     if 'input_type' in wi_object[i] and wi_object[i]['input_type'] == 'date':
-                        try:
-                            value = datetime.datetime.strptime(value,'%Y-%m-%dT%H:%M:%S.%f%z')
-                            value = value.strftime("%d.%m.%Y")
-                        except ValueError:
-                            value = value
+                        default_time = parser.parse(wi_object[i]['value'])
+                        timezone = pytz.timezone("Europe/Berlin")
+                        local_time = default_time.astimezone(timezone)
+                        value = local_time.strftime("%d.%m.%Y")
                     return_dict[wi_object[i]['position'].split(':')[-1]] = value
     return return_dict
 
@@ -349,7 +350,14 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
                 wi_object['input_fields'], pooled, organisms, warnings, errors = validate_part(wi_object['input_fields'], warnings, pooled, organisms, errors)
             else:
                 if wi_object['value'] is not None and wi_object['value'] != '':
-                    valid, message = validate_yaml.validate_value(wi_object['value'], wi_object['data_type'], wi_object['position'].split(':')[-1])
+                    if wi_object['input_type'] == 'date':
+                        default_time = parser.parse(wi_object['value'])
+                        timezone = pytz.timezone("Europe/Berlin")
+                        local_time = default_time.astimezone(timezone)
+                        value = local_time.strftime("%d.%m.%Y")
+                    else:
+                        value = wi_object['value']
+                    valid, message = validate_yaml.validate_value(value, wi_object['data_type'], wi_object['position'].split(':')[-1])
                     wi_object['error'] = not valid
                     if not valid:
                         errors.append(f'{wi_object["position"]}: {message}')
@@ -366,8 +374,10 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
                         organisms.append(wi_object['value'])
                     elif key == 'reference_genome':
                         warning, warn_text = validate_yaml.validate_reference_genome(organisms, wi_object['value'])
+                    wi_object['warning'] = warning
                     if warning:
                         warnings.append(f'{wi_object["position"]}: {warn_text}')
+                        wi_object['warn_text'] = warn_text
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
             wi_object[i], pooled, organisms, warnings, errors = validate_part(wi_object[i], warnings, pooled, organisms, errors)
