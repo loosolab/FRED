@@ -171,7 +171,8 @@ def get_samples(condition, sample):
                 if c[0] in ['age', 'time_point', 'duration']:
                     unit = c[1].lstrip('0123456789')
                     value = c[1][:len(c[1]) - len(unit)]
-                    sample[i]['value'] = {'unit': unit, 'value': int(value)}
+                    sample[i]['value'] = int(value)
+                    sample[i]['value_unit'] = unit
                 else:
                     sample[i]['value'] = c[1]
                 sample[i]['input_disabled'] = True
