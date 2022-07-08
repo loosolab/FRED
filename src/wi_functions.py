@@ -269,15 +269,18 @@ def parse_part(wi_object, factors):
         if wi_object['list']:
             test = []
             for elem in wi_object['list_value']:
-                test.append(parse_part(elem, factors))
+                if not isinstance(elem, dict) and not isinstance(elem, list):
+                    test.append(elem)
+                else:
+                    test.append(parse_part(elem, factors))
             return test
         else:
             if 'input_fields' in wi_object:
                 return parse_part(wi_object['input_fields'], factors)
             else:
                 if wi_object['value'] and wi_object['input_type'] == 'value_unit':
-                    unit = wi_object['value'].lstrip('0123456789')
-                    value = wi_object['value'][:len(wi_object['value']) - len(unit)]
+                    unit = wi_object['value_unit']
+                    value = wi_object['value']
                     return {'unit': unit, 'value': value}
                 else:
                     return wi_object['value']
@@ -347,7 +350,23 @@ def validate_object(wi_object):
 def validate_part(wi_object, warnings, pooled, organisms, errors):
     if isinstance(wi_object, dict):
         if wi_object['list']:
-            wi_object['list_value'], pooled, organisms, warnings, errors = validate_part(wi_object['list_value'], warnings, pooled, organisms, errors)
+            if not any([isinstance(x, dict) or isinstance(x, list) for x in wi_object['list_value']]):
+                error = False
+                messages = []
+                for elem in wi_object['list_value']:
+                    valid, message = validate_yaml.validate_value(elem, wi_object['data_type'], wi_object['position'].split(':')[-1])
+                    if not valid:
+                        error = True
+                        messages.append((elem, message))
+                        errors.append(f'{wi_object["position"]}: Value {elem} - {message}')
+                wi_object['error'] = error
+                if error:
+                    message = ', '.join([f'{msg[0]}: {msg[1]}' for msg in messages])
+                    wi_object['error_text'] = f'There are invalid values in the list: {message}'
+                else:
+                    wi_object['error_text'] = None
+            else:
+                wi_object['list_value'], pooled, organisms, warnings, errors = validate_part(wi_object['list_value'], warnings, pooled, organisms, errors)
         else:
             if 'input_fields' in wi_object:
                 wi_object['input_fields'], pooled, organisms, warnings, errors = validate_part(wi_object['input_fields'], warnings, pooled, organisms, errors)
@@ -380,7 +399,7 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
                     wi_object['warning'] = warning
                     if warning:
                         warnings.append(f'{wi_object["position"]}: {warn_text}')
-                        wi_object['warn_text'] = warn_text
+                    wi_object['warn_text'] = warn_text
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
             wi_object[i], pooled, organisms, warnings, errors = validate_part(wi_object[i], warnings, pooled, organisms, errors)
