@@ -292,6 +292,8 @@ def parse_part(wi_object, factors):
                     value = parse_part(wi_object[i]['list_value'][j], factors)
                     if ((isinstance(value,list) or isinstance(value, dict)) and len(value) > 0) or (not isinstance(value, list) and not isinstance(value, dict) and value is not None and value != ''):
                         test.append({'condition_name': wi_object[i]['list_value'][j]['title'], 'biological_replicates': {'count': len(value), 'samples': value}})
+                    else:
+                        test.append({'condition_name': wi_object[i]['list_value'][j]['title']})
                 return_dict['conditions'] = test
             elif wi_object[i]['position'].split(':')[-1] == 'technical_replicates':
                 technical_replicates = parse_part(wi_object[i], factors)
