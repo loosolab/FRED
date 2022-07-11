@@ -338,9 +338,13 @@ def validate_object(wi_object):
     factors = wi_object['all_factors']
     wi_object.pop('all_factors')
     for elem in wi_object:
-        wi_object[elem], pooled, organisms, part_warnings, part_errors = validate_part(wi_object[elem], [], pooled, organisms, errors)
+        wi_object[elem], pooled, organisms, part_warnings, part_errors = validate_part(wi_object[elem], [], pooled, organisms, [])
         warnings[elem] = part_warnings
         errors[elem] = part_errors
+    new_object = {}
+    for part in ['project', 'experimental_setting', 'technical_details']:
+        new_object[part] = wi_object[part]
+    wi_object = new_object
     wi_object['all_factors'] = factors
     html_str = ''
     yaml_object = parse_object(wi_object)
