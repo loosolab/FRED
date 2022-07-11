@@ -333,12 +333,14 @@ def parse_part(wi_object, factors):
 def validate_object(wi_object):
     pooled = None
     organisms = []
-    warnings = []
-    errors = []
+    warnings = {}
+    errors = {}
     factors = wi_object['all_factors']
     wi_object.pop('all_factors')
     for elem in wi_object:
-        wi_object[elem], pooled, organisms, warnings, errors = validate_part(wi_object[elem], warnings, pooled, organisms, errors)
+        wi_object[elem], pooled, organisms, part_warnings, part_errors = validate_part(wi_object[elem], [], pooled, organisms, errors)
+        warnings[elem] = part_warnings
+        errors[elem] = part_errors
     wi_object['all_factors'] = factors
     html_str = ''
     yaml_object = parse_object(wi_object)
