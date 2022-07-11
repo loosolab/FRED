@@ -48,14 +48,14 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
 
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
-                   'list': node[1], 'displayName': f'{node[2]}<sup>*</sup>' if node[0] == 'mandatory' else node[2], 'desc': node[3],
+                   'list': node[1], 'displayName': node[2], 'desc': node[3],
                    'value': None, 'value_unit': None,
                    'whitelist': unit_whitelist, 'input_type': 'value_unit',
                    'data_type': 'value_unit', 'input_disabled': input_disabled}
         else:
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
-                   'list': node[1], 'title': f'{node[2]}<sup>*</sup>' if node[0] == 'mandatory' else node[2], 'desc': node[3],
+                   'list': node[1], 'title': node[2], 'desc': node[3],
                    'input_fields': input_fields,
                    'input_disabled': input_disabled}
         if node[1]:
@@ -98,7 +98,7 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
                 whitelist = pre.split(':')[-1]
         res = {'position': pre,
                'mandatory': True if node[0] == 'mandatory' else False,
-               'list': node[1], 'displayName': f'{node[2]}<sup>*</sup>' if node[0] == 'mandatory' else node[2], 'desc': node[3],
+               'list': node[1], 'displayName': node[2], 'desc': node[3],
                'value': node[4],
                'whitelist': whitelist,
                'input_type': input_type, 'data_type': node[7],
@@ -349,7 +349,7 @@ def validate_object(wi_object):
     html_str = ''
     yaml_object = parse_object(wi_object)
     for elem in yaml_object:
-        html_str = f'{html_str}<h3>{elem}</h3><br><br>{object_to_html(yaml_object[elem],0)}<br><br>'
+        html_str = f'{html_str}<h3>{elem}</h3><br>{object_to_html(yaml_object[elem],0)}<br>'
     wi_object['all_factors'] = factors
     validation_object = {'object': wi_object, 'errors': errors, 'warnings': warnings, 'summary': html_str, 'yaml': yaml_object}
     return validation_object
@@ -370,7 +370,7 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
                 wi_object['error'] = error
                 if error:
                     message = ', '.join([f'{msg[0]}: {msg[1]}' for msg in messages])
-                    wi_object['desc'] = f'{wi_object["desc"]}<br><font color="red">{message}</font>'
+                    wi_object['desc'] = f'{wi_object["desc"]}{"<br>" if wi_object["desc"] != "" else ""}<font color="red">{message}</font>'
             else:
                 wi_object['list_value'], pooled, organisms, warnings, errors = validate_part(wi_object['list_value'], warnings, pooled, organisms, errors)
         else:
@@ -389,7 +389,7 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
                     wi_object['error'] = not valid
                     if not valid:
                         errors.append(f'{wi_object["position"]}: {message}')
-                        wi_object['desc'] = f'{wi_object["desc"]}<br><font color="red">{message}</font>'
+                        wi_object['desc'] = f'{wi_object["desc"]}{"<br>" if wi_object["desc"] != "" else ""}<font color="red">{message}</font>'
 
                     warning = False
                     warn_text = None
@@ -405,7 +405,7 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
                     wi_object['warning'] = warning
                     if warning:
                         warnings.append(f'{wi_object["position"]}: {warn_text}')
-                        wi_object['desc'] = f'{wi_object["desc"]}<br><font color="orange">{warn_text}</font>'
+                        wi_object['desc'] = f'{wi_object["desc"]}{"<br>" if wi_object["desc"] != "" else ""}<font color="orange">{warn_text}</font>'
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
             wi_object[i], pooled, organisms, warnings, errors = validate_part(wi_object[i], warnings, pooled, organisms, errors)
