@@ -118,7 +118,8 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             'value' in metafile and 'unit' in metafile):
         for key in metafile:
             if not key_yaml:
-                invalid_keys.append(key)
+                if not key in ['disease_type', 'disease_status', 'disease_stage', 'treatment_type', 'treatment_status', 'treatment_duration']:
+                    invalid_keys.append(key)
             elif key not in key_yaml:
                 invalid_keys.append(key)
             else:
@@ -280,9 +281,9 @@ def validate_value(input_value, value_type, key):
             except (IndexError, ValueError, SyntaxError) as e:
                 valid = False
                 message = f'Input must be of type \'DD.MM.YYYY\'.'
-        elif value_type == 'str' and '\"' in input_value and key not in generated:
+        elif value_type == 'str' and ('\"' in input_value or '{' in input_value or '}' in input_value or '|' in input_value) and key not in generated:
             valid = False
-            message = 'The value contains an invalid character (\").'
+            message = 'The value contains an invalid character (\", {, } or |).'
     return valid, message
 
 
