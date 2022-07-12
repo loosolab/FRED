@@ -75,7 +75,7 @@ def generate_file(path, input_id, name, mandatory_mode):
 
         utils.save_as_yaml(result_dict,
                            os.path.join(path, f'{input_id}_metadata.yaml'))
-    print_sample_names(result_dict)
+    print_sample_names(result_dict, path)
 
 def print_summary(result, pre):
     if isinstance(result, dict):
@@ -95,10 +95,22 @@ def print_summary(result, pre):
         print(f'{pre}{result}')
 
 
-def print_sample_names(result):
+def print_sample_names(result, path):
     samples = list(utils.find_list_key(result, 'technical_replicates:sample_name'))
-    print(samples)
-
+    print(f'{"".center(size.columns, "-")}\n'
+          f'{"SAMPLE NAMES".center(size.columns, " ")}\n'
+          f'{"".center(size.columns, "-")}\n')
+    sample_names = ''
+    for elem in samples:
+        for name in elem:
+            sample_names += f'- {name}\n'
+    print(sample_names)
+    save = parse_list_choose_one([True, False], 'Do you want to save the sample names into a file?')
+    if save:
+        text_file = open(os.path.join(path, 'samples.txt'), 'w')
+        text_file.write(sample_names)
+        text_file.close()
+        print(f'The sample names have been saved to file \'{path}/samples.txt\'.')
 
 def generate_part(node, key, return_dict, optional, mandatory_mode,
                   result_dict, first_node):
@@ -349,7 +361,7 @@ def get_experimental_factors(node, result_dict):
             used_values = parse_input_list(value_type, False)
 
         if isinstance(used_values, dict):
-            used_values = get_combinations(used_values, fac_node[2])
+            used_values = get_combinations(used_values, fac, fac_node[2])
 
         factor_value['values'] = used_values
         experimental_factors.append(factor_value)
@@ -359,9 +371,9 @@ def get_experimental_factors(node, result_dict):
     return experimental_factors
 
 
-def get_combinations(values, key):
+def get_combinations(values, key, key_name):
     if 'ident_key' in values and values['ident_key'] in values:
-        multi = parse_list_choose_one([True, False], f'\nCan one sample contain multiple {key}s?')
+        multi = parse_list_choose_one([True, False], f'\nCan one sample contain multiple {key_name}s?')
     else:
         multi = False
     if multi:
@@ -381,11 +393,11 @@ def get_combinations(values, key):
                         v = f'{v["value"]}{v["unit"]}'
                     possible_values[elem].append(f'{value}|{list(values.keys())[i]}:"{v}"')
             # TODO: second loop
-            for key in possible_values:
-                if key != elem:
+            for z in possible_values:
+                if z != elem:
                     for x in possible_values[elem]:
-                        for y in possible_values[key]:
-                            disease_values.append(f'disease:{"{"}{x}{"}"}-disease:{"{"}{y}{"}"}')
+                        for y in possible_values[z]:
+                            disease_values.append(f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
         print(
             f'\nPlease select the analyzed combinations for {key} '
             f'(1-{len(disease_values)}) divided by comma:\n')
@@ -662,7 +674,19 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
                 input_value = parse_input_value(key, desc, whitelist,
                                                 value_type, result_dict)
             elif '\"' in input_value:
-                print(f'Ivalid symbol \". Please try again.')
+                print(f'Ivalid symbol \'\"\'. Please try again.')
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type, result_dict)
+            elif '{' in input_value:
+                print(f'Ivalid symbol \'{"{"}\'. Please try again.')
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type, result_dict)
+            elif '}' in input_value:
+                print(f'Ivalid symbol \'{"}"}\'. Please try again.')
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type, result_dict)
+            elif '|' in input_value:
+                print(f'Ivalid symbol \'|\'. Please try again.')
                 input_value = parse_input_value(key, desc, whitelist,
                                                 value_type, result_dict)
         if value_type == 'int':
