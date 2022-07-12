@@ -126,7 +126,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                                                  key_yaml[key][4], sub_lists,
                                                  f'{key_name}:{key}' if
                                                  key_name != '' else key,
-                                                 invalid_keys, invalid_entry, invalid_value, key_yaml[key][7] if len(key_yaml[key]) > 5 else None)
+                                                 invalid_keys, invalid_entry, invalid_value, key_yaml[key][7] if len(key_yaml[key]) > 6 else None)
                 invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
