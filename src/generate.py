@@ -65,7 +65,7 @@ def generate_file(path, input_id, name, mandatory_mode):
           f'{"FILE VALIDATION".center(size.columns, " ")}\n'
           f'{"".center(size.columns, "-")}\n')
     valid, missing_mandatory_keys, invalid_keys, \
-    invalid_entries, invalid_values = validate_yaml.validate_file(result_dict)
+    invalid_entries, invalid_values, pool_warn, ref_genome_warn = validate_yaml.validate_file(result_dict)
     if not valid:
         validate_yaml.print_validation_report(
             result_dict, missing_mandatory_keys, invalid_keys,
@@ -73,8 +73,9 @@ def generate_file(path, input_id, name, mandatory_mode):
     else:
         print(f'Validation complete. No errors found.\n')
 
-        utils.save_as_yaml(result_dict, os.path.join(path, f'{input_id}_metadata.yaml'))
-
+        utils.save_as_yaml(result_dict,
+                           os.path.join(path, f'{input_id}_metadata.yaml'))
+    print_sample_names(result_dict)
 
 def print_summary(result, pre):
     if isinstance(result, dict):
@@ -92,6 +93,11 @@ def print_summary(result, pre):
                 print_summary(item, f'{tabs}\t-')
     else:
         print(f'{pre}{result}')
+
+
+def print_sample_names(result):
+    samples = list(utils.find_list_key(result, 'technical_replicates:sample_name'))
+    print(samples)
 
 
 def generate_part(node, key, return_dict, optional, mandatory_mode,
@@ -367,13 +373,13 @@ def get_combinations(values, key):
         values.pop('ident_key')
         for elem in depend:
             possible_values[elem] = []
-            value = f'{ident_key}:{elem}'
+            value = f'{ident_key}:"{elem}"'
             for i in range(len(values.keys())):
                 for v in values[list(values.keys())[i]]:
                     if isinstance(v,
                                   dict) and 'value' in v and 'unit' in v:
                         v = f'{v["value"]}{v["unit"]}'
-                    possible_values[elem].append(f'{value}|{list(values.keys())[i]}:{v}"')
+                    possible_values[elem].append(f'{value}|{list(values.keys())[i]}:"{v}"')
             # TODO: second loop
             for key in possible_values:
                 if key != elem:
@@ -387,8 +393,20 @@ def get_combinations(values, key):
         used_values = parse_input_list(disease_values, False)
     return used_values
 
+
 def get_conditions(factors, node, mandatory_mode, result_dict):
     combinations = get_condition_combinations(factors)
+    for fac in factors:
+        if fac['factor'] in ['disease', 'treatment']:
+            vals = []
+            for cond in fac['values']:
+                val = ([x[1] for x in split_cond(cond)])
+                for y in val:
+                    vals.append(y)
+            vals = [dict(t) for t in {tuple(d.items()) for d in vals}]
+            for i in range(len(result_dict['experimental_factors'])):
+                if result_dict['experimental_factors'][i]['factor'] == fac['factor']:
+                    result_dict['experimental_factors'][i]['values'] = vals
     print(
         f'\nPlease select the analyzed combinations of experimental factors '
         f'(1-{len(combinations)}) divided by comma:\n')
@@ -449,20 +467,17 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
         samples['donor_count'] = donor_count
         samples['technical_replicates'] = get_technical_replicates(sample_name)
         for cond in conditions:
-            sub = cond[0].split('_')[0]
-            if sub == 'disease' or sub == 'treatment':
-                if f'{sub}_information' not in samples:
-                    samples[f'{sub}_information'] = {}
-                if f'{sub}' in samples[f'{sub}_information']:
-                    samples[f'{sub}_information'][f'{sub}'][0][cond[0]] = cond[1]
-                else:
-                    samples[f'{sub}_information'] = {
-                        f'{sub}': [{cond[0]: cond[1]}]}
+            if cond[0] in ['age', 'time_point', 'duration']:
+                unit = cond[1].lstrip('0123456789')
+                value = cond[1][:len(cond[1]) - len(unit)]
+                samples[cond[0]] = {'unit': unit, 'value': int(value)}
             else:
-                if cond[0] in ['age', 'time_point', 'duration']:
-                    unit = cond[1].lstrip('0123456789')
-                    value = cond[1][:len(cond[1]) - len(unit)]
-                    samples[cond[0]] = {'unit': unit, 'value': int(value)}
+                # TODO : if is list
+                if cond[0] in ['disease', 'treatment']:
+                    if cond[0] not in samples:
+                        samples[cond[0]] = [cond[1]]
+                    else:
+                        samples[cond[0]].append(cond[1])
                 else:
                     samples[cond[0]] = cond[1]
 
@@ -477,22 +492,43 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
 
 def split_cond(condition):
     conditions = []
+    sub_cond = {}
+    sub = False
     key = ''
+    sub_key = ''
     value = ''
     count = 0
     start = 0
     for i in range(len(condition)):
-        if condition[i] == '\"':
+        if condition[i] == '{':
+            sub = True
+            key = condition[start:i].rstrip(':')
+            start = i+1
+        elif condition[i] == '|':
+            sub_cond[sub_key] = value
+            start = i+1
+        elif condition[i] == '}':
+            sub_cond[sub_key] = value
+            conditions.append((key,sub_cond))
+            sub_cond = {}
+        elif condition[i] == '\"':
             count += 1
             if count % 2 == 0:
                 value = condition[start:i]
             else:
-                key = condition[start:i].rstrip(':')
+                if sub:
+                    sub_key = condition[start:i].rstrip(':')
+                else:
+                    key = condition[start:i].rstrip(':')
                 start = i+1
         elif condition[i] == '-' and count % 2 == 0:
-            conditions.append((key, value))
+            if sub:
+                sub = False
+            else:
+                conditions.append((key, value))
             start = i+1
-    conditions.append((key, value))
+    if not sub:
+        conditions.append((key, value))
     return conditions
 
 
@@ -540,11 +576,17 @@ def get_condition_combinations(factors):
             if isinstance(value,
                           dict) and 'value' in value and 'unit' in value:
                 value = f'{value["value"]}{value["unit"]}'
-            combinations.append(f'{factors[i]["factor"]}:"{value}"')
+            if factors[i]['factor'] in ['disease', 'treatment']:
+                combinations.append(f'{value}')
+            else:
+                combinations.append(f'{factors[i]["factor"]}:"{value}"')
             for j in range(i + 1, len(factors)):
                 comb = get_condition_combinations(factors[j:])
                 for c in comb:
-                    combinations.append(f'{factors[i]["factor"]}:"{value}"-{c}')
+                    if factors[i]['factor'] in ['disease', 'treatment']:
+                        combinations.append(f'{value}-{c}')
+                    else:
+                        combinations.append(f'{factors[i]["factor"]}:"{value}"-{c}')
     return combinations
 
 
