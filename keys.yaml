@@ -195,7 +195,7 @@ experimental_setting:
       - 'mandatory'
       - False
       - 'Organism'
-      - ''
+      - 'The organism identifier is composed of the organism name and the Taxonomy ID.'
       - null
       - True
       - select
@@ -204,7 +204,7 @@ experimental_setting:
       - 'mandatory'
       - True
       - 'Experimental Factors'
-      - ''
+      - 'This part contains the factors that were investigated in the experiment.'
       - factor:
           - 'mandatory'
           - False
@@ -563,7 +563,7 @@ technical_details:
           - 'optional'
           - True
           - 'Sample preparation'
-          - ''
+          - 'Here you can insert links to files or URLs that contain information regarding the sample preparation.'
           - null
           - False
           - short_text
@@ -572,7 +572,7 @@ technical_details:
           - 'optional'
           - True
           - 'Further description'
-          - ''
+          - 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
           - null
           - False
           - short_text
@@ -604,7 +604,7 @@ technical_details:
               - 'optional'
               - True
               - 'Parameters'
-              - ''
+              - 'Here you can insert links to files that contain the parameters used for the run.'
               - null
               - False
               - short_text
@@ -613,7 +613,7 @@ technical_details:
               - 'optional'
               - False
               - 'Output'
-              - ''
+              - 'Here you can insert links to the output files of the run.'
               - null
               - False
               - short_text
