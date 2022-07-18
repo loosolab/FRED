@@ -500,14 +500,11 @@ def save_object(dictionary, path):
 def get_meta_info(path, id):
     # If file must be searched
 
-    #yaml = metaTools_functions.find(path, f'id:{id}', True)
-    #if len(yaml) == 0:
-    #    return f'No metadata found.'
-    #elif len(yaml) > 1:
-    #    return f'Error: Multiple metadata files found.'
-    #else:
-    #    yaml_html = object_to_html(yaml[0], 0)
-
-    yaml = utils.read_in_yaml(path)
-    yaml_html = object_to_html(yaml, 0)
+    yaml = metaTools_functions.find(path, f'id:{id}', True)
+    if len(yaml) == 0:
+        return f'No metadata found.'
+    elif len(yaml) > 1:
+        return f'Error: Multiple metadata files found.'
+    else:
+        yaml_html = object_to_html(yaml[0], 0)
     return yaml_html
