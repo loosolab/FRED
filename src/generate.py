@@ -385,24 +385,49 @@ def get_combinations(values, key, key_name):
         values.pop('ident_key')
         for elem in depend:
             possible_values[elem] = []
-            value = f'{ident_key}:"{elem}"'
+            value = [f'{ident_key}:"{elem}"']
             for i in range(len(values.keys())):
-                for v in values[list(values.keys())[i]]:
-                    if isinstance(v,
+                value2 = []
+                for x in value:
+                    val = x
+                    for v in values[list(values.keys())[i]]:
+                        if isinstance(v,
                                   dict) and 'value' in v and 'unit' in v:
-                        v = f'{v["value"]}{v["unit"]}'
-                    possible_values[elem].append(f'{value}|{list(values.keys())[i]}:"{v}"')
-            # TODO: second loop
+                            v = f'{v["value"]}{v["unit"]}'
+                        value2.append(f'{val}|{list(values.keys())[i]}:"{v}"')
+                value = value2
+            possible_values[elem] = value
             for z in possible_values:
                 if z != elem:
                     for x in possible_values[elem]:
                         for y in possible_values[z]:
                             disease_values.append(f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
-        print(
+
+    else:
+        disease_values = []
+        possible_values = []
+        if 'ident_key' in values and values['ident_key'] in values:
+            start = values['ident_key']
+            values.pop('ident_key')
+        else:
+            start = list(values.keys())[0]
+        for elem in values[start]:
+            v = [f'{start}:\"{elem}\"']
+            for k in values:
+                if k != start:
+                    v2 = []
+                    for i in v:
+                        for x in values[k]:
+                            v2.append(f'{i}|{k}:\"{x}\"')
+                    v = v2
+            possible_values = v
+            for z in possible_values:
+                disease_values.append(f'{key}:{"{"}{z}{"}"}')
+    print(
             f'\nPlease select the analyzed combinations for {key} '
             f'(1-{len(disease_values)}) divided by comma:\n')
-        print_option_list(disease_values, False)
-        used_values = parse_input_list(disease_values, False)
+    print_option_list(disease_values, False)
+    used_values = parse_input_list(disease_values, False)
     return used_values
 
 
