@@ -1,5 +1,4 @@
-whitelist_type: depend
-ident_key: factor
+whitelist_type: abbrev
 genotype: gnt
 tissue: tis
 cell_type: clt
