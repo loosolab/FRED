@@ -506,5 +506,5 @@ def get_meta_info(path, id):
     elif len(yaml) > 1:
         return f'Error: Multiple metadata files found.'
     else:
-        yaml_html = object_to_html(yaml[0], 0)
+        yaml_html = object_to_html(yaml[id][0], 0)
     return yaml_html
