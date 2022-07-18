@@ -493,7 +493,8 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
     for i in range(start, end):
         samples = {}
         sample_name = f'{condition}_{i}'
-        samples['sample_name'] = sample_name
+        short_name = f'{get_short_name(condition)}_{i}'
+        samples['sample_name'] = short_name
         print(f'{f"Sample: {sample_name}".center(size.columns, "-")}\n')
         samples['pooled'] = input_pooled
         if input_pooled:
@@ -502,7 +503,7 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
         else:
             donor_count = 1
         samples['donor_count'] = donor_count
-        samples['technical_replicates'] = get_technical_replicates(sample_name)
+        samples['technical_replicates'] = get_technical_replicates(short_name)
         for cond in conditions:
             if cond[0] in ['age', 'time_point', 'duration']:
                 unit = cond[1].lstrip('0123456789')
@@ -525,6 +526,30 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                                             result_dict, False))
         replicates['samples'].append(samples)
     return replicates
+
+
+def get_short_name(condition):
+    conds = split_cond(condition)
+    whitelist = utils.read_whitelist('abbreviations')
+    short_cond = []
+    for c in conds:
+        if whitelist and c[0] in whitelist:
+            k = whitelist[c[0]]
+        else:
+            k = c[0]
+        if isinstance(c[1], dict):
+            cond_whitelist = utils.read_whitelist(c[0])
+            new_vals = {}
+            for v in c[1]:
+                if cond_whitelist and v in cond_whitelist:
+                    new_vals[cond_whitelist[v]] = c[1][v]
+            val = '+'.join([f'{x}.{new_vals[x]}' for x in list(new_vals.keys())])
+            short_cond.append(f'{k}#{val}')
+        else:
+            short_cond.append(f'{k}.{c[1]}')
+    short_condition = '-'.join(short_cond)
+    return short_condition
+
 
 
 def split_cond(condition):
