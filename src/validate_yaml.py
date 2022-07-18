@@ -24,7 +24,8 @@ def validate_file(metafile):
     invalid_entries: a list containing the invalid entries -> (key, [values])
     """
     valid = True
-    key_yaml = utils.read_in_yaml('keys.yaml')
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
     invalid_keys, invalid_entries, invalid_value = new_test(metafile, key_yaml, [], '', [],
                                              [], [], None)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
