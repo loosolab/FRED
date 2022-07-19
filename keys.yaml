@@ -274,6 +274,15 @@ experimental_setting:
                   - False
                   - select
                   - bool
+                number_of_measurements:
+                  - 'optional'
+                  - False
+                  - 'Number of Measurements'
+                  - ''
+                  - 1
+                  - False
+                  - number
+                  - int
                 genotype:
                   - 'optional'
                   - False
