@@ -4,6 +4,7 @@ sys.path.append('metadata-organizer')
 import src.utils as utils
 import src.generate as generate
 import src.validate_yaml as validate_yaml
+import src.metaTools_functions as metaTools_functions
 import os
 import copy
 import datetime
@@ -494,3 +495,16 @@ def object_to_html(yaml_object, margin):
 def save_object(dictionary, path):
     utils.save_as_yaml(dictionary, os.path.join(path,
                                                 f'{dictionary["project"]["id"]}_metadata.yaml'))
+
+
+def get_meta_info(path, id):
+    # If file must be searched
+
+    yaml = metaTools_functions.find(path, f'id:{id}', True)
+    if len(yaml) == 0:
+        return f'No metadata found.'
+    elif len(yaml) > 1:
+        return f'Error: Multiple metadata files found.'
+    else:
+        yaml_html = object_to_html(yaml[0], 0)
+    return yaml_html
