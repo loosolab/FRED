@@ -544,7 +544,7 @@ def get_short_name(condition):
             for v in c[1]:
                 if cond_whitelist and v in cond_whitelist:
                     new_vals[cond_whitelist[v]] = c[1][v]
-            val = '+'.join([f'{x}.{new_vals[x]}' for x in list(new_vals.keys())])
+            val = '+'.join([f'{x}.{new_vals[x].replace(" ", "")}' for x in list(new_vals.keys())])
             short_cond.append(f'{k}#{val}')
         else:
             short_cond.append(f'{k}.{c[1]}')
