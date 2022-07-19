@@ -75,7 +75,7 @@ def generate_file(path, input_id, name, mandatory_mode):
 
         utils.save_as_yaml(result_dict,
                            os.path.join(path, f'{input_id}_metadata.yaml'))
-    print_sample_names(result_dict, path)
+    print_sample_names(result_dict, input_id, path)
 
 def print_summary(result, pre):
     if isinstance(result, dict):
@@ -95,7 +95,7 @@ def print_summary(result, pre):
         print(f'{pre}{result}')
 
 
-def print_sample_names(result, path):
+def print_sample_names(result, input_id, path):
     samples = list(utils.find_list_key(result, 'technical_replicates:sample_name'))
     print(f'{"".center(size.columns, "-")}\n'
           f'{"SAMPLE NAMES".center(size.columns, " ")}\n'
@@ -107,10 +107,11 @@ def print_sample_names(result, path):
     print(sample_names)
     save = parse_list_choose_one([True, False], 'Do you want to save the sample names into a file?')
     if save:
-        text_file = open(os.path.join(path, 'samples.txt'), 'w')
+        text_file = open(os.path.join(path, f'{input_id}_samples.txt'), 'w')
         text_file.write(sample_names)
         text_file.close()
-        print(f'The sample names have been saved to file \'{path}/samples.txt\'.')
+        print(f'The sample names have been saved to file \'{path}/{input_id}_samples.txt\'.')
+
 
 def generate_part(node, key, return_dict, optional, mandatory_mode,
                   result_dict, first_node):
