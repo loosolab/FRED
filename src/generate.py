@@ -65,7 +65,7 @@ def generate_file(path, input_id, name, mandatory_mode):
           f'{"FILE VALIDATION".center(size.columns, " ")}\n'
           f'{"".center(size.columns, "-")}\n')
     valid, missing_mandatory_keys, invalid_keys, \
-    invalid_entries, invalid_values = validate_yaml.validate_file(result_dict)
+    invalid_entries, invalid_values, pool_warn, ref_genome_warn = validate_yaml.validate_file(result_dict)
     if not valid:
         validate_yaml.print_validation_report(
             result_dict, missing_mandatory_keys, invalid_keys,
@@ -73,8 +73,9 @@ def generate_file(path, input_id, name, mandatory_mode):
     else:
         print(f'Validation complete. No errors found.\n')
 
-        utils.save_as_yaml(result_dict, os.path.join(path, f'{input_id}_metadata.yaml'))
-
+        utils.save_as_yaml(result_dict,
+                           os.path.join(path, f'{input_id}_metadata.yaml'))
+    print_sample_names(result_dict, input_id, path)
 
 def print_summary(result, pre):
     if isinstance(result, dict):
@@ -92,6 +93,24 @@ def print_summary(result, pre):
                 print_summary(item, f'{tabs}\t-')
     else:
         print(f'{pre}{result}')
+
+
+def print_sample_names(result, input_id, path):
+    samples = list(utils.find_list_key(result, 'technical_replicates:sample_name'))
+    print(f'{"".center(size.columns, "-")}\n'
+          f'{"SAMPLE NAMES".center(size.columns, " ")}\n'
+          f'{"".center(size.columns, "-")}\n')
+    sample_names = ''
+    for elem in samples:
+        for name in elem:
+            sample_names += f'- {name}\n'
+    print(sample_names)
+    save = parse_list_choose_one([True, False], 'Do you want to save the sample names into a file?')
+    if save:
+        text_file = open(os.path.join(path, f'{input_id}_samples.txt'), 'w')
+        text_file.write(sample_names)
+        text_file.close()
+        print(f'The sample names have been saved to file \'{path}/{input_id}_samples.txt\'.')
 
 
 def generate_part(node, key, return_dict, optional, mandatory_mode,
@@ -212,16 +231,77 @@ def get_experimental_factors(node, result_dict):
     for fac in used_factors:
         factor_value = {'factor': fac}
         fac_node = list(utils.find_keys(node, fac))[0]
-        if isinstance(fac_node[4], dict) and 'unit' in fac_node[
-            4] and 'value' in fac_node[4]:
-            used_values = []
-            print(f'\nPlease enter the unit for factor {fac}:')
-            unit = parse_input_value('unit', '', True, 'str', result_dict)
-            print(f'\nPlease enter int values for factor {fac} (in {unit}) '
-                  f'divided by comma:')
-            values = parse_input_list('int', False)
-            for val in values:
-                used_values.append({'unit': unit, 'value': val})
+        if isinstance(fac_node[4], dict):
+            if 'unit' in fac_node[4] and 'value' in fac_node[4]:
+                used_values = []
+                print(f'\nPlease enter the unit for factor {fac}:')
+                unit = parse_input_value('unit', '', True, 'str', result_dict)
+                print(f'\nPlease enter int values for factor {fac} (in {unit}) '
+                      f'divided by comma:')
+                values = parse_input_list('int', False)
+                for val in values:
+                    used_values.append({'unit': unit, 'value': val})
+            else:
+                used_values = {}
+                options = list(fac_node[4].keys())
+                print(
+                    f'\nPlease enter what information you want to add for '
+                    f'{fac} (1,...,{len(options)}).')
+                print_option_list(options, fac_node[3])
+                values = parse_input_list(options, False)
+                for value in values:
+                    value_list = utils.get_whitelist(value, result_dict)
+                    if isinstance(value_list, dict):
+                        w = [x for xs in list(value_list.values()) for x in xs]
+                        if len(w) > 30:
+                            redo = True
+                            print(
+                            f'\nPlease enter the values for '
+                            f'{value}.')
+                            while redo:
+                                input_value = complete_input(w, value)
+                                if input_value in value_list:
+                                    used_values[value] = input_value
+                                    redo = parse_list_choose_one([True, False],
+                                                         f'\nDo you want to add another {factor_value["factor"]}?')
+                                else:
+                                    print(f'The value you entered does not match the '
+                                          f'whitelist. Try tab for autocomplete.')
+                        else:
+                            print(
+                                f'\nPlease select the values for '
+                                f'{value} (1-{len(w)}) divided by '
+                                f'comma:\n')
+                            i = 1
+                            for w_key in value_list:
+                                print(f'\033[1m{w_key}\033[0m')
+                                for val in value_list[w_key]:
+                                    print(f'{i}: {val}')
+                                    i += 1
+                            used_values[value] = parse_input_list(w, False)
+                    elif len(value_list) > 30:
+                        redo = True
+                        print(
+                            f'\nPlease enter the values for '
+                            f'{value}.')
+                        while redo:
+                            input_value = complete_input(value_list, factor_value["factor"])
+                            if input_value in value_list:
+                                used_values[value] = input_value
+                                redo = parse_list_choose_one([True, False],
+                                         f'\nDo you want to add another {value}?')
+                            else:
+                                print(f'The value you entered does not match the '
+                                      f'whitelist. Try tab for autocomplete.')
+                    else:
+                        print(
+                            f'\nPlease select the values for '
+                            f'{value} (1-{len(value_list)}) divided by '
+                            f'comma:\n')
+                        print_option_list(value_list, False)
+                        used_values[value] = parse_input_list(value_list, False)
+                if len(fac_node) == 6:
+                    used_values['ident_key'] = fac_node[5]
         elif fac_node[5]:
             value_list = utils.get_whitelist(fac, result_dict)
             used_values = []
@@ -280,6 +360,10 @@ def get_experimental_factors(node, result_dict):
                 f'\nPlease enter a list of {value_type} values for experimental'
                 f' factor {factor_value["factor"]} divided by comma:\n')
             used_values = parse_input_list(value_type, False)
+
+        if isinstance(used_values, dict):
+            used_values = get_combinations(used_values, fac, fac_node[2])
+
         factor_value['values'] = used_values
         experimental_factors.append(factor_value)
 
@@ -288,8 +372,79 @@ def get_experimental_factors(node, result_dict):
     return experimental_factors
 
 
+def get_combinations(values, key, key_name):
+    if 'ident_key' in values and values['ident_key'] in values:
+        multi = parse_list_choose_one([True, False], f'\nCan one sample contain multiple {key_name}s?')
+    else:
+        multi = False
+    if multi:
+        possible_values = {}
+        disease_values = []
+        ident_key = values['ident_key']
+        depend = values[ident_key]
+        values.pop(ident_key)
+        values.pop('ident_key')
+        for elem in depend:
+            possible_values[elem] = []
+            value = [f'{ident_key}:"{elem}"']
+            for i in range(len(values.keys())):
+                value2 = []
+                for x in value:
+                    val = x
+                    for v in values[list(values.keys())[i]]:
+                        if isinstance(v,
+                                  dict) and 'value' in v and 'unit' in v:
+                            v = f'{v["value"]}{v["unit"]}'
+                        value2.append(f'{val}|{list(values.keys())[i]}:"{v}"')
+                value = value2
+            possible_values[elem] = value
+            for z in possible_values:
+                if z != elem:
+                    for x in possible_values[elem]:
+                        for y in possible_values[z]:
+                            disease_values.append(f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
+
+    else:
+        disease_values = []
+        possible_values = []
+        if 'ident_key' in values and values['ident_key'] in values:
+            start = values['ident_key']
+            values.pop('ident_key')
+        else:
+            start = list(values.keys())[0]
+        for elem in values[start]:
+            v = [f'{start}:\"{elem}\"']
+            for k in values:
+                if k != start:
+                    v2 = []
+                    for i in v:
+                        for x in values[k]:
+                            v2.append(f'{i}|{k}:\"{x}\"')
+                    v = v2
+            possible_values = v
+            for z in possible_values:
+                disease_values.append(f'{key}:{"{"}{z}{"}"}')
+    print(
+            f'\nPlease select the analyzed combinations for {key} '
+            f'(1-{len(disease_values)}) divided by comma:\n')
+    print_option_list(disease_values, False)
+    used_values = parse_input_list(disease_values, False)
+    return used_values
+
+
 def get_conditions(factors, node, mandatory_mode, result_dict):
     combinations = get_condition_combinations(factors)
+    for fac in factors:
+        if fac['factor'] in ['disease', 'treatment']:
+            vals = []
+            for cond in fac['values']:
+                val = ([x[1] for x in split_cond(cond)])
+                for y in val:
+                    vals.append(y)
+            vals = [dict(t) for t in {tuple(d.items()) for d in vals}]
+            for i in range(len(result_dict['experimental_factors'])):
+                if result_dict['experimental_factors'][i]['factor'] == fac['factor']:
+                    result_dict['experimental_factors'][i]['values'] = vals
     print(
         f'\nPlease select the analyzed combinations of experimental factors '
         f'(1-{len(combinations)}) divided by comma:\n')
@@ -339,7 +494,8 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
     for i in range(start, end):
         samples = {}
         sample_name = f'{condition}_{i}'
-        samples['sample_name'] = sample_name
+        short_name = f'{get_short_name(condition)}_{i}'
+        samples['sample_name'] = short_name
         print(f'{f"Sample: {sample_name}".center(size.columns, "-")}\n')
         samples['pooled'] = input_pooled
         if input_pooled:
@@ -348,22 +504,19 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
         else:
             donor_count = 1
         samples['donor_count'] = donor_count
-        samples['technical_replicates'] = get_technical_replicates(sample_name)
+        samples['technical_replicates'] = get_technical_replicates(short_name)
         for cond in conditions:
-            sub = cond[0].split('_')[0]
-            if sub == 'disease' or sub == 'treatment':
-                if f'{sub}_information' not in samples:
-                    samples[f'{sub}_information'] = {}
-                if f'{sub}' in samples[f'{sub}_information']:
-                    samples[f'{sub}_information'][f'{sub}'][0][cond[0]] = cond[1]
-                else:
-                    samples[f'{sub}_information'] = {
-                        f'{sub}': [{cond[0]: cond[1]}]}
+            if cond[0] in ['age', 'time_point', 'duration']:
+                unit = cond[1].lstrip('0123456789')
+                value = cond[1][:len(cond[1]) - len(unit)]
+                samples[cond[0]] = {'unit': unit, 'value': int(value)}
             else:
-                if cond[0] in ['age', 'time_point', 'duration']:
-                    unit = cond[1].lstrip('0123456789')
-                    value = cond[1][:len(cond[1]) - len(unit)]
-                    samples[cond[0]] = {'unit': unit, 'value': int(value)}
+                # TODO : if is list
+                if cond[0] in ['disease', 'treatment']:
+                    if cond[0] not in samples:
+                        samples[cond[0]] = [cond[1]]
+                    else:
+                        samples[cond[0]].append(cond[1])
                 else:
                     samples[cond[0]] = cond[1]
 
@@ -376,24 +529,69 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
     return replicates
 
 
+def get_short_name(condition):
+    conds = split_cond(condition)
+    whitelist = utils.read_whitelist('abbreviations')
+    short_cond = []
+    for c in conds:
+        if whitelist and c[0] in whitelist:
+            k = whitelist[c[0]]
+        else:
+            k = c[0]
+        if isinstance(c[1], dict):
+            cond_whitelist = utils.read_whitelist(c[0])
+            new_vals = {}
+            for v in c[1]:
+                if cond_whitelist and v in cond_whitelist:
+                    new_vals[cond_whitelist[v]] = c[1][v]
+            val = '+'.join([f'{x}.{new_vals[x].replace(" ", "")}' for x in list(new_vals.keys())])
+            short_cond.append(f'{k}#{val}')
+        else:
+            short_cond.append(f'{k}.{c[1]}')
+    short_condition = '-'.join(short_cond)
+    return short_condition
+
+
+
 def split_cond(condition):
     conditions = []
+    sub_cond = {}
+    sub = False
     key = ''
+    sub_key = ''
     value = ''
     count = 0
     start = 0
     for i in range(len(condition)):
-        if condition[i] == '\"':
+        if condition[i] == '{':
+            sub = True
+            key = condition[start:i].rstrip(':')
+            start = i+1
+        elif condition[i] == '|':
+            sub_cond[sub_key] = value
+            start = i+1
+        elif condition[i] == '}':
+            sub_cond[sub_key] = value
+            conditions.append((key,sub_cond))
+            sub_cond = {}
+        elif condition[i] == '\"':
             count += 1
             if count % 2 == 0:
                 value = condition[start:i]
             else:
-                key = condition[start:i].rstrip(':')
+                if sub:
+                    sub_key = condition[start:i].rstrip(':')
+                else:
+                    key = condition[start:i].rstrip(':')
                 start = i+1
         elif condition[i] == '-' and count % 2 == 0:
-            conditions.append((key, value))
+            if sub:
+                sub = False
+            else:
+                conditions.append((key, value))
             start = i+1
-    conditions.append((key, value))
+    if not sub:
+        conditions.append((key, value))
     return conditions
 
 
@@ -441,11 +639,17 @@ def get_condition_combinations(factors):
             if isinstance(value,
                           dict) and 'value' in value and 'unit' in value:
                 value = f'{value["value"]}{value["unit"]}'
-            combinations.append(f'{factors[i]["factor"]}:"{value}"')
+            if factors[i]['factor'] in ['disease', 'treatment']:
+                combinations.append(f'{value}')
+            else:
+                combinations.append(f'{factors[i]["factor"]}:"{value}"')
             for j in range(i + 1, len(factors)):
                 comb = get_condition_combinations(factors[j:])
                 for c in comb:
-                    combinations.append(f'{factors[i]["factor"]}:"{value}"-{c}')
+                    if factors[i]['factor'] in ['disease', 'treatment']:
+                        combinations.append(f'{value}-{c}')
+                    else:
+                        combinations.append(f'{factors[i]["factor"]}:"{value}"-{c}')
     return combinations
 
 
@@ -521,7 +725,19 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
                 input_value = parse_input_value(key, desc, whitelist,
                                                 value_type, result_dict)
             elif '\"' in input_value:
-                print(f'Ivalid symbol \". Please try again.')
+                print(f'Ivalid symbol \'\"\'. Please try again.')
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type, result_dict)
+            elif '{' in input_value:
+                print(f'Ivalid symbol \'{"{"}\'. Please try again.')
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type, result_dict)
+            elif '}' in input_value:
+                print(f'Ivalid symbol \'{"}"}\'. Please try again.')
+                input_value = parse_input_value(key, desc, whitelist,
+                                                value_type, result_dict)
+            elif '|' in input_value:
+                print(f'Ivalid symbol \'|\'. Please try again.')
                 input_value = parse_input_value(key, desc, whitelist,
                                                 value_type, result_dict)
         if value_type == 'int':

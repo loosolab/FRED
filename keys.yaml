@@ -195,7 +195,7 @@ experimental_setting:
       - 'mandatory'
       - False
       - 'Organism'
-      - ''
+      - 'The organism identifier is composed of the organism name and the Taxonomy ID.'
       - null
       - True
       - select
@@ -204,7 +204,7 @@ experimental_setting:
       - 'mandatory'
       - True
       - 'Experimental Factors'
-      - ''
+      - 'This part contains the factors that were investigated in the experiment.'
       - factor:
           - 'mandatory'
           - False
@@ -274,6 +274,15 @@ experimental_setting:
                   - False
                   - select
                   - bool
+                number_of_measurements:
+                  - 'optional'
+                  - False
+                  - 'Number of Measurements'
+                  - ''
+                  - 1
+                  - False
+                  - number
+                  - int
                 genotype:
                   - 'optional'
                   - False
@@ -360,112 +369,86 @@ experimental_setting:
                   - True
                   - select
                   - str
-                disease_information:
+                disease:
                   - 'optional'
                   - False
-                  - 'Disease Information'
+                  - 'Disease'
                   - ''
-                  - healthy:
+                  - disease_type:
                       - 'optional'
                       - False
-                      - 'Healthy'
+                      - 'Type'
                       - ''
+                      - null
                       - True
-                      - False
                       - select
-                      - bool
-                    disease:
+                      - str
+                    disease_status:
                       - 'optional'
-                      - True
-                      - 'Disease'
+                      - False
+                      - 'Status'
                       - ''
-                      - disease_status:
-                          - 'optional'
-                          - False
-                          - 'Status'
-                          - ''
-                          - null
-                          - True
-                          - select
-                          - str
-                        disease_type:
-                          - 'optional'
-                          - False
-                          - 'Type'
-                          - ''
-                          - null
-                          - True
-                          - select
-                          - str
-                        disease_stage:
-                          - 'optional'
-                          - False
-                          - 'Stage'
-                          - ''
-                          - null
-                          - True
-                          - select
-                          - str
-                treatment_information:
+                      - null
+                      - True
+                      - select
+                      - str
+                    disease_stage:
+                      - 'optional'
+                      - False
+                      - 'Stage'
+                      - ''
+                      - null
+                      - True
+                      - select
+                      - str
+                  - 'disease_type'
+                treatment:
                   - 'optional'
                   - False
-                  - 'Treatment Information'
+                  - 'Treatment'
                   - ''
-                  - treated:
+                  - treatment_type:
                       - 'optional'
                       - False
-                      - 'Treated'
+                      - 'Type'
                       - ''
-                      - False
-                      - False
-                      - select
-                      - bool
-                    treatment:
-                      - 'optional'
+                      - null
                       - True
-                      - 'Treatment'
+                      - select
+                      - str
+                    treatment_status:
+                      - 'optional'
+                      - False
+                      - 'Status'
                       - ''
-                      - treatment_status:
-                          - 'optional'
+                      - null
+                      - True
+                      - select
+                      - str
+                    treatment_duration:
+                      - 'optional'
+                      - False
+                      - 'Duration'
+                      - ''
+                      - value:
+                          - 'mandatory'
                           - False
-                          - 'Status'
+                          - 'Value'
+                          - ''
+                          - null
+                          - False
+                          - number
+                          - int
+                        unit:
+                          - 'mandatory'
+                          - False
+                          - 'Unit'
                           - ''
                           - null
                           - True
                           - select
                           - str
-                        treatment_type:
-                          - 'optional'
-                          - False
-                          - 'Type'
-                          - ''
-                          - null
-                          - True
-                          - select
-                          - str
-                        treatment_duration:
-                          - 'optional'
-                          - False
-                          - 'Duration'
-                          - ''
-                          - value:
-                              - 'mandatory'
-                              - False
-                              - 'Value'
-                              - ''
-                              - null
-                              - False
-                              - number
-                              - int
-                            unit:
-                              - 'mandatory'
-                              - False
-                              - 'Unit'
-                              - ''
-                              - null
-                              - True
-                              - select
-                              - str
+                  - 'treatment_type'
                 time_point:
                   - 'optional'
                   - False
@@ -563,7 +546,7 @@ technical_details:
           - 'optional'
           - True
           - 'Sample preparation'
-          - ''
+          - 'Here you can insert links to files or URLs that contain information regarding the sample preparation.'
           - null
           - False
           - short_text
@@ -572,7 +555,7 @@ technical_details:
           - 'optional'
           - True
           - 'Further description'
-          - ''
+          - 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
           - null
           - False
           - short_text
@@ -604,7 +587,7 @@ technical_details:
               - 'optional'
               - True
               - 'Parameters'
-              - ''
+              - 'Here you can insert links to files that contain the parameters used for the run.'
               - null
               - False
               - short_text
@@ -613,7 +596,7 @@ technical_details:
               - 'optional'
               - False
               - 'Output'
-              - ''
+              - 'Here you can insert links to the output files of the run.'
               - null
               - False
               - short_text

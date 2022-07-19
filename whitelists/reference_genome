@@ -1,5 +1,4 @@
-whitelist_type: depend
-ident_key: organism
+whitelist_type: group
 human_9606:
   - hg38
   - hg19

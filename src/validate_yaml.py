@@ -7,6 +7,8 @@ from src import utils
 
 # ---------------------------------VALIDATION-----------------------------------
 
+generated = ['condition_name', 'sample_name']
+
 
 def validate_file(metafile):
     """
@@ -22,7 +24,8 @@ def validate_file(metafile):
     invalid_entries: a list containing the invalid entries -> (key, [values])
     """
     valid = True
-    key_yaml = utils.read_in_yaml('keys.yaml')
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
     invalid_keys, invalid_entries, invalid_value = new_test(metafile, key_yaml, [], '', [],
                                              [], [], None)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
@@ -31,7 +34,8 @@ def validate_file(metafile):
     if len(missing_mandatory_keys) > 0 or len(invalid_keys) > 0 or len(
             invalid_entries) > 0 or len(invalid_value) > 0:
         valid = False
-    return valid, missing_mandatory_keys, invalid_keys, invalid_entries, invalid_value
+    pool_warn, ref_genome_warn = validate_logic(metafile)
+    return valid, missing_mandatory_keys, invalid_keys, invalid_entries, invalid_value, pool_warn, ref_genome_warn
 
 
 # -----------------------------------REPORT-------------------------------------
@@ -66,7 +70,7 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     value = []
     for v in invalid_value:
         value.append(f'{v[0]}: {v[1]} -> {v[2]}')
-    print(f'{"INVALID FILE".center(80, "-")}\n'
+    print(f'{"ERROR".center(80, "-")}\n'
           f'Project ID: {input_id}\n'
           f'Path: {path}\n\n'
           f'Report:\n')
@@ -85,6 +89,28 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     print(f'{"".center(80, "-")}')
 
 
+def print_warning(metafile, pool_warn, ref_genome_warn):
+    try:
+        input_id = metafile['project']['id']
+    except KeyError:
+        input_id = 'missing'
+    try:
+        path = metafile['path']
+    except KeyError:
+        path = 'missing'
+    print(f'{"WARNING".center(80, "-")}\n'
+          f'Project ID: {input_id}\n'
+          f'Path: {path}\n\n'
+          f'Report:\n')
+    if len(pool_warn) > 0:
+        for elem in pool_warn:
+            print(f'- Sample \'{elem[0]}\': {elem[1]}')
+    if len(ref_genome_warn) > 0:
+        for elem in ref_genome_warn:
+            print(f'- Run from {elem[0]}: {elem[1]}')
+    print(f'{"".center(80, "-")}')
+
+
 # ---------------------------------UTILITIES------------------------------------
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
@@ -93,7 +119,8 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             'value' in metafile and 'unit' in metafile):
         for key in metafile:
             if not key_yaml:
-                invalid_keys.append(key)
+                if not key in ['disease_type', 'disease_status', 'disease_stage', 'treatment_type', 'treatment_status', 'treatment_duration']:
+                    invalid_keys.append(key)
             elif key not in key_yaml:
                 invalid_keys.append(key)
             else:
@@ -101,7 +128,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                                                  key_yaml[key][4], sub_lists,
                                                  f'{key_name}:{key}' if
                                                  key_name != '' else key,
-                                                 invalid_keys, invalid_entry, invalid_value, key_yaml[key][7] if len(key_yaml[key]) > 5 else None)
+                                                 invalid_keys, invalid_entry, invalid_value, key_yaml[key][7] if len(key_yaml[key]) > 6 else None)
                 invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
@@ -117,7 +144,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
         if invalid:
             invalid_entry.append(f'{key_name}:{metafile}')
 
-        inv_value, message = validate_value(metafile, input_type)
+        inv_value, message = validate_value(metafile, input_type, key_name.split(':')[-1])
 
         if not inv_value:
             invalid_value.append((key_name, metafile, message))
@@ -148,7 +175,8 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
                 whitelist = utils.read_whitelist(value[0])
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
-            whitelist = [x for xs in list(whitelist.values()) for x in xs]
+            whitelist = utils.read_grouped_whitelist(whitelist)
+            whitelist = [x for xs in list(whitelist.values()) if xs is not None for x in xs]
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \
             and os.path.isfile(os.path.join(
@@ -226,34 +254,81 @@ def find_key(metafile, key, is_list, values, invalid_keys):
     return missing_keys
 
 
-def validate_value(input_value, value_type):
+def validate_value(input_value, value_type, key):
     valid = True
     message = None
-    if value_type == 'bool':
-        if input_value not in [True, False]:
+    if input_value is not None:
+        if value_type == 'bool':
+            if input_value not in [True, False]:
+                valid = False
+                message = 'The value has to be of type bool (True or False).'
+        elif value_type == 'int':
+            if not isinstance(input_value, int):
+                valid = False
+                message = 'The value has to be an integer.'
+        elif value_type == 'float':
+            if not isinstance(input_value, float):
+                valid = False
+                message = 'The value has to be a float.'
+        elif value_type == 'date':
+            try:
+                input_date = input_value.split('.')
+                if len(input_date) != 3 or len(input_date[0]) != 2 or len(
+                        input_date[1]) != 2 or len(input_date[2]) != 4:
+                    raise SyntaxError
+                input_value = datetime.date(int(input_date[2]),
+                                                int(input_date[1]),
+                                                int(input_date[0]))
+            except (IndexError, ValueError, SyntaxError) as e:
+                valid = False
+                message = f'Input must be of type \'DD.MM.YYYY\'.'
+        elif value_type == 'str' and ('\"' in input_value or '{' in input_value or '}' in input_value or '|' in input_value) and key not in generated:
             valid = False
-            message = 'The value has to be of type bool (True or False).'
-    elif value_type == 'int':
-        if not isinstance(input_value, int):
-            valid = False
-            message = 'The value has to be an integer.'
-    elif value_type == 'float':
-        if not isinstance(input_value, float):
-            valid = False
-            message = 'The value has to be a float.'
-    elif value_type == 'date':
-        try:
-            input_date = input_value.split('.')
-            if len(input_date) != 3 or len(input_date[0]) != 2 or len(
-                    input_date[1]) != 2 or len(input_date[2]) != 4:
-                raise SyntaxError
-            input_value = datetime.date(int(input_date[2]),
-                                            int(input_date[1]),
-                                            int(input_date[0]))
-        except (IndexError, ValueError, SyntaxError) as e:
-            valid = False
-            message = f'Input must be of type \'DD.MM.YYYY\'.'
-    elif input_value == 'str' and '\"' in input_value:
-        valid = False
-        message = 'The value contains an invalid character (\").'
+            message = 'The value contains an invalid character (\", {, } or |).'
     return valid, message
+
+
+def validate_logic(metafile):
+    pool_warn = []
+    ref_genome_warn = []
+    samples = list(utils.find_keys(metafile, 'samples'))
+    for cond in samples:
+        for sample in cond:
+            warning, warn_message = validate_donor_count(sample['pooled'], sample['donor_count'])
+            if warning:
+                pool_warn.append((sample['sample_name'], warn_message))
+    organisms = list(utils.find_keys(metafile, 'organism'))
+    runs = list(utils.find_keys(metafile, 'runs'))
+    if len(runs) > 0:
+        for run in runs[0]:
+            if 'reference_genome' in run:
+                warning, warn_message = validate_reference_genome(organisms, run['reference_genome'])
+                if warning:
+                    ref_genome_warn.append((run['date'], warn_message))
+    return pool_warn, ref_genome_warn
+
+
+def validate_reference_genome(organisms, reference_genome):
+    invalid = False
+    message = None
+    ref_genome_whitelist = utils.get_whitelist('reference_genome', None)
+    if not any([reference_genome in ref_genome_whitelist[organism] for organism in organisms]):
+        invalid = True
+        organisms = [f'\'{organism}\'' for organism in organisms]
+        message = (f'The reference genome \'{reference_genome}\' does not match '
+                   f'the input organism ({", ".join(organisms)}).')
+    return invalid, message
+
+
+def validate_donor_count(pooled, donor_count):
+    invalid = False
+    message = None
+    if pooled and donor_count <= 1:
+        invalid = True
+        message = (f'Found donor count {donor_count} for pooled sample. '
+                   f'The donor count should be greater than 1.')
+    elif not pooled and donor_count > 1:
+        invalid = True
+        message = (f'Found donor count {donor_count} for sample that is not '
+                   f'pooled. The donor count should be 1.')
+    return invalid, message

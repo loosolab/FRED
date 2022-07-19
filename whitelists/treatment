@@ -1,0 +1,4 @@
+whitelist_type: abbrev
+treatment_type: type
+treatment_status: status
+treatment_duration: duration

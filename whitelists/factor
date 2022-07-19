@@ -7,14 +7,8 @@ life_stage
 age
 ethnicity
 gene
-healthy
-disease_status
-disease_type
-disease_stage
-treated
-treatment_status
-treatment_type
-treatment_duration
+disease
+treatment
 time_point
 flow
 
