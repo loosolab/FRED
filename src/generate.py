@@ -516,8 +516,8 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
     replicates = {'count': end - start, 'samples': []}
     for i in range(start, end):
         samples = {}
-        sample_name = f'{condition}_{i}'
-        short_name = f'{get_short_name(condition)}_{i}'
+        sample_name = f'{condition}_b{"{:02d}".format(i)}'
+        short_name = f'{get_short_name(condition)}_b{"{:02d}".format(i)}'
         samples['sample_name'] = short_name
         print(f'{f"Sample: {sample_name}".center(size.columns, "-")}\n')
         samples['pooled'] = input_pooled
@@ -527,7 +527,6 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
         else:
             donor_count = 1
         samples['donor_count'] = donor_count
-        samples['technical_replicates'] = get_technical_replicates(short_name)
         for cond in conditions:
             if cond[0] in ['age', 'time_point', 'duration']:
                 unit = cond[1].lstrip('0123456789')
@@ -554,6 +553,9 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                                             'samples', {},
                                             False, mandatory_mode,
                                             result_dict, False))
+        if not 'number_of_measurements' in samples:
+            samples['number_of_measurements'] = 1
+        samples['technical_replicates'] = get_technical_replicates(short_name, samples['number_of_measurements'])
         replicates['samples'].append(samples)
     return replicates
 
@@ -643,7 +645,7 @@ def merge_dicts(a, b):
     return res
 
 
-def get_technical_replicates(sample_name):
+def get_technical_replicates(sample_name, nom):
     print(f'\nPlease enter the number of technical replicates:')
     count = parse_input_value('count', '', False, 'int', [])
     while count < 1:
@@ -651,7 +653,8 @@ def get_technical_replicates(sample_name):
         count = parse_input_value('count', '', False, 'int', [])
     samples = []
     for i in range(count):
-        samples.append(f'{sample_name}_t{i + 1}')
+        for j in range(nom):
+            samples.append(f'{sample_name}_t{"{:02d}".format(i+1)}_m{"{:02d}".format(j+1)}')
     return {'count': count, 'sample_name': samples}
 
 
