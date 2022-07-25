@@ -383,7 +383,7 @@ def validate_object(wi_object):
     html_str = ''
     yaml_object = parse_object(wi_object)
     for elem in yaml_object:
-        html_str = f'{html_str}<h3>{elem}</h3><br>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
+        html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
     wi_object['all_factors'] = factors
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings, 'summary': html_str,
@@ -524,8 +524,10 @@ def get_meta_info(path, id):
     elif len(yaml) > 1:
         return f'Error: Multiple metadata files found.'
     else:
+        if 'path' in yaml[0][id]:
+            yaml[0][id].pop('path')
         html_str = ''
-        for elem in yaml[0]:
-            html_str = f'{html_str}<h3>{elem}</h3><br>{object_to_html(yaml[0][elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml[0].keys())[-1] else ""}'
-    return yaml_html
+        for elem in yaml[0][id]:
+            html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml[0][id][elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml[0][id].keys())[-1] else ""}'
+        return html_str
 
