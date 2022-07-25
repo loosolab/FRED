@@ -459,6 +459,12 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
                 for y in val:
                     vals.append(y)
             vals = [dict(t) for t in {tuple(d.items()) for d in vals}]
+            for elem in vals:
+                for key in elem:
+                    if key == 'treatment_duration':
+                        unit = elem[key].lstrip('0123456789')
+                        value = elem[key][:len(elem[key]) - len(unit)]
+                        elem[key] = {'unit': unit, 'value': int(value)}
             for i in range(len(result_dict['experimental_factors'])):
                 if result_dict['experimental_factors'][i]['factor'] == fac['factor']:
                     result_dict['experimental_factors'][i]['values'] = vals
@@ -530,6 +536,12 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
             else:
                 # TODO : if is list
                 if cond[0] in ['disease', 'treatment']:
+                    for key in cond[1]:
+                        if key == 'treatment_duration':
+                            unit = cond[1][key].lstrip('0123456789')
+                            value = cond[1][key][:len(cond[1][key]) - len(unit)]
+                            cond[1][key] = {'unit': unit,
+                                                'value': int(value)}
                     if cond[0] not in samples:
                         samples[cond[0]] = [cond[1]]
                     else:
