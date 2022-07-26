@@ -243,14 +243,21 @@ def get_experimental_factors(node, result_dict):
                     used_values.append({'unit': unit, 'value': val})
             else:
                 used_values = {}
-                options = list(fac_node[4].keys())
-                print(
-                    f'\nPlease enter what information you want to add for '
-                    f'{fac} (1,...,{len(options)}).')
-                print_option_list(options, fac_node[3])
-                values = parse_input_list(options, False)
+                options = []
+                values = []
+                for key in fac_node[4]:
+                    if len(fac_node[4][key]) > 6 and (fac_node[4][key][0] == 'mandatory' or fac_node[4][key][6] == 'autofill'):
+                        values.append(key)
+                    else:
+                        options.append(key)
+                if len(options) > 0:
+                    print(
+                        f'\nPlease enter what information you want to add for '
+                        f'{fac} (1,...,{len(options)}).')
+                    print_option_list(options, fac_node[3])
+                    values += parse_input_list(options, False)
                 for value in values:
-                    if isinstance(fac_node[4][value][4],dict)and 'unit' in fac_node[4][value][4] and 'value' in fac_node[4][value][4]:
+                    if isinstance(fac_node[4][value][4],dict) and 'unit' in fac_node[4][value][4] and 'value' in fac_node[4][value][4]:
                         used_values[value] = []
                         print(f'\nPlease enter the unit for factor {fac}:')
                         unit = parse_input_value('unit', '', True, 'str',
