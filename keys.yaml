@@ -365,10 +365,24 @@ experimental_setting:
                   - False
                   - 'Gene'
                   - ''
-                  - null
-                  - True
-                  - select
-                  - str
+                  - gene_name:
+                      - 'mandatory'
+                      - False
+                      - 'Name'
+                      - ''
+                      - null
+                      - True
+                      - select
+                      - str
+                    ensembl_id:
+                      - 'mandatory'
+                      - False
+                      - 'ENSEMBL-ID'
+                      - ''
+                      - null
+                      - True
+                      - autofill
+                      - str
                 disease:
                   - 'optional'
                   - False
