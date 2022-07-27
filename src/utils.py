@@ -179,20 +179,24 @@ def read_depend_whitelist(whitelist, depend):
 
 def get_whitelist(key, filled_object):
     group = False
-    whitelist = None
-    while not isinstance(whitelist, list) and not group:
-        whitelist = read_whitelist(key)
-        if isinstance(whitelist, dict):
-            if whitelist['whitelist_type'] == 'group':
-                whitelist = read_grouped_whitelist(whitelist)
-                group = True
-            elif whitelist['whitelist_type'] == 'depend':
-                depend = list(find_keys(filled_object, whitelist['ident_key']))[0]
-                whitelist = read_depend_whitelist(whitelist, depend)
+    stay_depend = False
+    whitelist = read_whitelist(key)
+    while isinstance(whitelist, dict) and not group and not stay_depend:
+        if whitelist['whitelist_type'] == 'group':
+            whitelist = read_grouped_whitelist(whitelist)
+            group = True
+        elif whitelist['whitelist_type'] == 'depend':
+            depend = list(find_keys(filled_object, whitelist['ident_key']))
+            if len(depend) > 0:
+                whitelist = read_depend_whitelist(whitelist, depend[0])
+            else:
+                stay_depend = True
     if group:
         for key in whitelist:
             if whitelist[key] is not None:
                 whitelist[key] = sorted(whitelist[key])
+    elif stay_depend:
+        pass
     else:
         whitelist = sorted(whitelist)
     return whitelist
