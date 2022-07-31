@@ -383,7 +383,7 @@ def validate_object(wi_object):
     html_str = ''
     yaml_object = parse_object(wi_object)
     for elem in yaml_object:
-        html_str = f'{html_str}<h3>{elem}</h3><br>{object_to_html(yaml_object[elem], 0)}<br>'
+        html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
     wi_object['all_factors'] = factors
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings, 'summary': html_str,
@@ -479,17 +479,35 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
     return wi_object, pooled, organisms, warnings, errors
 
 
-def object_to_html(yaml_object, margin):
+def object_to_html(yaml_object, depth, margin, is_list):
     html_str = ''
     if isinstance(yaml_object, dict):
         for key in yaml_object:
-            html_str = f'{html_str}<p style="margin-left: {margin}px">{key}: {object_to_html(yaml_object[key], margin + 40)}</p>'
+            if key == list(yaml_object.keys())[0] and is_list:
+                html_str = f'{html_str}<p style="margin-left: {20*margin}px">- <font color={get_color(depth)}>{key}</font>: {object_to_html(yaml_object[key], depth+1, margin+1.5, is_list)}</p>'
+            else:
+                html_str = f'{html_str}<p style="margin-left: {20*(margin+0.5)}px"><font color={get_color(depth)}>{key}</font>: {object_to_html(yaml_object[key], depth+1, margin+1.5, is_list)}</p>'
     elif isinstance(yaml_object, list):
         for elem in yaml_object:
-            html_str = f'{html_str}<br>- {object_to_html(elem, margin)}'
+            if not isinstance(elem, list) and not isinstance(elem,dict):
+                html_str = f'{html_str}<p style="margin-left: {20*margin}px">- {elem}</p>'
+            else:
+                html_str = f'{html_str}{object_to_html(elem, depth, margin, True)}'
     else:
         html_str = f'{html_str}{yaml_object}'
     return html_str
+
+
+def get_color(depth):
+    if depth < 1:
+        color = 'blue'
+    elif depth < 2:
+        color = 'purple'
+    elif depth < 3:
+        color = 'red'
+    else:
+        color = 'orange'
+    return color
 
 
 def save_object(dictionary, path):
@@ -506,5 +524,10 @@ def get_meta_info(path, id):
     elif len(yaml) > 1:
         return f'Error: Multiple metadata files found.'
     else:
-        yaml_html = object_to_html(yaml[0], 0)
-    return yaml_html
+        if 'path' in yaml[0][id]:
+            yaml[0][id].pop('path')
+        html_str = ''
+        for elem in yaml[0][id]:
+            html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml[0][id][elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml[0][id].keys())[-1] else ""}'
+        return html_str
+
