@@ -153,7 +153,13 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                 options = parse_input_list(optionals, True)
                 if options:
                     for option in options:
-                        return_dict[option] = get_redo_value(node[option],
+
+                        if len(node[option]) > 5 and isinstance(node[option][5],dict) and list(node[option][5].keys())[0] == 'merge':
+                            whitelist = utils.get_whitelist(option, result_dict)
+                            value = parse_input_value(option, node[option][3], True, 'str', result_dict)
+                            return value
+                        else:
+                            return_dict[option] = get_redo_value(node[option],
                                                              option,
                                                              optional,
                                                              mandatory_mode,
@@ -251,19 +257,10 @@ def get_experimental_factors(node, result_dict):
                     else:
                         options.append(key)
                 if len(fac_node) > 5 and isinstance(fac_node[5], dict) and list(fac_node[5].keys())[0] == 'merge':
-                    depend = fac_node[5][list(fac_node[5].keys())[0]]
-                    whitelists = {}
-                    for key in fac_node[4]:
-                        whitelists[key] = utils.get_whitelist(key, result_dict)
-                    value_list = []
-                    for i in range(len(whitelists[depend])):
-                        k = whitelists[depend][i]
-                        elem = f'{k}'
-                        for key in whitelists:
-                            if key != depend:
-                                elem = f'{elem} {whitelists[key][k.lower()]}'
-                        value_list.append(elem)
-                    used_values = []
+                    whitelist = utils.get_whitelist(fac, result_dict)
+                    u_values = []
+                    value_list = whitelist['whitelist']
+                    values = []
                     if isinstance(value_list, dict):
                         w = [x for xs in list(value_list.values()) for x in xs]
                         if len(w) > 30:
@@ -275,7 +272,7 @@ def get_experimental_factors(node, result_dict):
                                 input_value = complete_input(w, factor_value[
                                     "factor"])
                                 if input_value in value_list:
-                                    used_values.append(input_value)
+                                    values.append(input_value)
                                     redo = parse_list_choose_one([True, False],
                                                                  f'\nDo you want to add another {factor_value["factor"]}?')
                                 else:
@@ -293,7 +290,7 @@ def get_experimental_factors(node, result_dict):
                                 for value in value_list[w_key]:
                                     print(f'{i}: {value}')
                                     i += 1
-                            used_values = parse_input_list(w, False)
+                            values = parse_input_list(w, False)
                     elif len(value_list) > 30:
                         redo = True
                         print(
@@ -304,7 +301,7 @@ def get_experimental_factors(node, result_dict):
                                                          factor_value[
                                                              "factor"])
                             if input_value in value_list:
-                                used_values.append(input_value)
+                                values.append(input_value)
                                 redo = parse_list_choose_one([True, False],
                                                              f'\nDo you want to add another {factor_value["factor"]}?')
                             else:
@@ -317,7 +314,17 @@ def get_experimental_factors(node, result_dict):
                             f'{factor_value["factor"]} (1-{len(value_list)}) divided by '
                             f'comma:\n')
                         print_option_list(value_list, False)
-                        used_values = parse_input_list(value_list, False)
+                        values = parse_input_list(value_list, False)
+                    if 'headers' in whitelist:
+                        headers = whitelist['headers'].split(' ')
+                        for i in range(len(values)):
+                            vals = values[i].split(' ')
+                            values[i] = '{'
+                            for j in range(len(headers)):
+                                values[i] = f'{values[i]}{"|" if j > 0 else ""}{headers[j]}:\"{vals[j]}\"'
+                            values[i] = f'{values[i]}{"}"}'
+                            u_values.append(f'{fac}:{values[i]}')
+                    used_values = u_values
                 else:
                     if len(options) > 0:
                         print(
@@ -528,7 +535,7 @@ def get_combinations(values, key, key_name):
 def get_conditions(factors, node, mandatory_mode, result_dict):
     combinations = get_condition_combinations(factors)
     for fac in factors:
-        if fac['factor'] in ['disease', 'treatment']:
+        if fac['factor'] in ['disease', 'treatment', 'gene']:
             vals = []
             for cond in fac['values']:
                 val = ([x[1] for x in split_cond(cond)])
@@ -624,11 +631,12 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                 else:
                     samples[cond[0]] = cond[1]
 
-        samples = merge_dicts(samples,
-                              generate_part(node[type][4]['samples'][4],
+        test = generate_part(node[type][4]['samples'][4],
                                             'samples', {},
                                             False, mandatory_mode,
-                                            result_dict, False))
+                                            result_dict, False)
+        print(test)
+        samples = merge_dicts(samples, test)
         if not 'number_of_measurements' in samples:
             samples['number_of_measurements'] = 1
         samples['technical_replicates'] = get_technical_replicates(short_name, samples['number_of_measurements'])
@@ -747,14 +755,15 @@ def get_condition_combinations(factors):
             if isinstance(value,
                           dict) and 'value' in value and 'unit' in value:
                 value = f'{value["value"]}{value["unit"]}'
-            if factors[i]['factor'] in ['disease', 'treatment']:
+            if factors[i]['factor'] in ['disease', 'treatment', 'gene']:
                 combinations.append(f'{value}')
             else:
                 combinations.append(f'{factors[i]["factor"]}:"{value}"')
             for j in range(i + 1, len(factors)):
                 comb = get_condition_combinations(factors[j:])
                 for c in comb:
-                    if factors[i]['factor'] in ['disease', 'treatment']:
+                    print(factors[i]['factor'])
+                    if factors[i]['factor'] in ['disease', 'treatment', 'gene']:
                         combinations.append(f'{value}-{c}')
                     else:
                         combinations.append(f'{factors[i]["factor"]}:"{value}"-{c}')
@@ -795,9 +804,13 @@ def parse_list_choose_one(whitelist, header):
 
 def parse_input_value(key, desc, whitelist, value_type, result_dict):
     whites = None
+    whites2 = None
     if whitelist:
         whites = utils.get_whitelist(key, result_dict)
-    if whites:
+        whites2 = whites
+        if isinstance(whites, dict) and 'whitelist' in whites:
+            whites2 = whites['whitelist']
+    if whites2:
         if isinstance(whites, dict):
             w = [x for xs in list(whites.values()) for x in xs]
             if len(w) > 30:
@@ -817,6 +830,13 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
                                   result_dict)
         elif len(whites) > 0:
             input_value = parse_list_choose_one(whites, f'{key}:')
+        if 'headers' in whites:
+            headers = whites['headers'].split(' ')
+            vals = input_value.split(' ')
+            value = {}
+            for i in range(len(headers)):
+                value[headers[i]] = vals[i]
+            input_value = {key: value}
     else:
         if desc != '':
             print(f'\n{desc}')
