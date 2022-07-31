@@ -381,8 +381,9 @@ experimental_setting:
                       - ''
                       - null
                       - True
-                      - autofill
+                      - select
                       - str
+                  - merge: gene_name
                 disease:
                   - 'optional'
                   - False
@@ -398,7 +399,7 @@ experimental_setting:
                       - select
                       - str
                     disease_status:
-                      - 'optional'
+                      - 'mandatory'
                       - False
                       - 'Status'
                       - ''
@@ -431,7 +432,7 @@ experimental_setting:
                       - select
                       - str
                     treatment_status:
-                      - 'optional'
+                      - 'mandatory'
                       - False
                       - 'Status'
                       - ''
