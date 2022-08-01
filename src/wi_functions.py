@@ -179,6 +179,7 @@ def get_whitelist_with_type(key, key_yaml, organism):
                     dn = list(utils.find_keys(key_yaml, k))[0][2]
                     k_val['displayName'] = dn
                     k_val['position'] = k
+                    k_val['value'] = []
                     val.append(k_val)
                 input_type = 'nested'
                 return val, input_type, headers
