@@ -1,0 +1,4 @@
+whitelist_type: abbrev
+disease_type: tp
+disease_status: sts
+disease_stage: stg

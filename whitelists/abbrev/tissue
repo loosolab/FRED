@@ -1,0 +1,26 @@
+whitelist_type: abbrev
+lung: lng
+liver: lvr
+heart: hrt
+brain: brn
+skeletal muscle: skmu
+smooth muscle: smmu
+adrenal gland: adgl
+esophagus: eso
+tongue: tng
+intestine: int
+pancreas: pncr
+kidney: kdny
+retina: rtn
+testis: tsts
+prostate: prst
+adipose tissue: adti
+cervix: crvx
+ovary: ovr
+skin: skn
+breast: brst
+bladder: bldr
+stomach: stm
+salivary gland: sagl
+placenta: plct
+gallbladder: gllbl

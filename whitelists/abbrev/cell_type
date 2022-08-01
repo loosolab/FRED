@@ -1,0 +1,42 @@
+whitelist_type: abbrev
+Endothelial cells: EndoCll
+Smooth muscle cells: SmMCll
+Fibroblasts: Fbrb
+Macrophages: Mcrp
+Mast cells: MstCll
+T-cells: TCll
+Plasma cells: PlCll
+Adipocyte: adpc
+Alpha cells: AlphaCll
+Alveolar cells type 1: AlvCll1
+Alveolar cells type 2: AlvCll2
+Ascending Loop of Henle cells: AscLHCll
+B-cells: BCll
+Beta cells: BetaCll
+Cardiomyocytes: Crdmct
+Ductal cells: DuctCll
+Eccrine sweat gland cells: EccSwGlCll
+Enteric glia cells: EntGliaCll
+Erythroid cells: EryCll
+Exocrine glandular cells: ExoGlCll
+Gastric enteroendocrine cells: GstrEntendCll
+Gastric mucous cells: GstrMucoCll
+Hair cortex cells: HairCrtxCll
+Hepatocytes: Hptct
+Keratinocyte (granular): granKrtnct
+Keratinocyte (other): othKrtnct
+Langerhans cells: LnghnsCll
+Melanocytes: Melanoct
+Mitotic cells: MitoCll
+Neutrophils: Ntrph
+NK-cells: NKCll
+Parafollicular cells: ParafllCll
+Peritubular cells: PeritblCll
+Podocytes: Podoct
+Prostate basal glandular cells: PrstBGlCll
+Prostate glandular cells: PrstGlCll
+Proximal tubular cells: ProxTblCll
+Respiratory ciliated cells: RespCilCll
+Skeletal myocytes: SklMct
+Spermatids: Sprmtd
+ASC TERT1: AscTert1
