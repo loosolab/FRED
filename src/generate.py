@@ -662,7 +662,11 @@ def get_short_name(condition):
             new_vals = {}
             for v in c[1]:
                 if cond_whitelist and v in cond_whitelist:
-                    new_vals[cond_whitelist[v]] = c[1][v]
+                    val_whitelist = utils.read_whitelist(os.path.join('abbrev', v))
+                    if val_whitelist and c[1][v].lower() in val_whitelist:
+                        new_vals[cond_whitelist[v]] = val_whitelist[c[1][v].lower()]
+                    else:
+                        new_vals[cond_whitelist[v]] = c[1][v]
             val = '+'.join([f'{x}.{new_vals[x].replace(" ", "")}' for x in list(new_vals.keys())])
             short_cond.append(f'{k}#{val}')
         else:
