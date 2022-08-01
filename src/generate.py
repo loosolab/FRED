@@ -650,7 +650,7 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
 
 def get_short_name(condition):
     conds = split_cond(condition)
-    whitelist = utils.read_whitelist('abbreviations')
+    whitelist = utils.read_whitelist(os.path.join('abbrev','factor'))
     short_cond = []
     for c in conds:
         if whitelist and c[0] in whitelist:
@@ -658,7 +658,7 @@ def get_short_name(condition):
         else:
             k = c[0]
         if isinstance(c[1], dict):
-            cond_whitelist = utils.read_whitelist(c[0])
+            cond_whitelist = utils.read_whitelist(os.path.join('abbrev', c[0]))
             new_vals = {}
             for v in c[1]:
                 if cond_whitelist and v in cond_whitelist:
@@ -666,7 +666,11 @@ def get_short_name(condition):
             val = '+'.join([f'{x}.{new_vals[x].replace(" ", "")}' for x in list(new_vals.keys())])
             short_cond.append(f'{k}#{val}')
         else:
-            short_cond.append(f'{k}.{c[1]}')
+            val_whitelist = utils.read_whitelist(os.path.join('abbrev', c[0]))
+            if val_whitelist and c[1] in val_whitelist:
+                short_cond.append(f'{k}.{val_whitelist[c[1]]}')
+            else:
+                short_cond.append(f'{k}.{c[1]}')
     short_condition = '-'.join(short_cond)
     return short_condition
 
