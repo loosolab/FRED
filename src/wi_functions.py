@@ -32,33 +32,64 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
                                                     'sample_name'] else False
     if isinstance(node[4], dict):
         input_fields = []
-        for key in node[4]:
-            input_fields.append(parse_empty(node[4][key], pre + ':' + key,
-                                            key_yaml, get_whitelists))
-        unit = False
-        value = False
-        unit_whitelist = []
-        if len(input_fields) == 2:
-            for i in range(len(input_fields)):
-                if input_fields[i]['position'].split(':')[-1] == 'unit':
-                    unit = True
-                    unit_whitelist = input_fields[i]['whitelist']
-                elif input_fields[i]['position'].split(':')[-1] == 'value':
-                    value = True
-        if unit and value:
 
+        if len(node) > 5 and isinstance(node[5], dict) and 'merge' in node[5]:
+            input_type = 'select'
+            if get_whitelists:
+                whitelist = utils.read_whitelist(pre.split(':')[-1])
+                if 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'depend':
+                    whitelist = None
+                    input_type = 'dependable'
+                elif 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'group':
+                    new_w = []
+                    for key in whitelist:
+                        if key != 'whitelist_type':
+                            new_w.append(
+                                {'title': key, 'whitelist': whitelist[key]})
+                    input_type = 'group_select'
+                    whitelist = new_w
+            else:
+                whitelist = None
+            if input_type != 'group_select':
+                if isinstance(whitelist, dict):
+                    input_type = 'dependable_select'
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
                    'list': node[1], 'displayName': node[2], 'desc': node[3],
-                   'value': None, 'value_unit': None,
-                   'whitelist': unit_whitelist, 'input_type': 'value_unit',
-                   'data_type': 'value_unit', 'input_disabled': input_disabled}
-        else:
-            res = {'position': pre,
-                   'mandatory': True if node[0] == 'mandatory' else False,
-                   'list': node[1], 'title': node[2], 'desc': node[3],
-                   'input_fields': input_fields,
+                   'value': None,
+                   'whitelist': whitelist,
+                   'input_type': input_type, 'data_type': 'str',
                    'input_disabled': input_disabled}
+        else:
+            for key in node[4]:
+                input_fields.append(parse_empty(node[4][key], pre + ':' + key,
+                                            key_yaml, get_whitelists))
+            unit = False
+            value = False
+            unit_whitelist = []
+            if len(input_fields) == 2:
+                for i in range(len(input_fields)):
+                    if input_fields[i]['position'].split(':')[-1] == 'unit':
+                        unit = True
+                        unit_whitelist = input_fields[i]['whitelist']
+                    elif input_fields[i]['position'].split(':')[-1] == 'value':
+                        value = True
+            if unit and value:
+
+                res = {'position': pre,
+                       'mandatory': True if node[0] == 'mandatory' else False,
+                       'list': node[1], 'displayName': node[2],
+                       'desc': node[3], 'value': None, 'value_unit': None,
+                       'whitelist': unit_whitelist, 'input_type': 'value_unit',
+                       'data_type': 'value_unit', 'input_disabled': input_disabled}
+            else:
+                res = {'position': pre,
+                       'mandatory': True if node[0] == 'mandatory' else False,
+                       'list': node[1], 'title': node[2], 'desc': node[3],
+                       'input_fields': input_fields,
+                       'input_disabled': input_disabled}
         if node[1]:
             res['list_value'] = []
     else:
@@ -119,24 +150,40 @@ def get_factors(organism):
     factor_value = {'factor': utils.read_whitelist('factor')}
     values = {}
     for factor in factor_value['factor']:
-        whitelist, input_type = get_whitelist_with_type(factor, key_yaml,
+        whitelist, input_type, headers = get_whitelist_with_type(factor, key_yaml,
                                                         organism)
         values[factor] = {'whitelist': whitelist, 'input_type': input_type}
+        if headers is not None:
+            values[factor]['headers'] = headers
     factor_value['values'] = values
     return factor_value
 
 
 def get_whitelist_with_type(key, key_yaml, organism):
+    headers = None
     input_type = list(utils.find_keys(key_yaml, key))
     if len(input_type) > 0:
-        if isinstance(input_type[0][4], dict) and len(
-                input_type[0][4].keys()) == 2 and 'value' in \
-                input_type[0][4] and 'unit' in input_type[0][4]:
-            input_type = 'value_unit'
-        elif input_type[0][7] == 'bool':
-            input_type = 'bool'
+        if isinstance(input_type[0][4], dict):
+            if len(input_type[0][4].keys()) == 2 and 'value' in \
+                    input_type[0][4] and 'unit' in input_type[0][4]:
+                    input_type = 'value_unit'
+            elif isinstance(input_type[0][5], dict) and 'merge' in input_type[0][5]:
+                    input_type = 'select'
+            else:
+                val = {}
+                for k in input_type[0][4]:
+                    val[k] = {}
+                    val[k]['whitelist'], val[k]['input_type'], header = get_whitelist_with_type(k, key_yaml, organism)
+                    if header is not None:
+                        val[k]['headers'] = header
+                input_type = 'nested'
+                return val, input_type, headers
+
         else:
-            input_type = input_type[0][6]
+            if input_type[0][7] == 'bool':
+                input_type = 'bool'
+            else:
+                input_type = input_type[0][6]
     else:
         input_type = 'short_text'
 
@@ -160,11 +207,17 @@ def get_whitelist_with_type(key, key_yaml, organism):
             input_type = 'group_select'
         elif whitelist['whitelist_type'] == 'depend':
             whitelist = utils.read_depend_whitelist(whitelist, organism)
+
+    if isinstance(whitelist, dict) and 'whitelist' in whitelist:
+        if 'headers' in whitelist:
+            headers = whitelist['headers']
+        whitelist = whitelist['whitelist']
+
     # if whitelist and len(whitelist) > 30:
     #    input_type = 'searchable_select'
     if key == 'gene':
-        input_type = 'unique'
-    return whitelist, input_type
+        input_type = 'gene'
+    return whitelist, input_type, headers
 
 
 def get_samples(condition, sample):
@@ -183,6 +236,12 @@ def get_samples(condition, sample):
                     value = c[1][:len(c[1]) - len(unit)]
                     sample[i]['value'] = int(value)
                     sample[i]['value_unit'] = unit
+                elif isinstance(c[1], dict):
+                   # TODO: save disease as list in correct place
+                    for j in range(len(sample[i]['input_fields'])):
+                        for x in c[1]:
+                            if sample[i]['input_fields'][j]['position'].split(':') == x:
+                                sample[i]['input_fields'][j]['value'] = c[1][x]
                 else:
                     sample[i]['value'] = c[1]
                 sample[i]['input_disabled'] = True
@@ -194,11 +253,14 @@ def get_conditions(factors, organism_name):
     This functions returns all possible combinations for experimental factors
     and their values.
     :param factors: multiple dictionaries containing the keys 'factor' and
-    'value' with their respective values grouped in a list
+    'values' with their respective values grouped in a list
     e.g. [{'factor': 'gender', 'values': ['male', 'female']},
           {'factor: 'life_stage', 'values': ['child', 'adult']}]
     :return: a list containing all combinations of conditions
     """
+    for i in range(len(factors)):
+        if isinstance(factors[i]['values'], dict) and not ('value' in factors[i]['values'] and 'unit' in factors[i]['values']):
+                factors[i]['values'] = generate.get_combis(factors[i]['values'], factors[i]['factor'], factors[i]['multi'])
     conditions = generate.get_condition_combinations(factors)
     condition_object = []
 
