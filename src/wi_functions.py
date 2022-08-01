@@ -180,6 +180,7 @@ def get_whitelist_with_type(key, key_yaml, organism):
                     k_val['displayName'] = dn
                     k_val['position'] = k
                     k_val['value'] = []
+                    k_val['multi'] = False
                     val.append(k_val)
                 input_type = 'nested'
                 return val, input_type, headers
