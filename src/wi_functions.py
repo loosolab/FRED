@@ -177,11 +177,13 @@ def get_whitelist_with_type(key, key_yaml, organism):
                     if header is not None:
                         key_val['headers'] = header
                     dn = list(utils.find_keys(key_yaml, k))[0][2]
+                    if k_val['input_type'] == 'value_unit':
+                        k_val['unit'] = None
                     k_val['displayName'] = dn
                     k_val['position'] = k
                     k_val['value'] = []
-                    k_val['multi'] = False
                     val.append(k_val)
+                val.append({'displayName': 'Multi', 'position': 'multi', 'whitelist': [True, False], 'input_type': 'select', 'value': False})
                 input_type = 'nested'
                 return val, input_type, headers
 
