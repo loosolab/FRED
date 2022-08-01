@@ -170,12 +170,14 @@ def get_whitelist_with_type(key, key_yaml, organism):
             elif isinstance(input_type[0][5], dict) and 'merge' in input_type[0][5]:
                     input_type = 'select'
             else:
-                val = {}
+                val = []
                 for k in input_type[0][4]:
-                    val[k] = {}
-                    val[k]['whitelist'], val[k]['input_type'], header = get_whitelist_with_type(k, key_yaml, organism)
+                    k_val = {}
+                    k_val['whitelist'], k_val['input_type'], header = get_whitelist_with_type(k, key_yaml, organism)
                     if header is not None:
-                        val[k]['headers'] = header
+                        key_val['headers'] = header
+                    k_val['displayName'] = k
+                    val.append(k_val)
                 input_type = 'nested'
                 return val, input_type, headers
 
