@@ -183,7 +183,7 @@ def get_whitelist_with_type(key, key_yaml, organism):
                     k_val['position'] = k
                     k_val['value'] = []
                     val.append(k_val)
-                val.append({'displayName': 'Multi', 'position': 'multi', 'whitelist': [True, False], 'input_type': 'select', 'value': False})
+                val.append({'displayName': 'Multi', 'position': 'multi', 'whitelist': [True, False], 'input_type': 'bool', 'value': False})
                 input_type = 'nested'
                 return val, input_type, headers
 
