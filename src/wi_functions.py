@@ -237,7 +237,7 @@ def get_samples(condition, sample):
                     sample[i]['value'] = int(value)
                     sample[i]['value_unit'] = unit
                 elif isinstance(c[1], dict):
-                   # TODO save gene 
+                   # TODO save gene
                    if not 'input_fields' in sample[i]:
                        pass
                    else:
