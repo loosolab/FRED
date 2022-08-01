@@ -667,8 +667,8 @@ def get_short_name(condition):
             short_cond.append(f'{k}#{val}')
         else:
             val_whitelist = utils.read_whitelist(os.path.join('abbrev', c[0]))
-            if val_whitelist and c[1] in val_whitelist:
-                short_cond.append(f'{k}.{val_whitelist[c[1]]}')
+            if val_whitelist and c[1].lower() in val_whitelist:
+                short_cond.append(f'{k}.{val_whitelist[c[1].lower()]}')
             else:
                 short_cond.append(f'{k}.{c[1]}')
     short_condition = '-'.join(short_cond)
