@@ -237,11 +237,15 @@ def get_samples(condition, sample):
                     sample[i]['value'] = int(value)
                     sample[i]['value_unit'] = unit
                 elif isinstance(c[1], dict):
+                   # TODO save gene 
+                   if not 'input_fields' in sample[i]:
+                       pass
+                   else:
                    # TODO: save disease as list in correct place
-                    for j in range(len(sample[i]['input_fields'])):
-                        for x in c[1]:
-                            if sample[i]['input_fields'][j]['position'].split(':') == x:
-                                sample[i]['input_fields'][j]['value'] = c[1][x]
+                        for j in range(len(sample[i]['input_fields'])):
+                            for x in c[1]:
+                                if sample[i]['input_fields'][j]['position'].split(':') == x:
+                                    sample[i]['input_fields'][j]['value'] = c[1][x]
                 else:
                     sample[i]['value'] = c[1]
                 sample[i]['input_disabled'] = True
@@ -261,6 +265,18 @@ def get_conditions(factors, organism_name):
     for i in range(len(factors)):
         if isinstance(factors[i]['values'], dict) and not ('value' in factors[i]['values'] and 'unit' in factors[i]['values']):
                 factors[i]['values'] = generate.get_combis(factors[i]['values'], factors[i]['factor'], factors[i]['multi'])
+        if 'headers' in factors[i]:
+            vals = []
+            headers = factors[i]['headers'].split(' ')
+            print(headers)
+            for j in range(len(factors[i]['values'])):
+                val = factors[i]['values'][j].split(' ')
+                print(val)
+                v = f'{factors[i]["factor"]}:{"{"}'
+                for k in range(len(headers)):
+                    v = (f'{v}{"|" if k > 0 else ""}{headers[k]}:{val[k]}')
+                v = f'{v}{"}"}'
+                factors[i]['values'][j] = v
     conditions = generate.get_condition_combinations(factors)
     condition_object = []
 
