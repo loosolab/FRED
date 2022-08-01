@@ -472,6 +472,16 @@ def get_combinations(values, key, key_name):
         multi = parse_list_choose_one([True, False], f'\nCan one sample contain multiple {key_name}s?')
     else:
         multi = False
+    disease_values = get_combis(values, key, multi)
+    print(
+        f'\nPlease select the analyzed combinations for {key} '
+        f'(1-{len(disease_values)}) divided by comma:\n')
+    print_option_list(disease_values, False)
+    used_values = parse_input_list(disease_values, False)
+    return used_values
+
+
+def get_combis(values, key, multi):
     if multi:
         possible_values = {}
         disease_values = []
@@ -487,7 +497,6 @@ def get_combinations(values, key, key_name):
                 for x in value:
                     val = x
                     for v in values[list(values.keys())[i]]:
-                        print(v)
                         if isinstance(v,
                                   dict) and 'value' in v and 'unit' in v:
                             v = f'{v["value"]}{v["unit"]}'
@@ -524,12 +533,7 @@ def get_combinations(values, key, key_name):
             possible_values = v
             for z in possible_values:
                 disease_values.append(f'{key}:{"{"}{z}{"}"}')
-    print(
-            f'\nPlease select the analyzed combinations for {key} '
-            f'(1-{len(disease_values)}) divided by comma:\n')
-    print_option_list(disease_values, False)
-    used_values = parse_input_list(disease_values, False)
-    return used_values
+    return disease_values
 
 
 def get_conditions(factors, node, mandatory_mode, result_dict):
@@ -762,7 +766,6 @@ def get_condition_combinations(factors):
             for j in range(i + 1, len(factors)):
                 comb = get_condition_combinations(factors[j:])
                 for c in comb:
-                    print(factors[i]['factor'])
                     if factors[i]['factor'] in ['disease', 'treatment', 'gene']:
                         combinations.append(f'{value}-{c}')
                     else:
