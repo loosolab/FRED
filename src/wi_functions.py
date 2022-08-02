@@ -176,10 +176,11 @@ def get_whitelist_with_type(key, key_yaml, organism):
                     k_val['whitelist'], k_val['input_type'], header = get_whitelist_with_type(k, key_yaml, organism)
                     if header is not None:
                         key_val['headers'] = header
-                    dn = list(utils.find_keys(key_yaml, k))[0][2]
+                    node = list(utils.find_keys(key_yaml, k))[0]
                     if k_val['input_type'] == 'value_unit':
                         k_val['unit'] = None
-                    k_val['displayName'] = dn
+                    k_val['displayName'] = node[2]
+                    k_val['required'] = True if node[0] == 'mandatory' else False
                     k_val['position'] = k
                     k_val['value'] = []
                     val.append(k_val)
