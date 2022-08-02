@@ -272,8 +272,8 @@ def get_conditions(factors, organism_name):
     :return: a list containing all combinations of conditions
     """
     for i in range(len(factors)):
-        if isinstance(factors[i]['values'], dict) and not ('value' in factors[i]['values'] and 'unit' in factors[i]['values']):
-                factors[i]['values'] = generate.get_combis(factors[i]['values'], factors[i]['factor'], factors[i]['multi'])
+        if len(factors[i]['values']) == 1 and isinstance(factors[i]['values'][0], dict) and not ('value' in factors[i]['values'][0] and 'unit' in factors[i]['values'][0]):
+            factors[i]['values'] = generate.get_combis(factors[i]['values'][0], factors[i]['factor'], factors[i]['multi'])
         if 'headers' in factors[i]:
             vals = []
             headers = factors[i]['headers'].split(' ')
