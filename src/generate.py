@@ -604,7 +604,7 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
     for i in range(start, end):
         samples = {}
         sample_name = f'{condition}_b{"{:02d}".format(i)}'
-        short_name = f'{get_short_name(condition)}_b{"{:02d}".format(i)}'
+        short_name = f'{get_short_name(condition, result_dict)}_b{"{:02d}".format(i)}'
         samples['sample_name'] = short_name
         print(f'{f"Sample: {sample_name}".center(size.columns, "-")}\n')
         samples['pooled'] = input_pooled
@@ -648,7 +648,7 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
     return replicates
 
 
-def get_short_name(condition):
+def get_short_name(condition, result_dict):
     conds = split_cond(condition)
     whitelist = utils.read_whitelist(os.path.join('abbrev','factor'))
     short_cond = []
@@ -662,7 +662,7 @@ def get_short_name(condition):
             new_vals = {}
             for v in c[1]:
                 if cond_whitelist and v in cond_whitelist:
-                    val_whitelist = utils.read_whitelist(os.path.join('abbrev', v))
+                    val_whitelist = utils.get_whitelist(os.path.join('abbrev', v), result_dict)
                     if val_whitelist and c[1][v].lower() in val_whitelist:
                         new_vals[cond_whitelist[v]] = val_whitelist[c[1][v].lower()]
                     else:
