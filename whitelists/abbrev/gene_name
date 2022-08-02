@@ -1,0 +1,11 @@
+whitelist_type: depend
+ident_key: organism
+human_9606: abbrev/genes/human
+mouse_10090: abbrev/genes/mouse
+zebrafish_7955: abbrev/genes/zebrafish
+rat_10114: abbrev/genes/rat
+pig_9823: abbrev/genes/pig
+medaka_8090: abbrev/genes/medaka
+chicken_9031: abbrev/genes/chicken
+drosophila_7215: abbrev/genes/drosophila
+yeast_4932: abbrev/genes/yeast
