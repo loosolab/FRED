@@ -273,7 +273,7 @@ def get_conditions(factors, organism_name):
     """
     for i in range(len(factors)):
         if len(factors[i]['values']) == 1 and isinstance(factors[i]['values'][0], dict) and not ('value' in factors[i]['values'][0] and 'unit' in factors[i]['values'][0]):
-            factors[i]['values'] = generate.get_combis(factors[i]['values'][0], factors[i]['factor'], factors[i][0]['multi'])
+            factors[i]['values'] = generate.get_combis(factors[i]['values'][0], factors[i]['factor'], factors[i]['values'][0]['multi'])
         if 'headers' in factors[i]:
             vals = []
             headers = factors[i]['headers'].split(' ')
