@@ -119,7 +119,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             'value' in metafile and 'unit' in metafile):
         for key in metafile:
             if not key_yaml:
-                if not key in ['disease_type', 'disease_status', 'disease_stage', 'treatment_type', 'treatment_status', 'treatment_duration']:
+                if not key in ['disease_type', 'disease_status', 'disease_stage', 'treatment_type', 'treatment_status', 'treatment_duration', 'gene_name', 'ensembl_id']:
                     invalid_keys.append(key)
             elif key not in key_yaml:
                 invalid_keys.append(key)

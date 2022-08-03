@@ -141,7 +141,7 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                                            mandatory_mode,
                                                            return_dict, False)
                     else:
-                        if item not in factor:
+                        if node[item][1] or item not in factor:
                             optionals.append(item)
                             desc.append(node[item][3])
             if len(optionals) > 0 and mandatory_mode == False:
@@ -635,12 +635,10 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                 else:
                     samples[cond[0]] = cond[1]
 
-        test = generate_part(node[type][4]['samples'][4],
+        samples = merge_dicts(samples, generate_part(node[type][4]['samples'][4],
                                             'samples', {},
                                             False, mandatory_mode,
-                                            result_dict, False)
-        print(test)
-        samples = merge_dicts(samples, test)
+                                            result_dict, False))
         if not 'number_of_measurements' in samples:
             samples['number_of_measurements'] = 1
         samples['technical_replicates'] = get_technical_replicates(short_name, samples['number_of_measurements'])
