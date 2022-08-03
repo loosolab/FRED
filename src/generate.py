@@ -14,7 +14,7 @@ except OSError:
 factor = []
 not_editable = ['id', 'project_name', 'sample_name', 'pooled', 'donor_count',
                 'technical_replicates']
-
+id = ''
 
 class WhitelistCompleter:
     def __init__(self, whitelist):
@@ -42,6 +42,8 @@ def generate_file(path, input_id, name, mandatory_mode):
         sys.exit(
             f'The metadata file for ID {input_id} already exists.')
 
+    global id
+    id = input_id
     key_yaml = utils.read_in_yaml('keys.yaml')
     result_dict = {'project': {'id': input_id, 'project_name': name}}
 
@@ -748,7 +750,7 @@ def get_technical_replicates(sample_name, nom):
     samples = []
     for i in range(count):
         for j in range(nom):
-            samples.append(f'{sample_name}_t{"{:02d}".format(i+1)}_m{"{:02d}".format(j+1)}')
+            samples.append(f'{id}_{sample_name}_t{"{:02d}".format(i+1)}_m{"{:02d}".format(j+1)}')
     return {'count': count, 'sample_name': samples}
 
 
