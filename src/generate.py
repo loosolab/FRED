@@ -484,6 +484,8 @@ def get_combinations(values, key, key_name):
 
 
 def get_combis(values, key, multi):
+    if 'multi' in values:
+        values.pop('multi')
     if multi:
         possible_values = {}
         disease_values = []
