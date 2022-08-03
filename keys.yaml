@@ -386,7 +386,7 @@ experimental_setting:
                   - merge: gene_name
                 disease:
                   - 'optional'
-                  - False
+                  - True
                   - 'Disease'
                   - ''
                   - disease_type:
@@ -419,7 +419,7 @@ experimental_setting:
                   - 'disease_type'
                 treatment:
                   - 'optional'
-                  - False
+                  - True
                   - 'Treatment'
                   - ''
                   - treatment_type:
