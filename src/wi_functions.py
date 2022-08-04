@@ -273,6 +273,18 @@ def get_conditions(factors, organism_name):
     """
     for i in range(len(factors)):
         if len(factors[i]['values']) == 1 and isinstance(factors[i]['values'][0], dict) and not ('value' in factors[i]['values'][0] and 'unit' in factors[i]['values'][0]):
+            for k in factors[i]['values'][0]:
+                if (isinstance(factors[i]['values'][0], list) and len(factors[i]['values'][0][k]) == 0) or factors[i]['values'][0][k] is None:
+                    factors[i]['values'][0].pop(k)
+            key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
+            node = list(utils.find_keys(key_yaml, factors[i]['factor']))
+            if len(node) > 0 and len(node[0]) > 5:
+                ident_key = node[0][5]
+            else:
+                ident_key = None
+            factors[i]['values'][0]['ident_key'] = ident_key
+            if factors[i]['values'][0]['multi'] and ident_key is None:
+                factors[i]['values'][0]['multi'] = False
             factors[i]['values'] = generate.get_combis(factors[i]['values'][0], factors[i]['factor'], factors[i]['values'][0]['multi'])
         if 'headers' in factors[i]:
             vals = []
