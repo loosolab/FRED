@@ -273,9 +273,12 @@ def get_conditions(factors, organism_name):
     """
     for i in range(len(factors)):
         if len(factors[i]['values']) == 1 and isinstance(factors[i]['values'][0], dict) and not ('value' in factors[i]['values'][0] and 'unit' in factors[i]['values'][0]):
+            empty_key = []
             for k in factors[i]['values'][0]:
-                if (isinstance(factors[i]['values'][0], list) and len(factors[i]['values'][0][k]) == 0) or factors[i]['values'][0][k] is None:
-                    factors[i]['values'][0].pop(k)
+                if (isinstance(factors[i]['values'][0][k], list) and len(factors[i]['values'][0][k]) == 0) or factors[i]['values'][0][k] is None:
+                    empty_key.append(k)
+            for key in empty_key:
+                factors[i]['values'][0].pop(key)
             key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
             node = list(utils.find_keys(key_yaml, factors[i]['factor']))
             if len(node) > 0 and len(node[0]) > 5:
