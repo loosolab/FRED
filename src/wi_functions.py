@@ -336,7 +336,7 @@ def get_conditions(factors, organism_name):
 def get_whitelist_object(item, organism_name, whitelists):
     if 'input_type' in item:
         input_type = item['input_type']
-        if input_type == 'select':
+        if input_type == 'select' or 'gene':
             whitelist = utils.get_whitelist(item['position'].split(':')[-1],
                                             {'organism': organism_name})
             if isinstance(whitelist, dict):
