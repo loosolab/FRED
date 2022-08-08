@@ -55,8 +55,8 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
             if input_type != 'group_select':
                 if isinstance(whitelist, dict):
                     input_type = 'dependable'
-            #if pre.split(':')[-1] == 'gene':
-            #    input_type = 'gene'
+            if pre.split(':')[-1] == 'gene':
+                input_type = 'gene'
             res = {'position': pre,
                    'mandatory': True if node[0] == 'mandatory' else False,
                    'list': node[1], 'displayName': node[2], 'desc': node[3],
@@ -391,15 +391,17 @@ def parse_part(wi_object, factors):
         input_fields = []
         for key in sub_keys:
             node = list(utils.find_keys(key_yaml, key))[0]
-            input_fields.append(parse_empty(node, wi_object['position'], key_yaml, False))
-
-        for i in range(len(factors)):
-            if 'header' in factors[i] and factors[i]['factor'] == wi_object['position'].split(':')[-1]:
-                for j in range(len(factors[i]['headers'].split(' '))):
-                    input_fields[factors[i]['headers'][j]]['value'] = wi_object['value'].split(' ')[j]
-
+            input_fields.append(parse_empty(node, f'{wi_object["position"]}:{key}', key_yaml, False))
+        for elem in factors:
+            for i in range(len(elem)):
+                if 'headers' in elem[i] and elem[i]['factor'] == wi_object['position'].split(':')[-1]:
+                    for j in range(len(elem[i]['headers'].split(' '))):
+                        for f in input_fields:
+                            if f['position'].split(':')[-1] == elem[i]['headers'].split(' ')[j]:
+                                f['value'] = wi_object['value'].split(' ')[j]
         new_samp['input_fields'] = input_fields
         wi_object = new_samp
+        print(wi_object)
 
     return_dict = {}
     if isinstance(wi_object, dict):
