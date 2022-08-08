@@ -55,7 +55,6 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
             if input_type != 'group_select':
                 if isinstance(whitelist, dict):
                     input_type = 'dependable'
-            print(pre)
             if pre.split(':')[-1] == 'gene':
                 input_type = 'gene'
             res = {'position': pre,
