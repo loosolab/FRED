@@ -723,6 +723,7 @@ def split_cond(condition):
             start = i+1
     if not sub:
         conditions.append((key, value))
+    print(conditions)
     return conditions
 
 
