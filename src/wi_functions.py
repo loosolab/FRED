@@ -401,7 +401,6 @@ def parse_part(wi_object, factors):
                                 f['value'] = wi_object['value'].split(' ')[j]
         new_samp['input_fields'] = input_fields
         wi_object = new_samp
-        print(wi_object)
 
     return_dict = {}
     if isinstance(wi_object, dict):
