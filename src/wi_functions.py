@@ -246,7 +246,7 @@ def get_samples(condition, sample):
                     sample[i]['value'] = int(value)
                     sample[i]['value_unit'] = unit
                 elif isinstance(c[1], dict):
-                   if sample[i]['input_type'] == 'gene':
+                   if 'input_type' in sample[i] and sample[i]['input_type'] == 'gene':
                        val = ""
                        for key in c[1]:
                            val = f'{val}{" " if val != "" else ""}{c[1][key]}'
