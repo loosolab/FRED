@@ -246,11 +246,12 @@ def get_samples(condition, sample):
                     sample[i]['value'] = int(value)
                     sample[i]['value_unit'] = unit
                 elif isinstance(c[1], dict):
-                   # TODO save gene
-                   if not 'input_fields' in sample[i]:
-                       pass
+                   if sample[i]['input_type'] == 'gene':
+                       val = ""
+                       for key in c[1]:
+                           val = f'{val}{" " if val != "" else ""}{c[1][key]}'
+                       sample[i]['value'] = val
                    else:
-                   # TODO: save disease as list in correct place
                         for j in range(len(sample[i]['input_fields'])):
                             for x in c[1]:
                                 if sample[i]['input_fields'][j]['position'].split(':')[-1] == x:
@@ -288,19 +289,17 @@ def get_conditions(factors, organism_name):
             else:
                 ident_key = None
             factors[i]['values'][0]['ident_key'] = ident_key
-            if factors[i]['values'][0]['multi'] and ident_key is None:
-                factors[i]['values'][0]['multi'] = False
-            factors[i]['values'] = generate.get_combis(factors[i]['values'][0], factors[i]['factor'], factors[i]['values'][0]['multi'])
+            if 'multi' in factors[i]['values'][0]:
+                if factors[i]['values'][0]['multi'] and ident_key is None:
+                    factors[i]['values'][0]['multi'] = False
+                factors[i]['values'] = generate.get_combis(factors[i]['values'][0], factors[i]['factor'], factors[i]['values'][0]['multi'])
         if 'headers' in factors[i]:
-            vals = []
             headers = factors[i]['headers'].split(' ')
-            print(headers)
             for j in range(len(factors[i]['values'])):
                 val = factors[i]['values'][j].split(' ')
-                print(val)
                 v = f'{factors[i]["factor"]}:{"{"}'
                 for k in range(len(headers)):
-                    v = (f'{v}{"|" if k > 0 else ""}{headers[k]}:{val[k]}')
+                    v = f'{v}{"|" if k > 0 else ""}{headers[k]}:"{val[k]}"'
                 v = f'{v}{"}"}'
                 factors[i]['values'][j] = v
     conditions = generate.get_condition_combinations(factors)
@@ -377,6 +376,29 @@ def parse_object(wi_object):
 
 
 def parse_part(wi_object, factors):
+    if 'input_type' in wi_object and wi_object['input_type'] == 'gene':
+        key_yaml = utils.read_in_yaml(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..',
+            'keys.yaml'))
+        sub_keys = list(utils.find_keys(key_yaml, wi_object['position'].split(':')[-1]))[0][4].keys()
+        new_samp = {'position': wi_object['position'],
+                    'mandatory': wi_object['mandatory'],
+                    'list': wi_object['list'],
+                    'title': wi_object['displayName'],
+                    'desc': wi_object['desc']}
+        input_fields = []
+        for key in sub_keys:
+            node = list(utils.find_keys(key_yaml, key))[0]
+            input_fields.append(parse_empty(node, wi_object['position'], key_yaml, False))
+
+        for i in range(len(factors)):
+            if 'header' in factors[i] and factors[i]['factor'] == wi_object['position'].split(':')[-1]:
+                for j in range(len(factors[i]['headers'].split(' '))):
+                    input_fields[factors[i]['headers'][j]]['value'] = wi_object['value'].split(' ')[j]
+
+        new_samp['input_fields'] = input_fields
+        wi_object = new_samp
+
     return_dict = {}
     if isinstance(wi_object, dict):
         if wi_object['list']:
@@ -392,7 +414,7 @@ def parse_part(wi_object, factors):
                 return parse_part(wi_object['input_fields'], factors)
             else:
                 if wi_object['value'] and wi_object[
-                    'input_type'] == 'value_unit':
+                        'input_type'] == 'value_unit':
                     unit = wi_object['value_unit']
                     value = wi_object['value']
                     return {'unit': unit, 'value': value}
@@ -444,7 +466,7 @@ def parse_part(wi_object, factors):
                         else:
                             for x in d['values']:
                                 if x not in res[all_factors[d['factor']]][
-                                    'values']:
+                                        'values']:
                                     res[all_factors[d['factor']]][
                                         'values'].append(x)
                 return_dict['experimental_factors'] = res
@@ -457,7 +479,7 @@ def parse_part(wi_object, factors):
                         not isinstance(value, list) and not isinstance(value,
                                                                        dict) and value is not None and value != ''):
                     if 'input_type' in wi_object[i] and wi_object[i][
-                        'input_type'] == 'date':
+                            'input_type'] == 'date':
                         default_time = parser.parse(wi_object[i]['value'])
                         timezone = pytz.timezone("Europe/Berlin")
                         local_time = default_time.astimezone(timezone)
