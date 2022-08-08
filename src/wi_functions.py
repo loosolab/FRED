@@ -240,7 +240,7 @@ def get_samples(condition, sample):
             if sample[i][
                 'position'] == f'experimental_setting:conditions:biological_' \
                                f'replicates:samples:{c[0]}':
-                if c[0] in ['age', 'time_point', 'duration']:
+                if c[0] in ['age', 'time_point', 'treatment_duration']:
                     unit = c[1].lstrip('0123456789')
                     value = c[1][:len(c[1]) - len(unit)]
                     sample[i]['value'] = int(value)
@@ -253,8 +253,10 @@ def get_samples(condition, sample):
                    # TODO: save disease as list in correct place
                         for j in range(len(sample[i]['input_fields'])):
                             for x in c[1]:
-                                if sample[i]['input_fields'][j]['position'].split(':') == x:
+                                if sample[i]['input_fields'][j]['position'].split(':')[-1] == x:
                                     sample[i]['input_fields'][j]['value'] = c[1][x]
+                        if sample[i]['list']:
+                            sample[i]['list_value'].append(sample[i]['input_fields'])
                 else:
                     sample[i]['value'] = c[1]
                 sample[i]['input_disabled'] = True
