@@ -462,6 +462,14 @@ def parse_part(wi_object, factors):
                 i = 0
                 for elem in factors:
                     for d in elem:
+                        for j in range(len(d['values'])):
+                            if isinstance(d['values'][j],dict):
+                                empty_keys = []
+                                for key in d['values'][j]:
+                                    if not isinstance(d['values'][j][key],list) or len(d['values'][j][key]) == 0:
+                                        empty_keys.append(key)
+                                for key in empty_keys:
+                                    d['values'][j].pop(key)
                         if not any(d['factor'] in y['factor'] for y in res):
                             res.append(d)
                             all_factors[d['factor']] = i
