@@ -647,13 +647,13 @@ def object_to_html(yaml_object, depth, margin, is_list):
 
 def get_color(depth):
     if depth < 1:
-        color = 'blue'
+        color = '26a69a'
     elif depth < 2:
-        color = 'purple'
+        color = '#d95965'
     elif depth < 3:
-        color = 'red'
+        color = '2fccbd'
     else:
-        color = 'orange'
+        color = 'fc6875'
     return color
 
 
