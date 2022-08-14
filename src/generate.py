@@ -155,17 +155,66 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                 options = parse_input_list(optionals, True)
                 if options:
                     for option in options:
+                        print(node[option])
+                        new_element = True
+                        if node[option][2]:
+                            if option in return_dict and all(isinstance(x, dict) for x in return_dict[option]):
+                                new_element = False
+                                key_yaml = utils.read_in_yaml('keys.yaml')
+                                possible_keys = list(list(utils.find_keys(key_yaml, option))[0][4].keys())
+                                elems = []
+                                desc = []
+                                for i in range(len(return_dict[option])):
+                                    if not all(k in return_dict[option][i] for k in possible_keys):
+                                        elems.append('\n'.join([f'{k}: {return_dict[option][i][k]}' for k in return_dict[option][i]]))
+                                        desc.append(f'Possible information to add: {", ".join([x for x in possible_keys if x not in return_dict[option][i]])}')
+                                if len(elems) > 0:
+                                    elems.append(f'Add new {option}')
+                                    desc.append('')
+                                    print(f'There are existing elements for {option}. Please select the elements for which you want to add information.')
+                                    print_option_list(elems, desc)
+                                    list_elems = parse_input_list(range(len(return_dict[option])+1), False)
+                                    for indc in list_elems:
+                                        if int(indc)-1 < len(return_dict[option]):
+                                            possible_input = [x for x in possible_keys if x not in list(return_dict[option][int(indc)-1].keys())]
+                                            if len(possible_input) > 1:
+                                                part_node = node[option]
+                                                remove_keys = []
+                                                for k in part_node[4]:
+                                                    if k not in possible_input:
+                                                        remove_keys.append(k)
+                                                for k in remove_keys:
+                                                    part_node[4].pop(k)
+                                                val = generate_part(part_node, option, {}, optional, mandatory_mode, result_dict, False)
+                                                return_dict[option][int(indc)-1] = merge_dicts(return_dict[option][int(indc)-1], val)
+                                            else:
+                                                part_node = list(utils.find_keys(key_yaml, possible_input[0]))[0]
+                                                val = get_redo_value(part_node, possible_input[0], optional, mandatory_mode, result_dict, False)
+                                                return_dict[option][int(indc)-1][possible_input[0]] = val
+                                        else:
+                                            new_element = True
+                                else:
+                                    new_element = True
 
-                        if len(node[option]) > 5 and isinstance(node[option][5],dict) and list(node[option][5].keys())[0] == 'merge':
-                            whitelist = utils.get_whitelist(option, result_dict)
-                            value = parse_input_value(option, node[option][3], True, 'str', result_dict)
-                            return value
-                        else:
-                            return_dict[option] = get_redo_value(node[option],
+                        if new_element:
+                            if len(node[option]) > 5 and isinstance(node[option][5],dict) and list(node[option][5].keys())[0] == 'merge':
+                                value = parse_input_value(option, node[option][3], True, 'str', result_dict)
+                                return value
+                            else:
+                                val = get_redo_value(node[option],
                                                              option,
                                                              optional,
                                                              mandatory_mode,
                                                              result_dict, False)
+                                print(val)
+                                if node[option][2]:
+                                    if option in return_dict:
+                                        return_dict[option] += val
+                                    else:
+                                        return_dict[option] = val
+                                else:
+                                    return_dict[option] = val
+                                print(return_dict)
     else:
         if node[0] == 'mandatory' or optional:
             value = enter_information(node, key, return_dict, optional,
@@ -175,12 +224,8 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
 
 
 def print_option_list(options, desc):
-    if desc:
-        data = [[f'{i+1}: {options[i]}', desc[i]] for i in range(len(options))]
-        print(tabulate(data, tablefmt='plain', maxcolwidths=[None, size.columns/2]))
-    else:
-        for i in range(len(options)):
-            print(f'{i + 1}: {options[i]}')
+    data = [[f'{i+1}:', f'{options[i]}', desc[i] if desc else ''] for i in range(len(options))]
+    print(tabulate(data, tablefmt='plain', maxcolwidths=[None, None, size.columns/2]))
 
 
 def parse_input_list(options, terminable):
@@ -328,13 +373,79 @@ def get_experimental_factors(node, result_dict):
                             u_values.append(f'{fac}:{values[i]}')
                     used_values = u_values
                 else:
+                    for value in values:
+                        if isinstance(fac_node[4][value][4],dict) and 'unit' in fac_node[4][value][4] and 'value' in fac_node[4][value][4]:
+                            used_values[value] = []
+                            print(f'\nPlease enter the unit for factor {fac}:')
+                            unit = parse_input_value('unit', '', True, 'str',
+                                                 result_dict)
+                            print(
+                                f'\nPlease enter int values for factor {fac} (in {unit}) '
+                                f'divided by comma:')
+                            values = parse_input_list('int', False)
+                            for val in values:
+                                used_values[value].append({'unit': unit, 'value': val})
+                        else:
+                            value_list = utils.get_whitelist(value, result_dict)
+                            if isinstance(value_list, dict):
+                                w = [x for xs in list(value_list.values()) for x in xs]
+                                if len(w) > 30:
+                                    redo = True
+                                    print(
+                                    f'\nPlease enter the values for '
+                                    f'{value}.')
+                                    while redo:
+                                        input_value = complete_input(w, value)
+                                        if input_value in value_list:
+                                            used_values[value] = input_value
+                                            redo = parse_list_choose_one([True, False],
+                                                         f'\nDo you want to add another {factor_value["factor"]}?')
+                                        else:
+                                            print(f'The value you entered does not match the '
+                                            f'whitelist. Try tab for autocomplete.')
+                                else:
+                                    print(
+                                        f'\nPlease select the values for '
+                                        f'{value} (1-{len(w)}) divided by '
+                                        f'comma:\n')
+                                    i = 1
+                                    for w_key in value_list:
+                                        print(f'\033[1m{w_key}\033[0m')
+                                        for val in value_list[w_key]:
+                                            print(f'{i}: {val}')
+                                            i += 1
+                                    used_values[value] = parse_input_list(w, False)
+                            elif len(value_list) > 30:
+                                redo = True
+                                print(
+                                    f'\nPlease enter the values for '
+                                    f'{value}.')
+                                while redo:
+                                    input_value = complete_input(value_list, factor_value["factor"])
+                                    if input_value in value_list:
+                                        used_values[value] = input_value
+                                        redo = parse_list_choose_one([True, False],
+                                             f'\nDo you want to add another {value}?')
+                                    else:
+                                        print(f'The value you entered does not match the '
+                                        f'whitelist. Try tab for autocomplete.')
+                            else:
+                                print(
+                                    f'\nPlease select the values for '
+                                    f'{value} (1-{len(value_list)}) divided by '
+                                    f'comma:\n')
+                                print_option_list(value_list, False)
+                                used_values[value] = parse_input_list(value_list, False)
+                        if len(fac_node) == 6:
+                            used_values['ident_key'] = fac_node[5]
+
                     if len(options) > 0:
                         print(
-                            f'\nPlease enter what information you want to add for '
-                            f'{fac} (1,...,{len(options)}).')
+                            f'\nDo you want to add any of the following optional keys '
+                            f'(1,...,{len(options)} or n)?')
                         print_option_list(options, fac_node[3])
-                        values += parse_input_list(options, False)
-                    for value in values:
+                        val = parse_input_list(options, True)
+                    for value in val:
                         if isinstance(fac_node[4][value][4],dict) and 'unit' in fac_node[4][value][4] and 'value' in fac_node[4][value][4]:
                             used_values[value] = []
                             print(f'\nPlease enter the unit for factor {fac}:')
@@ -470,16 +581,20 @@ def get_experimental_factors(node, result_dict):
 
 
 def get_combinations(values, key, key_name):
-    if 'ident_key' in values and values['ident_key'] in values and len(values[values['ident_key']])>1:
-        multi = parse_list_choose_one([True, False], f'\nCan one sample contain multiple {key_name}s?')
+    if 'ident_key' in values:
+        if values['ident_key'] in values and len(values[values['ident_key']])>1:
+            multi = parse_list_choose_one([True, False], f'\nCan one sample contain multiple {key_name}s?')
+        else:
+            multi = False
+            values.pop('ident_key')
     else:
         multi = False
-    disease_values = get_combis(values, key, multi)
+    merge_values = get_combis(values, key, multi)
     print(
         f'\nPlease select the analyzed combinations for {key} '
-        f'(1-{len(disease_values)}) divided by comma:\n')
-    print_option_list(disease_values, False)
-    used_values = parse_input_list(disease_values, False)
+        f'(1-{len(merge_values)}) divided by comma:\n')
+    print_option_list(merge_values, False)
+    used_values = parse_input_list(merge_values, False)
     return used_values
 
 
@@ -543,7 +658,11 @@ def get_combis(values, key, multi):
 
 
 def get_conditions(factors, node, mandatory_mode, result_dict):
+    combi = True
     combinations = get_condition_combinations(factors)
+    if len(factors) == 1 and combinations == factors[0]['values']:
+        combi = False
+        used_combinations = combinations
     for fac in factors:
         if fac['factor'] in ['disease', 'treatment', 'gene']:
             vals = []
@@ -561,11 +680,14 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
             for i in range(len(result_dict['experimental_factors'])):
                 if result_dict['experimental_factors'][i]['factor'] == fac['factor']:
                     result_dict['experimental_factors'][i]['values'] = vals
-    print(
-        f'\nPlease select the analyzed combinations of experimental factors '
-        f'(1-{len(combinations)}) divided by comma:\n')
-    print_option_list(combinations, False)
-    used_combinations = parse_input_list(combinations, False)
+
+    if combi:
+        print(
+            f'\nPlease select the analyzed combinations of experimental factors '
+            f'(1-{len(combinations)}) divided by comma:\n')
+        print_option_list(combinations, False)
+        used_combinations = parse_input_list(combinations, False)
+
     conditions = get_replicate_count(used_combinations, node, mandatory_mode,
                                      result_dict)
     return conditions
@@ -642,7 +764,7 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                     samples[cond[0]] = cond[1]
 
         samples = merge_dicts(samples, generate_part(node[type][4]['samples'][4],
-                                            'samples', {},
+                                            'samples', samples,
                                             False, mandatory_mode,
                                             result_dict, False))
         if not 'number_of_measurements' in samples:
@@ -731,7 +853,9 @@ def merge_dicts(a, b):
         res = []
         for i in range(len(a)):
             res.append(merge_dicts(a[i], b[i]))
-    else:
+    elif isinstance(a, dict):
+        print(a)
+        print(b)
         b_keys = list(b.keys())
         res = {}
         for key in a.keys():
@@ -742,6 +866,8 @@ def merge_dicts(a, b):
                 res[key] = a[key]
         for key in b_keys:
             res[key] = b[key]
+    else:
+        res = a
     return res
 
 
