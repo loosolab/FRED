@@ -6,6 +6,7 @@ import datetime
 import os
 import readline
 import re
+import copy
 
 try:
     size = os.get_terminal_size()
@@ -155,7 +156,6 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                 options = parse_input_list(optionals, True)
                 if options:
                     for option in options:
-                        print(node[option])
                         new_element = True
                         if node[option][2]:
                             if option in return_dict and all(isinstance(x, dict) for x in return_dict[option]):
@@ -171,14 +171,19 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                 if len(elems) > 0:
                                     elems.append(f'Add new {option}')
                                     desc.append('')
-                                    print(f'There are existing elements for {option}. Please select the elements for which you want to add information.')
+                                    print(f'\nThere are existing elements for {option}. Please select the elements for which you want to add information.\n')
                                     print_option_list(elems, desc)
                                     list_elems = parse_input_list(range(len(return_dict[option])+1), False)
                                     for indc in list_elems:
                                         if int(indc)-1 < len(return_dict[option]):
+                                            caption = elems[int(indc)-1].replace("\n", ", ")
+                                            print(f'\n'
+                                                  f'{"".center(size.columns, "_")}\n\n'
+                                                  f'{f"List element: {caption}".center(size.columns, " ")}\n'
+                                                  f'{"".center(size.columns, "_")}\n')
                                             possible_input = [x for x in possible_keys if x not in list(return_dict[option][int(indc)-1].keys())]
                                             if len(possible_input) > 1:
-                                                part_node = node[option]
+                                                part_node = copy.deepcopy(node[option])
                                                 remove_keys = []
                                                 for k in part_node[4]:
                                                     if k not in possible_input:
@@ -192,6 +197,10 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                                 val = get_redo_value(part_node, possible_input[0], optional, mandatory_mode, result_dict, False)
                                                 return_dict[option][int(indc)-1][possible_input[0]] = val
                                         else:
+                                            print(f'\n'
+                                                  f'{"".center(size.columns, "_")}\n\n'
+                                                  f'{f"New {option}".center(size.columns, " ")}\n'
+                                                  f'{"".center(size.columns, "_")}\n')
                                             new_element = True
                                 else:
                                     new_element = True
@@ -201,12 +210,12 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                 value = parse_input_value(option, node[option][3], True, 'str', result_dict)
                                 return value
                             else:
+                                print(node[option])
                                 val = get_redo_value(node[option],
                                                              option,
                                                              optional,
                                                              mandatory_mode,
                                                              result_dict, False)
-                                print(val)
                                 if node[option][2]:
                                     if option in return_dict:
                                         return_dict[option] += val
@@ -214,7 +223,6 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                         return_dict[option] = val
                                 else:
                                     return_dict[option] = val
-                                print(return_dict)
     else:
         if node[0] == 'mandatory' or optional:
             value = enter_information(node, key, return_dict, optional,
@@ -225,7 +233,7 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
 
 def print_option_list(options, desc):
     data = [[f'{i+1}:', f'{options[i]}', desc[i] if desc else ''] for i in range(len(options))]
-    print(tabulate(data, tablefmt='plain', maxcolwidths=[None, None, size.columns/2]))
+    print(tabulate(data, tablefmt='plain', maxcolwidths=[size.columns*1/8, size.columns*2/8, size.columns*5/8]))
 
 
 def parse_input_list(options, terminable):
@@ -445,71 +453,72 @@ def get_experimental_factors(node, result_dict):
                             f'(1,...,{len(options)} or n)?')
                         print_option_list(options, fac_node[3])
                         val = parse_input_list(options, True)
-                    for value in val:
-                        if isinstance(fac_node[4][value][4],dict) and 'unit' in fac_node[4][value][4] and 'value' in fac_node[4][value][4]:
-                            used_values[value] = []
-                            print(f'\nPlease enter the unit for factor {fac}:')
-                            unit = parse_input_value('unit', '', True, 'str',
-                                                 result_dict)
-                            print(
-                                f'\nPlease enter int values for factor {fac} (in {unit}) '
-                                f'divided by comma:')
-                            values = parse_input_list('int', False)
-                            for val in values:
-                                used_values[value].append({'unit': unit, 'value': val})
-                        else:
-                            value_list = utils.get_whitelist(value, result_dict)
-                            if isinstance(value_list, dict):
-                                w = [x for xs in list(value_list.values()) for x in xs]
-                                if len(w) > 30:
-                                    redo = True
+                        if val:
+                            for value in val:
+                                if isinstance(fac_node[4][value][4],dict) and 'unit' in fac_node[4][value][4] and 'value' in fac_node[4][value][4]:
+                                    used_values[value] = []
+                                    print(f'\nPlease enter the unit for factor {fac}:')
+                                    unit = parse_input_value('unit', '', True, 'str',
+                                                         result_dict)
                                     print(
-                                    f'\nPlease enter the values for '
-                                    f'{value}.')
-                                    while redo:
-                                        input_value = complete_input(w, value)
-                                        if input_value in value_list:
-                                            used_values[value] = input_value
-                                            redo = parse_list_choose_one([True, False],
-                                                         f'\nDo you want to add another {factor_value["factor"]}?')
-                                        else:
-                                            print(f'The value you entered does not match the '
-                                            f'whitelist. Try tab for autocomplete.')
+                                        f'\nPlease enter int values for factor {fac} (in {unit}) '
+                                        f'divided by comma:')
+                                    values = parse_input_list('int', False)
+                                    for val in values:
+                                        used_values[value].append({'unit': unit, 'value': val})
                                 else:
-                                    print(
-                                        f'\nPlease select the values for '
-                                        f'{value} (1-{len(w)}) divided by '
-                                        f'comma:\n')
-                                    i = 1
-                                    for w_key in value_list:
-                                        print(f'\033[1m{w_key}\033[0m')
-                                        for val in value_list[w_key]:
-                                            print(f'{i}: {val}')
-                                            i += 1
-                                    used_values[value] = parse_input_list(w, False)
-                            elif len(value_list) > 30:
-                                redo = True
-                                print(
-                                    f'\nPlease enter the values for '
-                                    f'{value}.')
-                                while redo:
-                                    input_value = complete_input(value_list, factor_value["factor"])
-                                    if input_value in value_list:
-                                        used_values[value] = input_value
-                                        redo = parse_list_choose_one([True, False],
-                                             f'\nDo you want to add another {value}?')
+                                    value_list = utils.get_whitelist(value, result_dict)
+                                    if isinstance(value_list, dict):
+                                        w = [x for xs in list(value_list.values()) for x in xs]
+                                        if len(w) > 30:
+                                            redo = True
+                                            print(
+                                            f'\nPlease enter the values for '
+                                            f'{value}.')
+                                            while redo:
+                                                input_value = complete_input(w, value)
+                                                if input_value in value_list:
+                                                    used_values[value] = input_value
+                                                    redo = parse_list_choose_one([True, False],
+                                                                 f'\nDo you want to add another {factor_value["factor"]}?')
+                                                else:
+                                                    print(f'The value you entered does not match the '
+                                                    f'whitelist. Try tab for autocomplete.')
+                                        else:
+                                            print(
+                                                f'\nPlease select the values for '
+                                                f'{value} (1-{len(w)}) divided by '
+                                                f'comma:\n')
+                                            i = 1
+                                            for w_key in value_list:
+                                                print(f'\033[1m{w_key}\033[0m')
+                                                for val in value_list[w_key]:
+                                                    print(f'{i}: {val}')
+                                                    i += 1
+                                            used_values[value] = parse_input_list(w, False)
+                                    elif len(value_list) > 30:
+                                        redo = True
+                                        print(
+                                            f'\nPlease enter the values for '
+                                            f'{value}.')
+                                        while redo:
+                                            input_value = complete_input(value_list, factor_value["factor"])
+                                            if input_value in value_list:
+                                                used_values[value] = input_value
+                                                redo = parse_list_choose_one([True, False],
+                                                     f'\nDo you want to add another {value}?')
+                                            else:
+                                                print(f'The value you entered does not match the '
+                                                f'whitelist. Try tab for autocomplete.')
                                     else:
-                                        print(f'The value you entered does not match the '
-                                        f'whitelist. Try tab for autocomplete.')
-                            else:
-                                print(
-                                    f'\nPlease select the values for '
-                                    f'{value} (1-{len(value_list)}) divided by '
-                                    f'comma:\n')
-                                print_option_list(value_list, False)
-                                used_values[value] = parse_input_list(value_list, False)
-                        if len(fac_node) == 6:
-                            used_values['ident_key'] = fac_node[5]
+                                        print(
+                                            f'\nPlease select the values for '
+                                            f'{value} (1-{len(value_list)}) divided by '
+                                            f'comma:\n')
+                                        print_option_list(value_list, False)
+                                        used_values[value] = parse_input_list(value_list, False)
+                                if len(fac_node) == 6:
+                                    used_values['ident_key'] = fac_node[5]
         elif fac_node[5]:
             value_list = utils.get_whitelist(fac, result_dict)
             used_values = []
@@ -728,6 +737,9 @@ def get_replicates(condition, bio, input_pooled, node, mandatory_mode,
 def fill_replicates(type, condition, start, end, input_pooled, node,
                     mandatory_mode, result_dict):
     conditions = split_cond(condition)
+    organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'), result_dict)
+    if result_dict['organism'] in organism:
+        organism = organism[result_dict['organism']]
     replicates = {'count': end - start, 'samples': []}
     for i in range(start, end):
         samples = {}
@@ -769,14 +781,14 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                                             result_dict, False))
         if not 'number_of_measurements' in samples:
             samples['number_of_measurements'] = 1
-        samples['technical_replicates'] = get_technical_replicates(short_name, samples['number_of_measurements'])
+        samples['technical_replicates'] = get_technical_replicates(short_name, organism, samples['number_of_measurements'])
         replicates['samples'].append(samples)
     return replicates
 
 
 def get_short_name(condition, result_dict):
     conds = split_cond(condition)
-    whitelist = utils.read_whitelist(os.path.join('abbrev','factor'))
+    whitelist = utils.get_whitelist(os.path.join('abbrev', 'factor'), result_dict)
     short_cond = []
     for c in conds:
         if whitelist and c[0] in whitelist:
@@ -784,7 +796,7 @@ def get_short_name(condition, result_dict):
         else:
             k = c[0]
         if isinstance(c[1], dict):
-            cond_whitelist = utils.read_whitelist(os.path.join('abbrev', c[0]))
+            cond_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]), result_dict)
             new_vals = {}
             for v in c[1]:
                 if cond_whitelist and v in cond_whitelist:
@@ -796,7 +808,7 @@ def get_short_name(condition, result_dict):
             val = '+'.join([f'{x}.{new_vals[x].replace(" ", "")}' for x in list(new_vals.keys())])
             short_cond.append(f'{k}#{val}')
         else:
-            val_whitelist = utils.read_whitelist(os.path.join('abbrev', c[0]))
+            val_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]), result_dict)
             if val_whitelist and c[1].lower() in val_whitelist:
                 short_cond.append(f'{k}.{val_whitelist[c[1].lower()]}')
             else:
@@ -854,8 +866,6 @@ def merge_dicts(a, b):
         for i in range(len(a)):
             res.append(merge_dicts(a[i], b[i]))
     elif isinstance(a, dict):
-        print(a)
-        print(b)
         b_keys = list(b.keys())
         res = {}
         for key in a.keys():
@@ -871,7 +881,7 @@ def merge_dicts(a, b):
     return res
 
 
-def get_technical_replicates(sample_name, nom):
+def get_technical_replicates(sample_name, organism, nom):
     print(f'\nPlease enter the number of technical replicates:')
     count = parse_input_value('count', '', False, 'int', [])
     while count < 1:
@@ -880,7 +890,7 @@ def get_technical_replicates(sample_name, nom):
     samples = []
     for i in range(count):
         for j in range(nom):
-            samples.append(f'{id}_{sample_name}_t{"{:02d}".format(i+1)}_m{"{:02d}".format(j+1)}')
+            samples.append(f'{id}_{organism}_{sample_name}_t{"{:02d}".format(i+1)}_m{"{:02d}".format(j+1)}')
     return {'count': count, 'sample_name': samples}
 
 
