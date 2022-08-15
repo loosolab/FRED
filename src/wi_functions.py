@@ -254,15 +254,25 @@ def get_samples(condition, sample):
                            val = f'{val}{" " if val != "" else ""}{c[1][key]}'
                        sample[i]['value'] = val
                    else:
-                        for j in range(len(sample[i]['input_fields'])):
-                            for x in c[1]:
-                                if sample[i]['input_fields'][j]['position'].split(':')[-1] == x:
-                                    sample[i]['input_fields'][j]['value'] = c[1][x]
                         if sample[i]['list']:
-                            sample[i]['list_value'].append(sample[i]['input_fields'])
+                            sample[i]['list_value'].append(copy.deepcopy(sample[i]['input_fields']))
+                            for j in range(len(sample[i]['list_value'])):
+                                for k in range(len(sample[i]['list_value'][j])):
+                                    for x in c[1]:
+                                        if sample[i]['list_value'][j][k]['position'].split(':')[-1] == x:
+                                            sample[i]['list_value'][j][k]['value'] = c[1][x]
+                                            sample[i]['list_value'][j][k]['input_disabled'] = True
+                        else:
+                            for j in range(len(sample[i]['input_fields'])):
+                                for x in c[1]:
+                                    if sample[i]['input_fields'][j]['position'].split(':')[-1] == x:
+                                        sample[i]['input_fields'][j]['value'] = c[1][x]
+
+
                 else:
                     sample[i]['value'] = c[1]
-                sample[i]['input_disabled'] = True
+                if not sample[i]['list']:
+                    sample[i]['input_disabled'] = True
     return sample
 
 
