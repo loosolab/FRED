@@ -201,7 +201,9 @@ def get_whitelist(key, filled_object):
         for key in whitelist:
             if whitelist[key] is not None:
                 whitelist[key] = sorted(whitelist[key])
-    elif whitelist and not stay_depend and not plain and not abbrev:
+    elif plain:
+        whitelist = whitelist['whitelist']
+    elif whitelist and not stay_depend and not abbrev:
         whitelist = sorted(whitelist)
     return whitelist
 

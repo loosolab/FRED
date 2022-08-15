@@ -1,3 +1,5 @@
-not treated
-currently treated
-formerly treated
+whitelist_type: plain
+whitelist:
+    - not treated
+    - currently treated
+    - formerly treated

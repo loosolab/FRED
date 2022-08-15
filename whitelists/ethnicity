@@ -1,2 +1,4 @@
-caucasian
-asian
+whitelist_type: plain
+whitelist:
+    - caucasian
+    - asian

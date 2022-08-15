@@ -1,3 +1,5 @@
-male
-female
-mixed
+whitelist_type: plain
+whitelist:
+    - male
+    - female
+    - mixed

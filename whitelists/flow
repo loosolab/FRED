@@ -1,3 +1,5 @@
-low
-mid
-high
+whitelist_type: plain
+whitelist:
+    - low
+    - mid
+    - high

@@ -1,10 +1,12 @@
-human_9606
-mouse_10090
-zebrafish_7955
-rat_10114
-pig_9823
-medaka_8090
-chicken_9031
-drosophila_7215
-yeast_4932
+whitelist_type: plain
+whitelist:
+    - human_9606
+    - mouse_10090
+    - zebrafish_7955
+    - rat_10114
+    - pig_9823
+    - medaka_8090
+    - chicken_9031
+    - drosophila_7215
+    - yeast_4932
 

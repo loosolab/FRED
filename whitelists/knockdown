@@ -1,3 +1,5 @@
-WT
-siRNA
-morpholino
+whitelist_type: plain
+whitelist:
+    - WT
+    - siRNA
+    - morpholino

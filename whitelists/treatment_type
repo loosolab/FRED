@@ -1,6 +1,8 @@
-Placebo
-Medication
-Puromycin
-Gemcitabine
+whitelist_type: plain
+whitelist:
+    - Placebo
+    - Medication
+    - Puromycin
+    - Gemcitabine
 
 

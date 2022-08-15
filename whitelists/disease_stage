@@ -1,3 +1,5 @@
-early
-mid
-late
+whitelist_type: plain
+whitelist:
+    - early
+    - mid
+    - late

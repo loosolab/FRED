@@ -1,27 +1,29 @@
-lung
-liver
-heart
-brain
-skeletal muscle
-smooth muscle
-adrenal gland
-esophagus
-tongue
-intestine
-pancreas
-kidney
-retina
-eye
-testis
-prostate
-adipose tissue
-cervix
-ovary
-skin
-breast
-bladder
-stomach
-salivary gland
-placenta
-gallbladder
+whitelist_type: plain
+whitelist:
+    - lung
+    - liver
+    - heart
+    - brain
+    - skeletal muscle
+    - smooth muscle
+    - adrenal gland
+    - esophagus
+    - tongue
+    - intestine
+    - pancreas
+    - kidney
+    - retina
+    - eye
+    - testis
+    - prostate
+    - adipose tissue
+    - cervix
+    - ovary
+    - skin
+    - breast
+    - bladder
+    - stomach
+    - salivary gland
+    - placenta
+    - gallbladder
 

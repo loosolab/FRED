@@ -1,4 +1,6 @@
-healthy
-ill
-recovered
+whitelist_type: plain
+whitelist:
+    - healthy
+    - ill
+    - recovered
 

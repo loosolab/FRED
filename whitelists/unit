@@ -1,11 +1,13 @@
-seconds
-minutes
-hours
-days
-weeks
-years
-ml
-l
-nl
-mol
+whitelist_type: plain
+whitelist:
+    - seconds
+    - minutes
+    - hours
+    - days
+    - weeks
+    - years
+    - ml
+    - l
+    - nl
+    - mol
 
