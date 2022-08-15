@@ -1,0 +1,10 @@
+whitelist_type: abbrev
+human_9606: hum
+mouse_10090: mouse
+zebrafish_7955: zbrf
+rat_10114: rat
+pig_9823: pig
+medaka_8090: mdka
+chicken_9031: chick
+drosophila_7215: drsph
+yeast_4932: yeast
