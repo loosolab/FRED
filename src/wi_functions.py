@@ -260,13 +260,32 @@ def get_samples(condition, sample):
                                 for k in range(len(sample[i]['list_value'][j])):
                                     for x in c[1]:
                                         if sample[i]['list_value'][j][k]['position'].split(':')[-1] == x:
-                                            sample[i]['list_value'][j][k]['value'] = c[1][x]
+                                            if x in ['age', 'time_point',
+                                                     'treatment_duration']:
+                                                unit = c[1][x].lstrip(
+                                                    '0123456789')
+                                                value = c[1][x][
+                                                        :len(c[1][x]) - len(unit)]
+                                                sample[i]['list_value'][j][k]['value'] = int(value)
+                                                sample[i]['list_value'][j][k]['value_unit'] = unit
+                                            else:
+                                                sample[i]['list_value'][j][k]['value'] = c[1][x]
                                             sample[i]['list_value'][j][k]['input_disabled'] = True
                         else:
                             for j in range(len(sample[i]['input_fields'])):
                                 for x in c[1]:
                                     if sample[i]['input_fields'][j]['position'].split(':')[-1] == x:
-                                        sample[i]['input_fields'][j]['value'] = c[1][x]
+                                        if x in ['age', 'time_point',
+                                                 'treatment_duration']:
+                                            unit = c[1][x].lstrip(
+                                                '0123456789')
+                                            value = c[1][x][
+                                                    :len(c[1][x]) - len(unit)]
+                                            sample[i]['input_fields'][j]['value'] = int(value)
+                                            sample[i]['input_fields'][j][
+                                                'value_unit'] = unit
+                                        else:
+                                            sample[i]['input_fields'][j]['value'] = c[1][x]
 
 
                 else:
