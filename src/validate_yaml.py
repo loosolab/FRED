@@ -154,6 +154,8 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
 
 def new_test_for_whitelist(entry_key, entry_value, sublists):
     whitelist = utils.read_whitelist(entry_key)
+    if whitelist and whitelist['whitelist_type'] == 'plain':
+        whitelist = whitelist['whitelist']
     if isinstance(whitelist, dict):
         while isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'depend':
@@ -173,6 +175,8 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
                 whitelist = whitelist[value[0]]
             else:
                 whitelist = utils.read_whitelist(value[0])
+                if whitelist and whitelist['whitelist_type'] == 'plain':
+                    whitelist = whitelist['whitelist']
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
             whitelist = utils.read_grouped_whitelist(whitelist)
@@ -183,6 +187,8 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
             os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists',
             whitelist)):
         whitelist = utils.read_whitelist(whitelist)
+        if whitelist and whitelist['whitelist_type'] == 'plain':
+            whitelist = whitelist['whitelist']
     if whitelist and entry_value not in whitelist:
         return True
     return False
