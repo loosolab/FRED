@@ -132,7 +132,7 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                 optional = False
                 if item == 'conditions':
                     return_dict[item] = get_conditions(
-                        return_dict['experimental_factors'], node[item][4],
+                        copy.deepcopy(return_dict['experimental_factors']), node[item][4],
                         mandatory_mode, return_dict)
                 elif item == 'experimental_factors':
                     return_dict[item] = get_experimental_factors(node,
@@ -592,9 +592,6 @@ def get_experimental_factors(node, result_dict):
                 f' factor {factor_value["factor"]} divided by comma:\n')
             used_values = parse_input_list(value_type, False)
 
-        if isinstance(used_values, dict):
-            used_values = get_combinations(used_values, fac, fac_node[2])
-
         factor_value['values'] = used_values
         experimental_factors.append(factor_value)
 
@@ -681,6 +678,11 @@ def get_combis(values, key, multi):
 
 
 def get_conditions(factors, node, mandatory_mode, result_dict):
+    for i in range(len(factors)):
+        if isinstance(factors[i]['values'], dict):
+            factors[i]['values'] = get_combinations(factors[i]['values'], factors[i]['factor'], factors[i]['factor'])
+            if 'ident_key' in result_dict['experimental_factors'][i]['values']:
+                result_dict['experimental_factors'][i]['values'].pop('ident_key')
     combi = True
     combinations = get_condition_combinations(factors)
     if len(factors) == 1 and combinations == factors[0]['values']:
@@ -700,9 +702,6 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
                         unit = elem[key].lstrip('0123456789')
                         value = elem[key][:len(elem[key]) - len(unit)]
                         elem[key] = {'unit': unit, 'value': int(value)}
-            for i in range(len(result_dict['experimental_factors'])):
-                if result_dict['experimental_factors'][i]['factor'] == fac['factor']:
-                    result_dict['experimental_factors'][i]['values'] = vals
 
     if combi:
         print(
