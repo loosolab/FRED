@@ -196,10 +196,25 @@ experimental_setting:
       - False
       - 'Organism'
       - 'The organism identifier is composed of the organism name and the Taxonomy ID.'
-      - null
-      - True
-      - select
-      - str
+      - organism_name:
+          - 'mandatory'
+          - False
+          - 'Organism Name'
+          - ''
+          - null
+          - True
+          - select
+          - str
+        taxonomy_id:
+          - 'mandatory'
+          - False
+          - 'Taxonomy ID'
+          - ''
+          - null
+          - True
+          - select
+          - str
+      - merge: organism_name
     experimental_factors:
       - 'mandatory'
       - True

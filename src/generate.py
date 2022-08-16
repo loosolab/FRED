@@ -225,7 +225,13 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                     return_dict[option] = val
     else:
         if node[0] == 'mandatory' or optional:
-            value = enter_information(node, key, return_dict, optional,
+            if len(node) > 5 and isinstance(node[5], dict) and \
+                    list(node[5].keys())[0] == 'merge':
+                value = parse_input_value(key, node[3], True, 'str',
+                                          result_dict)
+                value = value[key]
+            else:
+                value = enter_information(node, key, return_dict, optional,
                                       mandatory_mode, result_dict, first_node)
             return value
     return return_dict
@@ -282,6 +288,8 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict, first_node
 
 def get_experimental_factors(node, result_dict):
     factor_list = utils.get_whitelist('factor', result_dict)
+    if factor_list and 'whitelist_type' in factor_list and factor_list['whitelist_type'] == 'plain':
+        factor_list = factor_list['whitelist']
     print(
         f'\nPlease select the analyzed experimental factors '
         f'(1-{len(factor_list)}) divided by comma:\n')
@@ -395,6 +403,8 @@ def get_experimental_factors(node, result_dict):
                                 used_values[value].append({'unit': unit, 'value': val})
                         else:
                             value_list = utils.get_whitelist(value, result_dict)
+                            if value_list and 'whitelist_type' in value_list and value_list['whitelist_type'] == 'plain':
+                                value_list = value_list['whitelist']
                             if isinstance(value_list, dict):
                                 w = [x for xs in list(value_list.values()) for x in xs]
                                 if len(w) > 30:
@@ -468,6 +478,8 @@ def get_experimental_factors(node, result_dict):
                                         used_values[value].append({'unit': unit, 'value': val})
                                 else:
                                     value_list = utils.get_whitelist(value, result_dict)
+                                    if value_list and 'whitelist_type' in value_list and value_list['whitelist_type'] == 'plain':
+                                        value_list = value_list['whitelist']
                                     if isinstance(value_list, dict):
                                         w = [x for xs in list(value_list.values()) for x in xs]
                                         if len(w) > 30:
@@ -521,6 +533,8 @@ def get_experimental_factors(node, result_dict):
                                     used_values['ident_key'] = fac_node[5]
         elif fac_node[5]:
             value_list = utils.get_whitelist(fac, result_dict)
+            if value_list and 'whitelist_type' in value_list and value_list['whitelist_type'] == 'plain':
+                value_list = value_list['whitelist']
             used_values = []
             if isinstance(value_list, dict):
                 w = [x for xs in list(value_list.values()) for x in xs]
@@ -738,8 +752,10 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                     mandatory_mode, result_dict):
     conditions = split_cond(condition)
     organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'), result_dict)
-    if result_dict['organism'] in organism:
-        organism = organism[result_dict['organism']]
+    if organism and 'whitelist_type' in organism and organism['whitelist_type'] == 'plain':
+        organism = organism['whitelist']
+    if organism and result_dict['organism']['organism_name'] in organism:
+        organism = organism[result_dict['organism']['organism_name']]
     replicates = {'count': end - start, 'samples': []}
     for i in range(start, end):
         samples = {}
@@ -789,6 +805,8 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
 def get_short_name(condition, result_dict):
     conds = split_cond(condition)
     whitelist = utils.get_whitelist(os.path.join('abbrev', 'factor'), result_dict)
+    if whitelist and 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'plain':
+        whitelist = whitelist['whitelist']
     short_cond = []
     for c in conds:
         if whitelist and c[0] in whitelist:
@@ -797,10 +815,14 @@ def get_short_name(condition, result_dict):
             k = c[0]
         if isinstance(c[1], dict):
             cond_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]), result_dict)
+            if cond_whitelist and 'whitelist_type' in cond_whitelist and cond_whitelist['whitelist_type'] == 'plain':
+                cond_whitelist = cond_whitelist['whitelist']
             new_vals = {}
             for v in c[1]:
                 if cond_whitelist and v in cond_whitelist:
                     val_whitelist = utils.get_whitelist(os.path.join('abbrev', v), result_dict)
+                    if val_whitelist and 'whitelist_type' in val_whitelist and val_whitelist['whitelist_type'] == 'plain':
+                        val_whitelist = val_whitelist['whitelist']
                     if val_whitelist and c[1][v].lower() in val_whitelist:
                         new_vals[cond_whitelist[v]] = val_whitelist[c[1][v].lower()]
                     else:
@@ -809,6 +831,8 @@ def get_short_name(condition, result_dict):
             short_cond.append(f'{k}#{val}')
         else:
             val_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]), result_dict)
+            if val_whitelist and 'whitelist_type' in val_whitelist and val_whitelist['whitelist_type'] == 'plain':
+                val_whitelist = val_whitelist['whitelist']
             if val_whitelist and c[1].lower() in val_whitelist:
                 short_cond.append(f'{k}.{val_whitelist[c[1].lower()]}')
             else:
@@ -959,11 +983,11 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
     if whitelist:
         whites = utils.get_whitelist(key, result_dict)
         whites2 = whites
-        if isinstance(whites, dict) and 'whitelist' in whites:
+        if whites and 'whitelist_type' in whites and whites['whitelist_type'] == 'plain':
             whites2 = whites['whitelist']
     if whites2:
-        if isinstance(whites, dict):
-            w = [x for xs in list(whites.values()) for x in xs]
+        if isinstance(whites2, dict):
+            w = [x for xs in list(whites2.values()) if xs is not None for x in xs]
             if len(w) > 30:
                 input_value = complete_input(w, key)
                 if input_value not in w:
@@ -971,16 +995,16 @@ def parse_input_value(key, desc, whitelist, value_type, result_dict):
                           f'whitelist. Try tab for autocomplete.')
                     input_value = parse_input_value(key, desc, whitelist, value_type, result_dict)
             else:
-                input_value = parse_group_choose_one(whites, w, f'{key}:')
-        elif len(whites) > 30:
-            input_value = complete_input(whites, key)
-            if input_value not in whites:
+                input_value = parse_group_choose_one(whites2, w, f'{key}:')
+        elif len(whites2) > 30:
+            input_value = complete_input(whites2, key)
+            if input_value not in whites2:
                 print(f'The value you entered does not match the '
                       f'whitelist. Try tab for autocomplete.')
                 input_value = parse_input_value(key, desc, whitelist, value_type,
                                   result_dict)
-        elif len(whites) > 0:
-            input_value = parse_list_choose_one(whites, f'{key}:')
+        elif len(whites2) > 0:
+            input_value = parse_list_choose_one(whites2, f'{key}:')
         if 'headers' in whites:
             headers = whites['headers'].split(' ')
             vals = input_value.split(' ')
@@ -1058,10 +1082,11 @@ def parse_group_choose_one(whitelist, w, header):
         print(f'{header}\n')
         i = 1
         for key in whitelist:
-            print(f'\033[1m{key}\033[0m')
-            for value in whitelist[key]:
-                print(f'{i}: {value}')
-                i += 1
+            if whitelist[key] is not None:
+                print(f'\033[1m{key}\033[0m')
+                for value in whitelist[key]:
+                    print(f'{i}: {value}')
+                    i += 1
         value = w[int(input()) - 1]
     except (IndexError, ValueError) as e:
         print(f'Invalid entry. Please enter a number between 1 and '

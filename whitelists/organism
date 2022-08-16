@@ -1,12 +1,13 @@
 whitelist_type: plain
+headers: organism_name taxonomy_id
 whitelist:
-    - human_9606
-    - mouse_10090
-    - zebrafish_7955
-    - rat_10114
-    - pig_9823
-    - medaka_8090
-    - chicken_9031
-    - drosophila_7215
-    - yeast_4932
+    - human 9606
+    - mouse 10090
+    - zebrafish 7955
+    - rat 10114
+    - pig 9823
+    - medaka 8090
+    - chicken 9031
+    - drosophila 7215
+    - yeast 4932
 

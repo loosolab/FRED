@@ -303,7 +303,7 @@ def validate_logic(metafile):
             warning, warn_message = validate_donor_count(sample['pooled'], sample['donor_count'])
             if warning:
                 pool_warn.append((sample['sample_name'], warn_message))
-    organisms = list(utils.find_keys(metafile, 'organism'))
+    organisms = list(utils.find_keys(metafile, 'organism_name'))
     runs = list(utils.find_keys(metafile, 'runs'))
     if len(runs) > 0:
         for run in runs[0]:

@@ -1,17 +1,17 @@
 whitelist_type: group
-human_9606:
+human:
   - hg38
   - hg19
-mouse_10090:
+mouse:
   - mm10
   - mm9
   - mm38
-zebrafish_7955:
+zebrafish:
   - danrer11
   - danrer10
-rat_10114:
-pig_9823:
-medaka_8090:
-chicken_9031:
-drosophila_7215:
-yeast_4932:
+rat:
+pig:
+medaka:
+chicken:
+drosophila:
+yeast:
