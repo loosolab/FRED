@@ -290,8 +290,8 @@ def get_samples(condition, sample):
 
                 else:
                     sample[i]['value'] = c[1]
-                if not sample[i]['list']:
-                    sample[i]['input_disabled'] = True
+
+                sample[i]['input_disabled'] = True
     return sample
 
 
