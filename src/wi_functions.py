@@ -383,6 +383,8 @@ def get_whitelist_object(item, organism_name, whitelists):
         elif input_type == 'value_unit':
             item['value_unit'] = None
             whitelist = utils.read_whitelist('unit')
+            if 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'plain':
+                whitelist = whitelist['whitelist']
         else:
             whitelist = None
         if item['position'].split(':')[-1] == 'gene':
