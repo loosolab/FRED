@@ -423,10 +423,10 @@ def parse_object(wi_object):
 
 
 def parse_part(wi_object, factors):
+    key_yaml = utils.read_in_yaml(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), '..',
+        'keys.yaml'))
     if 'input_type' in wi_object and wi_object['input_type'] == 'gene':
-        key_yaml = utils.read_in_yaml(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..',
-            'keys.yaml'))
         sub_keys = list(utils.find_keys(key_yaml, wi_object['position'].split(':')[-1]))[0][4].keys()
         new_samp = {'position': wi_object['position'],
                     'mandatory': wi_object['mandatory'],
@@ -460,6 +460,19 @@ def parse_part(wi_object, factors):
         else:
             if 'input_fields' in wi_object:
                 return parse_part(wi_object['input_fields'], factors)
+            elif wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
+                new_obj = {'position': wi_object['position'],
+                            'mandatory': wi_object['mandatory'],
+                            'list': wi_object['list'],
+                            'title': wi_object['displayName'],
+                            'desc': wi_object['desc']}
+                input_fields = []
+                for j in range(len(wi_object['whitelist']['headers'].split(' '))):
+                    node = list(utils.find_keys(key_yaml, wi_object['whitelist']['headers'].split(' ')[j]))[0]
+                    input_fields.append(parse_empty(node, f'{wi_object["position"]}:{wi_object["whitelist"]["headers"].split(" ")[j]}', key_yaml, False))
+                    input_fields[j]['value'] = wi_object['value'].split(' ')[j]
+                print(input_fields)
+
             else:
                 if wi_object['value'] and wi_object[
                         'input_type'] == 'value_unit':
