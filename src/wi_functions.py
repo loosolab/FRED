@@ -290,8 +290,8 @@ def get_samples(condition, sample):
 
                 else:
                     sample[i]['value'] = c[1]
-                if not sample[i]['list']:
-                    sample[i]['input_disabled'] = True
+
+                sample[i]['input_disabled'] = True
     return sample
 
 
@@ -365,7 +365,7 @@ def get_conditions(factors, organism_name):
 def get_whitelist_object(item, organism_name, whitelists):
     if 'input_type' in item:
         input_type = item['input_type']
-        if input_type == 'select' or 'gene':
+        if input_type == 'select' or input_type == 'gene':
             whitelist = utils.get_whitelist(item['position'].split(':')[-1],
                                             {'organism': organism_name})
             if isinstance(whitelist, dict):
