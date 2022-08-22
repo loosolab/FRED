@@ -308,7 +308,7 @@ def get_conditions(factors, organism_name):
           {'factor: 'life_stage', 'values': ['child', 'adult']}]
     :return: a list containing all combinations of conditions
     """
-    organism_name = organism_name.split(' ')[0]
+    organism = organism_name.split(' ')[0]
     for i in range(len(factors)):
         if len(factors[i]['values']) == 1 and isinstance(factors[i]['values'][0], dict) and not ('value' in factors[i]['values'][0] and 'unit' in factors[i]['values'][0]):
             empty_key = []
@@ -350,7 +350,7 @@ def get_conditions(factors, organism_name):
         'input_fields']
     whitelists = {}
     for item in sample:
-        item, whitelists = get_whitelist_object(item, organism_name,
+        item, whitelists = get_whitelist_object(item, organism,
                                                 whitelists)
 
     for cond in conditions:
