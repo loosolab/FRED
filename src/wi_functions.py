@@ -373,7 +373,10 @@ def get_whitelist_object(item, organism_name, whitelists):
             whitelist = utils.get_whitelist(item['position'].split(':')[-1],
                                             {'organism': organism_name})
             if isinstance(whitelist, dict):
-                input_type = 'group_select'
+                if 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'group_select':
+                    input_type = 'group_select'
+                elif 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'plain':
+                    whitelist = whitelist['whitelist']
         elif input_type == 'bool':
             whitelist = [True, False]
             input_type = 'select'
