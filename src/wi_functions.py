@@ -152,7 +152,7 @@ def get_factors(organism):
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
-    factor_value = {'factor': utils.read_whitelist('factor')}
+    factor_value = {'factor': utils.read_whitelist('factor')['whitelist']}
     values = {}
     for factor in factor_value['factor']:
         whitelist, input_type, headers = get_whitelist_with_type(factor, key_yaml,
@@ -308,7 +308,7 @@ def get_conditions(factors, organism_name):
           {'factor: 'life_stage', 'values': ['child', 'adult']}]
     :return: a list containing all combinations of conditions
     """
-    organism_name = organism_name.aplit(' ')[0]
+    organism_name = organism_name.split(' ')[0]
     for i in range(len(factors)):
         if len(factors[i]['values']) == 1 and isinstance(factors[i]['values'][0], dict) and not ('value' in factors[i]['values'][0] and 'unit' in factors[i]['values'][0]):
             empty_key = []
