@@ -641,7 +641,7 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
                         warning, warn_text = validate_yaml.validate_donor_count(
                             pooled, wi_object['value'])
                     elif key == 'organism':
-                        organisms.append(wi_object['value'])
+                        organisms.append(wi_object['value'].split(' ')[0])
                     elif key == 'reference_genome':
                         warning, warn_text = validate_yaml.validate_reference_genome(
                             organisms, wi_object['value'])
