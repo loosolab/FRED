@@ -383,7 +383,8 @@ def get_whitelist_object(item, organism_name, whitelists):
         else:
             whitelist = None
         if item['position'].split(':')[-1] == 'gene':
-            whitelist = whitelist['whitelist']
+            if 'whitelist' in whitelist:
+                whitelist = whitelist['whitelist']
             input_type = 'gene'
         item['input_type'] = input_type
         if input_type == 'group_select':
