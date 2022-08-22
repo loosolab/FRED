@@ -459,7 +459,7 @@ def parse_part(wi_object, factors):
             return test
         else:
 
-            if wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
+            if 'whitelist' in wi_object and wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
                 new_obj = {'position': wi_object['position'],
                             'mandatory': wi_object['mandatory'],
                             'list': wi_object['list'],
@@ -716,9 +716,9 @@ def get_color(depth):
     return color
 
 
-def save_object(dictionary, path):
+def save_object(dictionary, path, filename):
     utils.save_as_yaml(dictionary, os.path.join(path,
-                                                f'{dictionary["project"]["id"]}_metadata.yaml'))
+                                                f'{filename}_{dictionary["project"]["id"]}_metadata.yaml'))
 
 
 def get_meta_info(path, id):
