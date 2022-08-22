@@ -38,6 +38,9 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
             if get_whitelists:
                 whitelist = utils.read_whitelist(pre.split(':')[-1])
                 if 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'plain' and not 'headers' in whitelist:
+                    whitelist = whitelist['whitelist']
+                elif 'whitelist_type' in whitelist and whitelist[
                     'whitelist_type'] == 'depend':
                     whitelist = None
                     input_type = 'dependable'
@@ -105,6 +108,9 @@ def parse_empty(node, pre, key_yaml, get_whitelists):
             if node[5]:
                 whitelist = utils.read_whitelist(pre.split(':')[-1])
                 if 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'plain' and not 'headers' in whitelist:
+                    whitelist = whitelist['whitelist']
+                elif 'whitelist_type' in whitelist and whitelist[
                     'whitelist_type'] == 'depend':
                     whitelist = None
                     input_type = 'dependable'
