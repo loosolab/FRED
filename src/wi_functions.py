@@ -458,9 +458,8 @@ def parse_part(wi_object, factors):
                     test.append(parse_part(elem, factors))
             return test
         else:
-            if 'input_fields' in wi_object:
-                return parse_part(wi_object['input_fields'], factors)
-            elif wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
+
+            if wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
                 new_obj = {'position': wi_object['position'],
                             'mandatory': wi_object['mandatory'],
                             'list': wi_object['list'],
@@ -471,8 +470,10 @@ def parse_part(wi_object, factors):
                     node = list(utils.find_keys(key_yaml, wi_object['whitelist']['headers'].split(' ')[j]))[0]
                     input_fields.append(parse_empty(node, f'{wi_object["position"]}:{wi_object["whitelist"]["headers"].split(" ")[j]}', key_yaml, False))
                     input_fields[j]['value'] = wi_object['value'].split(' ')[j]
-                print(input_fields)
-
+                new_obj['input_fields'] = input_fields
+                wi_object = new_obj
+            if 'input_fields' in wi_object:
+                return parse_part(wi_object['input_fields'], factors)
             else:
                 if wi_object['value'] and wi_object[
                         'input_type'] == 'value_unit':
