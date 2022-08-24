@@ -10,7 +10,8 @@ import copy
 import datetime
 import pytz
 from dateutil import parser
-
+import multiprocessing
+import time
 
 # This script contains all functions for generation of objects for the web
 # interface
@@ -737,3 +738,54 @@ def get_meta_info(path, id):
             html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml[0][id][elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml[0][id].keys())[-1] else ""}'
         return html_str
 
+
+def get_search_mask():
+    key_yaml = utils.read_in_yaml(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
+    keys = get_search_keys(key_yaml)
+    whitelist_object = get_gene_whitelist()
+    return {'keys': keys, 'whitelist_object': whitelist_object}
+
+
+def get_gene_whitelist():
+    whitelist = utils.read_whitelist('gene')
+    whitelist.pop('whitelist_type')
+    whitelist.pop('ident_key')
+    paths = [whitelist[k] for k in whitelist]
+
+    pool_obj = multiprocessing.Pool()
+    answer = pool_obj.map(read_gene_whitelist, paths)
+    gene_name = []
+    ensembl_id = []
+    for elem in answer:
+        gene_name += list(set(elem[0]))
+        ensembl_id += list(set(elem[1]))
+    gene_name = set(gene_name)
+    ensembl_id = set(ensembl_id)
+    return({'gene_name': gene_name, 'ensembl_id': ensembl_id})
+
+
+def read_gene_whitelist(path):
+    gene_name = []
+    ensembl_id = []
+    sublist = utils.read_whitelist(path)['whitelist']
+    for elem in sublist:
+        gene_name.append(elem.split(' ')[0])
+        ensembl_id.append(elem.split(' ')[1])
+    return gene_name, ensembl_id
+
+def get_search_keys(key_yaml):
+    res = []
+    for key in key_yaml:
+        d = {'key_name': key}
+        if isinstance(key_yaml[key][4], dict):
+            d['nested'] = get_search_keys(key_yaml[key][4])
+        else:
+            d['nested'] = []
+        if key == 'gene_name' or key == 'ensembl_id':
+            d['whitelist'] = True
+        else:
+            d['whitelist'] = False
+        res.append(d)
+    return res
