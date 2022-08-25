@@ -748,6 +748,11 @@ def get_search_mask():
     return {'keys': keys, 'whitelist_object': whitelist_object}
 
 
+def find_metadata(path, search_string):
+    files = metaTools_functions.find(path, search_string, False)
+    return files
+
+
 def get_gene_whitelist():
     whitelist = utils.read_whitelist('gene')
     whitelist.pop('whitelist_type')
