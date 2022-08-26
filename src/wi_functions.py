@@ -9,7 +9,7 @@ import os
 import copy
 import datetime
 import pytz
-from dateutil import parser
+import dateutil
 import multiprocessing
 import time
 
@@ -560,7 +560,7 @@ def parse_part(wi_object, factors):
                                                                        dict) and value is not None and value != ''):
                     if 'input_type' in wi_object[i] and wi_object[i][
                             'input_type'] == 'date':
-                        default_time = parser.parse(wi_object[i]['value'])
+                        default_time = dateutil.parser.parse(wi_object[i]['value'])
                         timezone = pytz.timezone("Europe/Berlin")
                         local_time = default_time.astimezone(timezone)
                         value = local_time.strftime("%d.%m.%Y")
@@ -642,7 +642,7 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
             else:
                 if wi_object['value'] is not None and wi_object['value'] != '':
                     if wi_object['input_type'] == 'date':
-                        default_time = parser.parse(wi_object['value'])
+                        default_time = dateutil.parser.parse(wi_object['value'])
                         timezone = pytz.timezone("Europe/Berlin")
                         local_time = default_time.astimezone(timezone)
                         value = local_time.strftime("%d.%m.%Y")
@@ -756,8 +756,7 @@ def find_metadata(path, search_string):
 def read_gene_whitelist(path):
     gene_name = []
     ensembl_id = []
-    #sublist = utils.read_whitelist(path)['whitelist']
-    sublist = ['a', 'b']
+    sublist = utils.read_whitelist(path)['whitelist']
     for elem in sublist:
         gene_name.append(elem.split(' ')[0])
         ensembl_id.append(elem.split(' ')[1])
