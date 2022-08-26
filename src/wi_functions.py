@@ -1,7 +1,6 @@
 import sys
 
 sys.path.append('metadata-organizer')
-import src
 import src.utils as utils
 import src.generate as generate
 import src.validate_yaml as validate_yaml
@@ -10,7 +9,7 @@ import os
 import copy
 import datetime
 import pytz
-import dateutil
+from dateutil import parser
 import multiprocessing
 import time
 
@@ -561,7 +560,7 @@ def parse_part(wi_object, factors):
                                                                        dict) and value is not None and value != ''):
                     if 'input_type' in wi_object[i] and wi_object[i][
                             'input_type'] == 'date':
-                        default_time = dateutil.parser.parse(wi_object[i]['value'])
+                        default_time = parser.parse(wi_object[i]['value'])
                         timezone = pytz.timezone("Europe/Berlin")
                         local_time = default_time.astimezone(timezone)
                         value = local_time.strftime("%d.%m.%Y")
@@ -643,7 +642,7 @@ def validate_part(wi_object, warnings, pooled, organisms, errors):
             else:
                 if wi_object['value'] is not None and wi_object['value'] != '':
                     if wi_object['input_type'] == 'date':
-                        default_time = dateutil.parser.parse(wi_object['value'])
+                        default_time = parser.parse(wi_object['value'])
                         timezone = pytz.timezone("Europe/Berlin")
                         local_time = default_time.astimezone(timezone)
                         value = local_time.strftime("%d.%m.%Y")
@@ -757,7 +756,7 @@ def find_metadata(path, search_string):
 def read_gene_whitelist(path):
     gene_name = []
     ensembl_id = []
-    sublist = src.utils.read_whitelist(path)['whitelist']
+    sublist = utils.read_whitelist(path)['whitelist']
     for elem in sublist:
         gene_name.append(elem.split(' ')[0])
         ensembl_id.append(elem.split(' ')[1])
@@ -765,24 +764,24 @@ def read_gene_whitelist(path):
 
 
 def get_gene_whitelist():
-    whitelist = src.utils.read_whitelist('gene')
+    whitelist = utils.read_whitelist('gene')
     whitelist.pop('whitelist_type')
     whitelist.pop('ident_key')
     paths = [whitelist[k] for k in whitelist]
 
-    #gene_name = []
-    #ensembl_id = []
-    #for p in paths:
-    #    gn, embl = read_gene_whitelist(p)
-    #    gene_name += list(set(gn))
-    #    ensembl_id += list(set(embl))
-    pool_obj = multiprocessing.Pool()
-    answer = pool_obj.map(src.wi_functions.read_gene_whitelist, paths)
     gene_name = []
     ensembl_id = []
-    for elem in answer:
-        gene_name += list(set(elem[0]))
-        ensembl_id += list(set(elem[1]))
+    for p in paths:
+        gn, embl = read_gene_whitelist(p)
+        gene_name += list(set(gn))
+        ensembl_id += list(set(embl))
+    #pool_obj = multiprocessing.Pool()
+    #answer = pool_obj.map(read_gene_whitelist, paths)
+    #gene_name = []
+    #ensembl_id = []
+    #for elem in answer:
+    #    gene_name += list(set(elem[0]))
+    #    ensembl_id += list(set(elem[1]))
     gene_name = set(gene_name)
     ensembl_id = set(ensembl_id)
     return({'gene_name': gene_name, 'ensembl_id': ensembl_id})
