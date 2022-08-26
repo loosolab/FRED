@@ -753,6 +753,16 @@ def find_metadata(path, search_string):
     return files
 
 
+def read_gene_whitelist(path):
+    gene_name = []
+    ensembl_id = []
+    sublist = utils.read_whitelist(path)['whitelist']
+    for elem in sublist:
+        gene_name.append(elem.split(' ')[0])
+        ensembl_id.append(elem.split(' ')[1])
+    return gene_name, ensembl_id
+
+
 def get_gene_whitelist():
     whitelist = utils.read_whitelist('gene')
     whitelist.pop('whitelist_type')
@@ -770,15 +780,6 @@ def get_gene_whitelist():
     ensembl_id = set(ensembl_id)
     return({'gene_name': gene_name, 'ensembl_id': ensembl_id})
 
-
-def read_gene_whitelist(path):
-    gene_name = []
-    ensembl_id = []
-    sublist = utils.read_whitelist(path)['whitelist']
-    for elem in sublist:
-        gene_name.append(elem.split(' ')[0])
-        ensembl_id.append(elem.split(' ')[1])
-    return gene_name, ensembl_id
 
 def get_search_keys(key_yaml):
     res = []
