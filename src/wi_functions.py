@@ -782,8 +782,8 @@ def get_gene_whitelist():
     #for elem in answer:
     #    gene_name += list(set(elem[0]))
     #    ensembl_id += list(set(elem[1]))
-    gene_name = set(gene_name)
-    ensembl_id = set(ensembl_id)
+    gene_name = list(set(gene_name))
+    ensembl_id = list(set(ensembl_id))
     return({'gene_name': gene_name, 'ensembl_id': ensembl_id})
 
 
