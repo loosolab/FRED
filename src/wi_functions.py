@@ -1,6 +1,7 @@
 import sys
 
 sys.path.append('metadata-organizer')
+import src
 import src.utils as utils
 import src.generate as generate
 import src.validate_yaml as validate_yaml
@@ -756,7 +757,7 @@ def find_metadata(path, search_string):
 def read_gene_whitelist(path):
     gene_name = []
     ensembl_id = []
-    sublist = utils.read_whitelist(path)['whitelist']
+    sublist = src.utils.read_whitelist(path)['whitelist']
     for elem in sublist:
         gene_name.append(elem.split(' ')[0])
         ensembl_id.append(elem.split(' ')[1])
@@ -764,7 +765,7 @@ def read_gene_whitelist(path):
 
 
 def get_gene_whitelist():
-    whitelist = utils.read_whitelist('gene')
+    whitelist = src.utils.read_whitelist('gene')
     whitelist.pop('whitelist_type')
     whitelist.pop('ident_key')
     paths = [whitelist[k] for k in whitelist]
@@ -776,7 +777,7 @@ def get_gene_whitelist():
     #    gene_name += list(set(gn))
     #    ensembl_id += list(set(embl))
     pool_obj = multiprocessing.Pool()
-    answer = pool_obj.map(read_gene_whitelist, paths)
+    answer = pool_obj.map(src.wi_functions.read_gene_whitelist, paths)
     gene_name = []
     ensembl_id = []
     for elem in answer:
