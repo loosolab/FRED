@@ -743,7 +743,7 @@ def get_search_mask():
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
-    keys = get_search_keys(key_yaml)
+    keys = get_search_keys(key_yaml, '')
     whitelist_object = get_gene_whitelist()
     return {'keys': keys, 'whitelist_object': whitelist_object}
 
@@ -787,13 +787,14 @@ def get_gene_whitelist():
     return({'gene_name': gene_name, 'ensembl_id': ensembl_id})
 
 
-def get_search_keys(key_yaml):
+def get_search_keys(key_yaml, chained):
     res = []
     for key in key_yaml:
-        d = {'key_name': key}
+        d = {'key_name': key, 'display_name': list(utils.find_keys(key_yaml, key))[0][2]}
         if isinstance(key_yaml[key][4], dict):
-            d['nested'] = get_search_keys(key_yaml[key][4])
+            d['nested'] = get_search_keys(key_yaml[key][4], f'{chained}:{key}' if chained != '' else f'{key}')
         else:
+            d['chained_keys'] = f'{chained}:{key}' if chained != '' else f'{key}'
             d['nested'] = []
         if key == 'gene_name' or key == 'ensembl_id':
             d['whitelist'] = True
