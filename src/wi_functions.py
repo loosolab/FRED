@@ -749,8 +749,15 @@ def get_search_mask():
 
 
 def find_metadata(path, search_string):
-    files = metaTools_functions.find(path, search_string, False)
-    return files
+    files = metaTools_functions.find(path, search_string, True)
+    new_files = []
+    for i in range(len(files)):
+        for key in files[i]:
+            new_files.append({'id': key,
+                              'path': files[i][key]['path'],
+                              'project_name': files[i][key]['project']['project_name'],
+                              'owner': files[i][key]['project']['owner']['name']})
+    return new_files
 
 
 def read_gene_whitelist(path):
