@@ -792,9 +792,9 @@ def get_search_keys(key_yaml, chained):
     for key in key_yaml:
         d = {'key_name': key, 'display_name': list(utils.find_keys(key_yaml, key))[0][2]}
         if isinstance(key_yaml[key][4], dict):
-            d['nested'] = get_search_keys(key_yaml[key][4], f'{chained}:{key}' if chained != '' else f'{key}')
+            d['nested'] = get_search_keys(key_yaml[key][4], f'{chained}{key}:' if chained != '' else f'{key}:')
         else:
-            d['chained_keys'] = f'{chained}:{key}' if chained != '' else f'{key}'
+            d['chained_keys'] = f'{chained}{key}:' if chained != '' else f'{key}:'
             d['nested'] = []
         if key == 'gene_name' or key == 'ensembl_id':
             d['whitelist'] = True
