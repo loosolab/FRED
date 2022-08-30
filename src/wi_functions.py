@@ -781,9 +781,10 @@ def get_gene_whitelist():
     gene_name = []
     ensembl_id = []
     for p in paths:
-        gn, embl = read_gene_whitelist(p)
-        gene_name += list(set(gn))
-        ensembl_id += list(set(embl))
+        if p == paths[0]:
+            gn, embl = read_gene_whitelist(p)
+            gene_name += list(set(gn))
+            ensembl_id += list(set(embl))
     #pool_obj = multiprocessing.Pool()
     #answer = pool_obj.map(read_gene_whitelist, paths)
     #gene_name = []
