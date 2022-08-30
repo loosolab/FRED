@@ -2,6 +2,7 @@ import sys
 
 sys.path.append('metadata-organizer')
 import src.utils as utils
+import src.wi_utils as wi_utils
 import src.generate as generate
 import src.validate_yaml as validate_yaml
 import src.metaTools_functions as metaTools_functions
@@ -762,16 +763,6 @@ def find_metadata(path, search_string):
     return new_files
 
 
-def read_gene_whitelist(path):
-    gene_name = []
-    ensembl_id = []
-    sublist = utils.read_whitelist(path)['whitelist']
-    for elem in sublist:
-        gene_name.append(elem.split(' ')[0])
-        ensembl_id.append(elem.split(' ')[1])
-    return gene_name, ensembl_id
-
-
 def get_gene_whitelist():
     whitelist = utils.read_whitelist('gene')
     whitelist.pop('whitelist_type')
@@ -780,18 +771,18 @@ def get_gene_whitelist():
 
     gene_name = []
     ensembl_id = []
-    for p in paths:
-        if p == paths[0]:
-            gn, embl = read_gene_whitelist(p)
-            gene_name += list(set(gn))
-            ensembl_id += list(set(embl))
-    #pool_obj = multiprocessing.Pool()
-    #answer = pool_obj.map(read_gene_whitelist, paths)
-    #gene_name = []
-    #ensembl_id = []
-    #for elem in answer:
-    #    gene_name += list(set(elem[0]))
-    #    ensembl_id += list(set(elem[1]))
+    #for p in paths:
+    #    if p == paths[0]:
+    #        gn, embl = read_gene_whitelist(p)
+    #        gene_name += list(set(gn))
+    #        ensembl_id += list(set(embl))
+    pool_obj = multiprocessing.Pool()
+    answer = pool_obj.map(wi_utils.read_gene_whitelist, paths)
+    gene_name = []
+    ensembl_id = []
+    for elem in answer:
+        gene_name += list(set(elem[0]))
+        ensembl_id += list(set(elem[1]))
     gene_name = list(set(gene_name))
     ensembl_id = list(set(ensembl_id))
     return({'gene_name': gene_name, 'ensembl_id': ensembl_id})
