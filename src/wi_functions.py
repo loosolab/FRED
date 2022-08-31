@@ -756,10 +756,20 @@ def find_metadata(path, search_string):
     new_files = []
     for i in range(len(files)):
         for key in files[i]:
-            new_files.append({'id': key,
-                              'path': files[i][key]['path'],
-                              'project_name': files[i][key]['project']['project_name'],
-                              'owner': files[i][key]['project']['owner']['name']})
+            res = {'id': key,
+                   'path': files[i][key]['path'],
+                   'project_name': files[i][key]['project']['project_name'],
+                   'owner': files[i][key]['project']['owner']['name'],
+                   'description': files[i][key]['project']['description'],
+                   'date': files[i][key]['project']['date']}
+            if 'nerd' in files[i][key]['project']:
+                nerds = []
+                for nerd in files[i][key]['project']['nerd']:
+                    nerds.append(nerd['name'])
+                res['nerd'] = nerds
+            else:
+                res['nerd'] = None
+            new_files.append(res)
     return new_files
 
 
