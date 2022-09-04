@@ -166,7 +166,7 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                 desc = []
                                 for i in range(len(return_dict[option])):
                                     if not all(k in return_dict[option][i] for k in possible_keys):
-                                        elems.append('\n'.join([f'{k}: {return_dict[option][i][k]}' for k in return_dict[option][i]]))
+                                        elems.append(', '.join([f'{k}: {return_dict[option][i][k]}' for k in return_dict[option][i]]))
                                         desc.append(f'Possible information to add: {", ".join([x for x in possible_keys if x not in return_dict[option][i]])}')
                                 if len(elems) > 0:
                                     elems.append(f'Add new {option}')
@@ -238,9 +238,12 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
 
 
 def print_option_list(options, desc):
-    data = [[f'{i+1}:', f'{options[i]}', desc[i] if desc else ''] for i in range(len(options))]
-    print(tabulate(data, tablefmt='plain', maxcolwidths=[size.columns*1/8, size.columns*2/8, size.columns*5/8]))
-
+    if desc:
+        data = [[f'{i+1}:', f'{options[i]}', desc[i]] for i in range(len(options))]
+        print(tabulate(data, tablefmt='plain', maxcolwidths=[size.columns*1/8, size.columns*3/8, size.columns*4/8]))
+    else:
+        data = [[f'{i+1}:', f'{options[i]}'] for i in range(len(options))]
+        print(tabulate(data, tablefmt='plain', maxcolwidths=[size.columns*1/8, size.columns*7/8]))
 
 def parse_input_list(options, terminable):
     input_list = input()
