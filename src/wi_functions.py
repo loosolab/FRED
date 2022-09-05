@@ -575,7 +575,7 @@ def validate_object(wi_object):
     organisms = []
     warnings = {}
     errors = {}
-    factors = wi_object['all_factors']
+    factors = copy.deepcopy(wi_object['all_factors'])
     wi_object.pop('all_factors')
     for elem in wi_object:
         wi_object[
@@ -587,7 +587,7 @@ def validate_object(wi_object):
     for part in ['project', 'experimental_setting', 'technical_details']:
         new_object[part] = wi_object[part]
     wi_object = new_object
-    wi_object['all_factors'] = factors
+    wi_object['all_factors'] = copy.deepcopy(factors)
     html_str = ''
     yaml_object = parse_object(wi_object)
     for elem in yaml_object:
