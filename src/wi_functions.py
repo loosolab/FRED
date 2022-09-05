@@ -429,6 +429,8 @@ def parse_part(wi_object, factors):
         os.path.dirname(os.path.abspath(__file__)), '..',
         'keys.yaml'))
     if 'input_type' in wi_object and wi_object['input_type'] == 'gene':
+        if wi_object['value'] is not None:
+            gn, embl = wi_object['value'].split(' ')
         sub_keys = list(utils.find_keys(key_yaml, wi_object['position'].split(':')[-1]))[0][4].keys()
         new_samp = {'position': wi_object['position'],
                     'mandatory': wi_object['mandatory'],
@@ -438,7 +440,10 @@ def parse_part(wi_object, factors):
         input_fields = []
         for key in sub_keys:
             node = list(utils.find_keys(key_yaml, key))[0]
-            input_fields.append(parse_empty(node, f'{wi_object["position"]}:{key}', key_yaml, False))
+            input_field = parse_empty(node, f'{wi_object["position"]}:{key}', key_yaml, False)
+            if gn is not None and embl is not None:
+                input_field['value'] = gn if key == 'gene_name' else embl
+            input_fields.append(input_field)
         for elem in factors:
             for i in range(len(elem)):
                 if 'headers' in elem[i] and elem[i]['factor'] == wi_object['position'].split(':')[-1]:
@@ -448,7 +453,6 @@ def parse_part(wi_object, factors):
                                 f['value'] = wi_object['value'].split(' ')[j]
         new_samp['input_fields'] = input_fields
         wi_object = new_samp
-
     return_dict = {}
     if isinstance(wi_object, dict):
         if wi_object['list']:
@@ -460,7 +464,6 @@ def parse_part(wi_object, factors):
                     test.append(parse_part(elem, factors))
             return test
         else:
-
             if 'whitelist' in wi_object and wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
                 new_obj = {'position': wi_object['position'],
                             'mandatory': wi_object['mandatory'],
