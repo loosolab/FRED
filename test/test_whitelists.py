@@ -19,7 +19,6 @@ def test_whitelists():
 
 
 def test_whitelist(file, whitelist_path, depend):
-    print(file)
     whitelist = utils.read_whitelist(file)
     headers = False
     if isinstance(whitelist, dict):
@@ -94,7 +93,6 @@ def testing2(file, whitelist, abbrev, headers):
     if not headers:
         duplicates = [elem for elem, count in
                   collections.Counter(whitelist).items() if count > 1]
-        print(duplicates)
         if len(duplicates) > 0:
             print(f'{file}: There are duplicates in the whitelist!')
             return 1
