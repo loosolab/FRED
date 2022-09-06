@@ -459,10 +459,7 @@ def validate_object(wi_object):
     wi_object = new_object
     wi_object['all_factors'] = copy.deepcopy(factors)
     html_str = ''
-    start = time.time()
     yaml_object = parse_object(wi_object)
-    end = time.time() - start
-    print(end)
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
     wi_object['all_factors'] = factors

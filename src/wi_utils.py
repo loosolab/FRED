@@ -2,6 +2,7 @@ import src.utils as utils
 import src.validate_yaml as validate_yaml
 from dateutil import parser
 import pytz
+import os
 
 
 def read_gene_whitelist(path):
@@ -100,3 +101,279 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
             elem, wi_object[i], pooled, organisms, warnings, errors = validate_part(
                 elem, wi_object[i], warnings, pooled, organisms, errors)
     return elem, wi_object, pooled, organisms, warnings, errors
+
+def parse_part(wi_object, factors):
+    gn = None
+    embl = None
+    key_yaml = utils.read_in_yaml(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), '..',
+        'keys.yaml'))
+    if 'input_type' in wi_object and wi_object['input_type'] == 'gene':
+        if wi_object['value'] is not None:
+            gn, embl = wi_object['value'].split(' ')
+        sub_keys = list(utils.find_keys(key_yaml, wi_object['position'].split(':')[-1]))[0][4].keys()
+        new_samp = {'position': wi_object['position'],
+                    'mandatory': wi_object['mandatory'],
+                    'list': wi_object['list'],
+                    'title': wi_object['displayName'],
+                    'desc': wi_object['desc']}
+        input_fields = []
+        for key in sub_keys:
+            node = list(utils.find_keys(key_yaml, key))[0]
+            input_field = parse_empty(node, f'{wi_object["position"]}:{key}', key_yaml, False)
+            if gn is not None and embl is not None:
+                input_field['value'] = gn if key == 'gene_name' else embl
+            input_fields.append(input_field)
+        for elem in factors:
+            for i in range(len(elem)):
+                if 'headers' in elem[i] and elem[i]['factor'] == wi_object['position'].split(':')[-1]:
+                    for j in range(len(elem[i]['headers'].split(' '))):
+                        for f in input_fields:
+                            if f['position'].split(':')[-1] == elem[i]['headers'].split(' ')[j]:
+                                f['value'] = wi_object['value'].split(' ')[j]
+        new_samp['input_fields'] = input_fields
+        wi_object = new_samp
+    return_dict = {}
+    if isinstance(wi_object, dict):
+        if wi_object['list']:
+            test = []
+            for elem in wi_object['list_value']:
+                if not isinstance(elem, dict) and not isinstance(elem, list):
+                    test.append(elem)
+                else:
+                    test.append(parse_part(elem, factors))
+            return test
+        else:
+            if 'whitelist' in wi_object and wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
+                new_obj = {'position': wi_object['position'],
+                            'mandatory': wi_object['mandatory'],
+                            'list': wi_object['list'],
+                            'title': wi_object['displayName'],
+                            'desc': wi_object['desc']}
+                input_fields = []
+                for j in range(len(wi_object['whitelist']['headers'].split(' '))):
+                    node = list(utils.find_keys(key_yaml, wi_object['whitelist']['headers'].split(' ')[j]))[0]
+                    input_fields.append(parse_empty(node, f'{wi_object["position"]}:{wi_object["whitelist"]["headers"].split(" ")[j]}', key_yaml, False))
+                    input_fields[j]['value'] = wi_object['value'].split(' ')[j]
+                new_obj['input_fields'] = input_fields
+                wi_object = new_obj
+            if 'input_fields' in wi_object:
+                return parse_part(wi_object['input_fields'], factors)
+            else:
+                if wi_object['value'] and wi_object[
+                        'input_type'] == 'value_unit':
+                    unit = wi_object['value_unit']
+                    value = wi_object['value']
+                    return {'unit': unit, 'value': value}
+                else:
+                    return wi_object['value']
+    elif isinstance(wi_object, list):
+        for i in range(len(wi_object)):
+            if wi_object[i]['position'].split(':')[-1] == 'conditions':
+                test = []
+                for j in range(len(wi_object[i]['list_value'])):
+                    value = parse_part(wi_object[i]['list_value'][j], factors)
+                    if ((isinstance(value, list) or isinstance(value,
+                                                               dict)) and len(
+                        value) > 0) or (
+                            not isinstance(value, list) and not isinstance(
+                        value,
+                        dict) and value is not None and value != ''):
+                        test.append({'condition_name':
+                                         wi_object[i]['list_value'][j][
+                                             'title'],
+                                     'biological_replicates': {
+                                         'count': len(value),
+                                         'samples': value}})
+                    else:
+                        test.append({'condition_name':
+                                         wi_object[i]['list_value'][j][
+                                             'title']})
+                return_dict['conditions'] = test
+            elif wi_object[i]['position'].split(':')[
+                -1] == 'technical_replicates':
+                technical_replicates = parse_part(wi_object[i], factors)
+                sample_name = []
+                for c in range(technical_replicates['count']):
+                    sample_name.append(
+                        f'{return_dict["sample_name"]}_t{c + 1}')
+                technical_replicates['sample_name'] = sample_name
+                return_dict['technical_replicates'] = technical_replicates
+            elif wi_object[i]['position'].split(':')[
+                -1] == 'experimental_factors':
+                res = []
+                all_factors = {}
+                i = 0
+                for elem in factors:
+                    for d in elem:
+                        if 'headers' in d:
+                            header = d['headers'].split(' ')
+                            d.pop('headers')
+                            for l in range(len(d['values'])):
+                                vals = d['values'][l].split(' ')
+                                d['values'][l] = {}
+                                for h in range(len(header)):
+                                    d['values'][l][header[h]] = vals[h]
+                        else:
+                            for j in range(len(d['values'])):
+                                if isinstance(d['values'][j], dict):
+                                    empty_keys = []
+                                    for key in d['values'][j]:
+                                        if not isinstance(d['values'][j][key],list) or len(d['values'][j][key]) == 0:
+                                            empty_keys.append(key)
+                                    for key in empty_keys:
+                                        d['values'][j].pop(key)
+                        if not any(d['factor'] in y['factor'] for y in res):
+                            res.append(d)
+                            all_factors[d['factor']] = i
+                            i += 1
+                        else:
+                            for x in d['values']:
+                                if x not in res[all_factors[d['factor']]][
+                                        'values']:
+                                    res[all_factors[d['factor']]][
+                                        'values'].append(x)
+                return_dict['experimental_factors'] = res
+
+            else:
+                value = parse_part(wi_object[i], factors)
+                if ((isinstance(value, list) or isinstance(value,
+                                                           dict)) and len(
+                    value) > 0) or (
+                        not isinstance(value, list) and not isinstance(value,
+                                                                       dict) and value is not None and value != ''):
+                    if 'input_type' in wi_object[i] and wi_object[i][
+                            'input_type'] == 'date':
+                        default_time = parser.parse(wi_object[i]['value'])
+                        timezone = pytz.timezone("Europe/Berlin")
+                        local_time = default_time.astimezone(timezone)
+                        value = local_time.strftime("%d.%m.%Y")
+                    return_dict[
+                        wi_object[i]['position'].split(':')[-1]] = value
+    return return_dict
+
+
+def parse_empty(node, pre, key_yaml, get_whitelists):
+    input_disabled = True if pre.split(':')[-1] in ['condition_name',
+                                                    'sample_name'] else False
+    if isinstance(node[4], dict):
+        input_fields = []
+
+        if len(node) > 5 and isinstance(node[5], dict) and 'merge' in node[5]:
+            input_type = 'select'
+            if get_whitelists:
+                whitelist = utils.read_whitelist(pre.split(':')[-1])
+                if 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'plain' and not 'headers' in whitelist:
+                    whitelist = whitelist['whitelist']
+                elif 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'depend':
+                    whitelist = None
+                    input_type = 'dependable'
+                elif 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'group':
+                    new_w = []
+                    for key in whitelist:
+                        if key != 'whitelist_type':
+                            new_w.append(
+                                {'title': key, 'whitelist': whitelist[key]})
+                    input_type = 'group_select'
+                    whitelist = new_w
+            else:
+                whitelist = None
+            if input_type != 'group_select':
+                if isinstance(whitelist, dict):
+                    input_type = 'dependable'
+            if pre.split(':')[-1] == 'gene':
+                input_type = 'gene'
+            if pre.split(':')[-1] == 'organism':
+                input_type = 'organism_name'
+            res = {'position': pre,
+                   'mandatory': True if node[0] == 'mandatory' else False,
+                   'list': node[1], 'displayName': node[2], 'desc': node[3],
+                   'value': None,
+                   'whitelist': whitelist,
+                   'input_type': input_type, 'data_type': 'str',
+                   'input_disabled': input_disabled}
+        else:
+            for key in node[4]:
+                input_fields.append(parse_empty(node[4][key], pre + ':' + key,
+                                            key_yaml, get_whitelists))
+            unit = False
+            value = False
+            unit_whitelist = []
+            if len(input_fields) == 2:
+                for i in range(len(input_fields)):
+                    if input_fields[i]['position'].split(':')[-1] == 'unit':
+                        unit = True
+                        unit_whitelist = input_fields[i]['whitelist']
+                    elif input_fields[i]['position'].split(':')[-1] == 'value':
+                        value = True
+            if unit and value:
+
+                res = {'position': pre,
+                       'mandatory': True if node[0] == 'mandatory' else False,
+                       'list': node[1], 'displayName': node[2],
+                       'desc': node[3], 'value': None, 'value_unit': None,
+                       'whitelist': unit_whitelist, 'input_type': 'value_unit',
+                       'data_type': 'value_unit', 'input_disabled': input_disabled}
+            else:
+                res = {'position': pre,
+                       'mandatory': True if node[0] == 'mandatory' else False,
+                       'list': node[1], 'title': node[2], 'desc': node[3],
+                       'input_fields': input_fields,
+                       'input_disabled': input_disabled}
+        if node[1]:
+            res['list_value'] = []
+    else:
+        if pre.split(':')[-1] == 'organism':
+            input_type = 'organism_name'
+        else:
+            input_type = node[6]
+        if get_whitelists:
+            if node[5]:
+                whitelist = utils.read_whitelist(pre.split(':')[-1])
+                if 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'plain' and not 'headers' in whitelist:
+                    whitelist = whitelist['whitelist']
+                elif 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'depend':
+                    whitelist = None
+                    input_type = 'dependable'
+                elif 'whitelist_type' in whitelist and whitelist[
+                    'whitelist_type'] == 'group':
+                    new_w = []
+                    for key in whitelist:
+                        if key != 'whitelist_type':
+                            new_w.append(
+                                {'title': key, 'whitelist': whitelist[key]})
+                    input_type = 'group_select'
+                    whitelist = new_w
+            elif node[7] == 'bool':
+                whitelist = [True, False]
+                input_type = 'select'
+            else:
+                whitelist = None
+            if input_type != 'group_select':
+                if isinstance(whitelist, dict):
+                    input_type = 'dependable_select'
+                # elif whitelist and len(whitelist) > 30:
+                #    input_type = 'searchable_select'
+        else:
+            if node[5]:
+                whitelist = pre.split(':')[-1]
+            else:
+                whitelist = None
+            if node[7] == 'bool':
+                input_type = 'bool'
+                whitelist = pre.split(':')[-1]
+        res = {'position': pre,
+               'mandatory': True if node[0] == 'mandatory' else False,
+               'list': node[1], 'displayName': node[2], 'desc': node[3],
+               'value': node[4],
+               'whitelist': whitelist,
+               'input_type': input_type, 'data_type': node[7],
+               'input_disabled': input_disabled}
+        if node[1]:
+            res['list_value'] = []
+    return res
