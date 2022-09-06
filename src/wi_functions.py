@@ -419,160 +419,13 @@ def parse_object(wi_object):
     factors = wi_object['all_factors']
     wi_object.pop('all_factors')
     result = {}
-    for key in wi_object:
-        result[key] = parse_part(wi_object[key], factors)
+
+    arguments = [(wi_object[key], factors) for key in wi_object]
+    pool_obj = multiprocessing.Pool()
+    answer = pool_obj.starmap(wi_utils.parse_part, arguments)
+    for i in range(len(answer)):
+        result[list(wi_object.keys())[i]] = answer[i]
     return result
-
-
-def parse_part(wi_object, factors):
-    gn = None
-    embl = None
-    key_yaml = utils.read_in_yaml(os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), '..',
-        'keys.yaml'))
-    if 'input_type' in wi_object and wi_object['input_type'] == 'gene':
-        if wi_object['value'] is not None:
-            gn, embl = wi_object['value'].split(' ')
-        sub_keys = list(utils.find_keys(key_yaml, wi_object['position'].split(':')[-1]))[0][4].keys()
-        new_samp = {'position': wi_object['position'],
-                    'mandatory': wi_object['mandatory'],
-                    'list': wi_object['list'],
-                    'title': wi_object['displayName'],
-                    'desc': wi_object['desc']}
-        input_fields = []
-        for key in sub_keys:
-            node = list(utils.find_keys(key_yaml, key))[0]
-            input_field = parse_empty(node, f'{wi_object["position"]}:{key}', key_yaml, False)
-            if gn is not None and embl is not None:
-                input_field['value'] = gn if key == 'gene_name' else embl
-            input_fields.append(input_field)
-        for elem in factors:
-            for i in range(len(elem)):
-                if 'headers' in elem[i] and elem[i]['factor'] == wi_object['position'].split(':')[-1]:
-                    for j in range(len(elem[i]['headers'].split(' '))):
-                        for f in input_fields:
-                            if f['position'].split(':')[-1] == elem[i]['headers'].split(' ')[j]:
-                                f['value'] = wi_object['value'].split(' ')[j]
-        new_samp['input_fields'] = input_fields
-        wi_object = new_samp
-    return_dict = {}
-    if isinstance(wi_object, dict):
-        if wi_object['list']:
-            test = []
-            for elem in wi_object['list_value']:
-                if not isinstance(elem, dict) and not isinstance(elem, list):
-                    test.append(elem)
-                else:
-                    test.append(parse_part(elem, factors))
-            return test
-        else:
-            if 'whitelist' in wi_object and wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
-                new_obj = {'position': wi_object['position'],
-                            'mandatory': wi_object['mandatory'],
-                            'list': wi_object['list'],
-                            'title': wi_object['displayName'],
-                            'desc': wi_object['desc']}
-                input_fields = []
-                for j in range(len(wi_object['whitelist']['headers'].split(' '))):
-                    node = list(utils.find_keys(key_yaml, wi_object['whitelist']['headers'].split(' ')[j]))[0]
-                    input_fields.append(parse_empty(node, f'{wi_object["position"]}:{wi_object["whitelist"]["headers"].split(" ")[j]}', key_yaml, False))
-                    input_fields[j]['value'] = wi_object['value'].split(' ')[j]
-                new_obj['input_fields'] = input_fields
-                wi_object = new_obj
-            if 'input_fields' in wi_object:
-                return parse_part(wi_object['input_fields'], factors)
-            else:
-                if wi_object['value'] and wi_object[
-                        'input_type'] == 'value_unit':
-                    unit = wi_object['value_unit']
-                    value = wi_object['value']
-                    return {'unit': unit, 'value': value}
-                else:
-                    return wi_object['value']
-    elif isinstance(wi_object, list):
-        for i in range(len(wi_object)):
-            if wi_object[i]['position'].split(':')[-1] == 'conditions':
-                test = []
-                for j in range(len(wi_object[i]['list_value'])):
-                    value = parse_part(wi_object[i]['list_value'][j], factors)
-                    if ((isinstance(value, list) or isinstance(value,
-                                                               dict)) and len(
-                        value) > 0) or (
-                            not isinstance(value, list) and not isinstance(
-                        value,
-                        dict) and value is not None and value != ''):
-                        test.append({'condition_name':
-                                         wi_object[i]['list_value'][j][
-                                             'title'],
-                                     'biological_replicates': {
-                                         'count': len(value),
-                                         'samples': value}})
-                    else:
-                        test.append({'condition_name':
-                                         wi_object[i]['list_value'][j][
-                                             'title']})
-                return_dict['conditions'] = test
-            elif wi_object[i]['position'].split(':')[
-                -1] == 'technical_replicates':
-                technical_replicates = parse_part(wi_object[i], factors)
-                sample_name = []
-                for c in range(technical_replicates['count']):
-                    sample_name.append(
-                        f'{return_dict["sample_name"]}_t{c + 1}')
-                technical_replicates['sample_name'] = sample_name
-                return_dict['technical_replicates'] = technical_replicates
-            elif wi_object[i]['position'].split(':')[
-                -1] == 'experimental_factors':
-                res = []
-                all_factors = {}
-                i = 0
-                for elem in factors:
-                    for d in elem:
-                        if 'headers' in d:
-                            header = d['headers'].split(' ')
-                            d.pop('headers')
-                            for l in range(len(d['values'])):
-                                vals = d['values'][l].split(' ')
-                                d['values'][l] = {}
-                                for h in range(len(header)):
-                                    d['values'][l][header[h]] = vals[h]
-                        else:
-                            for j in range(len(d['values'])):
-                                if isinstance(d['values'][j], dict):
-                                    empty_keys = []
-                                    for key in d['values'][j]:
-                                        if not isinstance(d['values'][j][key],list) or len(d['values'][j][key]) == 0:
-                                            empty_keys.append(key)
-                                    for key in empty_keys:
-                                        d['values'][j].pop(key)
-                        if not any(d['factor'] in y['factor'] for y in res):
-                            res.append(d)
-                            all_factors[d['factor']] = i
-                            i += 1
-                        else:
-                            for x in d['values']:
-                                if x not in res[all_factors[d['factor']]][
-                                        'values']:
-                                    res[all_factors[d['factor']]][
-                                        'values'].append(x)
-                return_dict['experimental_factors'] = res
-
-            else:
-                value = parse_part(wi_object[i], factors)
-                if ((isinstance(value, list) or isinstance(value,
-                                                           dict)) and len(
-                    value) > 0) or (
-                        not isinstance(value, list) and not isinstance(value,
-                                                                       dict) and value is not None and value != ''):
-                    if 'input_type' in wi_object[i] and wi_object[i][
-                            'input_type'] == 'date':
-                        default_time = parser.parse(wi_object[i]['value'])
-                        timezone = pytz.timezone("Europe/Berlin")
-                        local_time = default_time.astimezone(timezone)
-                        value = local_time.strftime("%d.%m.%Y")
-                    return_dict[
-                        wi_object[i]['position'].split(':')[-1]] = value
-    return return_dict
 
 
 def validate_object(wi_object):
@@ -586,7 +439,6 @@ def validate_object(wi_object):
     errors = {}
     factors = copy.deepcopy(wi_object['all_factors'])
     wi_object.pop('all_factors')
-
     arguments = [(elem, wi_object[elem], [], pooled, organisms, []) for elem in wi_object]
     pool_obj = multiprocessing.Pool()
     answer = pool_obj.starmap(wi_utils.validate_part, arguments)
@@ -607,13 +459,17 @@ def validate_object(wi_object):
     wi_object = new_object
     wi_object['all_factors'] = copy.deepcopy(factors)
     html_str = ''
+    start = time.time()
     yaml_object = parse_object(wi_object)
+    end = time.time() - start
+    print(end)
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
     wi_object['all_factors'] = factors
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings, 'summary': html_str,
                          'yaml': yaml_object}
+    end = time.time() - start
     return validation_object
 
 
@@ -690,6 +546,8 @@ def find_metadata(path, search_string):
                    'path': files[i][key]['path'],
                    'project_name': files[i][key]['project']['project_name'],
                    'owner': files[i][key]['project']['owner']['name'],
+                   'email': files[i][key]['project']['owner']['email'],
+                   'organisms': list(utils.find_keys(files[i][key], 'organism_name')),
                    'description': files[i][key]['project']['description'],
                    'date': files[i][key]['project']['date']}
             if 'nerd' in files[i][key]['project']:
