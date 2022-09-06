@@ -87,7 +87,7 @@ def testing(file, whitelist, whitelist_path, headers, depend):
 
 def testing2(file, whitelist, abbrev, headers):
     for i in range(len(whitelist)):
-        if whitelist[i].lower() in abbrev:
+        if whitelist is not None and whitelist[i].lower() in abbrev:
             whitelist[i] = abbrev[whitelist[i].lower()]
 
     if not headers:
