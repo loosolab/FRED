@@ -69,6 +69,7 @@ def testing(file, whitelist, whitelist_path, headers, depend):
         return 1
     if os.path.isfile(os.path.join(whitelist_path, 'abbrev', file)):
         abbrev = utils.read_whitelist(os.path.join('abbrev', file))
+        print(abbrev)
         if abbrev['whitelist_type'] == 'depend':
             if abbrev['ident_key'] == 'organism_name':
                 depend_elems = [x.split(' ')[0] for x in
