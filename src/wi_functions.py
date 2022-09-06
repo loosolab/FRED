@@ -425,6 +425,8 @@ def parse_object(wi_object):
 
 
 def parse_part(wi_object, factors):
+    gn = None
+    embl = None
     key_yaml = utils.read_in_yaml(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..',
         'keys.yaml'))
