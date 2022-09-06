@@ -81,7 +81,7 @@ def testing(file, whitelist, whitelist_path, headers, depend):
                     if elem in abbrev:
                         if os.path.isfile(os.path.join(whitelist_path, abbrev[elem])):
                             #TODO use function read_whitelist -> find error
-                            abbrev = utils.read_in_yaml(os.path.join(whitelist_path, abbrev[elem])))
+                            abbrev = utils.read_in_yaml(os.path.join(whitelist_path, abbrev[elem]))
                         res.append(testing2(elem, whitelist, abbrev, headers))
             return sum(filter(None, res))
 
