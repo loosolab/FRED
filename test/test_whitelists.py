@@ -80,9 +80,9 @@ def testing(file, whitelist, whitelist_path, headers, depend):
                 if depend is not None and elem == depend:
                     if elem in abbrev:
                         if os.path.isfile(os.path.join(whitelist_path, abbrev[elem])):
+                            print(utils.read_in_yaml(os.path.join(whitelist_path, abbrev[elem])))
                             abbrev = utils.read_whitelist(os.path.join(whitelist_path, abbrev[elem]))
                             print(abbrev)
-                            print(utils.read_whitelist(os.path.join(whitelist_path, 'abbrev', 'genes', 'yeast')))
                         res.append(testing2(elem, whitelist, abbrev, headers))
             return sum(filter(None, res))
 
