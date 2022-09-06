@@ -466,7 +466,6 @@ def validate_object(wi_object):
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings, 'summary': html_str,
                          'yaml': yaml_object}
-    end = time.time() - start
     return validation_object
 
 
