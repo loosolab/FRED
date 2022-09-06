@@ -16,7 +16,7 @@ import time
 
 # This script contains all functions for generation of objects for the web
 # interface
-
+disabled_fields = []
 
 def get_empty_wi_object():
     key_yaml = utils.read_in_yaml(
@@ -576,16 +576,29 @@ def parse_part(wi_object, factors):
 def validate_object(wi_object):
     pooled = None
     organisms = []
+    for setting in wi_object['experimental_setting']['list_value']:
+        for elem in setting:
+            if elem['position'].split(':')[-1] == 'organism':
+                organisms.append(elem['value'].split(' ')[0])
     warnings = {}
     errors = {}
     factors = copy.deepcopy(wi_object['all_factors'])
     wi_object.pop('all_factors')
-    for elem in wi_object:
-        wi_object[
-            elem], pooled, organisms, part_warnings, part_errors = validate_part(
-            wi_object[elem], [], pooled, organisms, [])
-        warnings[elem] = part_warnings
-        errors[elem] = part_errors
+
+    arguments = [(elem, wi_object[elem], [], pooled, organisms, []) for elem in wi_object]
+    pool_obj = multiprocessing.Pool()
+    answer = pool_obj.starmap(wi_utils.validate_part, arguments)
+
+    for elem in answer:
+        wi_object[elem[0]] = elem[1]
+        warnings[elem[0]] = elem[4]
+        errors[elem[0]] = elem[5]
+    #for elem in wi_object:
+    #    wi_object[
+    #        elem], pooled, organisms, part_warnings, part_errors = validate_part(
+    #        wi_object[elem], [], pooled, organisms, [])
+    #    warnings[elem] = part_warnings
+    #    errors[elem] = part_errors
     new_object = {}
     for part in ['project', 'experimental_setting', 'technical_details']:
         new_object[part] = wi_object[part]
@@ -600,94 +613,6 @@ def validate_object(wi_object):
                          'warnings': warnings, 'summary': html_str,
                          'yaml': yaml_object}
     return validation_object
-
-
-def validate_part(wi_object, warnings, pooled, organisms, errors):
-    error_desc = ''
-    warning_desc = ''
-    if isinstance(wi_object, dict):
-        if 'desc' in wi_object and 'backup_desc' not in wi_object:
-            wi_object['backup_desc'] = wi_object['desc']
-        if wi_object['list']:
-            if not any([isinstance(x, dict) or isinstance(x, list) for x in
-                        wi_object['list_value']]):
-                error = False
-                messages = []
-                for elem in wi_object['list_value']:
-                    valid, message = validate_yaml.validate_value(elem,
-                                                                  wi_object[
-                                                                      'data_type'],
-                                                                  wi_object[
-                                                                      'position'].split(
-                                                                      ':')[-1])
-                    if not valid:
-                        error = True
-                        messages.append((elem, message))
-                        errors.append(
-                            f'{wi_object["position"]}: Value {elem} - {message}')
-                wi_object['error'] = error
-                if error:
-                    message = ', '.join(
-                        [f'{msg[0]}: {msg[1]}' for msg in messages])
-                    error_desc = f'{error_desc}{"<br>" if error_desc != "" else ""}<font color="red">{message}</font>'
-                wi_object[
-                    'desc'] = f'{wi_object["backup_desc"]}{"<br>" if wi_object["backup_desc"] != "" else ""}{error_desc}{"<br>" if error_desc != "" else ""}{warning_desc}'
-            else:
-                wi_object[
-                    'list_value'], pooled, organisms, warnings, errors = validate_part(
-                    wi_object['list_value'], warnings, pooled, organisms,
-                    errors)
-        else:
-            if 'input_fields' in wi_object:
-                wi_object[
-                    'input_fields'], pooled, organisms, warnings, errors = validate_part(
-                    wi_object['input_fields'], warnings, pooled, organisms,
-                    errors)
-            else:
-                if wi_object['value'] is not None and wi_object['value'] != '':
-                    if wi_object['input_type'] == 'date':
-                        default_time = parser.parse(wi_object['value'])
-                        timezone = pytz.timezone("Europe/Berlin")
-                        local_time = default_time.astimezone(timezone)
-                        value = local_time.strftime("%d.%m.%Y")
-                    else:
-                        value = wi_object['value']
-                    valid, message = validate_yaml.validate_value(value,
-                                                                  wi_object[
-                                                                      'data_type'],
-                                                                  wi_object[
-                                                                      'position'].split(
-                                                                      ':')[-1])
-                    wi_object['error'] = not valid
-                    if not valid:
-                        errors.append(f'{wi_object["position"]}: {message}')
-                        error_desc = f'{error_desc}{"<br>" if error_desc != "" else ""}<font color="red">{message}</font>'
-
-                    warning = False
-                    warn_text = None
-                    key = wi_object['position'].split(':')[-1]
-                    if key == 'pooled':
-                        pooled = wi_object['value']
-                    elif key == 'donor_count':
-                        warning, warn_text = validate_yaml.validate_donor_count(
-                            pooled, wi_object['value'])
-                    elif key == 'organism':
-                        organisms.append(wi_object['value'].split(' ')[0])
-                    elif key == 'reference_genome':
-                        warning, warn_text = validate_yaml.validate_reference_genome(
-                            organisms, wi_object['value'])
-                    wi_object['warning'] = warning
-                    if warning:
-                        warnings.append(
-                            f'{wi_object["position"]}: {warn_text}')
-                        warning_desc = f'{warning_desc}{"<br>" if warning_desc != "" else ""}<font color="orange">{warn_text}</font>'
-                    wi_object[
-                        'desc'] = f'{wi_object["backup_desc"]}{"<br>" if wi_object["backup_desc"] != "" else ""}{error_desc}{"<br>" if error_desc != "" else ""}{warning_desc}'
-    elif isinstance(wi_object, list):
-        for i in range(len(wi_object)):
-            wi_object[i], pooled, organisms, warnings, errors = validate_part(
-                wi_object[i], warnings, pooled, organisms, errors)
-    return wi_object, pooled, organisms, warnings, errors
 
 
 def object_to_html(yaml_object, depth, margin, is_list):
@@ -816,3 +741,84 @@ def get_search_keys(key_yaml, chained):
             d['whitelist'] = False
         res.append(d)
     return res
+
+
+def edit_wi_object(meta_yaml):
+    empty_object = get_empty_wi_object()
+    wi_object = {}
+    for part in empty_object:
+        if part == 'all_factors':
+            wi_object[part] = get_all_factors(meta_yaml)
+        else:
+            wi_object[part] = fill_wi_object(empty_object[part], meta_yaml[part])
+    return wi_object
+
+
+def get_all_factors(meta_yaml):
+    all_factors = []
+    for setting in meta_yaml['experimental_setting']:
+        setting_factors = []
+        for factors in setting['experimental_factors']:
+            setting_fac = {'factor': factors['factor']}
+            if factors['factor'] == 'gene':
+                header = ''
+                value = []
+                for elem in factors['values']:
+                    val = ''
+                    for key in elem:
+                        header = f'{header}{" " if header != "" else ""}{key}'
+                        val = f'{val}{" " if val != "" else ""}{elem[key]}'
+                    value.append(val)
+                setting_fac['headers'] = header
+            else:
+                value = factors['values']
+            setting_fac['values'] = value
+            setting_factors.append(setting_fac)
+        all_factors.append(setting_factors)
+    return all_factors
+
+
+def fill_wi_object(wi_object, meta_yaml):
+    if 'list' in wi_object and wi_object['list']:
+        if 'input_fields' in wi_object:
+            if wi_object['position'].split(':')[-1] == 'experimental_factors':
+                pass
+            else:
+                for elem in meta_yaml:
+                    for field in wi_object['input_fields']:
+                        if field['position'].split(':')[-1] in elem:
+                            wi_object['list_value'].append(fill_wi_object(copy.deepcopy(field), elem[field['position'].split(':')[-1]]))
+                        else:
+                            wi_object['list_value'].append(copy.deepcopy(field))
+        else:
+            for elem in meta_yaml:
+                wi_object['list_value'].append(elem)
+    else:
+        if 'input_fields' in wi_object:
+            filled_fields = []
+            for elem in wi_object['input_fields']:
+                if elem['position'].split(':')[-1] in meta_yaml:
+                    filled_fields.append(fill_wi_object(elem, meta_yaml[elem['position'].split(':')[-1]]))
+                else:
+                    filled_fields.append(elem)
+        else:
+            if isinstance(meta_yaml, dict):
+                val = ''
+                for key in meta_yaml:
+                    val = f'{val}{" " if val != "" else ""}{meta_yaml[key]}'
+            else:
+                if wi_object['position'].split(':')[-1] == 'date':
+                    local_time = parser.parse(meta_yaml, dayfirst=True)
+                    default_time = local_time.astimezone(pytz.utc)
+                    val = default_time.strftime("%Y-%m-%dT%X.%fZ")
+                else:
+                    val = meta_yaml
+            wi_object['value'] = val
+            if wi_object['position'].split(':')[-1] == 'condition_name':
+                global disabled_fields
+                disabled_fields = [x[0] for x in generate.split_cond(wi_object['value'])]
+            if wi_object['position'].split(':')[-1] in disabled_fields or wi_object['position'].split(':')[-1] in ['sample_name','condition_name']:
+                wi_object['input_disabled'] = True
+            else:
+                wi_object['input_disabled'] = False
+    return wi_object
