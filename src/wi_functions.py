@@ -447,26 +447,25 @@ def validate_object(wi_object):
         wi_object[elem[0]] = elem[1]
         warnings[elem[0]] = elem[4]
         errors[elem[0]] = elem[5]
-    #for elem in wi_object:
-    #    wi_object[
-    #        elem], pooled, organisms, part_warnings, part_errors = validate_part(
-    #        wi_object[elem], [], pooled, organisms, [])
-    #    warnings[elem] = part_warnings
-    #    errors[elem] = part_errors
+
     new_object = {}
     for part in ['project', 'experimental_setting', 'technical_details']:
         new_object[part] = wi_object[part]
     wi_object = new_object
     wi_object['all_factors'] = copy.deepcopy(factors)
-    html_str = ''
+    validation_object = {'object': wi_object, 'errors': errors,
+                         'warnings': warnings}
+    return validation_object
+
+
+def get_summary(wi_object):
+    factors = copy.deepcopy(wi_object['all_factors'])
     yaml_object = parse_object(wi_object)
+    wi_object['all_factors'] = factors
+    html_str = ''
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
-    wi_object['all_factors'] = factors
-    validation_object = {'object': wi_object, 'errors': errors,
-                         'warnings': warnings, 'summary': html_str,
-                         'yaml': yaml_object}
-    return validation_object
+    return {'yaml': yaml_object, 'summary': html_str, 'file_names': 'TBA'}
 
 
 def object_to_html(yaml_object, depth, margin, is_list):
