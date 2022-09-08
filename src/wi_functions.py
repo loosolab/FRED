@@ -418,6 +418,10 @@ def get_whitelist_object(item, organism_name, whitelists):
 def parse_object(wi_object):
     factors = wi_object['all_factors']
     wi_object.pop('all_factors')
+    new_object = {}
+    for part in ['project', 'experimental_setting', 'technical_details']:
+        new_object[part] = wi_object[part]
+    wi_object = new_object
     result = {}
 
     arguments = [(wi_object[key], factors) for key in wi_object]
@@ -460,8 +464,11 @@ def validate_object(wi_object):
 
 def get_summary(wi_object):
     factors = copy.deepcopy(wi_object['all_factors'])
-    yaml_object = parse_object(wi_object)
-    wi_object['all_factors'] = factors
+    new_object = {}
+    for part in ['project', 'experimental_setting', 'technical_details']:
+        new_object[part] = wi_object[part]
+    new_object['all_factors'] = factors
+    yaml_object = parse_object(new_object)
     html_str = ''
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
