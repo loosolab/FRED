@@ -423,8 +423,11 @@ def parse_object(wi_object):
         new_object[part] = wi_object[part]
     wi_object = new_object
     result = {}
-
-    arguments = [(wi_object[key], factors) for key in wi_object]
+    id = ''
+    for elem in wi_object['project']['input_fields']:
+        if elem['position'].split(':')[-1] == 'id':
+            id = elem['value']
+    arguments = [(wi_object[key], factors, '', id, 1) for key in wi_object]
     pool_obj = multiprocessing.Pool()
     answer = pool_obj.starmap(wi_utils.parse_part, arguments)
     for i in range(len(answer)):
@@ -469,10 +472,15 @@ def get_summary(wi_object):
         new_object[part] = wi_object[part]
     new_object['all_factors'] = factors
     yaml_object = parse_object(new_object)
+    filename_nested = list(utils.find_list_key(yaml_object, 'technical_replicates:sample_name'))
+    filenames = []
+    for file_list in filename_nested:
+        for filename in file_list:
+            filenames.append(filename)
     html_str = ''
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
-    return {'yaml': yaml_object, 'summary': html_str, 'file_names': 'TBA'}
+    return {'yaml': yaml_object, 'summary': html_str, 'file_names': filenames}
 
 
 def object_to_html(yaml_object, depth, margin, is_list):

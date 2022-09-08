@@ -102,7 +102,8 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
                 elem, wi_object[i], warnings, pooled, organisms, errors)
     return elem, wi_object, pooled, organisms, warnings, errors
 
-def parse_part(wi_object, factors):
+
+def parse_part(wi_object, factors, organism, id, nom):
     gn = None
     embl = None
     key_yaml = utils.read_in_yaml(os.path.join(
@@ -134,6 +135,7 @@ def parse_part(wi_object, factors):
         new_samp['input_fields'] = input_fields
         wi_object = new_samp
     return_dict = {}
+
     if isinstance(wi_object, dict):
         if wi_object['list']:
             test = []
@@ -141,7 +143,10 @@ def parse_part(wi_object, factors):
                 if not isinstance(elem, dict) and not isinstance(elem, list):
                     test.append(elem)
                 else:
-                    test.append(parse_part(elem, factors))
+                    for sub_elem in elem:
+                        if sub_elem['position'].split(':')[-1] == 'number_of_measurements':
+                            nom = sub_elem['value']
+                    test.append(parse_part(elem, factors, organism, id, nom))
             return test
         else:
             if 'whitelist' in wi_object and wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
@@ -158,7 +163,7 @@ def parse_part(wi_object, factors):
                 new_obj['input_fields'] = input_fields
                 wi_object = new_obj
             if 'input_fields' in wi_object:
-                return parse_part(wi_object['input_fields'], factors)
+                return parse_part(wi_object['input_fields'], factors, organism, id, nom)
             else:
                 if wi_object['value'] and wi_object[
                         'input_type'] == 'value_unit':
@@ -169,10 +174,13 @@ def parse_part(wi_object, factors):
                     return wi_object['value']
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
+            if wi_object[i]['position'].split(':')[-1] == 'organism':
+                organism = wi_object[i]['value'].split(' ')[0]
+
             if wi_object[i]['position'].split(':')[-1] == 'conditions':
                 test = []
                 for j in range(len(wi_object[i]['list_value'])):
-                    value = parse_part(wi_object[i]['list_value'][j], factors)
+                    value = parse_part(wi_object[i]['list_value'][j], factors, organism, id, nom)
                     if ((isinstance(value, list) or isinstance(value,
                                                                dict)) and len(
                         value) > 0) or (
@@ -192,11 +200,12 @@ def parse_part(wi_object, factors):
                 return_dict['conditions'] = test
             elif wi_object[i]['position'].split(':')[
                 -1] == 'technical_replicates':
-                technical_replicates = parse_part(wi_object[i], factors)
+                technical_replicates = parse_part(wi_object[i], factors, organism, id, nom)
                 sample_name = []
                 for c in range(technical_replicates['count']):
-                    sample_name.append(
-                        f'{return_dict["sample_name"]}_t{c + 1}')
+                    for m in range(nom):
+                        sample_name.append(
+                            f'{id}_{organism}_{return_dict["sample_name"]}_t{"{:02d}".format(c+1)}_m{"{:02d}".format(m+1)}')
                 technical_replicates['sample_name'] = sample_name
                 return_dict['technical_replicates'] = technical_replicates
             elif wi_object[i]['position'].split(':')[
@@ -236,7 +245,7 @@ def parse_part(wi_object, factors):
                 return_dict['experimental_factors'] = res
 
             else:
-                value = parse_part(wi_object[i], factors)
+                value = parse_part(wi_object[i], factors, organism, id, nom)
                 if ((isinstance(value, list) or isinstance(value,
                                                            dict)) and len(
                     value) > 0) or (
