@@ -558,8 +558,9 @@ def get_color(depth):
 
 
 def save_object(dictionary, path, filename):
-    utils.save_as_yaml(dictionary, os.path.join(path,
-                                                f'{filename}_{dictionary["project"]["id"]}_metadata.yaml'))
+    new_filename = f'{filename}_{dictionary["project"]["id"]}_metadata.yaml'
+    utils.save_as_yaml(dictionary, os.path.join(path, new_filename))
+    return new_filename
 
 
 def get_meta_info(path, id):
