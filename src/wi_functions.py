@@ -260,7 +260,7 @@ def get_samples(condition, sample):
                            'replicates:samples:sample_name':
             sample[i]['value'] = condition.replace(':', ': ').replace('|',
                                                                       '| ').replace(
-                '#', '# ')
+                '#', '# ').replace('-', ' - ')
             sample[i]['correct_value'] = condition
         for c in conds:
             if sample[i][
@@ -401,7 +401,7 @@ def get_conditions(factors, organism_name):
         d = {'correct_value': cond,
              'title': cond.replace(':', ': ').replace('|',
                                                               '| ').replace(
-                 '#', '# '),
+                 '#', '# ').replace('-', ' - '),
              'position': 'experimental_setting:condition',
              'list': True, 'mandatory': True, 'list_value': [],
              'input_disabled': False, 'desc': '',
