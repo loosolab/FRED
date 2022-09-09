@@ -258,10 +258,11 @@ def get_samples(condition, sample):
         if sample[i][
             'position'] == 'experimental_setting:conditions:biological_' \
                            'replicates:samples:sample_name':
-            sample[i]['value'] = condition.replace(':', ': ').replace('|',
+            sample_name = generate.get_short_name(condition, {})
+            sample[i]['value'] = sample_name.replace(':', ': ').replace('|',
                                                                       '| ').replace(
-                '#', '# ').replace('-', ' - ')
-            sample[i]['correct_value'] = condition
+                '#', '# ').replace('-', ' - ').replace('+', ' + ')
+            sample[i]['correct_value'] = sample_name
         for c in conds:
             if sample[i][
                 'position'] == f'experimental_setting:conditions:biological_' \
