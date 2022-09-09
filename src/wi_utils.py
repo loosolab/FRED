@@ -171,7 +171,10 @@ def parse_part(wi_object, factors, organism, id, nom):
                     value = wi_object['value']
                     return {'unit': unit, 'value': value}
                 else:
-                    return wi_object['value']
+                    if 'correct_value' in wi_object:
+                        return wi_object['correct_value']
+                    else:
+                        return wi_object['value']
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
             if wi_object[i]['position'].split(':')[-1] == 'organism':
@@ -189,7 +192,7 @@ def parse_part(wi_object, factors, organism, id, nom):
                         dict) and value is not None and value != ''):
                         test.append({'condition_name':
                                          wi_object[i]['list_value'][j][
-                                             'title'],
+                                             'correct_value'],
                                      'biological_replicates': {
                                          'count': len(value),
                                          'samples': value}})
