@@ -278,7 +278,7 @@ experimental_setting:
                   - ''
                   - null
                   - False
-                  - short_text
+                  - long_text
                   - str
                 pooled:
                   - 'mandatory'
