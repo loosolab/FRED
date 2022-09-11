@@ -172,6 +172,9 @@ def parse_part(wi_object, factors, organism, id, nom):
                     return {'unit': unit, 'value': value}
                 else:
                     if 'correct_value' in wi_object:
+                        if wi_object['position'].split(':')[-1] == 'sample_name':
+                            sample_count = int(wi_object['value'].split('_')[-1])
+                            return f'{wi_object["correct_value"]}_b{"{:02d}".format(sample_count)}'
                         return wi_object['correct_value']
                     else:
                         return wi_object['value']
@@ -199,7 +202,7 @@ def parse_part(wi_object, factors, organism, id, nom):
                     else:
                         test.append({'condition_name':
                                          wi_object[i]['list_value'][j][
-                                             'title']})
+                                             'correct_value']})
                 return_dict['conditions'] = test
             elif wi_object[i]['position'].split(':')[
                 -1] == 'technical_replicates':
