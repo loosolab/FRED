@@ -663,15 +663,19 @@ def get_search_keys(key_yaml, chained):
 
 
 def edit_wi_object(path, id):
-    meta_yaml = metaTools_functions.find(path, id, True)[0][id]
-    empty_object = get_empty_wi_object()
-    wi_object = {}
-    for part in empty_object:
-        if part == 'all_factors':
-            wi_object[part] = get_all_factors(meta_yaml)
-        else:
-            wi_object[part] = fill_wi_object(empty_object[part],
+    meta_yaml = metaTools_functions.find(path, id, True)
+    if len(meta_yaml) > 0:
+        meta_yaml = meta_yaml[0][id]
+        empty_object = get_empty_wi_object()
+        wi_object = {}
+        for part in empty_object:
+            if part == 'all_factors':
+                wi_object[part] = get_all_factors(meta_yaml)
+            else:
+                wi_object[part] = fill_wi_object(empty_object[part],
                                              meta_yaml[part])
+    else:
+        wi_object = get_empty_wi_object()
     return wi_object
 
 
