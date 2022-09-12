@@ -15,9 +15,10 @@ whitelist:
     - Ribotag
     - Riboseq
     - Multiome
-    - CnRunseq
+    - Cut&Run
     - Methylation array
     - Bisulfitseq
     - Proseq
     - Medip
     - Ripseq
+    - Cut&Tag
