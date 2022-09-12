@@ -13,4 +13,5 @@ whitelist:
     - treatment
     - time_point
     - flow
+    - enrichment
 

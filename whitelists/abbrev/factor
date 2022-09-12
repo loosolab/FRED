@@ -9,3 +9,4 @@ ethnicity: eth
 disease: dis
 treatment: trt
 time_point: tmp
+enrichment: enr

@@ -520,6 +520,15 @@ experimental_setting:
                   - True
                   - select
                   - str
+                enrichment:
+                  - 'optional'
+                  - False
+                  - 'Enrichment / Histone-Mark / Pull-Down'
+                  - 'Enrichment for bound protein/histone mark as a result of an antibody pulldown or similar procedure (e.g. ChIPSeq, Cut&Tag, RiboTag)'
+                  - null
+                  - True
+                  - select
+                  - str
                 donor_count:
                   - 'mandatory'
                   - False
