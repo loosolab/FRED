@@ -26,8 +26,8 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
                         wi_object['list_value']]):
                 error = False
                 messages = []
-                for elem in wi_object['list_value']:
-                    valid, message = validate_yaml.validate_value(elem,
+                for sub_elem in wi_object['list_value']:
+                    valid, message = validate_yaml.validate_value(sub_elem,
                                                                   wi_object[
                                                                       'data_type'],
                                                                   wi_object[
@@ -35,9 +35,9 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
                                                                       ':')[-1])
                     if not valid:
                         error = True
-                        messages.append((elem, message))
+                        messages.append((sub_elem, message))
                         errors.append(
-                            f'{wi_object["position"]}: Value {elem} - {message}')
+                            f'{wi_object["position"]}: Value {sub_elem} - {message}')
                 wi_object['error'] = error
                 if error:
                     message = ', '.join(
