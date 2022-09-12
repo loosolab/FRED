@@ -662,7 +662,8 @@ def get_search_keys(key_yaml, chained):
     return res
 
 
-def edit_wi_object(meta_yaml):
+def edit_wi_object(path, id):
+    meta_yaml = metaTools_functions.find(path, id, True)[0][id]
     empty_object = get_empty_wi_object()
     wi_object = {}
     for part in empty_object:
@@ -705,17 +706,59 @@ def fill_wi_object(wi_object, meta_yaml):
                 pass
             else:
                 for elem in meta_yaml:
+                    list_value = []
                     for field in wi_object['input_fields']:
                         if field['position'].split(':')[-1] in elem:
-                            wi_object['list_value'].append(
+                            list_value.append(
                                 fill_wi_object(copy.deepcopy(field), elem[
                                     field['position'].split(':')[-1]]))
+
                         else:
-                            wi_object['list_value'].append(
-                                copy.deepcopy(field))
+                            if field['position'].split(':')[
+                                -2] == 'samples':
+                                if 'input_fields' in field:
+                                    for part in field['input_fields']:
+                                        if 'whitelist' in part and part[
+                                    'whitelist'] is not None:
+                                            if part['data_type'] == 'value_unit':
+                                                part['whitelist'] = 'unit'
+                                            else:
+                                                part['whitelist'] = \
+                                                        part['position'].split(':')[-1]
+                                else:
+                                    if 'whitelist' in field and field[
+                                        'whitelist'] is not None:
+                                        if field['data_type'] == 'value_unit':
+                                            field['whitelist'] = 'unit'
+                                        else:
+                                            field['whitelist'] = \
+                                                field['position'].split(':')[-1]
+                            list_value.append(copy.deepcopy(field))
+                    wi_object['list_value'].append(list_value)
+                if wi_object['position'].split(':')[-1] == 'experimental_setting':
+                    for part in wi_object['list_value']:
+                        conditions = []
+                        for elem in part[2]['list_value']:
+                            input_fields = copy.deepcopy(elem[1]['input_fields'][1]['list_value'][0])
+                            for i in range(len(input_fields)):
+                                if input_fields[i]['position'].split(':')[
+                                        -1] == 'sample_name':
+                                    input_fields[i]['value'] = input_fields[i]['value'].split('_')[0]
+                            conditions.append({'position': 'experimental_setting:condition',
+                                         'correct_value': f'{elem[0]["value"]}',
+                                         'title': elem[0]['value'].replace(':', ': ').replace('|', '| ').replace('#', '# ').replace('-', ' - '),
+                                         'desc': "", 'mandatory': True,
+                                         'input_disabled': False, 'list': True,
+                                         'input_fields': input_fields,
+                                         'list_value': elem[1]['input_fields'][1]['list_value']})
+                        part[2]['list_value'] = conditions
+
         else:
-            for elem in meta_yaml:
-                wi_object['list_value'].append(elem)
+            if wi_object['position'].endswith('technical_replicates:sample_name'):
+                wi_object['list_value'] = []
+            else:
+                for elem in meta_yaml:
+                    wi_object['list_value'].append(elem)
     else:
         if 'input_fields' in wi_object:
             filled_fields = []
@@ -742,6 +785,15 @@ def fill_wi_object(wi_object, meta_yaml):
                 global disabled_fields
                 disabled_fields = [x[0] for x in
                                    generate.split_cond(wi_object['value'])]
+            if wi_object['position'].split(':')[-1] == 'sample_name':
+                sample_count = wi_object['value'].split('_')[-1]
+                int_count = int(sample_count.replace('b', ''))
+                value = f'{wi_object["value"].replace("_"+sample_count, "")}'
+                wi_object['correct_value'] = copy.deepcopy(value)
+                wi_object['value'] = f'{value.replace(":", ": ").replace("|", "| ").replace("#", "# ").replace("-", " - ").replace("+", " + ")}_{int_count}'
+            if wi_object['position'].split(':')[-2] == 'samples':
+                if 'whitelist' in wi_object and wi_object['whitelist'] is not None:
+                    wi_object['whitelist'] = wi_object['position'].split(':')[-1]
             if wi_object['position'].split(':')[-1] in disabled_fields or \
                     wi_object['position'].split(':')[-1] in ['sample_name',
                                                              'condition_name']:
