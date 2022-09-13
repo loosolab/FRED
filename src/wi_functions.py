@@ -531,7 +531,7 @@ def get_html_filenames(filename_nested):
         for filename in file_list:
             part_html = f'{part_html}- {filename}<br>'
             filenames.append(filename)
-        html_filenames = f'{html_filenames}{part_html}{"<br><hr><br>" if file_list != filename_nested[-1] else ""}'
+        html_filenames = f'{html_filenames}{part_html}{"<br><hr><br>" if file_list != filename_nested[-1] else "<br>"}'
     return html_filenames, filenames
 
 
@@ -578,15 +578,22 @@ def get_meta_info(path, id):
     yaml = metaTools_functions.find(path, f'id:{id}', True)
     if len(yaml) == 0:
         return f'No metadata found.'
-    elif len(yaml) > 1:
-        return f'Error: Multiple metadata files found.'
     else:
-        if 'path' in yaml[0][id]:
-            yaml[0][id].pop('path')
-        html_str = ''
-        for elem in yaml[0][id]:
-            html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml[0][id][elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml[0][id].keys())[-1] else ""}'
-        return html_str
+        count = 0
+        for elem in yaml:
+            for key in elem:
+                if key == id:
+                    yaml = elem[key]
+                    count += 1
+        if count > 1:
+            return f'Error: Multiple metadata files found.'
+        else:
+            if 'path' in yaml:
+                yaml.pop('path')
+            html_str = ''
+            for elem in yaml:
+                html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml.keys())[-1] else ""}'
+            return html_str
 
 
 def get_search_mask():
