@@ -593,7 +593,6 @@ def get_experimental_factors(node, result_dict):
                 f' factor {factor_value["factor"]} divided by comma:\n')
             used_values = parse_input_list(value_type, False)
 
-        print(used_values)
         factor_value['values'] = used_values
         experimental_factors.append(factor_value)
 
@@ -681,12 +680,12 @@ def get_combis(values, key, multi):
 
 def get_conditions(factors, node, mandatory_mode, result_dict):
     for i in range(len(factors)):
-        if isinstance(factors[i]['values'], dict):
+        if isinstance(factors[i]['values'], dict) and 'value' not in factors[i]['values'] and 'unit' not in factors[i]['values']:
             factors[i]['values'] = get_combinations(factors[i]['values'], factors[i]['factor'], factors[i]['factor'])
             if 'ident_key' in result_dict['experimental_factors'][i]['values']:
                 result_dict['experimental_factors'][i]['values'].pop('ident_key')
         elif isinstance(factors[i]['values'], list):
-            if all(isinstance(elem, dict) for elem in factors[i]['values']):
+            if all(isinstance(elem, dict) and 'value' not in elem and 'unit' not in elem for elem in factors[i]['values']):
                 for k in range(len(factors[i]['values'])):
                     new_val = f'{factors[i]["factor"]}:{"{"}'
                     for j in range(len(list(factors[i]['values'][k].keys()))):
