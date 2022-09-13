@@ -260,7 +260,7 @@ def get_samples(condition, sample):
                            'replicates:samples:sample_name':
             sample_name = generate.get_short_name(condition, {})
             sample[i]['value'] = sample_name.replace(':', ': ').replace('|',
-                                                                      '| ').replace(
+                                                                        '| ').replace(
                 '#', '# ').replace('-', ' - ').replace('+', ' + ')
             sample[i]['correct_value'] = sample_name
         for c in conds:
@@ -401,7 +401,7 @@ def get_conditions(factors, organism_name):
         cond_sample = get_samples(cond, cond_sample)
         d = {'correct_value': cond,
              'title': cond.replace(':', ': ').replace('|',
-                                                              '| ').replace(
+                                                      '| ').replace(
                  '#', '# ').replace('-', ' - '),
              'position': 'experimental_setting:condition',
              'list': True, 'mandatory': True, 'list_value': [],
@@ -524,7 +524,9 @@ def get_summary(wi_object):
     html_str = ''
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
-    return {'yaml': yaml_object, 'summary': html_str, 'file_names': html_filenames, 'file_string': (id, '\n'.join(filenames)) if id is not None else None}
+    return {'yaml': yaml_object, 'summary': html_str,
+            'file_names': html_filenames, 'file_string': (
+        id, '\n'.join(filenames)) if id is not None else None}
 
 
 def get_html_filenames(filename_nested):
@@ -571,8 +573,20 @@ def get_color(depth):
 
 
 def save_object(dictionary, path, filename):
-    new_filename = f'{filename}_{dictionary["project"]["id"]}_metadata.yaml'
-    utils.save_as_yaml(dictionary, os.path.join(path, new_filename))
+    metafiles = metaTools_functions.find(path,
+                                         f'id:"{dictionary["project"]["id"]}"',
+                                         False)
+    if len(metafiles) > 0:
+        for elem in metafiles:
+            for key in elem:
+                if key == dictionary['project']['id']:
+                    path = elem[key]
+        new_filename = path
+        utils.save_as_yaml(dictionary, path)
+    else:
+        new_filename = f'{filename}_{dictionary["project"]["id"]}_metadata.yaml'
+        utils.save_as_yaml(dictionary, os.path.join(path, new_filename))
+        new_filename = os.path.join(path, new_filename)
     return new_filename
 
 
@@ -700,6 +714,8 @@ def edit_wi_object(path, id):
             for key in elem:
                 if key == id:
                     meta_yaml = elem[key]
+        if 'path' in meta_yaml:
+            meta_yaml.pop('path')
         empty_object = get_empty_wi_object()
         wi_object = {}
         for part in empty_object:
@@ -707,10 +723,33 @@ def edit_wi_object(path, id):
                 wi_object[part] = get_all_factors(meta_yaml)
             else:
                 wi_object[part] = fill_wi_object(empty_object[part],
-                                             meta_yaml[part])
+                                                 meta_yaml[part])
     else:
         wi_object = get_empty_wi_object()
-    return wi_object
+
+    key_yaml = utils.read_in_yaml(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
+    sample = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
+                         ['biological_replicates'][4]['samples'],
+                         'experimental_setting:conditions:biological_'
+                         'replicates:samples', key_yaml, False)[
+        'input_fields']
+    whitelist_object = {}
+    for experimental_setting in wi_object['experimental_setting'][
+        'list_value']:
+        organism = ''
+        for elem in experimental_setting:
+            if elem['position'].split(':')[-1] == 'organism':
+                organism = elem['value'].split(' ')[0]
+                print(organism)
+                break
+        whitelists = {}
+        for item in sample:
+            item, whitelists = get_whitelist_object(item, organism,
+                                                    whitelists)
+        whitelist_object[organism] = whitelists
+    return {'object': wi_object, 'whitelists': whitelist_object}
 
 
 def get_all_factors(meta_yaml):
@@ -757,12 +796,14 @@ def fill_wi_object(wi_object, meta_yaml):
                                 if 'input_fields' in field:
                                     for part in field['input_fields']:
                                         if 'whitelist' in part and part[
-                                    'whitelist'] is not None:
-                                            if part['data_type'] == 'value_unit':
+                                            'whitelist'] is not None:
+                                            if part[
+                                                'data_type'] == 'value_unit':
                                                 part['whitelist'] = 'unit'
                                             else:
                                                 part['whitelist'] = \
-                                                        part['position'].split(':')[-1]
+                                                    part['position'].split(
+                                                        ':')[-1]
                                 else:
                                     if 'whitelist' in field and field[
                                         'whitelist'] is not None:
@@ -770,29 +811,39 @@ def fill_wi_object(wi_object, meta_yaml):
                                             field['whitelist'] = 'unit'
                                         else:
                                             field['whitelist'] = \
-                                                field['position'].split(':')[-1]
+                                                field['position'].split(':')[
+                                                    -1]
                             list_value.append(copy.deepcopy(field))
                     wi_object['list_value'].append(list_value)
-                if wi_object['position'].split(':')[-1] == 'experimental_setting':
+                if wi_object['position'].split(':')[
+                    -1] == 'experimental_setting':
                     for part in wi_object['list_value']:
                         conditions = []
                         for elem in part[2]['list_value']:
-                            input_fields = copy.deepcopy(elem[1]['input_fields'][1]['list_value'][0])
+                            input_fields = copy.deepcopy(
+                                elem[1]['input_fields'][1]['list_value'][0])
                             for i in range(len(input_fields)):
                                 if input_fields[i]['position'].split(':')[
-                                        -1] == 'sample_name':
-                                    input_fields[i]['value'] = input_fields[i]['value'].split('_')[0]
-                            conditions.append({'position': 'experimental_setting:condition',
-                                         'correct_value': f'{elem[0]["value"]}',
-                                         'title': elem[0]['value'].replace(':', ': ').replace('|', '| ').replace('#', '# ').replace('-', ' - '),
-                                         'desc': "", 'mandatory': True,
-                                         'input_disabled': False, 'list': True,
-                                         'input_fields': input_fields,
-                                         'list_value': elem[1]['input_fields'][1]['list_value']})
+                                    -1] == 'sample_name':
+                                    input_fields[i]['value'] = \
+                                    input_fields[i]['value'].split('_')[0]
+                            conditions.append(
+                                {'position': 'experimental_setting:condition',
+                                 'correct_value': f'{elem[0]["value"]}',
+                                 'title': elem[0]['value'].replace(':',
+                                                                   ': ').replace(
+                                     '|', '| ').replace('#', '# ').replace('-',
+                                                                           ' - '),
+                                 'desc': "", 'mandatory': True,
+                                 'input_disabled': False, 'list': True,
+                                 'input_fields': input_fields,
+                                 'list_value': elem[1]['input_fields'][1][
+                                     'list_value']})
                         part[2]['list_value'] = conditions
 
         else:
-            if wi_object['position'].endswith('technical_replicates:sample_name'):
+            if wi_object['position'].endswith(
+                    'technical_replicates:sample_name'):
                 wi_object['list_value'] = []
             else:
                 for elem in meta_yaml:
@@ -826,12 +877,15 @@ def fill_wi_object(wi_object, meta_yaml):
             if wi_object['position'].split(':')[-1] == 'sample_name':
                 sample_count = wi_object['value'].split('_')[-1]
                 int_count = int(sample_count.replace('b', ''))
-                value = f'{wi_object["value"].replace("_"+sample_count, "")}'
+                value = f'{wi_object["value"].replace("_" + sample_count, "")}'
                 wi_object['correct_value'] = copy.deepcopy(value)
-                wi_object['value'] = f'{value.replace(":", ": ").replace("|", "| ").replace("#", "# ").replace("-", " - ").replace("+", " + ")}_{int_count}'
+                wi_object[
+                    'value'] = f'{value.replace(":", ": ").replace("|", "| ").replace("#", "# ").replace("-", " - ").replace("+", " + ")}_{int_count}'
             if wi_object['position'].split(':')[-2] == 'samples':
-                if 'whitelist' in wi_object and wi_object['whitelist'] is not None:
-                    wi_object['whitelist'] = wi_object['position'].split(':')[-1]
+                if 'whitelist' in wi_object and wi_object[
+                    'whitelist'] is not None:
+                    wi_object['whitelist'] = wi_object['position'].split(':')[
+                        -1]
             if wi_object['position'].split(':')[-1] in disabled_fields or \
                     wi_object['position'].split(':')[-1] in ['sample_name',
                                                              'condition_name',
