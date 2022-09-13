@@ -516,14 +516,23 @@ def get_summary(wi_object):
     yaml_object = parse_object(new_object)
     filename_nested = list(
         utils.find_list_key(yaml_object, 'technical_replicates:sample_name'))
-    filenames = []
-    for file_list in filename_nested:
-        for filename in file_list:
-            filenames.append(filename)
+    html_filenames, filenames = get_html_filenames(filename_nested)
     html_str = ''
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
-    return {'yaml': yaml_object, 'summary': html_str, 'file_names': filenames}
+    return {'yaml': yaml_object, 'summary': html_str, 'file_names': html_filenames, 'file_string': '\n'.join(filenames)}
+
+
+def get_html_filenames(filename_nested):
+    filenames = []
+    html_filenames = ''
+    for file_list in filename_nested:
+        part_html = ''
+        for filename in file_list:
+            part_html = f'{part_html}- {filename}<br>'
+            filenames.append(filename)
+        html_filenames = f'{html_filenames}{part_html}{"<br><hr><br>" if file_list != filename_nested[-1] else ""}'
+    return html_filenames, filenames
 
 
 def object_to_html(yaml_object, depth, margin, is_list):
