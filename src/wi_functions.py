@@ -665,7 +665,10 @@ def get_search_keys(key_yaml, chained):
 def edit_wi_object(path, id):
     meta_yaml = metaTools_functions.find(path, id, True)
     if len(meta_yaml) > 0:
-        meta_yaml = meta_yaml[0][id]
+        for elem in meta_yaml:
+            for key in elem:
+                if key == id:
+                    meta_yaml = elem[key]
         empty_object = get_empty_wi_object()
         wi_object = {}
         for part in empty_object:
@@ -800,7 +803,9 @@ def fill_wi_object(wi_object, meta_yaml):
                     wi_object['whitelist'] = wi_object['position'].split(':')[-1]
             if wi_object['position'].split(':')[-1] in disabled_fields or \
                     wi_object['position'].split(':')[-1] in ['sample_name',
-                                                             'condition_name']:
+                                                             'condition_name',
+                                                             'id',
+                                                             'project_name']:
                 wi_object['input_disabled'] = True
             else:
                 wi_object['input_disabled'] = False
