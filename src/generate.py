@@ -210,7 +210,6 @@ def generate_part(node, key, return_dict, optional, mandatory_mode,
                                 value = parse_input_value(option, node[option][3], True, 'str', result_dict)
                                 return value
                             else:
-                                print(node[option])
                                 val = get_redo_value(node[option],
                                                              option,
                                                              optional,
@@ -337,7 +336,7 @@ def get_experimental_factors(node, result_dict):
                             while redo:
                                 input_value = complete_input(w, factor_value[
                                     "factor"])
-                                if input_value in value_list:
+                                if input_value in w:
                                     values.append(input_value)
                                     redo = parse_list_choose_one([True, False],
                                                                  f'\nDo you want to add another {factor_value["factor"]}?')
@@ -416,7 +415,7 @@ def get_experimental_factors(node, result_dict):
                                     f'{value}.')
                                     while redo:
                                         input_value = complete_input(w, value)
-                                        if input_value in value_list:
+                                        if input_value in w:
                                             used_values[value] = input_value
                                             redo = parse_list_choose_one([True, False],
                                                          f'\nDo you want to add another {factor_value["factor"]}?')
@@ -491,7 +490,7 @@ def get_experimental_factors(node, result_dict):
                                             f'{value}.')
                                             while redo:
                                                 input_value = complete_input(w, value)
-                                                if input_value in value_list:
+                                                if input_value in w:
                                                     used_values[value] = input_value
                                                     redo = parse_list_choose_one([True, False],
                                                                  f'\nDo you want to add another {factor_value["factor"]}?')
@@ -547,7 +546,7 @@ def get_experimental_factors(node, result_dict):
                         f'{factor_value["factor"]}.')
                     while redo:
                         input_value = complete_input(w, factor_value["factor"])
-                        if input_value in value_list:
+                        if input_value in w:
                             used_values.append(input_value)
                             redo = parse_list_choose_one([True, False],
                                                          f'\nDo you want to add another {factor_value["factor"]}?')
