@@ -22,3 +22,5 @@ whitelist:
     - Medip
     - Ripseq
     - Cut&Tag
+    - ChiRP-Seq
+    - DRIP-seq
