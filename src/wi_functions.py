@@ -514,13 +514,17 @@ def get_summary(wi_object):
         new_object[part] = wi_object[part]
     new_object['all_factors'] = factors
     yaml_object = parse_object(new_object)
+    if 'project' in yaml_object and 'id' in yaml_object['project']:
+        id = yaml_object['project']['id']
+    else:
+        id = None
     filename_nested = list(
         utils.find_list_key(yaml_object, 'technical_replicates:sample_name'))
     html_filenames, filenames = get_html_filenames(filename_nested)
     html_str = ''
     for elem in yaml_object:
         html_str = f'{html_str}<h3>{elem}</h3>{object_to_html(yaml_object[elem], 0, 0, False)}<br>{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
-    return {'yaml': yaml_object, 'summary': html_str, 'file_names': html_filenames, 'file_string': '\n'.join(filenames)}
+    return {'yaml': yaml_object, 'summary': html_str, 'file_names': html_filenames, 'file_string': (id, '\n'.join(filenames)) if id is not None else None}
 
 
 def get_html_filenames(filename_nested):
@@ -570,6 +574,17 @@ def save_object(dictionary, path, filename):
     new_filename = f'{filename}_{dictionary["project"]["id"]}_metadata.yaml'
     utils.save_as_yaml(dictionary, os.path.join(path, new_filename))
     return new_filename
+
+
+def save_filenames(file_str, path):
+    if file_str is not None:
+        filename = f'{file_str[0]}_samples.txt'
+        text_file = open(os.path.join(path, filename), "w")
+        text_file.write(file_str[1])
+        text_file.close()
+    else:
+        filename = None
+    return filename
 
 
 def get_meta_info(path, id):
