@@ -741,12 +741,11 @@ def edit_wi_object(path, id):
         organism = ''
         for elem in experimental_setting:
             if elem['position'].split(':')[-1] == 'organism':
-                organism = elem['value'].split(' ')[0]
-                print(organism)
+                organism = elem['value']
                 break
         whitelists = {}
         for item in sample:
-            item, whitelists = get_whitelist_object(item, organism,
+            item, whitelists = get_whitelist_object(item, organism.split(' ')[0],
                                                     whitelists)
         whitelist_object[organism] = whitelists
     return {'object': wi_object, 'whitelists': whitelist_object}
