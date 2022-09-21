@@ -104,10 +104,10 @@ def print_warning(metafile, pool_warn, ref_genome_warn):
           f'Report:\n')
     if len(pool_warn) > 0:
         for elem in pool_warn:
-            print(f'- Sample \'{elem[0]}\': {elem[1]}')
+            print(f'- Sample \'{elem[0]}\':\n{elem[1]}')
     if len(ref_genome_warn) > 0:
         for elem in ref_genome_warn:
-            print(f'- Run from {elem[0]}: {elem[1]}')
+            print(f'- Run from {elem[0]}:\n{elem[1]}')
     print(f'{"".center(80, "-")}')
 
 

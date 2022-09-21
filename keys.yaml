@@ -49,7 +49,7 @@ project:
           - 'mandatory'
           - False
           - 'Name'
-          - ''
+          - "The name should be entered in the format '<Last name>, <First name>'"
           - null
           - False
           - short_text

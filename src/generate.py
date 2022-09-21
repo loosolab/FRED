@@ -60,7 +60,8 @@ def generate_file(path, input_id, name, mandatory_mode):
     print(f'{"".center(size.columns, "-")}\n'
           f'{"SUMMARY".center(size.columns, " ")}\n'
           f'{"".center(size.columns, "-")}\n')
-    print_summary(result_dict, '')
+    sum = print_summary(result_dict, 1, False)
+    print(sum)
     print(f'\n\n')
     print(f'{"".center(size.columns, "-")}\n')
 
@@ -80,22 +81,26 @@ def generate_file(path, input_id, name, mandatory_mode):
                            os.path.join(path, f'{input_id}_metadata.yaml'))
     print_sample_names(result_dict, input_id, path)
 
-def print_summary(result, pre):
+
+def print_summary(result, depth, is_list):
+    summary = ''
     if isinstance(result, dict):
-        print(f'{pre}')
-        tabs = '\t' * pre.count('\t')
         for key in result:
-            print_summary(result[key], f'\t{tabs}{key}: ')
-    elif isinstance(result, list):
-        print(f'{pre}')
-        tabs = '\t' * pre.count('\t')
-        for item in result:
-            if isinstance(item, dict):
-                print_summary(item, f'{tabs}')
+            if key == list(result.keys())[0] and is_list:
+                summary = f'{summary}\n{"    "*(depth-1)}{"  - "}{key}: {print_summary(result[key], depth + 1, is_list)}'
             else:
-                print_summary(item, f'{tabs}\t-')
+                summary = f'{summary}\n{"    "*depth}{key}: {print_summary(result[key], depth + 1, is_list)}'
+    elif isinstance(result, list):
+        for elem in result:
+            if not isinstance(elem, list) and not isinstance(elem, dict):
+                summary = f'{summary}\n{"    "*(depth-1)}{"  - "}{elem}'
+            else:
+                summary = f'{summary}{print_summary(elem, depth, True)}'
     else:
-        print(f'{pre}{result}')
+        summary = f'{summary}{result}'
+    return summary
+
+
 
 
 def print_sample_names(result, input_id, path):
