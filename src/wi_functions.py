@@ -46,13 +46,13 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
     """
     input_disabled = True if pos.split(':')[-1] in ['condition_name',
                                                     'sample_name'] else False
+    whitelist_type = None
     if isinstance(node[4], dict):
         input_fields = []
 
         if len(node) > 5 and isinstance(node[5], dict) and 'merge' in node[5]:
             input_type = 'select'
             if get_whitelists:
-                whitelist_type = None
                 whitelist = utils.read_whitelist(pos.split(':')[-1])
                 if 'whitelist_type' in whitelist \
                         and whitelist['whitelist_type'] == 'plain' \
@@ -62,7 +62,6 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                 elif 'whitelist_type' in whitelist \
                         and whitelist['whitelist_type'] == 'depend':
                     whitelist = None
-                    whitelist_type = whitelist['whitelist_type']
                     input_type = 'dependable'
                 elif 'whitelist_type' in whitelist and whitelist[
                         'whitelist_type'] == 'group':
@@ -139,19 +138,24 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                         and whitelist['whitelist_type'] == 'plain' \
                         and 'headers' not in whitelist:
                     whitelist = whitelist['whitelist']
+                    whitelist_type = 'plain'
                 elif 'whitelist_type' in whitelist and whitelist[
                         'whitelist_type'] == 'depend':
                     whitelist = None
                     input_type = 'dependable'
                 elif 'whitelist_type' in whitelist and whitelist[
                         'whitelist_type'] == 'group':
-                    new_w = []
-                    for key in whitelist:
-                        if key != 'whitelist_type':
-                            new_w.append(
-                                {'title': key, 'whitelist': whitelist[key]})
-                    input_type = 'group_select'
-                    whitelist = new_w
+                    if isinstance(whitelist, dict) and not 'whitelist' in whitelist:
+                        new_w = []
+                        for key in whitelist:
+                            if key != 'whitelist_type':
+                                new_w.append(
+                                    {'title': key, 'whitelist': whitelist[key]})
+                        input_type = 'group_select'
+                        whitelist = new_w
+                    else:
+                        whitelist_type = 'plain_group'
+                        whitelist = whitelist['whitelist']
             elif node[7] == 'bool':
                 whitelist = [True, False]
                 input_type = 'select'
@@ -175,6 +179,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                'list': node[1], 'displayName': node[2], 'desc': node[3],
                'value': node[4],
                'whitelist': whitelist,
+               'whitelist_type': whitelist_type,
                'input_type': input_type, 'data_type': node[7],
                'input_disabled': input_disabled}
         if node[1]:
