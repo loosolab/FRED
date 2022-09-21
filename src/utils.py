@@ -66,16 +66,8 @@ def find_values(node, kv):
             for x in find_values(i, kv):
                 yield x
     elif isinstance(node, dict):
-        for val in node.values():
-            if ((type(kv) is int or type(
-                    kv) is float) and (
-                        type(val) is int or type(val) is float)) or (
-                    type(kv) is bool and type(val) is bool):
-                if kv == val:
-                    yield kv
-            else:
-                if str(kv) in str(val):
-                    yield kv
+        if kv in node.values():
+            yield kv
         for j in node.values():
             for x in find_values(j, kv):
                 yield x

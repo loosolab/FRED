@@ -183,10 +183,6 @@ def find_entry(metafile, targets, target_value):
         result = list(utils.find_values(metafile, target_value))
     # test if target_value was found
     for value in result:
-        if ((type(target_value) is int or type(target_value) is float) and (type(value) is int or type(value) is float)) or (type(target_value) is bool and type(value) is bool):
-            if target_value == value:
-                return True
-        else:
-            if str(target_value) in str(value):
-                return True
+        if str(target_value) == str(value):
+            return True
     return False
