@@ -42,10 +42,16 @@ conda deactivate
 
 ### Clone the repository
 
-To use the tool, the repository must first be cloned from git via:
+To use the tool, the repository must first be cloned from git 
 
+via HTTPS:
 ```bash
 git clone https://gitlab.gwdg.de/loosolab/software/metadata-organizer.git
+```
+
+or via SSH:
+```bash
+git@gitlab.gwdg.de:loosolab/software/metadata-organizer.git
 ```
 
 Then navigate to the metadata-organizer folder where the executable python file metaTools.py is located via:
