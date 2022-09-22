@@ -2,7 +2,7 @@
 
 ### Requirements
 
-The requirements can be installed directly or within a conda environment.
+The requirements can be installed directly via pip or within a conda environment.
 
 Python>=3.6
 
@@ -10,8 +10,6 @@ __Python Packages:__
 
 - PyYAML>=5.1
 - tabulate>=0.8.10
-
-The requirements can be installed via pip or with the help of a conda environment.
 
 ### Setting up a conda environment
 
