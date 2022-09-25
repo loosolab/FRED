@@ -394,8 +394,9 @@ def get_samples(condition, sample):
                             new_samp.pop('list_value')
                             new_samp['list'] = False
                             sample[i]['input_fields'] = [new_samp]
-                            sample[i]['list_value'].append(copy.deepcopy(new_samp))
-                            sample[i]['list_value'][0]['value']= c[1]
+                            new_val = copy.deepcopy(new_samp)
+                            new_val['value'] = c[1]
+                            sample[i]['list_value'].append([new_val])
                             sample[i]['title'] = copy.deepcopy(sample[i]['displayName'])
                             sample[i].pop('displayName')
                             sample[i].pop('value')
@@ -406,6 +407,20 @@ def get_samples(condition, sample):
                     else:
                         sample[i]['value'] = c[1]
                 sample[i]['input_disabled'] = True
+            elif not any(sample[i]['position'] == f'experimental_setting:conditions:biological_replicates:samples:{x[0]}' for x in conds):
+                if sample[i]['list']:
+                    new_samp = copy.deepcopy(sample[i])
+                    new_samp.pop('list_value')
+                    new_samp['list'] = False
+                    sample[i]['input_fields'] = [new_samp]
+                    sample[i]['title'] = copy.deepcopy(
+                        sample[i]['displayName'])
+                    sample[i].pop('displayName')
+                    sample[i].pop('value')
+                    sample[i].pop('whitelist')
+                    sample[i].pop('whitelist_type')
+                    sample[i].pop('input_type')
+                    sample[i].pop('data_type')
     return sample
 
 
