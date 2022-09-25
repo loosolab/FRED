@@ -388,14 +388,18 @@ def get_samples(condition, sample):
                         if len(sample[i]['list_value']) > 0:
                             new_val = copy.deepcopy(sample[i]['input_fields'][0])
                             new_val['value'] = c[1]
+                            new_val['input_disabled'] = True 
                             sample[i]['list_value'].append(new_val)
                         else:
                             new_samp = copy.deepcopy(sample[i])
                             new_samp.pop('list_value')
                             new_samp['list'] = False
+                            new_samp[
+                                'position'] = f'{new_samp["position"]}:{new_samp["position"].split(":")[-1]}'
                             sample[i]['input_fields'] = [new_samp]
                             new_val = copy.deepcopy(new_samp)
                             new_val['value'] = c[1]
+                            new_val['input_disabled'] = True
                             sample[i]['list_value'].append([new_val])
                             sample[i]['title'] = copy.deepcopy(sample[i]['displayName'])
                             sample[i].pop('displayName')
@@ -412,6 +416,7 @@ def get_samples(condition, sample):
                     new_samp = copy.deepcopy(sample[i])
                     new_samp.pop('list_value')
                     new_samp['list'] = False
+                    new_samp['position'] = f'{new_samp["position"]}:{new_samp["position"].split(":")[-1]}'
                     sample[i]['input_fields'] = [new_samp]
                     sample[i]['title'] = copy.deepcopy(
                         sample[i]['displayName'])
