@@ -307,6 +307,10 @@ def get_experimental_factors(node, result_dict):
     for fac in used_factors:
         factor_value = {'factor': fac}
         fac_node = list(utils.find_keys(node, fac))[0]
+        if fac_node[1]:
+            is_list = True
+        else:
+            is_list = False
         if isinstance(fac_node[4], dict):
             if 'unit' in fac_node[4] and 'value' in fac_node[4]:
                 used_values = []
@@ -539,8 +543,19 @@ def get_experimental_factors(node, result_dict):
                                     used_values['ident_key'] = fac_node[5]
         elif fac_node[5]:
             value_list = utils.get_whitelist(fac, result_dict)
-            if value_list and 'whitelist_type' in value_list and value_list['whitelist_type'] == 'plain':
+            if value_list and 'headers' in value_list:
+                headers = value_list['headers']
+            else:
+                headers = None
+            if value_list and 'whitelist_keys' in value_list:
+                whitelist_keys = value_list['whitelist_keys']
+            else:
+                whitelist_keys = None
+            if value_list and 'whitelist_type' in value_list:
+                whitelist_type = value_list['whitelist_type']
                 value_list = value_list['whitelist']
+            else:
+                whitelist_type = None
             used_values = []
             if isinstance(value_list, dict):
                 w = [x for xs in list(value_list.values()) for x in xs]
@@ -591,6 +606,20 @@ def get_experimental_factors(node, result_dict):
                     f'comma:\n')
                 print_option_list(value_list, False)
                 used_values = parse_input_list(value_list, False)
+            if whitelist_type == 'group':
+                if whitelist_keys is not None:
+                    for i in range(len(used_values)):
+                        for w_key in whitelist_keys:
+                            if used_values[i].endswith(f' ({w_key})'):
+                                used_values[i] = used_values[i].replace(f' ({w_key})', '')
+                                if headers is not None and w_key in headers:
+                                    part_vals = used_values[i].split(' ')
+                                    header = headers[w_key].split(' ')
+                                    new_val = {}
+                                    for j in range(len(header)):
+                                        new_val[header[j]] = part_vals[j]
+                                    used_values[i] = new_val
+                                break
         else:
             value_type = fac_node[7]
             print(
@@ -599,6 +628,7 @@ def get_experimental_factors(node, result_dict):
             used_values = parse_input_list(value_type, False)
 
         factor_value['values'] = used_values
+        factor_value['is_list'] = is_list
         experimental_factors.append(factor_value)
 
     global factor
@@ -607,20 +637,26 @@ def get_experimental_factors(node, result_dict):
 
 
 def get_combinations(values, key, key_name):
+    is_dict = False
     if 'ident_key' in values:
+        is_dict = True
         if values['ident_key'] in values and len(values[values['ident_key']])>1:
             multi = parse_list_choose_one([True, False], f'\nCan one sample contain multiple {key_name}s?')
         else:
             multi = False
             values.pop('ident_key')
     else:
-        multi = False
-    merge_values = get_combis(values, key, multi)
-    print(
-        f'\nPlease select the analyzed combinations for {key} '
-        f'(1-{len(merge_values)}) divided by comma:\n')
-    print_option_list(merge_values, False)
-    used_values = parse_input_list(merge_values, False)
+        multi = parse_list_choose_one([True, False], f'\nCan one sample contain multiple {key_name}s?')
+
+    if multi or is_dict:
+        merge_values = get_combis(values, key, multi)
+        print(
+            f'\nPlease select the analyzed combinations for {key} '
+            f'(1-{len(merge_values)}) divided by comma:\n')
+        print_option_list(merge_values, False)
+        used_values = parse_input_list(merge_values, False)
+    else:
+        used_values = values
     return used_values
 
 
@@ -629,76 +665,92 @@ def get_combis(values, key, multi):
         values.pop('multi')
     if 'ident_key' in values and values['ident_key'] is None:
         values.pop('ident_key')
-    if multi:
-        possible_values = {}
-        disease_values = []
-        ident_key = values['ident_key']
-        depend = values[ident_key]
-        values.pop(ident_key)
-        values.pop('ident_key')
-        for elem in depend:
-            possible_values[elem] = []
-            value = [f'{ident_key}:"{elem}"']
-            for i in range(len(values.keys())):
-                value2 = []
-                for x in value:
-                    val = x
-                    for v in values[list(values.keys())[i]]:
-                        if isinstance(v,
-                                  dict) and 'value' in v and 'unit' in v:
-                            v = f'{v["value"]}{v["unit"]}'
-                        value2.append(f'{val}|{list(values.keys())[i]}:"{v}"')
-                value = value2
-            possible_values[elem] = value
-            for z in possible_values:
-                if z != elem:
-                    for x in possible_values[elem]:
-                        for y in possible_values[z]:
-                            disease_values.append(f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
-
-    else:
-        disease_values = []
-        possible_values = []
-        if 'ident_key' in values and values['ident_key'] in values:
-            start = values['ident_key']
-            values.pop('ident_key')
+    if isinstance(values, list):
+        if multi:
+            possible_values = []
+            for i in range(len(values)):
+                s = f'{key}:"{values[i]}"'
+                possible_values.append(s)
+                for j in range(i+1, len(values)):
+                    s = f'{s}-{key}:"{values[j]}"'
+                    possible_values.append(s)
+            return possible_values
         else:
-            start = list(values.keys())[0]
-        for elem in values[start]:
-            v = [f'{start}:\"{elem}\"']
-            for k in values:
-                if k != start:
-                    v2 = []
-                    for i in v:
-                        for x in values[k]:
-                            if isinstance(x,
-                                          dict) and 'value' in x and 'unit' in x:
-                                v2.append(f'{i}|{k}:\"{x["value"]}{x["unit"]}\"')
-                            else:
-                                v2.append(f'{i}|{k}:\"{x}\"')
-                    v = v2
-            possible_values = v
-            for z in possible_values:
-                disease_values.append(f'{key}:{"{"}{z}{"}"}')
-    return disease_values
+            return values
+    else:
+        if multi:
+            possible_values = {}
+            disease_values = []
+            ident_key = values['ident_key']
+            depend = values[ident_key]
+            values.pop(ident_key)
+            values.pop('ident_key')
+            for elem in depend:
+                possible_values[elem] = []
+                value = [f'{ident_key}:"{elem}"']
+                for i in range(len(values.keys())):
+                    value2 = []
+                    for x in value:
+                        val = x
+                        for v in values[list(values.keys())[i]]:
+                            if isinstance(v,
+                                      dict) and 'value' in v and 'unit' in v:
+                                v = f'{v["value"]}{v["unit"]}'
+                            value2.append(f'{val}|{list(values.keys())[i]}:"{v}"')
+                    value = value2
+                possible_values[elem] = value
+                for z in possible_values:
+                    if z != elem:
+                        for x in possible_values[elem]:
+                            for y in possible_values[z]:
+                                disease_values.append(f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
+
+        else:
+            disease_values = []
+            possible_values = []
+            if 'ident_key' in values and values['ident_key'] in values:
+                start = values['ident_key']
+                values.pop('ident_key')
+            else:
+                start = list(values.keys())[0]
+            for elem in values[start]:
+                v = [f'{start}:\"{elem}\"']
+                for k in values:
+                    if k != start:
+                        v2 = []
+                        for i in v:
+                            for x in values[k]:
+                                if isinstance(x,
+                                              dict) and 'value' in x and 'unit' in x:
+                                    v2.append(f'{i}|{k}:\"{x["value"]}{x["unit"]}\"')
+                                else:
+                                    v2.append(f'{i}|{k}:\"{x}\"')
+                        v = v2
+                possible_values = v
+                for z in possible_values:
+                    disease_values.append(f'{key}:{"{"}{z}{"}"}')
+        return disease_values
 
 
 def get_conditions(factors, node, mandatory_mode, result_dict):
     for i in range(len(factors)):
-        if isinstance(factors[i]['values'], dict) and 'value' not in factors[i]['values'] and 'unit' not in factors[i]['values']:
+        if 'is_list' in result_dict['experimental_factors'][i]:
+            result_dict['experimental_factors'][i].pop('is_list')
+        if (isinstance(factors[i]['values'], dict) and 'value' not in factors[i]['values'] and 'unit' not in factors[i]['values']) or ('is_list' in factors[i] and factors[i]['is_list']):
             factors[i]['values'] = get_combinations(factors[i]['values'], factors[i]['factor'], factors[i]['factor'])
             if 'ident_key' in result_dict['experimental_factors'][i]['values']:
                 result_dict['experimental_factors'][i]['values'].pop('ident_key')
         elif isinstance(factors[i]['values'], list):
-            if all(isinstance(elem, dict) and 'value' not in elem and 'unit' not in elem for elem in factors[i]['values']):
+            if any(isinstance(elem, dict) and 'value' not in elem and 'unit' not in elem for elem in factors[i]['values']):
                 for k in range(len(factors[i]['values'])):
-                    new_val = f'{factors[i]["factor"]}:{"{"}'
-                    for j in range(len(list(factors[i]['values'][k].keys()))):
-                        new_val = f'{new_val}{"|" if j > 0 else ""}' \
-                                  f'{list(factors[i]["values"][k].keys())[j]}:' \
-                                  f'\"{factors[i]["values"][k][list(factors[i]["values"][k].keys())[j]]}\"'
-                    new_val = f'{new_val}{"}"}'
-                    factors[i]['values'][k] = new_val
+                    if isinstance(factors[i]['values'][k],dict):
+                        new_val = f'{factors[i]["factor"]}:{"{"}'
+                        for j in range(len(list(factors[i]['values'][k].keys()))):
+                            new_val = f'{new_val}{"|" if j > 0 else ""}' \
+                                      f'{list(factors[i]["values"][k].keys())[j]}:' \
+                                      f'\"{factors[i]["values"][k][list(factors[i]["values"][k].keys())[j]]}\"'
+                        new_val = f'{new_val}{"}"}'
+                        factors[i]['values'][k] = new_val
     combi = True
     combinations = get_condition_combinations(factors)
     if len(factors) == 1 and combinations == factors[0]['values']:
@@ -765,6 +817,7 @@ def get_replicates(condition, bio, input_pooled, node, mandatory_mode,
 
 def fill_replicates(type, condition, start, end, input_pooled, node,
                     mandatory_mode, result_dict):
+    key_yaml = utils.read_in_yaml('keys.yaml')
     conditions = split_cond(condition)
     organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'), result_dict)
     if organism and 'whitelist_type' in organism and organism['whitelist_type'] == 'plain':
@@ -791,18 +844,20 @@ def fill_replicates(type, condition, start, end, input_pooled, node,
                 value = cond[1][:len(cond[1]) - len(unit)]
                 samples[cond[0]] = {'unit': unit, 'value': int(value)}
             else:
-                # TODO : if is list
-                if cond[0] in ['disease', 'treatment']:
-                    for key in cond[1]:
-                        if key == 'treatment_duration':
-                            unit = cond[1][key].lstrip('0123456789')
-                            value = cond[1][key][:len(cond[1][key]) - len(unit)]
-                            cond[1][key] = {'unit': unit,
-                                                'value': int(value)}
+                is_list = list(utils.find_keys(key_yaml, cond[0]))[0][1]
+                if is_list:
+                    if cond[0] in ['disease', 'treatment']:
+                        for key in cond[1]:
+                            if key == 'treatment_duration':
+                                unit = cond[1][key].lstrip('0123456789')
+                                value = cond[1][key][:len(cond[1][key]) - len(unit)]
+                                cond[1][key] = {'unit': unit,
+                                                    'value': int(value)}
                     if cond[0] not in samples:
                         samples[cond[0]] = [cond[1]]
                     else:
                         samples[cond[0]].append(cond[1])
+
                 else:
                     samples[cond[0]] = cond[1]
 
@@ -946,7 +1001,7 @@ def get_condition_combinations(factors):
             if isinstance(value,
                           dict) and 'value' in value and 'unit' in value:
                 value = f'{value["value"]}{value["unit"]}'
-            if factors[i]['factor'] in ['disease', 'treatment', 'gene']:
+            if factors[i]['factor'] in ['disease', 'treatment', 'gene'] or value.split(':')[0] == factors[i]['factor']:
                 combinations.append(f'{value}')
             else:
                 combinations.append(f'{factors[i]["factor"]}:"{value}"')
