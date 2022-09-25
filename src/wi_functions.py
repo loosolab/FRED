@@ -385,10 +385,21 @@ def get_samples(condition, sample):
                                                 'value'] = c[1][x]
                 else:
                     if sample[i]['list']:
-                        sample[i]['list_value'].append(c[1])
+                        if len(sample[i]['list_value']) > 0:
+                            sample[i]['list_value'][0]['list_value'].append(c[1])
+                        else:
+                            sample[i]['list_value'].append(copy.deepcopy(sample[i]))
+                            sample[i]['input_fields'] = copy.deepcopy(sample[i])
+                            sample[i]['list_value'][0]['list_value'].append(c[1])
+                            sample[i]['title'] = copy.deepcopy(sample[i]['displayName'])
+                            sample[i].pop('displayName')
+                            sample[i].pop('value')
+                            sample[i].pop('whitelist')
+                            sample[i].pop('whitelist_type')
+                            sample[i].pop('input_type')
+                            sample[i].pop('data_type')
                     else:
                         sample[i]['value'] = c[1]
-
                 sample[i]['input_disabled'] = True
     return sample
 
@@ -423,12 +434,10 @@ def get_conditions(factors, organism_name):
             for key in empty_key:
                 factors[i]['values'][0].pop(key)
             node = list(utils.find_keys(key_yaml, factors[i]['factor']))
-            print(node)
             if len(node) > 0 and len(node[0]) > 5 and isinstance(node[0][4], dict):
                 ident_key = node[0][5]
             else:
                 ident_key = None
-            print(ident_key)
             factors[i]['values'][0]['ident_key'] = ident_key
             if 'multi' in factors[i]['values'][0]:
                 factor_info = list(utils.find_keys(key_yaml, factors[i]['factor']))[0]
