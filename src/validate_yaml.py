@@ -179,7 +179,7 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
                     whitelist = whitelist['whitelist']
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
-            whitelist = utils.read_grouped_whitelist(whitelist)
+            whitelist = utils.read_grouped_whitelist(whitelist, {})
             whitelist = [x for xs in list(whitelist.values()) if xs is not None for x in xs]
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \
