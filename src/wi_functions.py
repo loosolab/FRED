@@ -408,7 +408,7 @@ def get_samples(condition, sample):
                         sample[i]['value'] = c[1]
                 sample[i]['input_disabled'] = True
             elif not any(sample[i]['position'] == f'experimental_setting:conditions:biological_replicates:samples:{x[0]}' for x in conds):
-                if sample[i]['list']:
+                if sample[i]['list'] and not 'title' in sample[i]:
                     new_samp = copy.deepcopy(sample[i])
                     new_samp.pop('list_value')
                     new_samp['list'] = False
