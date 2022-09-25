@@ -2,6 +2,7 @@ import re
 from src import utils
 from src import generate
 from itertools import chain
+from tabulate import tabulate
 
 # This scripts implements functions to find metadata files that contain given
 # values
@@ -57,6 +58,15 @@ def find_projects(metafile, search, return_dict):
         return True
     else:
         return False
+
+
+def print_summary(result):
+    res = [['id', 'path', 'project_name', 'owner']]
+    for elem in result:
+        for key in elem:
+            res.append([key, elem[key]['path'], elem[key]['project']['project_name'], elem[key]['project']['owner']['name']])
+    res = tabulate(res, tablefmt='fancy_grid', headers='firstrow')
+    return res
 
 
 def parse_search_parameters(metafile, search, list_element = None):

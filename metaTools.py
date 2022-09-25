@@ -2,6 +2,7 @@ import argparse
 import pathlib
 from src import metaTools_functions
 from src import generate
+from src import find_metafiles
 
 def find(args):
     """
@@ -11,8 +12,11 @@ def find(args):
     search: a string specifying search parameters linked via 'and', 'or' and
     'not'
     """
-    ids = metaTools_functions.find(args.path, args.search, False)
-    print(ids)
+    result = metaTools_functions.find(args.path, args.search, True)
+    if len(result) > 0:
+        print(find_metafiles.print_summary(result))
+    else:
+        print('No matches found')
 
 
 def create(args):

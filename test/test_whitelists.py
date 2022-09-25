@@ -38,9 +38,15 @@ def test_whitelist(file, whitelist_path, depend):
             else:
                 return testing(file, whitelist['whitelist'], whitelist_path, headers, depend)
         elif whitelist['whitelist_type'] == 'group':
+            res = 0
+            for elem in whitelist:
+                if whitelist[elem] is not None and elem != 'whitelist_type' and not isinstance(whitelist[elem], list) and os.path.isfile(os.path.join(whitelist_path, whitelist[elem])):
+                    res = test_whitelist(whitelist[elem], whitelist_path, None)
+                    whitelist[elem] = None
             whitelist = [x for xs in list(whitelist.values()) if xs is not None
                          for x in xs]
-            return testing(file, whitelist, whitelist_path, headers, depend)
+            res2 = [res, testing(file, whitelist, whitelist_path, headers, depend)]
+            return sum(filter(None, res2))
         elif whitelist['whitelist_type'] == 'depend':
             if whitelist['ident_key'] == 'organism_name':
                 depend_elems = [x.split(' ')[0] for x in

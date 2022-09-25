@@ -5,6 +5,7 @@ whitelist:
     - hours
     - days
     - weeks
+    - months
     - years
     - ml
     - l

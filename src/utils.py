@@ -168,6 +168,33 @@ def read_whitelist(key):
 
 def read_grouped_whitelist(whitelist):
     whitelist.pop('whitelist_type')
+    headers = {}
+    for key in whitelist:
+        if not isinstance(whitelist[key], list) and os.path.isfile(
+                os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             '..', 'whitelists', whitelist[key])):
+            whitelist[key] = get_whitelist(whitelist[key], filled_object)
+            if isinstance(whitelist[key], dict):
+
+                if whitelist[key]['whitelist_type'] == 'depend':
+                    if whitelist and 'whitelist' in whitelist:
+                        whitelist[key] = whitelist['whitelist']
+                    else:
+                        whitelist[key] = None
+                elif whitelist[key]['whitelist_type'] == 'group':
+                    whitelist[key] = [x for xs in list(whitelist[key].values()) for x in xs]
+                elif whitelist[key]['whitelist_type'] == 'plain':
+                    if 'headers' in whitelist[key]:
+                        headers[key] = whitelist[key]['headers']
+                    whitelist[key] = whitelist[key]['whitelist']
+    w = [f'{x} ({xs})' for xs in list(whitelist.keys()) if whitelist[xs] is not None for x in whitelist[xs] if x is not None]
+    if len(w) > 30:
+        new_whitelist = {'whitelist': w}
+        new_whitelist['whitelist_keys'] = [key for key in whitelist if key not in ['headers', 'whitelist_type']]
+        whitelist = new_whitelist
+        whitelist['whitelist_type'] = 'group'
+    if len(list(headers.keys())) > 0:
+         whitelist['headers'] = headers
     return whitelist
 
 
@@ -205,12 +232,13 @@ def get_whitelist(key, filled_object):
                 if whitelist['ident_key'] == 'organism_name':
                     depend = list(find_keys(filled_object, 'organism'))
             if len(depend) > 0:
-                whitelist = read_depend_whitelist(whitelist, depend[0])
+                whitelist = read_depend_whitelist(whitelist, depend[0].split(' ')[0])
             else:
                 stay_depend = True
     if group:
         for key in whitelist:
-            if whitelist[key] is not None:
+            if whitelist[key] is not None and key != 'headers' and \
+                    key != 'whitelist_type' and key != 'whitelist_keys':
                 whitelist[key] = sorted(whitelist[key])
 
     elif whitelist and not stay_depend and not plain and not abbrev:

@@ -104,10 +104,10 @@ def print_warning(metafile, pool_warn, ref_genome_warn):
           f'Report:\n')
     if len(pool_warn) > 0:
         for elem in pool_warn:
-            print(f'- Sample \'{elem[0]}\': {elem[1]}')
+            print(f'- Sample \'{elem[0]}\':\n{elem[1]}')
     if len(ref_genome_warn) > 0:
         for elem in ref_genome_warn:
-            print(f'- Run from {elem[0]}: {elem[1]}')
+            print(f'- Run from {elem[0]}:\n{elem[1]}')
     print(f'{"".center(80, "-")}')
 
 
@@ -179,7 +179,7 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
                     whitelist = whitelist['whitelist']
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
-            whitelist = utils.read_grouped_whitelist(whitelist)
+            whitelist = utils.read_grouped_whitelist(whitelist, {})
             whitelist = [x for xs in list(whitelist.values()) if xs is not None for x in xs]
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \

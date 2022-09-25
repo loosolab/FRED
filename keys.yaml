@@ -49,7 +49,7 @@ project:
           - 'mandatory'
           - False
           - 'Name'
-          - ''
+          - "The name should be entered in the format '<Last name>, <First name>'"
           - null
           - False
           - short_text
@@ -359,7 +359,7 @@ experimental_setting:
                   - str
                 tissue:
                   - 'optional'
-                  - False
+                  - True
                   - 'Tissue'
                   - ''
                   - null
@@ -569,7 +569,7 @@ technical_details:
   - 'This part contains all technical details of the experiment including an analysis part that stores additional information e.g. about runs.'
   - technique:
       - 'mandatory'
-      - False
+      - True
       - 'Technique'
       - ''
       - null

@@ -46,6 +46,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
     """
     input_disabled = True if pos.split(':')[-1] in ['condition_name',
                                                     'sample_name'] else False
+    whitelist_type = None
     if isinstance(node[4], dict):
         input_fields = []
 
@@ -129,19 +130,24 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                         and whitelist['whitelist_type'] == 'plain' \
                         and 'headers' not in whitelist:
                     whitelist = whitelist['whitelist']
+                    whitelist_type = 'plain'
                 elif 'whitelist_type' in whitelist and whitelist[
                         'whitelist_type'] == 'depend':
                     whitelist = None
                     input_type = 'dependable'
                 elif 'whitelist_type' in whitelist and whitelist[
                         'whitelist_type'] == 'group':
-                    new_w = []
-                    for key in whitelist:
-                        if key != 'whitelist_type':
-                            new_w.append(
-                                {'title': key, 'whitelist': whitelist[key]})
-                    input_type = 'group_select'
-                    whitelist = new_w
+                    if isinstance(whitelist, dict) and not 'whitelist' in whitelist:
+                        new_w = []
+                        for key in whitelist:
+                            if key != 'whitelist_type':
+                                new_w.append(
+                                    {'title': key, 'whitelist': whitelist[key]})
+                        input_type = 'group_select'
+                        whitelist = new_w
+                    else:
+                        whitelist_type = 'plain_group'
+                        whitelist = whitelist['whitelist']
             elif node[7] == 'bool':
                 whitelist = [True, False]
                 input_type = 'select'
@@ -165,6 +171,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                'list': node[1], 'displayName': node[2], 'desc': node[3],
                'value': node[4],
                'whitelist': whitelist,
+               'whitelist_type': whitelist_type,
                'input_type': input_type, 'data_type': node[7],
                'input_disabled': input_disabled}
         if node[1]:
@@ -182,18 +189,24 @@ def get_factors(organism):
     for factor in factor_value['factor']:
         whitelist, input_type, headers = get_whitelist_with_type(factor,
                                                                  key_yaml,
-                                                                 organism)
-        values[factor] = {'whitelist': whitelist, 'input_type': input_type}
+                                                                 organism, None)
+        values[factor] = {'whitelist': whitelist, 'input_type': input_type,
+                          'whitelist_type': whitelist_type}
         if headers is not None:
             values[factor]['headers'] = headers
     factor_value['values'] = values
     return factor_value
 
 
-def get_whitelist_with_type(key, key_yaml, organism):
-    headers = None
+def get_whitelist_with_type(key, key_yaml, organism, headers):
+    whitelist_type = None
+    is_list = False
+    filled_object = {'organism': copy.deepcopy(organism)}
+    organism = organism.split(' ')[0]
     input_type = list(utils.find_keys(key_yaml, key))
     if len(input_type) > 0:
+        if input_type[0][1]:
+            is_list = True
         if isinstance(input_type[0][4], dict):
             if len(input_type[0][4].keys()) == 2 and 'value' in \
                     input_type[0][4] and 'unit' in input_type[0][4]:
@@ -205,9 +218,9 @@ def get_whitelist_with_type(key, key_yaml, organism):
                 val = []
                 for k in input_type[0][4]:
                     k_val = {}
-                    k_val['whitelist'], \
+                    k_val['whitelist'], k_val['whitelist_type'], \
                         k_val['input_type'], \
-                        header = get_whitelist_with_type(k, key_yaml, organism)
+                        header = get_whitelist_with_type(k, key_yaml, organism, headers)
                     if header is not None:
                         k_val['headers'] = header
                     node = list(utils.find_keys(key_yaml, k))[0]
@@ -223,8 +236,7 @@ def get_whitelist_with_type(key, key_yaml, organism):
                             'whitelist': [True, False], 'input_type': 'bool',
                             'value': False})
                 input_type = 'nested'
-                return val, input_type, headers
-
+                return val, whitelist_type, input_type, headers
         else:
             if input_type[0][7] == 'bool':
                 input_type = 'bool'
@@ -244,26 +256,49 @@ def get_whitelist_with_type(key, key_yaml, organism):
         whitelist = None
 
     if isinstance(whitelist, dict):
+        if 'headers' in whitelist:
+            headers = whitelist['headers']
         if whitelist['whitelist_type'] == 'group':
-            whitelist = utils.read_grouped_whitelist(whitelist)
-            new_w = []
-            for value in whitelist:
-                new_w.append({'title': value, 'whitelist': whitelist[value]})
-            whitelist = new_w
+            whitelist = utils.read_grouped_whitelist(whitelist, filled_object)
+            if 'headers' in whitelist:
+                headers = whitelist['headers']
+            if 'whitelist' not in whitelist:
+                new_w = []
+                for value in whitelist:
+                    if value not in ['headers', 'whitelist_keys']:
+                        new_w.append({'title': value, 'whitelist': whitelist[value]})
+                whitelist = new_w
+                whitelist_type = 'group'
+            else:
+                whitelist_type = 'plain_group'
+                input_type = 'select'
             input_type = 'group_select'
         elif whitelist['whitelist_type'] == 'depend':
             whitelist = utils.read_depend_whitelist(whitelist, organism)
 
     if isinstance(whitelist, dict) and 'whitelist' in whitelist:
-        if 'headers' in whitelist:
-            headers = whitelist['headers']
         whitelist = whitelist['whitelist']
+
 
     # if whitelist and len(whitelist) > 30:
     #    input_type = 'searchable_select'
     if key == 'gene':
         input_type = 'gene'
-    return whitelist, input_type, headers
+    elif key == 'enrichment':
+        whitelist = whitelist[:50]
+        input_type = 'select'
+    if is_list:
+        node = list(utils.find_keys(key_yaml, key))[0]
+        new_w = [
+            {'whitelist': whitelist, 'position': key, 'displayName': node[2],
+             'input_type': input_type, 'whitelist_type': whitelist_type},
+            {'displayName': 'Multi', 'position': 'multi',
+             'whitelist': [True, False], 'input_type': 'bool',
+             'value': False}]
+        whitelist = new_w
+        whitelist_type = 'list_select'
+        input_type = 'nested'
+    return whitelist, whitelist_type, input_type, headers
 
 
 def get_samples(condition, sample):
