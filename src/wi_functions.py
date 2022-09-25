@@ -350,7 +350,7 @@ def get_samples(condition, sample):
                                             j][k]['position'].split(
                                                 ':')[-1] == x:
                                             if x in ['age', 'time_point',
-                                                     'treatment_duration']:
+                                                        'treatment_duration']:
                                                 unit = c[1][x].lstrip(
                                                     '0123456789')
                                                 value = c[1][x][
@@ -384,7 +384,10 @@ def get_samples(condition, sample):
                                             sample[i]['input_fields'][j][
                                                 'value'] = c[1][x]
                 else:
-                    sample[i]['value'] = c[1]
+                    if sample[i]['list']:
+                        sample[i]['list_value'].append(c[1])
+                    else:
+                        sample[i]['value'] = c[1]
 
                 sample[i]['input_disabled'] = True
     return sample
@@ -403,6 +406,9 @@ def get_conditions(factors, organism_name):
     and their values.
     """
     organism = organism_name.split(' ')[0]
+    key_yaml = utils.read_in_yaml(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
     for i in range(len(factors)):
         if len(factors[i]['values']) == 1 and isinstance(
                 factors[i]['values'][0], dict) and not (
@@ -416,21 +422,24 @@ def get_conditions(factors, organism_name):
                     empty_key.append(k)
             for key in empty_key:
                 factors[i]['values'][0].pop(key)
-            key_yaml = utils.read_in_yaml(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
-                             'keys.yaml'))
             node = list(utils.find_keys(key_yaml, factors[i]['factor']))
-            if len(node) > 0 and len(node[0]) > 5:
+            print(node)
+            if len(node) > 0 and len(node[0]) > 5 and isinstance(node[0][4], dict):
                 ident_key = node[0][5]
             else:
                 ident_key = None
+            print(ident_key)
             factors[i]['values'][0]['ident_key'] = ident_key
             if 'multi' in factors[i]['values'][0]:
-                if factors[i]['values'][0]['multi'] and ident_key is None:
-                    factors[i]['values'][0]['multi'] = False
-                factors[i]['values'] = generate.get_combis(
-                    factors[i]['values'][0], factors[i]['factor'],
-                    factors[i]['values'][0]['multi'])
+                factor_info = list(utils.find_keys(key_yaml, factors[i]['factor']))[0]
+                if factor_info[1] and isinstance(factor_info[4], dict):
+                    if factors[i]['values'][0]['multi'] and ident_key is None:
+                        factors[i]['values'][0]['multi'] = False
+                    factors[i]['values'] = generate.get_combis(
+                        factors[i]['values'][0], factors[i]['factor'],
+                        factors[i]['values'][0]['multi'])
+                else:
+                    factors[i]['values'] = generate.get_combis(factors[i]['values'][0][factors[i]['factor']], factors[i]['factor'], factors[i]['values'][0]['multi'])
         if 'headers' in factors[i]:
             headers = factors[i]['headers'].split(' ')
             for j in range(len(factors[i]['values'])):

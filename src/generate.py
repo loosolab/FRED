@@ -661,9 +661,10 @@ def get_combinations(values, key, key_name):
 
 
 def get_combis(values, key, multi):
+    print(f'VALUES: {values}')
     if 'multi' in values:
         values.pop('multi')
-    if 'ident_key' in values and values['ident_key'] is None:
+    if 'ident_key' in values and (values['ident_key'] not in values or values['ident_key'] is None):
         values.pop('ident_key')
     if isinstance(values, list):
         if multi:
@@ -676,6 +677,7 @@ def get_combis(values, key, multi):
                     possible_values.append(s)
             return possible_values
         else:
+            print(f'VAL2: {values}')
             return values
     else:
         if multi:
