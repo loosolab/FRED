@@ -187,7 +187,7 @@ def get_factors(organism):
     factor_value = {'factor': utils.read_whitelist('factor')['whitelist']}
     values = {}
     for factor in factor_value['factor']:
-        whitelist, input_type, headers = get_whitelist_with_type(factor,
+        whitelist, whitelist_type, input_type, headers = get_whitelist_with_type(factor,
                                                                  key_yaml,
                                                                  organism, None)
         values[factor] = {'whitelist': whitelist, 'input_type': input_type,
