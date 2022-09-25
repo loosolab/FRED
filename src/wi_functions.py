@@ -386,11 +386,13 @@ def get_samples(condition, sample):
                 else:
                     if sample[i]['list']:
                         if len(sample[i]['list_value']) > 0:
-                            sample[i]['list_value'][0]['list_value'].append(c[1])
+                            new_val = copy.deepcopy(sample[i]['input_fields'][0])
+                            new_val['value'] = c[1]
+                            sample[i]['list_value'].append(new_val)
                         else:
                             sample[i]['list_value'].append(copy.deepcopy(sample[i]))
                             sample[i]['input_fields'] = [copy.deepcopy(sample[i])]
-                            sample[i]['list_value'][0]['list_value'].append(c[1])
+                            sample[i]['list_value'][0]['value']= c[1]
                             sample[i]['title'] = copy.deepcopy(sample[i]['displayName'])
                             sample[i].pop('displayName')
                             sample[i].pop('value')
