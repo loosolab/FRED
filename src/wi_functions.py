@@ -58,19 +58,26 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                         and whitelist['whitelist_type'] == 'plain' \
                         and 'headers' not in whitelist:
                     whitelist = whitelist['whitelist']
+                    whitelist_type = whitelist['whitelist_type']
                 elif 'whitelist_type' in whitelist \
                         and whitelist['whitelist_type'] == 'depend':
                     whitelist = None
                     input_type = 'dependable'
                 elif 'whitelist_type' in whitelist and whitelist[
                         'whitelist_type'] == 'group':
-                    new_w = []
-                    for key in whitelist:
-                        if key != 'whitelist_type':
-                            new_w.append(
-                                {'title': key, 'whitelist': whitelist[key]})
-                    input_type = 'group_select'
-                    whitelist = new_w
+                    if isinstance(whitelist['whitelist'], dict):
+                        new_w = []
+                        for key in whitelist:
+                            if key != 'whitelist_type':
+                                new_w.append(
+                                    {'title': key, 'whitelist': whitelist[key]})
+                        input_type = 'group_select'
+                        whitelist = new_w
+                        whitelist_type = whitelist['whitelist_type']
+                    else:
+                        whitelist = whitelist['whitelist']
+                        input_type = 'select'
+                        whitelist_type = 'plain_group'
             else:
                 whitelist = None
             if input_type != 'group_select':
@@ -85,6 +92,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                    'list': node[1], 'displayName': node[2], 'desc': node[3],
                    'value': None,
                    'whitelist': whitelist,
+                   'whitelist_type': whitelist_type,
                    'input_type': input_type, 'data_type': 'str',
                    'input_disabled': input_disabled}
         else:
@@ -180,7 +188,6 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
 
 
 def get_factors(organism):
-    organism = organism.split(' ')[0]
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
@@ -275,7 +282,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
             input_type = 'group_select'
         elif whitelist['whitelist_type'] == 'depend':
             whitelist = utils.read_depend_whitelist(whitelist, organism)
-
+            whitelist_type = 'depend'
     if isinstance(whitelist, dict) and 'whitelist' in whitelist:
         whitelist = whitelist['whitelist']
 

@@ -11,7 +11,7 @@ def save_as_yaml(dictionary, file_path):
     :param dictionary: a dictionary that should be saved
     :param file_path: the path of the yaml file to be created
     """
-    with open(file_path, 'w') as file:  # format richtig so?
+    with open(file_path, 'w') as file:
         documents = yaml.dump(dictionary, file, sort_keys=False)
 
 
@@ -81,56 +81,6 @@ def find_values(node, kv):
                 yield x
 
 
-def get_keys_as_list(node, nested, pre=''):
-    """
-    generator to return all keys in dictionary that fit a given key value
-    :param node: a dictionary to be searched
-    :param kv: the key value to search for
-    """
-    if isinstance(node, list):
-        test = []
-        is_list_or_dict = False
-        for i in node:
-            if isinstance(i, list) or isinstance(i, dict):
-                is_list_or_dict = True
-                for x in get_keys_as_list(i, nested):
-                    if nested:
-                        test.append(pre + str(x))
-                    else:
-                        yield pre #+ str(x)
-                if nested:
-                    yield test
-        if not is_list_or_dict:
-            yield pre + str(node)
-    elif isinstance(node, dict):
-        for j in list(node.keys()):
-            for x in get_keys_as_list(node[j], nested, pre + j + ':'):
-                yield x
-    else:
-        yield pre #+ str(values)
-
-
-def get_keys_in_dict(node, res={}, pre=''):
-    if isinstance(node, dict):
-        for key in node:
-            res = get_keys_in_dict(node[key], res, pre + ':' + key if pre != '' else key)
-    elif isinstance(node, list):
-        for elem in node:
-            if not isinstance(elem, dict):
-                if pre in res:
-                    res[pre].append(node)
-                else:
-                    res[pre] = [node]
-            else:
-                res = get_keys_in_dict(elem, res, pre)
-    else:
-        if pre in res:
-            res[pre].append(str(node))
-        else:
-            res[pre] = [str(node)]
-    return res
-
-
 # split string of list into list
 def split_str(s):
     splitted = s.split(':')
@@ -141,32 +91,23 @@ def split_str(s):
     return keys, value
 
 
-# parse list to dictionary for webinterface
-def parse_list_to_dict(node):
-    if isinstance(node, list):
-        for i in range(len(node)):
-            node[i] = parse_list_to_dict(node[i])
-        node = {'title': 'Information ' + node[0]['position'].split(':')[-2],
-                'desc': 'TBA', 'input_fields': node}
-    else:
-        keys, value = split_str(node)
-        node = {'position': keys, 'value': value, 'whitelist': None,
-                'displayName': keys.split(':')[-1], 'desc': 'TBA'}
-    return node
-
-
 def read_whitelist(key):
     try:
-        whitelist = read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key))
+        whitelist = read_in_yaml(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                         'whitelists', key))
     except (AttributeError, FileNotFoundError):
         try:
-            whitelist = [w for w in open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', 'whitelists', key)).read().splitlines() if w.strip()]
+            whitelist = [w for w in open(
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                             'whitelists', key)).read().splitlines() if
+                         w.strip()]
         except FileNotFoundError:
             whitelist = None
     return whitelist
 
 
-def read_grouped_whitelist(whitelist):
+def read_grouped_whitelist(whitelist, filled_object):
     whitelist.pop('whitelist_type')
     headers = {}
     for key in whitelist:
@@ -218,9 +159,10 @@ def get_whitelist(key, filled_object):
     plain = False
     abbrev = False
     whitelist = read_whitelist(key)
-    while isinstance(whitelist, dict) and not group and not stay_depend and not plain and not abbrev:
+    while isinstance(whitelist,
+                     dict) and not group and not stay_depend and not plain and not abbrev:
         if whitelist['whitelist_type'] == 'group':
-            whitelist = read_grouped_whitelist(whitelist)
+            whitelist = read_grouped_whitelist(whitelist, filled_object)
             group = True
         elif whitelist['whitelist_type'] == 'plain':
             plain = True
