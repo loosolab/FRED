@@ -146,7 +146,11 @@ def parse_part(wi_object, factors, organism, id, nom):
                     for sub_elem in elem:
                         if sub_elem['position'].split(':')[-1] == 'number_of_measurements':
                             nom = sub_elem['value']
-                    test.append(parse_part(elem, factors, organism, id, nom))
+                    if all(sub_elem['position'].split(':')[-1] == wi_object['position'].split(':')[-1] for sub_elem in elem):
+                        for sub_elem in elem:
+                            test.append(sub_elem['value'])
+                    else:
+                        test.append(parse_part(elem, factors, organism, id, nom))
             return test
         else:
             if 'whitelist' in wi_object and wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
@@ -238,6 +242,8 @@ def parse_part(wi_object, factors, organism, id, nom):
                                             empty_keys.append(key)
                                     for key in empty_keys:
                                         d['values'][j].pop(key)
+                                    if all(k == d['factor'] for k in d['values'][j]):
+                                        d['values'] = d['values'][j][d['factor']]
                         if not any(d['factor'] in y['factor'] for y in res):
                             res.append(d)
                             all_factors[d['factor']] = i
