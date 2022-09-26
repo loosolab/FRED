@@ -1,5 +1,9 @@
 whitelist_type: abbrev
-Endothelial cells: EndoCll
+Embryonic stem cells: ESC
+Endothelial cells: EC
+Endothelial cells umbilical vein: ECumb
+Endothelial cells pulmonary artery: ECpulmArt
+Endothelial cells dermal lymphatic: ECdermLym
 Smooth muscle cells: SmMCll
 Fibroblasts: Fbrb
 Macrophages: Mcrp
@@ -13,6 +17,7 @@ Alveolar cells type 2: AlvCll2
 Ascending Loop of Henle cells: AscLHCll
 B-cells: BCll
 Beta cells: BetaCll
+Bone Marrow Neutrophils: BMNtrph
 Cardiomyocytes: Crdmct
 Ductal cells: DuctCll
 Eccrine sweat gland cells: EccSwGlCll
@@ -26,11 +31,14 @@ Hepatocytes: Hptct
 Keratinocyte (granular): granKrtnct
 Keratinocyte (other): othKrtnct
 Langerhans cells: LnghnsCll
+Liver Neutrophils: LvrNtrph
 Melanocytes: Melanoct
 Mitotic cells: MitoCll
 Neutrophils: Ntrph
 NK-cells: NKCll
 Parafollicular cells: ParafllCll
+Peritoneal cavity Neutrophils: PCNtrph
+Peripheral blood Neutrophils: PeriBlNtrph
 Peritubular cells: PeritblCll
 Podocytes: Podoct
 Prostate basal glandular cells: PrstBGlCll
@@ -39,4 +47,6 @@ Proximal tubular cells: ProxTblCll
 Respiratory ciliated cells: RespCilCll
 Skeletal myocytes: SklMct
 Spermatids: Sprmtd
+Spleen Neutrophils: SplNtrph
+
 ASC TERT1: AscTert1

@@ -1,6 +1,10 @@
 whitelist_type: plain
 whitelist:
+    - Embryonic stem cells
     - Endothelial cells
+    - Endothelial cells umbilical vein
+    - Endothelial cells pulmonary artery
+    - Endothelial cells dermal lymphatic
     - Smooth muscle cells
     - Fibroblasts
     - Macrophages
@@ -14,6 +18,7 @@ whitelist:
     - Ascending Loop of Henle cells
     - B-cells
     - Beta cells
+    - Bone Marrow Neutrophils
     - Cardiomyocytes
     - Ductal cells
     - Eccrine sweat gland cells
@@ -27,11 +32,14 @@ whitelist:
     - Keratinocyte (granular)
     - Keratinocyte (other)
     - Langerhans cells
+    - Liver Neutrophils
     - Melanocytes
     - Mitotic cells
     - Neutrophils
     - NK-cells
     - Parafollicular cells
+    - Peritoneal cavity Neutrophils
+    - Peripheral blood Neutrophils
     - Peritubular cells
     - Podocytes
     - Prostate basal glandular cells
@@ -40,6 +48,7 @@ whitelist:
     - Respiratory ciliated cells
     - Skeletal myocytes
     - Spermatids
+    - Spleen Neutrophils
     - HL60
     - A549
     - JURKAT
