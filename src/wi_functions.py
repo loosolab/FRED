@@ -389,7 +389,7 @@ def get_samples(condition, sample):
                             new_val = copy.deepcopy(sample[i]['input_fields'][0])
                             new_val['value'] = c[1]
                             new_val['input_disabled'] = True
-                            sample[i]['list_value'].append(new_val)
+                            sample[i]['list_value'].append([new_val])
                         else:
                             new_samp = copy.deepcopy(sample[i])
                             new_samp.pop('list_value')
