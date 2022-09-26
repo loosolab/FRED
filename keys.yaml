@@ -49,7 +49,7 @@ project:
           - 'mandatory'
           - False
           - 'Name'
-          - "The name should be entered in the format '<Last name>, <First name>'"
+          - "The name should be entered in the format '<Last name>, <First name>'. For public projects enter 'public'."
           - null
           - False
           - short_text
@@ -58,7 +58,7 @@ project:
           - 'mandatory'
           - False
           - 'LDAP Name'
-          - ''
+          - "For public projects enter '---'."
           - null
           - False
           - short_text
@@ -67,7 +67,7 @@ project:
           - 'mandatory'
           - False
           - 'Department'
-          - ''
+          - "For public projects enter 'alleAbt'."
           - null
           - True
           - select
@@ -76,7 +76,7 @@ project:
           - 'mandatory'
           - False
           - 'E-Mail'
-          - ''
+          - "For public projects enter '---'."
           - null
           - False
           - short_text
