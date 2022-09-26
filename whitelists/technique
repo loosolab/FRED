@@ -1,26 +1,28 @@
 whitelist_type: plain
 whitelist:
-    - bulk RNAseq
+    - bulk RNA-seq
     - bulk RNA array
-    - bulk ATACseq
-    - bulk Chipseq
-    - sc RNAseq
-    - sc ATACseq
-    - ACTseq
-    - HiCseq
-    - Mnaseseq
-    - Dartseq
-    - Hypertribeseq
-    - Cage
-    - Ribotag
-    - Riboseq
+    - bulk ATAC-seq
+    - bulk ChIP-seq
+    - sc RNA-seq
+    - sc ATAC-seq
+    - ACT-seq
+    - HiC-seq
+    - MNase-seq
+    - DART-seq
+    - HyperTribe-seq
+    - CAGE-seq
+    - RiboTag
+    - Ribo-seq
     - Multiome
     - Cut&Run
     - Methylation array
-    - Bisulfitseq
-    - Proseq
-    - Medip
-    - Ripseq
+    - Bisulfit-seq
+    - PRO-seq
+    - MeDIP-seq
+    - RIP-seq
     - Cut&Tag
-    - ChiRP-Seq
+    - ChiRP-seq
     - DRIP-seq
+    - snRNA-seq
+    - snATAC-seq
