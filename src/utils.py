@@ -128,7 +128,9 @@ def read_grouped_whitelist(whitelist, filled_object):
                     if 'headers' in whitelist[key]:
                         headers[key] = whitelist[key]['headers']
                     whitelist[key] = whitelist[key]['whitelist']
-    w = [f'{x} ({xs})' for xs in list(whitelist.keys()) if whitelist[xs] is not None for x in whitelist[xs] if x is not None]
+    #w = [f'{x} ({xs})' for xs in list(whitelist.keys()) if whitelist[xs] is not None for x in whitelist[xs] if x is not None]
+    w = [f'{x}' for xs in list(whitelist.keys()) if
+         whitelist[xs] is not None for x in whitelist[xs] if x is not None]
     if len(w) > 30:
         new_whitelist = {'whitelist': w}
         new_whitelist['whitelist_keys'] = [key for key in whitelist if key not in ['headers', 'whitelist_type']]
