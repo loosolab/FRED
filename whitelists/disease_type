@@ -1,15 +1,16 @@
 whitelist_type: group
 lung:
-  - lung cancer
+  - Lung cancer
   - COPD
   - PH
   - PAH
   - Asthma
-  - pneumonia
-  - pulmonary edema
-  - bronchitis
-  - pneumothorax
-  - pulmonary embolus
+  - Pneumonia
+  - Pulmonary edema
+  - Pulmonary fibrosis
+  - Bronchitis
+  - Pneumothorax
+  - Pulmonary embolus
   - Covid
   - Influenca
 heart:
@@ -18,6 +19,7 @@ heart:
   - Blood pressure
   - Heart failure
   - Bypass surgery
+  - Myocardial Infarction
 other:
-  - breast cancer
-  - prostate cancer
+  - Breast cancer
+  - Prostate cancer

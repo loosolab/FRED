@@ -1,11 +1,12 @@
 whitelist_type: abbrev
-lung cancer: LngCnc
+Lung cancer: LngCnc
 Asthma: Asth
-pneumonia: pneum
-pulmonary edema: PulmEd
-bronchitis: brnch
-pneumothorax: pnmthrx
-pulmonary embolus: PulmEmb
+Pneumonia: pneum
+Pulmonary edema: PulmEd
+Pulmonary fibrosis: PulFib
+Bronchitis: brnch
+Pneumothorax: pnmthrx
+Pulmonary embolus: PulmEmb
 Covid: Cov
 Influenca: flu
 Coronary heart disease CHD: CHD
@@ -13,5 +14,6 @@ Angina: Ang
 Blood pressure: BldPrs
 Heart failure: HrtFail
 Bypass surgery: BypSrg
-breast cancer: BrstCnc
-prostate cancer: PrstCnc
+Breast cancer: BrstCnc
+Prostate cancer: PrstCnc
+Myocardial Infarction: MyoInf
