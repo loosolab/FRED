@@ -4,5 +4,8 @@ whitelist:
     - Medication
     - Puromycin
     - Gemcitabine
+    - Cardiotoxin
+    - 2-deoxyglucose
+    - Saline
 
 
