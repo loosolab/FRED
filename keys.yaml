@@ -348,15 +348,6 @@ experimental_setting:
                       - True
                       - select
                       - str
-                bmi:
-                  - 'optional'
-                  - False
-                  - 'BMI'
-                  - ''
-                  - null
-                  - False
-                  - number
-                  - float
                 ethnicity:
                   - 'optional'
                   - False
