@@ -568,7 +568,7 @@ technical_details:
   - 'Technical Details'
   - 'This part contains all technical details of the experiment including an analysis part that stores additional information e.g. about runs.'
   - technique:
-      - 'mandatory'
+      - 'optional'
       - True
       - 'Technique'
       - ''
