@@ -1,3 +1,4 @@
 whitelist_type: abbrev
-caucasian: cau
-asian: as
+whitelist:
+    caucasian: cau
+    asian: as

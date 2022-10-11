@@ -1,3 +1,4 @@
 whitelist_type: abbrev
-gene_name: gn
-ensembl_id: embl
+whitelist:
+    gene_name: gn
+    ensembl_id: embl

@@ -1,10 +1,11 @@
 whitelist_type: abbrev
-human: hum
-mouse: mouse
-zebrafish: zbrf
-rat: rat
-pig: pig
-medaka: mdka
-chicken: chick
-drosophila: drsph
-yeast: yeast
+whitelist:
+    human: hum
+    mouse: mouse
+    zebrafish: zbrf
+    rat: rat
+    pig: pig
+    medaka: mdka
+    chicken: chick
+    drosophila: drsph
+    yeast: yeast

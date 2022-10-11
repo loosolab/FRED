@@ -1,4 +1,5 @@
 whitelist_type: abbrev
-male: m
-female: f
-mixed: x
+whitelist:
+    male: m
+    female: f
+    mixed: x

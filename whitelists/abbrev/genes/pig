@@ -1,412 +1,413 @@
 whitelist_type: abbrev
-H1-7: H17
-H1-3: H13
-ATP6V1G2-DDX39B: ATP6V1G2DDX39B
-HLA-DRA: HLADRA
-SLA-DQB1: SLADQB1
-HLA-DOB: HLADOB
-SLA-DMB: SLADMB
-SLA-DMA: SLADMA
-SLA-DOA: SLADOA
-NKX2-8: NKX28
-NKX2-1: NKX21
-PSP-II: PSPII
-IFN-DELTA-1: IFNDELTA1
-MSANTD3-TMEFF1: MSANTD3TMEFF1
-NKX2-4: NKX24
-AMCF-II: AMCFII
-NKX6-1: NKX61
-NKX2-3: NKX23
-NKX1-2: NKX12
-H1-8: H18
-Y_RNA: YRNA
-ssc-mir-29b-1: sscmir29b1
-ssc-mir-493: sscmir493
-ssc-mir-320: sscmir320
-ssc-mir-199a-2: sscmir199a2
-ssc-mir-365-2: sscmir3652
-ssc-mir-331: sscmir331
-ssc-let-7c: ssclet7c
-ssc-mir-425: sscmir425
-ssc-mir-31: sscmir31
-ssc-mir-324: sscmir324
-ssc-mir-30c-1: sscmir30c1
-ssc-mir-24-1: sscmir241
-Y_RNA: YRNA
-ssc-mir-450b: sscmir450b
-ssc-let-7a-2: ssclet7a2
-ssc-mir-149: sscmir149
-ssc-mir-192: sscmir192
-ssc-mir-421: sscmir421
-ssc-mir-130b: sscmir130b
-ssc-mir-1296: sscmir1296
-ssc-mir-450c: sscmir450c
-ssc-mir-183: sscmir183
-ssc-mir-136: sscmir136
-ssc-mir-135-1: sscmir1351
-ssc-mir-20b-1: sscmir20b1
-ssc-mir-222: sscmir222
-Y_RNA: YRNA
-ssc-mir-145: sscmir145
-ssc-let-7f-2: ssclet7f2
-ssc-mir-190a: sscmir190a
-ssc-mir-21: sscmir21
-ssc-mir-191: sscmir191
-ssc-mir-17: sscmir17
-ssc-mir-874: sscmir874
-5S_rRNA: 5SrRNA
-ssc-mir-219a: sscmir219a
-ssc-mir-190b: sscmir190b
-ssc-mir-497: sscmir497
-ssc-let-7e: ssclet7e
-ssc-mir-885: sscmir885
-MIR92A-1: MIR92A1
-ssc-mir-221: sscmir221
-RNase_MRP: RNaseMRP
-ssc-mir-378-1: sscmir3781
-ssc-mir-339-1: sscmir3391
-Y_RNA: YRNA
-ssc-mir-374a: sscmir374a
-Y_RNA: YRNA
-ssc-mir-202: sscmir202
-ssc-mir-489: sscmir489
-ssc-mir-182: sscmir182
-ssc-mir-205: sscmir205
-ssc-mir-30d: sscmir30d
-ssc-mir-214: sscmir214
-ssc-mir-96: sscmir96
-ssc-mir-133a-1: sscmir133a1
-ssc-mir-133b: sscmir133b
-ssc-mir-628: sscmir628
-ssc-mir-129b: sscmir129b
-ssc-mir-326: sscmir326
-ssc-mir-181a-2: sscmir181a2
-ssc-mir-29a: sscmir29a
-ssc-mir-135-2: sscmir1352
-ssc-mir-582: sscmir582
-ssc-mir-103-1: sscmir1031
-ssc-mir-152: sscmir152
-ssc-mir-328: sscmir328
-ssc-mir-218b: sscmir218b
-ssc-mir-1: sscmir1
-ssc-mir-744: sscmir744
-ssc-mir-429: sscmir429
-ssc-mir-15b: sscmir15b
-MIR199A-1: MIR199A1
-ssc-mir-29b-2: sscmir29b2
-ssc-mir-193a: sscmir193a
-ssc-mir-95: sscmir95
-ssc-mir-186: sscmir186
-ssc-let-7f-1: ssclet7f1
-MIR365-1: MIR3651
-ssc-mir-155: sscmir155
-ssc-mir-106a: sscmir106a
-ssc-mir-505: sscmir505
-ssc-mir-143: sscmir143
-ssc-mir-9-3: sscmir93
-ssc-mir-670: sscmir670
-ssc-mir-24-2: sscmir242
-ssc-mir-423: sscmir423
-ssc-mir-708: sscmir708
-ssc-mir-208b: sscmir208b
-ssc-mir-30b: sscmir30b
-ssc-mir-206: sscmir206
-ssc-mir-130a: sscmir130a
-ssc-mir-100: sscmir100
-ssc-mir-450a: sscmir450a
-ssc-mir-125a: sscmir125a
-ssc-mir-184: sscmir184
-ssc-mir-451: sscmir451
-ssc-let-7d: ssclet7d
-ssc-mir-181b-1: sscmir181b1
-Y_RNA: YRNA
-ssc-mir-16-1: sscmir161
-ssc-mir-144: sscmir144
-ssc-mir-223: sscmir223
-ssc-mir-28: sscmir28
-ssc-mir-224: sscmir224
-ssc-mir-1307: sscmir1307
-ssc-mir-452: sscmir452
-ssc-mir-432: sscmir432
-ssc-mir-23b: sscmir23b
-ssc-mir-195: sscmir195
-ssc-mir-101-1: sscmir1011
-ssc-mir-30e: sscmir30e
-ssc-mir-1306: sscmir1306
-MIR128-1: MIR1281
-ssc-mir-124a-1: sscmir124a1
-ssc-mir-30c-2: sscmir30c2
-ssc-mir-18a: sscmir18a
-ssc-mir-98: sscmir98
-ssc-mir-122: sscmir122
-ssc-mir-1468: sscmir1468
-ssc-mir-29c: sscmir29c
-ssc-mir-204: sscmir204
-ssc-mir-105-2: sscmir1052
-ssc-mir-542: sscmir542
-ssc-mir-185: sscmir185
-ssc-mir-181b-2: sscmir181b2
-ssc-mir-181a-1: sscmir181a1
-ssc-mir-181d: sscmir181d
-ssc-mir-107: sscmir107
-ssc-let-7a-1: ssclet7a1
-Y_RNA: YRNA
-ssc-mir-16-2: sscmir162
-ssc-mir-7-1: sscmir71
-ssc-mir-23a: sscmir23a
-MIR196A-1: MIR196A1
-ssc-mir-128-2: sscmir1282
-ssc-mir-105-1: sscmir1051
-ssc-mir-361: sscmir361
-ssc-mir-19a: sscmir19a
-MIR19B-1: MIR19B1
-ssc-mir-194a: sscmir194a
-ssc-mir-504: sscmir504
-ssc-mir-551a: sscmir551a
-ssc-mir-30a: sscmir30a
-ssc-mir-138: sscmir138
-ssc-mir-101-2: sscmir1012
-ssc-mir-92b: sscmir92b
-ssc-mir-124a-2: sscmir124a2
-ssc-mir-1343: sscmir1343
-RNaseP_nuc: RNasePnuc
-Y_RNA: YRNA
-ssc-mir-2483: sscmir2483
-RNaseP_nuc: RNasePnuc
-ssc-mir-2320: sscmir2320
-RNaseP_nuc: RNasePnuc
-ssc-mir-19b-2: sscmir19b2
-ssc-mir-141: sscmir141
-ssc-mir-383: sscmir383
-Metazoa_SRP: MetazoaSRP
-IFN-ALPHAOMEGA: IFNALPHAOMEGA
-RNaseP_nuc: RNasePnuc
-KRTAP24-1: KRTAP241
-ssc-mir-935: sscmir935
-UABP-2: UABP2
-ssc-mir-26a: sscmir26a
-ssc-mir-103-2: sscmir1032
-ssc-mir-486-2: sscmir4862
-ssc-mir-34c-1: sscmir34c1
-Metazoa_SRP: MetazoaSRP
-ssc-mir-362: sscmir362
-Metazoa_SRP: MetazoaSRP
-ssc-mir-218-1: sscmir2181
-H3-3A: H33A
-ssc-mir-200b: sscmir200b
-ssc-mir-1249-1: sscmir12491
-ssc-mir-216-1: sscmir2161
-Metazoa_SRP: MetazoaSRP
-Metazoa_SRP: MetazoaSRP
-Metazoa_SRP: MetazoaSRP
-TRBV25-1: TRBV251
-ssc-mir-125b-1: sscmir125b1
-ssc-mir-92a-2: sscmir92a2
-ssc-mir-490-1: sscmir4901
-Metazoa_SRP: MetazoaSRP
-ssc-mir-1271: sscmir1271
-Metazoa_SRP: MetazoaSRP
-MIR133A-2: MIR133A2
-ssc-mir-660: sscmir660
-ssc-mir-217-1: sscmir2171
-ssc-mir-375: sscmir375
-ssc-mir-18b: sscmir18b
-ssc-mir-802: sscmir802
-ssc-mir-371: sscmir371
-Metazoa_SRP: MetazoaSRP
-ssc-mir-150-1: sscmir1501
-ssc-mir-345-1: sscmir3451
-ssc-mir-363-1: sscmir3631
-ssc-mir-7-2: sscmir72
-NKX2-6: NKX26
-ssc-mir-32: sscmir32
-ssc-mir-378-2: sscmir3782
-Metazoa_SRP: MetazoaSRP
-ssc-mir-4331-2: sscmir43312
-ssc-mir-1224: sscmir1224
-KRTAP27-1: KRTAP271
-Metazoa_SRP: MetazoaSRP
-ssc-mir-500: sscmir500
-ssc-mir-532: sscmir532
-Metazoa_SRP: MetazoaSRP
-ssc-mir-676-1: sscmir6761
-ssc-mir-4337: sscmir4337
-ssc-mir-4338: sscmir4338
-RNaseP_nuc: RNasePnuc
-SERPINA3-2: SERPINA32
-ssc-mir-4334: sscmir4334
-ssc-mir-196a-2: sscmir196a2
-ssc-mir-339-2: sscmir3392
-5S_rRNA: 5SrRNA
-IFN-ALPHA-15: IFNALPHA15
-5S_rRNA: 5SrRNA
-OLF42-1: OLF421
-ssc-mir-2411: sscmir2411
-5S_rRNA: 5SrRNA
-ssc-mir-146a: sscmir146a
-ssc-mir-9843: sscmir9843
-ssc-mir-9852: sscmir9852
-ssc-mir-9795: sscmir9795
-5S_rRNA: 5SrRNA
-Metazoa_SRP: MetazoaSRP
-ssc-mir-9860: sscmir9860
-ssc-mir-9819: sscmir9819
-ssc-mir-9804: sscmir9804
-IFN-OMEGA-3: IFNOMEGA3
-NKX3-1: NKX31
-IFN-DELTA-11: IFNDELTA11
-ssc-mir-9815: sscmir9815
-ssc-mir-7141: sscmir7141
-5S_rRNA: 5SrRNA
-ssc-mir-7144: sscmir7144
-ssc-mir-9823: sscmir9823
-ssc-mir-215: sscmir215
-ssc-mir-9832: sscmir9832
-ssc-mir-370: sscmir370
-Metazoa_SRP: MetazoaSRP
-5S_rRNA: 5SrRNA
-ssc-mir-7143: sscmir7143
-ssc-mir-9828-1: sscmir98281
-Metazoa_SRP: MetazoaSRP
-NKX6-3: NKX63
-5S_rRNA: 5SrRNA
-ssc-mir-9803: sscmir9803
-ssc-mir-342: sscmir342
-H1-4: H14
-SPAI-2: SPAI2
-ssc-mir-6529: sscmir6529
-IFN-OMEGA-2: IFNOMEGA2
-5S_rRNA: 5SrRNA
-ssc-mir-33b: sscmir33b
-ssc-mir-9798: sscmir9798
-NKX3-2: NKX32
-ssc-mir-9794: sscmir9794
-ssc-mir-9858: sscmir9858
-ssc-mir-424: sscmir424
-ssc-mir-9814: sscmir9814
-ssc-mir-7134: sscmir7134
-ssc-mir-9828-1: sscmir98281
-ssc-mir-9831: sscmir9831
-ssc-mir-9833: sscmir9833
-IFN-DELTA-9: IFNDELTA9
-Metazoa_SRP: MetazoaSRP
-RPL17-C18orf32: RPL17C18orf32
-ssc-mir-9784-1: sscmir97841
-ssc-mir-1285: sscmir1285
-ssc-mir-9788-1: sscmir97881
-ISG12(A): ISG12A
-ssc-mir-664: sscmir664
-ssc-mir-9839: sscmir9839
-ssc-mir-4335: sscmir4335
-ssc-mir-325: sscmir325
-ssc-mir-9801: sscmir9801
-ssc-mir-9820: sscmir9820
-NKX6-2: NKX62
-5S_rRNA: 5SrRNA
-GP91-PHOX: GP91PHOX
-ssc-mir-9828-1: sscmir98281
-NKX2-5: NKX25
-ssc-mir-9853-1: sscmir98531
-ssc-mir-7139: sscmir7139
-ssc-mir-9792: sscmir9792
-IFN-DELTA-6: IFNDELTA6
-ssc-mir-9855-1: sscmir98551
-5S_rRNA: 5SrRNA
-ssc-mir-9835: sscmir9835
-ssc-mir-9841: sscmir9841
-ssc-mir-7136: sscmir7136
-5S_rRNA: 5SrRNA
-ssc-mir-9810: sscmir9810
-ssc-mir-9830: sscmir9830
-5S_rRNA: 5SrRNA
-H1-2: H12
-ssc-mir-7135: sscmir7135
-ssc-mir-7140: sscmir7140
-ssc-mir-9788-1: sscmir97881
-ssc-mir-4331-1: sscmir43311
-ssc-mir-153: sscmir153
-ssc-mir-9818: sscmir9818
-IFN-OMEGA-5: IFNOMEGA5
-ssc-mir-9824: sscmir9824
-KRTAP11-1: KRTAP111
-ssc-mir-769: sscmir769
-ssc-mir-503: sscmir503
-ssc-mir-9799: sscmir9799
-ssc-mir-9789: sscmir9789
-ssc-mir-1285: sscmir1285
-ssc-mir-9825: sscmir9825
-ssc-mir-9808: sscmir9808
-NKX1-1: NKX11
-ssc-mir-9838: sscmir9838
-ssc-mir-125b-2: sscmir125b2
-RPL36A-HNRNPH2: RPL36AHNRNPH2
-ssc-mir-9840: sscmir9840
-ssc-mir-9807: sscmir9807
-ssc-mir-615: sscmir615
-H1-0: H10
-ssc-mir-9802: sscmir9802
-ssc-mir-9837: sscmir9837
-ssc-mir-7137: sscmir7137
-ssc-mir-7142: sscmir7142
-ssc-mir-7857: sscmir7857
-ssc-mir-9813: sscmir9813
-ssc-mir-9805: sscmir9805
-ssc-mir-194b: sscmir194b
-NKX2-2: NKX22
-IFN-OMEGA-7: IFNOMEGA7
-5S_rRNA: 5SrRNA
-ssc-mir-2366-1: sscmir23661
-ssc-mir-196b-1: sscmir196b1
-ssc-mir-9796: sscmir9796
-5S_rRNA: 5SrRNA
-CFAP298-TCP10L: CFAP298TCP10L
-ssc-mir-7138: sscmir7138
-ssc-mir-9846: sscmir9846
-ssc-mir-1839: sscmir1839
-IFN-ALPHA-1: IFNALPHA1
-KRTAP17-1: KRTAP171
-ssc-mir-1842: sscmir1842
-ssc-mir-10389: sscmir10389
-ssc-mir-9836: sscmir9836
-ssc-mir-27a: sscmir27a
-IFN-ALPHA-8: IFNALPHA8
-ssc-mir-9850: sscmir9850
-ssc-mir-1388: sscmir1388
-ssc-mir-10391: sscmir10391
-ssc-mir-9861: sscmir9861
-IFN-ALPHA-4: IFNALPHA4
-ssc-mir-378b: sscmir378b
-IFN-ALPHA-9: IFNALPHA9
-ssc-mir-9857: sscmir9857
-PMAP-36: PMAP36
-ssc-mir-9817: sscmir9817
-ssc-mir-574: sscmir574
-ssc-mir-9786-1: sscmir97861
-ssc-mir-10387: sscmir10387
-ssc-mir-9848: sscmir9848
-ssc-mir-9859: sscmir9859
-ssc-mir-10388: sscmir10388
-ssc-mir-9842: sscmir9842
-ssc-mir-296: sscmir296
-ssc-mir-9790: sscmir9790
-ssc-mir-9800: sscmir9800
-ssc-mir-9854: sscmir9854
-TRBV3-1: TRBV31
-ssc-mir-9827: sscmir9827
-IFN-ALPHA-17: IFNALPHA17
-KRTAP16-1: KRTAP161
-ssc-mir-10384-2: sscmir103842
-IFN-DELTA-8: IFNDELTA8
-ssc-mir-9826: sscmir9826
-ssc-mir-9812: sscmir9812
-ssc-mir-10382: sscmir10382
-ssc-mir-9811: sscmir9811
-ssc-mir-9809: sscmir9809
-RNaseP_nuc: RNasePnuc
-ssc-mir-9849: sscmir9849
-ssc-mir-9787: sscmir9787
-ssc-mir-9829: sscmir9829
-ssc-mir-6516: sscmir6516
-ssc-mir-10390: sscmir10390
-ssc-mir-10383: sscmir10383
-IFN-OMEGA-6: IFNOMEGA6
+whitelist:
+    H1-7: H17
+    H1-3: H13
+    ATP6V1G2-DDX39B: ATP6V1G2DDX39B
+    HLA-DRA: HLADRA
+    SLA-DQB1: SLADQB1
+    HLA-DOB: HLADOB
+    SLA-DMB: SLADMB
+    SLA-DMA: SLADMA
+    SLA-DOA: SLADOA
+    NKX2-8: NKX28
+    NKX2-1: NKX21
+    PSP-II: PSPII
+    IFN-DELTA-1: IFNDELTA1
+    MSANTD3-TMEFF1: MSANTD3TMEFF1
+    NKX2-4: NKX24
+    AMCF-II: AMCFII
+    NKX6-1: NKX61
+    NKX2-3: NKX23
+    NKX1-2: NKX12
+    H1-8: H18
+    Y_RNA: YRNA
+    ssc-mir-29b-1: sscmir29b1
+    ssc-mir-493: sscmir493
+    ssc-mir-320: sscmir320
+    ssc-mir-199a-2: sscmir199a2
+    ssc-mir-365-2: sscmir3652
+    ssc-mir-331: sscmir331
+    ssc-let-7c: ssclet7c
+    ssc-mir-425: sscmir425
+    ssc-mir-31: sscmir31
+    ssc-mir-324: sscmir324
+    ssc-mir-30c-1: sscmir30c1
+    ssc-mir-24-1: sscmir241
+    Y_RNA: YRNA
+    ssc-mir-450b: sscmir450b
+    ssc-let-7a-2: ssclet7a2
+    ssc-mir-149: sscmir149
+    ssc-mir-192: sscmir192
+    ssc-mir-421: sscmir421
+    ssc-mir-130b: sscmir130b
+    ssc-mir-1296: sscmir1296
+    ssc-mir-450c: sscmir450c
+    ssc-mir-183: sscmir183
+    ssc-mir-136: sscmir136
+    ssc-mir-135-1: sscmir1351
+    ssc-mir-20b-1: sscmir20b1
+    ssc-mir-222: sscmir222
+    Y_RNA: YRNA
+    ssc-mir-145: sscmir145
+    ssc-let-7f-2: ssclet7f2
+    ssc-mir-190a: sscmir190a
+    ssc-mir-21: sscmir21
+    ssc-mir-191: sscmir191
+    ssc-mir-17: sscmir17
+    ssc-mir-874: sscmir874
+    5S_rRNA: 5SrRNA
+    ssc-mir-219a: sscmir219a
+    ssc-mir-190b: sscmir190b
+    ssc-mir-497: sscmir497
+    ssc-let-7e: ssclet7e
+    ssc-mir-885: sscmir885
+    MIR92A-1: MIR92A1
+    ssc-mir-221: sscmir221
+    RNase_MRP: RNaseMRP
+    ssc-mir-378-1: sscmir3781
+    ssc-mir-339-1: sscmir3391
+    Y_RNA: YRNA
+    ssc-mir-374a: sscmir374a
+    Y_RNA: YRNA
+    ssc-mir-202: sscmir202
+    ssc-mir-489: sscmir489
+    ssc-mir-182: sscmir182
+    ssc-mir-205: sscmir205
+    ssc-mir-30d: sscmir30d
+    ssc-mir-214: sscmir214
+    ssc-mir-96: sscmir96
+    ssc-mir-133a-1: sscmir133a1
+    ssc-mir-133b: sscmir133b
+    ssc-mir-628: sscmir628
+    ssc-mir-129b: sscmir129b
+    ssc-mir-326: sscmir326
+    ssc-mir-181a-2: sscmir181a2
+    ssc-mir-29a: sscmir29a
+    ssc-mir-135-2: sscmir1352
+    ssc-mir-582: sscmir582
+    ssc-mir-103-1: sscmir1031
+    ssc-mir-152: sscmir152
+    ssc-mir-328: sscmir328
+    ssc-mir-218b: sscmir218b
+    ssc-mir-1: sscmir1
+    ssc-mir-744: sscmir744
+    ssc-mir-429: sscmir429
+    ssc-mir-15b: sscmir15b
+    MIR199A-1: MIR199A1
+    ssc-mir-29b-2: sscmir29b2
+    ssc-mir-193a: sscmir193a
+    ssc-mir-95: sscmir95
+    ssc-mir-186: sscmir186
+    ssc-let-7f-1: ssclet7f1
+    MIR365-1: MIR3651
+    ssc-mir-155: sscmir155
+    ssc-mir-106a: sscmir106a
+    ssc-mir-505: sscmir505
+    ssc-mir-143: sscmir143
+    ssc-mir-9-3: sscmir93
+    ssc-mir-670: sscmir670
+    ssc-mir-24-2: sscmir242
+    ssc-mir-423: sscmir423
+    ssc-mir-708: sscmir708
+    ssc-mir-208b: sscmir208b
+    ssc-mir-30b: sscmir30b
+    ssc-mir-206: sscmir206
+    ssc-mir-130a: sscmir130a
+    ssc-mir-100: sscmir100
+    ssc-mir-450a: sscmir450a
+    ssc-mir-125a: sscmir125a
+    ssc-mir-184: sscmir184
+    ssc-mir-451: sscmir451
+    ssc-let-7d: ssclet7d
+    ssc-mir-181b-1: sscmir181b1
+    Y_RNA: YRNA
+    ssc-mir-16-1: sscmir161
+    ssc-mir-144: sscmir144
+    ssc-mir-223: sscmir223
+    ssc-mir-28: sscmir28
+    ssc-mir-224: sscmir224
+    ssc-mir-1307: sscmir1307
+    ssc-mir-452: sscmir452
+    ssc-mir-432: sscmir432
+    ssc-mir-23b: sscmir23b
+    ssc-mir-195: sscmir195
+    ssc-mir-101-1: sscmir1011
+    ssc-mir-30e: sscmir30e
+    ssc-mir-1306: sscmir1306
+    MIR128-1: MIR1281
+    ssc-mir-124a-1: sscmir124a1
+    ssc-mir-30c-2: sscmir30c2
+    ssc-mir-18a: sscmir18a
+    ssc-mir-98: sscmir98
+    ssc-mir-122: sscmir122
+    ssc-mir-1468: sscmir1468
+    ssc-mir-29c: sscmir29c
+    ssc-mir-204: sscmir204
+    ssc-mir-105-2: sscmir1052
+    ssc-mir-542: sscmir542
+    ssc-mir-185: sscmir185
+    ssc-mir-181b-2: sscmir181b2
+    ssc-mir-181a-1: sscmir181a1
+    ssc-mir-181d: sscmir181d
+    ssc-mir-107: sscmir107
+    ssc-let-7a-1: ssclet7a1
+    Y_RNA: YRNA
+    ssc-mir-16-2: sscmir162
+    ssc-mir-7-1: sscmir71
+    ssc-mir-23a: sscmir23a
+    MIR196A-1: MIR196A1
+    ssc-mir-128-2: sscmir1282
+    ssc-mir-105-1: sscmir1051
+    ssc-mir-361: sscmir361
+    ssc-mir-19a: sscmir19a
+    MIR19B-1: MIR19B1
+    ssc-mir-194a: sscmir194a
+    ssc-mir-504: sscmir504
+    ssc-mir-551a: sscmir551a
+    ssc-mir-30a: sscmir30a
+    ssc-mir-138: sscmir138
+    ssc-mir-101-2: sscmir1012
+    ssc-mir-92b: sscmir92b
+    ssc-mir-124a-2: sscmir124a2
+    ssc-mir-1343: sscmir1343
+    RNaseP_nuc: RNasePnuc
+    Y_RNA: YRNA
+    ssc-mir-2483: sscmir2483
+    RNaseP_nuc: RNasePnuc
+    ssc-mir-2320: sscmir2320
+    RNaseP_nuc: RNasePnuc
+    ssc-mir-19b-2: sscmir19b2
+    ssc-mir-141: sscmir141
+    ssc-mir-383: sscmir383
+    Metazoa_SRP: MetazoaSRP
+    IFN-ALPHAOMEGA: IFNALPHAOMEGA
+    RNaseP_nuc: RNasePnuc
+    KRTAP24-1: KRTAP241
+    ssc-mir-935: sscmir935
+    UABP-2: UABP2
+    ssc-mir-26a: sscmir26a
+    ssc-mir-103-2: sscmir1032
+    ssc-mir-486-2: sscmir4862
+    ssc-mir-34c-1: sscmir34c1
+    Metazoa_SRP: MetazoaSRP
+    ssc-mir-362: sscmir362
+    Metazoa_SRP: MetazoaSRP
+    ssc-mir-218-1: sscmir2181
+    H3-3A: H33A
+    ssc-mir-200b: sscmir200b
+    ssc-mir-1249-1: sscmir12491
+    ssc-mir-216-1: sscmir2161
+    Metazoa_SRP: MetazoaSRP
+    Metazoa_SRP: MetazoaSRP
+    Metazoa_SRP: MetazoaSRP
+    TRBV25-1: TRBV251
+    ssc-mir-125b-1: sscmir125b1
+    ssc-mir-92a-2: sscmir92a2
+    ssc-mir-490-1: sscmir4901
+    Metazoa_SRP: MetazoaSRP
+    ssc-mir-1271: sscmir1271
+    Metazoa_SRP: MetazoaSRP
+    MIR133A-2: MIR133A2
+    ssc-mir-660: sscmir660
+    ssc-mir-217-1: sscmir2171
+    ssc-mir-375: sscmir375
+    ssc-mir-18b: sscmir18b
+    ssc-mir-802: sscmir802
+    ssc-mir-371: sscmir371
+    Metazoa_SRP: MetazoaSRP
+    ssc-mir-150-1: sscmir1501
+    ssc-mir-345-1: sscmir3451
+    ssc-mir-363-1: sscmir3631
+    ssc-mir-7-2: sscmir72
+    NKX2-6: NKX26
+    ssc-mir-32: sscmir32
+    ssc-mir-378-2: sscmir3782
+    Metazoa_SRP: MetazoaSRP
+    ssc-mir-4331-2: sscmir43312
+    ssc-mir-1224: sscmir1224
+    KRTAP27-1: KRTAP271
+    Metazoa_SRP: MetazoaSRP
+    ssc-mir-500: sscmir500
+    ssc-mir-532: sscmir532
+    Metazoa_SRP: MetazoaSRP
+    ssc-mir-676-1: sscmir6761
+    ssc-mir-4337: sscmir4337
+    ssc-mir-4338: sscmir4338
+    RNaseP_nuc: RNasePnuc
+    SERPINA3-2: SERPINA32
+    ssc-mir-4334: sscmir4334
+    ssc-mir-196a-2: sscmir196a2
+    ssc-mir-339-2: sscmir3392
+    5S_rRNA: 5SrRNA
+    IFN-ALPHA-15: IFNALPHA15
+    5S_rRNA: 5SrRNA
+    OLF42-1: OLF421
+    ssc-mir-2411: sscmir2411
+    5S_rRNA: 5SrRNA
+    ssc-mir-146a: sscmir146a
+    ssc-mir-9843: sscmir9843
+    ssc-mir-9852: sscmir9852
+    ssc-mir-9795: sscmir9795
+    5S_rRNA: 5SrRNA
+    Metazoa_SRP: MetazoaSRP
+    ssc-mir-9860: sscmir9860
+    ssc-mir-9819: sscmir9819
+    ssc-mir-9804: sscmir9804
+    IFN-OMEGA-3: IFNOMEGA3
+    NKX3-1: NKX31
+    IFN-DELTA-11: IFNDELTA11
+    ssc-mir-9815: sscmir9815
+    ssc-mir-7141: sscmir7141
+    5S_rRNA: 5SrRNA
+    ssc-mir-7144: sscmir7144
+    ssc-mir-9823: sscmir9823
+    ssc-mir-215: sscmir215
+    ssc-mir-9832: sscmir9832
+    ssc-mir-370: sscmir370
+    Metazoa_SRP: MetazoaSRP
+    5S_rRNA: 5SrRNA
+    ssc-mir-7143: sscmir7143
+    ssc-mir-9828-1: sscmir98281
+    Metazoa_SRP: MetazoaSRP
+    NKX6-3: NKX63
+    5S_rRNA: 5SrRNA
+    ssc-mir-9803: sscmir9803
+    ssc-mir-342: sscmir342
+    H1-4: H14
+    SPAI-2: SPAI2
+    ssc-mir-6529: sscmir6529
+    IFN-OMEGA-2: IFNOMEGA2
+    5S_rRNA: 5SrRNA
+    ssc-mir-33b: sscmir33b
+    ssc-mir-9798: sscmir9798
+    NKX3-2: NKX32
+    ssc-mir-9794: sscmir9794
+    ssc-mir-9858: sscmir9858
+    ssc-mir-424: sscmir424
+    ssc-mir-9814: sscmir9814
+    ssc-mir-7134: sscmir7134
+    ssc-mir-9828-1: sscmir98281
+    ssc-mir-9831: sscmir9831
+    ssc-mir-9833: sscmir9833
+    IFN-DELTA-9: IFNDELTA9
+    Metazoa_SRP: MetazoaSRP
+    RPL17-C18orf32: RPL17C18orf32
+    ssc-mir-9784-1: sscmir97841
+    ssc-mir-1285: sscmir1285
+    ssc-mir-9788-1: sscmir97881
+    ISG12(A): ISG12A
+    ssc-mir-664: sscmir664
+    ssc-mir-9839: sscmir9839
+    ssc-mir-4335: sscmir4335
+    ssc-mir-325: sscmir325
+    ssc-mir-9801: sscmir9801
+    ssc-mir-9820: sscmir9820
+    NKX6-2: NKX62
+    5S_rRNA: 5SrRNA
+    GP91-PHOX: GP91PHOX
+    ssc-mir-9828-1: sscmir98281
+    NKX2-5: NKX25
+    ssc-mir-9853-1: sscmir98531
+    ssc-mir-7139: sscmir7139
+    ssc-mir-9792: sscmir9792
+    IFN-DELTA-6: IFNDELTA6
+    ssc-mir-9855-1: sscmir98551
+    5S_rRNA: 5SrRNA
+    ssc-mir-9835: sscmir9835
+    ssc-mir-9841: sscmir9841
+    ssc-mir-7136: sscmir7136
+    5S_rRNA: 5SrRNA
+    ssc-mir-9810: sscmir9810
+    ssc-mir-9830: sscmir9830
+    5S_rRNA: 5SrRNA
+    H1-2: H12
+    ssc-mir-7135: sscmir7135
+    ssc-mir-7140: sscmir7140
+    ssc-mir-9788-1: sscmir97881
+    ssc-mir-4331-1: sscmir43311
+    ssc-mir-153: sscmir153
+    ssc-mir-9818: sscmir9818
+    IFN-OMEGA-5: IFNOMEGA5
+    ssc-mir-9824: sscmir9824
+    KRTAP11-1: KRTAP111
+    ssc-mir-769: sscmir769
+    ssc-mir-503: sscmir503
+    ssc-mir-9799: sscmir9799
+    ssc-mir-9789: sscmir9789
+    ssc-mir-1285: sscmir1285
+    ssc-mir-9825: sscmir9825
+    ssc-mir-9808: sscmir9808
+    NKX1-1: NKX11
+    ssc-mir-9838: sscmir9838
+    ssc-mir-125b-2: sscmir125b2
+    RPL36A-HNRNPH2: RPL36AHNRNPH2
+    ssc-mir-9840: sscmir9840
+    ssc-mir-9807: sscmir9807
+    ssc-mir-615: sscmir615
+    H1-0: H10
+    ssc-mir-9802: sscmir9802
+    ssc-mir-9837: sscmir9837
+    ssc-mir-7137: sscmir7137
+    ssc-mir-7142: sscmir7142
+    ssc-mir-7857: sscmir7857
+    ssc-mir-9813: sscmir9813
+    ssc-mir-9805: sscmir9805
+    ssc-mir-194b: sscmir194b
+    NKX2-2: NKX22
+    IFN-OMEGA-7: IFNOMEGA7
+    5S_rRNA: 5SrRNA
+    ssc-mir-2366-1: sscmir23661
+    ssc-mir-196b-1: sscmir196b1
+    ssc-mir-9796: sscmir9796
+    5S_rRNA: 5SrRNA
+    CFAP298-TCP10L: CFAP298TCP10L
+    ssc-mir-7138: sscmir7138
+    ssc-mir-9846: sscmir9846
+    ssc-mir-1839: sscmir1839
+    IFN-ALPHA-1: IFNALPHA1
+    KRTAP17-1: KRTAP171
+    ssc-mir-1842: sscmir1842
+    ssc-mir-10389: sscmir10389
+    ssc-mir-9836: sscmir9836
+    ssc-mir-27a: sscmir27a
+    IFN-ALPHA-8: IFNALPHA8
+    ssc-mir-9850: sscmir9850
+    ssc-mir-1388: sscmir1388
+    ssc-mir-10391: sscmir10391
+    ssc-mir-9861: sscmir9861
+    IFN-ALPHA-4: IFNALPHA4
+    ssc-mir-378b: sscmir378b
+    IFN-ALPHA-9: IFNALPHA9
+    ssc-mir-9857: sscmir9857
+    PMAP-36: PMAP36
+    ssc-mir-9817: sscmir9817
+    ssc-mir-574: sscmir574
+    ssc-mir-9786-1: sscmir97861
+    ssc-mir-10387: sscmir10387
+    ssc-mir-9848: sscmir9848
+    ssc-mir-9859: sscmir9859
+    ssc-mir-10388: sscmir10388
+    ssc-mir-9842: sscmir9842
+    ssc-mir-296: sscmir296
+    ssc-mir-9790: sscmir9790
+    ssc-mir-9800: sscmir9800
+    ssc-mir-9854: sscmir9854
+    TRBV3-1: TRBV31
+    ssc-mir-9827: sscmir9827
+    IFN-ALPHA-17: IFNALPHA17
+    KRTAP16-1: KRTAP161
+    ssc-mir-10384-2: sscmir103842
+    IFN-DELTA-8: IFNDELTA8
+    ssc-mir-9826: sscmir9826
+    ssc-mir-9812: sscmir9812
+    ssc-mir-10382: sscmir10382
+    ssc-mir-9811: sscmir9811
+    ssc-mir-9809: sscmir9809
+    RNaseP_nuc: RNasePnuc
+    ssc-mir-9849: sscmir9849
+    ssc-mir-9787: sscmir9787
+    ssc-mir-9829: sscmir9829
+    ssc-mir-6516: sscmir6516
+    ssc-mir-10390: sscmir10390
+    ssc-mir-10383: sscmir10383
+    IFN-OMEGA-6: IFNOMEGA6

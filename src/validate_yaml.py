@@ -8,7 +8,7 @@ from src import utils
 # ---------------------------------VALIDATION-----------------------------------
 
 generated = ['condition_name', 'sample_name']
-
+factor = None
 
 def validate_file(metafile):
     """
@@ -111,7 +111,7 @@ def print_warning(metafile, pool_warn, ref_genome_warn):
     print(f'{"".center(80, "-")}')
 
 
-# ---------------------------------UTILITIES------------------------------------
+#---------------------------------UTILITIES------------------------------------
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
              invalid_entry, invalid_value, input_type):
@@ -124,11 +124,22 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             elif key not in key_yaml:
                 invalid_keys.append(key)
             else:
+                if key == 'factor':
+                    global factor
+                    factor = metafile[key]
+                input_type = None
+                if key == 'values' and factor is not None:
+                    node = list(utils.find_keys(key_yaml, factor))
+                    if len(node) > 0:
+                        if len(node[0]) > 6:
+                            input_type = node[7]
+                elif len(key_yaml[key]) > 6:
+                    input_type = key_yaml[key][7]
                 res_keys, res_entries, res_values = new_test(metafile[key],
                                                  key_yaml[key][4], sub_lists,
                                                  f'{key_name}:{key}' if
                                                  key_name != '' else key,
-                                                 invalid_keys, invalid_entry, invalid_value, key_yaml[key][7] if len(key_yaml[key]) > 6 else None)
+                                                 invalid_keys, invalid_entry, invalid_value, input_type)
                 invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
@@ -180,14 +191,14 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
             whitelist = utils.read_grouped_whitelist(whitelist, {})
-            whitelist = [x for xs in list(whitelist.values()) if xs is not None for x in xs]
+            whitelist = [x for xs in list(whitelist['whitelist'].values()) if xs is not None for x in xs]
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \
             and os.path.isfile(os.path.join(
             os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists',
             whitelist)):
         whitelist = utils.read_whitelist(whitelist)
-        if whitelist and whitelist['whitelist_type'] == 'plain':
+        if whitelist:
             whitelist = whitelist['whitelist']
     if whitelist and entry_value not in whitelist:
         return True

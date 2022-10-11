@@ -1,25 +1,27 @@
 whitelist_type: group
-lung:
-  - Lung cancer
-  - COPD
-  - PH
-  - PAH
-  - Asthma
-  - Pneumonia
-  - Pulmonary edema
-  - Pulmonary fibrosis
-  - Bronchitis
-  - Pneumothorax
-  - Pulmonary embolus
-  - Covid
-  - Influenca
-heart:
-  - Coronary heart disease CHD
-  - Angina
-  - Blood pressure
-  - Heart failure
-  - Bypass surgery
-  - Myocardial Infarction
-other:
-  - Breast cancer
-  - Prostate cancer
+whitelist:
+    lung:
+      - Lung cancer
+      - COPD
+      - PH
+      - PAH
+      - Asthma
+      - Pneumonia
+      - Pulmonary edema
+      - Pulmonary fibrosis
+      - Bronchitis
+      - Pneumothorax
+      - Pulmonary embolus
+      - Covid
+      - Influenca
+    heart:
+      - Coronary heart disease CHD
+      - Angina
+      - Blood pressure
+      - Heart failure
+      - Bypass surgery
+      - Myocardial Infarction
+    other:
+      - Breast cancer
+      - Prostate cancer
+      - Duchenne muscular dystrophy

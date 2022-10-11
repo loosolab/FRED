@@ -502,6 +502,15 @@ experimental_setting:
                       - True
                       - select
                       - str
+                bmi:
+                  - 'optional'
+                  - False
+                  - 'BMI'
+                  - ''
+                  - null
+                  - False
+                  - number
+                  - int
                 flow:
                   - 'optional'
                   - False

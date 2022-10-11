@@ -1,6 +1,6 @@
 import re
 from src import utils
-from src import generate
+from src import generate_metafile as generate
 from itertools import chain
 from tabulate import tabulate
 

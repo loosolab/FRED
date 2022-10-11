@@ -1,12 +1,13 @@
 whitelist_type: abbrev
-genotype: gnt
-tissue: tis
-cell_type: clt
-knockdown: knd
-gender: gnd
-life_stage: lfs
-ethnicity: eth
-disease: dis
-treatment: trt
-time_point: tmp
-enrichment: enr
+whitelist:
+    genotype: gnt
+    tissue: tis
+    cell_type: clt
+    knockdown: knd
+    gender: gnd
+    life_stage: lfs
+    ethnicity: eth
+    disease: dis
+    treatment: trt
+    time_point: tmp
+    enrichment: enr
