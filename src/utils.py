@@ -1,6 +1,6 @@
 import yaml
 import os
-
+import copy
 
 # The following functions were copied from Mampok
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/utils.py
@@ -131,8 +131,9 @@ def read_grouped_whitelist(whitelist, filled_object):
     w = [f'{x}' for xs in list(whitelist['whitelist'].keys()) if
          whitelist['whitelist'][xs] is not None for x in whitelist['whitelist'][xs] if x is not None]
     if len(w) > 30:
-        new_whitelist = w
-        new_whitelist['whitelist_keys'] = [key for key in whitelist['whitelist'] if key not in ['headers', 'whitelist_type']]
+        new_whitelist = copy.deepcopy(whitelist)
+        new_whitelist['whitelist'] = w
+        new_whitelist['whitelist_keys'] = list(whitelist['whitelist'].keys())
         whitelist['whitelist'] = new_whitelist
         whitelist['whitelist_type'] = 'group'
     if len(list(headers.keys())) > 0:

@@ -96,7 +96,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                    'value': None,
                    'whitelist': whitelist,
                    'whitelist_type': whitelist_type,
-                   'input_type': input_type, 'data_type': 'str',
+                   'input_type': input_type,
                    'input_disabled': input_disabled}
         else:
             for key in node['value']:
@@ -119,7 +119,6 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                        'list': node['list'], 'displayName': node['display_name'],
                        'desc': node['desc'], 'value': None, 'value_unit': None,
                        'whitelist': unit_whitelist, 'input_type': 'value_unit',
-                       'data_type': 'value_unit',
                        'input_disabled': input_disabled}
             else:
                 part_object = {'position': pos,
@@ -219,7 +218,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
             is_list = True
         if isinstance(input_type[0]['value'], dict) and not \
                 set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
-                set(node['value'].keys()):
+                set(input_type[0]['value'].keys()):
             if len(input_type[0]['value'].keys()) == 2 and 'value' in \
                     input_type[0]['value'] and 'unit' in input_type[0]['value']:
                 input_type = 'value_unit'
@@ -294,9 +293,9 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     #    input_type = 'searchable_select'
     if key == 'gene':
         input_type = 'gene'
-    elif key == 'enrichment':
-        whitelist = whitelist[:50]
-        input_type = 'select'
+    #elif key == 'enrichment':
+    #    whitelist = whitelist[:50]
+    #    input_type = 'select'
     if is_list:
         node = list(utils.find_keys(key_yaml, key))[0]
         new_w = [
@@ -410,7 +409,6 @@ def get_samples(condition, sample):
                             sample[i].pop('whitelist')
                             sample[i].pop('whitelist_type')
                             sample[i].pop('input_type')
-                            sample[i].pop('data_type')
                     else:
                         sample[i]['value'] = c[1]
                 sample[i]['input_disabled'] = True
@@ -428,7 +426,6 @@ def get_samples(condition, sample):
                     sample[i].pop('whitelist')
                     sample[i].pop('whitelist_type')
                     sample[i].pop('input_type')
-                    sample[i].pop('data_type')
     return sample
 
 
@@ -650,7 +647,6 @@ def parse_part(wi_object, factors, organism, id, nom):
                 elif isinstance(elem, list):
                     val.append(parse_list_part(elem, factors, organism, id, nom))
                 else:
-                    print(elem)
                     val.append(elem)
         else:
             if 'whitelist' in wi_object and wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
@@ -704,7 +700,7 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                                        f'm{"{:02d}".format(m+1)}')
             val['sample_name'] = sample_name
 
-        elif elem['position'].split(':')[-1] == 'experimental_factors':
+        #elif elem['position'].split(':')[-1] == 'experimental_factors':
         #        res = []
         #        all_factors = {}
         #        i = 0
@@ -1083,7 +1079,7 @@ def fill_wi_object(wi_object, meta_yaml):
                                         if 'whitelist' in part and part[
                                                 'whitelist'] is not None:
                                             if part[
-                                                'data_type'] == \
+                                                'input_type'] == \
                                                     'value_unit':
                                                 part['whitelist'] = 'unit'
                                             else:
@@ -1093,7 +1089,7 @@ def fill_wi_object(wi_object, meta_yaml):
                                 else:
                                     if 'whitelist' in field and field[
                                             'whitelist'] is not None:
-                                        if field['data_type'] == 'value_unit':
+                                        if field['input_type'] == 'value_unit':
                                             field['whitelist'] = 'unit'
                                         else:
                                             field['whitelist'] = \

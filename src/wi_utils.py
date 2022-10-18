@@ -29,7 +29,7 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
                 for sub_elem in wi_object['list_value']:
                     valid, message = validate_yaml.validate_value(sub_elem,
                                                                   wi_object[
-                                                                      'data_type'],
+                                                                      'input_type'],
                                                                   wi_object[
                                                                       'position'].split(
                                                                       ':')[-1])
@@ -67,7 +67,7 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
                         value = wi_object['value']
                     valid, message = validate_yaml.validate_value(value,
                                                                   wi_object[
-                                                                      'data_type'],
+                                                                      'input_type'],
                                                                   wi_object[
                                                                       'position'].split(
                                                                       ':')[-1])
