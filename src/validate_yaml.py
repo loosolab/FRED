@@ -131,12 +131,12 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                 if key == 'values' and factor is not None:
                     node = list(utils.find_keys(key_yaml, factor))
                     if len(node) > 0:
-                        if len(node[0]) > 6:
-                            input_type = node[7]
-                elif len(key_yaml[key]) > 6:
-                    input_type = key_yaml[key][7]
+                        if 'input_type' in node:
+                            input_type = node['input_type']
+                elif 'input_type' in key_yaml[key]:
+                    input_type = key_yaml[key]['input_type']
                 res_keys, res_entries, res_values = new_test(metafile[key],
-                                                 key_yaml[key][4], sub_lists,
+                                                 key_yaml[key]['value'], sub_lists,
                                                  f'{key_name}:{key}' if
                                                  key_name != '' else key,
                                                  invalid_keys, invalid_entry, invalid_value, input_type)
@@ -231,15 +231,16 @@ def get_missing_keys(node, metafile, invalid_keys, pre, missing):
     :param pre: a string to save and chain keys in order to save their position
     :param missing: a list to save the missing mandatory keys
     """
-    res = find_key(metafile, pre, node[1], node[4], invalid_keys)
+    res = find_key(metafile, pre, node['list'], node['value'], invalid_keys)
 
-    if node[0] == 'mandatory':
+    if node['mandatory']:
         missing += res
 
-    if node[0] == 'mandatory' or len(res) == 0:
-        if isinstance(node[4], dict):
-            for key in node[4]:
-                missing = get_missing_keys(node[4][key], metafile,
+    if node['mandatory'] or len(res) == 0:
+        if isinstance(node['value'], dict) and set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+                set(node['value'].keys()):
+            for key in node['value']:
+                missing = get_missing_keys(node['value'][key], metafile,
                                            invalid_keys, pre + ':' + key,
                                            missing)
     return missing
@@ -264,7 +265,7 @@ def find_key(metafile, key, is_list, values, invalid_keys):
         for entry in metafile[0]:
             for value in entry:
                 if value not in invalid_keys:
-                    if values[value][0] == 'mandatory':
+                    if values[value]['mandatory']:
                         for y in metafile[0]:
                             if value not in y:
                                 missing_keys.append(key + ':' + value)
@@ -279,14 +280,10 @@ def validate_value(input_value, value_type, key):
             if input_value not in [True, False]:
                 valid = False
                 message = 'The value has to be of type bool (True or False).'
-        elif value_type == 'int':
+        elif value_type == 'number':
             if not isinstance(input_value, int):
                 valid = False
                 message = 'The value has to be an integer.'
-        elif value_type == 'float':
-            if not isinstance(input_value, float):
-                valid = False
-                message = 'The value has to be a float.'
         elif value_type == 'date':
             try:
                 input_date = input_value.split('.')

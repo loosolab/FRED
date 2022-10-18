@@ -9,643 +9,606 @@
 # - data type											# data type (only if leaf)
 
 project:
-  - 'mandatory'
-  - False
-  - 'Project'
-  - 'This part contains general information about the project.'
-  - id:
-      - 'mandatory'
-      - False
-      - 'ID'
-      - ''
-      - null
-      - False
-      - short_text
-      - str
+  mandatory: True
+  list:  False
+  display_name: 'Project'
+  desc: 'This part contains general information about the project.'
+  value:
+    id:
+      mandatory: True
+      list: False
+      display_name: 'ID'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
     project_name:
-      - 'mandatory'
-      - False
-      - 'Project Name'
-      - ''
-      - null
-      - False
-      - short_text
-      - str
+      mandatory: True
+      list: False
+      display_name: 'Project Name'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
     date:
-      - 'mandatory'
-      - False
-      - 'Date'
-      - 'The date has the format dd.mm.yyyy'
-      - null
-      - False
-      - date
-      - date
+      mandatory: True
+      list: False
+      display_name: 'Date'
+      desc: 'The date has the format dd.mm.yyyy'
+      value: null
+      whitelist: False
+      input_type: date
     owner:
-      - 'mandatory'
-      - False
-      - 'Owner'
-      - 'The owner manages the project and acts as the first point of contact for questions.'
-      - name:
-          - 'mandatory'
-          - False
-          - 'Name'
-          - "The name should be entered in the format 'Last name, First name'. For public projects enter 'public'."
-          - null
-          - False
-          - short_text
-          - str
+      mandatory: True
+      list: False
+      display_name: 'Owner'
+      desc: 'The owner manages the project and acts as the first point of contact for questions.'
+      value:
+        name:
+          mandatory: True
+          list: False
+          display_name: 'Name'
+          desc: "The name should be entered in the format 'Last name, First name'. For public projects enter 'public'."
+          value: null
+          whitelist: False
+          input_type: short_text
         ldap_name:
-          - 'mandatory'
-          - False
-          - 'LDAP Name'
-          - "For public projects enter '---'."
-          - null
-          - False
-          - short_text
-          - str
+          mandatory: True
+          list: False
+          display_name: 'LDAP Name'
+          desc: "For public projects enter '---'."
+          value: null
+          whitelist: False
+          input_type: short_text
         department:
-          - 'mandatory'
-          - False
-          - 'Department'
-          - "For public projects enter 'alleAbt'."
-          - null
-          - True
-          - select
-          - str
+          mandatory: True
+          list: False
+          display_name: 'Department'
+          desc: "For public projects enter 'alleAbt'."
+          value: null
+          whitelist: True
+          input_type: select
         email:
-          - 'mandatory'
-          - False
-          - 'E-Mail'
-          - "For public projects enter '---'."
-          - null
-          - False
-          - short_text
-          - str
+          mandatory: True
+          list: False
+          display_name: 'E-Mail'
+          desc: "For public projects enter '---'."
+          value: null
+          whitelist: False
+          input_type: short_text
         address:
-          - 'optional'
-          - False
-          - 'Address'
-          - ''
-          - null
-          - False
-          - short_text
-          - str
+          mandatory: False
+          list: False
+          display_name: 'Address'
+          desc: ''
+          value: null
+          whitelist: False
+          input_type: short_text
         telephone:
-          - 'optional'
-          - False
-          - 'Telephone'
-          - ''
-          - null
-          - False
-          - short_text
-          - str
+          mandatory: False
+          list: False
+          display_name: 'Telephone'
+          desc: ''
+          value: null
+          whitelist: False
+          input_type: short_text
     nerd:
-      - 'optional'
-      - True
-      - 'Nerd'
-      - 'A nerd is a person assigned to the project to perform analysis.'
-      - name:
-          - 'mandatory'
-          - False
-          - 'Name'
-          - ''
-          - null
-          - False
-          - short_text
-          - str
+      mandatory: False
+      list: True
+      display_name: 'Nerd'
+      desc: 'A nerd is a person assigned to the project to perform analysis.'
+      value:
+        name:
+          mandatory: True
+          list: False
+          display_name: 'Name'
+          desc: "The name should be entered in the format 'Last name, First name'. For public projects enter 'public'."
+          value: null
+          whitelist: False
+          input_type: short_text
         ldap_name:
-          - 'mandatory'
-          - False
-          - 'LDAP Name'
-          - ''
-          - null
-          - False
-          - short_text
-          - str
+          mandatory: True
+          list: False
+          display_name: 'LDAP Name'
+          desc: "For public projects enter '---'."
+          value: null
+          whitelist: False
+          input_type: short_text
         department:
-          - 'mandatory'
-          - False
-          - 'Department'
-          - ''
-          - null
-          - True
-          - select
-          - str
+          mandatory: True
+          list: False
+          display_name: 'Department'
+          desc: "For public projects enter 'alleAbt'."
+          value: null
+          whitelist: True
+          input_type: select
         email:
-          - 'mandatory'
-          - False
-          - 'E-Mail'
-          - ''
-          - null
-          - False
-          - short_text
-          - str
+          mandatory: True
+          list: False
+          display_name: 'E-Mail'
+          desc: "For public projects enter '---'."
+          value: null
+          whitelist: False
+          input_type: short_text
         address:
-          - 'optional'
-          - False
-          - 'Address'
-          - ''
-          - null
-          - False
-          - short_text
-          - str
+          mandatory: False
+          list: False
+          display_name: 'Address'
+          desc: ''
+          value: null
+          whitelist: False
+          input_type: short_text
         telephone:
-          - 'optional'
-          - False
-          - 'Telephone'
-          - ''
-          - null
-          - False
-          - short_text
-          - str
+          mandatory: False
+          list: False
+          display_name: 'Telephone'
+          desc: ''
+          value: null
+          whitelist: False
+          input_type: short_text
     description:
-      - 'mandatory'
-      - False
-      - 'Description'
-      - 'Here you need to enter a detailed description of the project.'
-      - null
-      - False
-      - long_text
-      - str
+      mandatory: True
+      list: False
+      display_name: 'Description'
+      desc: 'Here you need to enter a detailed description of the project.'
+      value: null
+      whitelist: False
+      input_type: long_text
     further_description:
-      - 'optional'
-      - True
-      - 'Further Description / Additional Info'
-      - 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
-      - null
-      - False
-      - short_text
-      - str
+      mandatory: False
+      list: True
+      display_name: 'Further Description / Additional Info'
+      desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
+      value: null
+      whitelist: False
+      input_type: short_text
     graphical_abstract:
-      - 'optional'
-      - True
-      - 'Graphical Abstract'
-      - 'Here you can insert links to files containing a graphical abstract.'
-      - null
-      - False
-      - short_text
-      - str
+      mandatory: False
+      list: True
+      display_name: 'Graphical Abstract'
+      desc: 'Here you can insert links to files containing a graphical abstract.'
+      value: null
+      whitelist: False
+      input_type: short_text
 
 experimental_setting:
-  - 'mandatory'
-  - True
-  - 'Experimental setting'
-  - 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for different organisms.'
-  - organism:
-      - 'mandatory'
-      - False
-      - 'Organism'
-      - 'The organism identifier is composed of the organism name and the Taxonomy ID.'
-      - organism_name:
-          - 'mandatory'
-          - False
-          - 'Organism Name'
-          - ''
-          - null
-          - True
-          - select
-          - str
+  mandatory: True
+  list: True
+  display_name: 'Experimental setting'
+  desc: 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for different organisms.'
+  value:
+    organism:
+      mandatory: True
+      list: False
+      display_name: 'Organism'
+      desc: 'The organism identifier is composed of the organism name and the Taxonomy ID.'
+      special_case:
+        merge: organism_name
+      value:
+        organism_name:
+          mandatory: True
+          list: False
+          display_name: 'Organism Name'
+          desc: ''
+          value: null
+          whitelist: True
+          input_type: select
         taxonomy_id:
-          - 'mandatory'
-          - False
-          - 'Taxonomy ID'
-          - ''
-          - null
-          - True
-          - select
-          - str
-      - merge: organism_name
+          mandatory: True
+          list: False
+          display_name: 'Taxonomy ID'
+          desc: ''
+          value: null
+          whitelist: True
+          input_type: select
     experimental_factors:
-      - 'mandatory'
-      - True
-      - 'Experimental Factors'
-      - 'This part contains the factors that were investigated in the experiment.'
-      - factor:
-          - 'mandatory'
-          - False
-          - 'Factor'
-          - ''
-          - null
-          - True
-          - select
-          - str
+      mandatory: True
+      list: True
+      display_name: 'Experimental Factors'
+      desc: 'This part contains the factors that were investigated in the experiment.'
+      value:
+        factor:
+          mandatory: True
+          list: False
+          display_name: 'Factor'
+          desc: ''
+          value: null
+          whitelist: True
+          input_type: select
         values:
-          - 'mandatory'
-          - False
-          - 'Values'
-          - ''
-          - null
-          - True
-          - select
-          - str
+          mandatory: True
+          list: False
+          display_name: 'Values'
+          desc: ''
+          value: null
+          whitelist: True
+          input_type: select
     conditions:
-      - 'mandatory'
-      - True
-      - 'Conditions'
-      - ''
-      - condition_name:
-          - 'mandatory'
-          - False
-          - 'Condition Name'
-          - ''
-          - null
-          - False
-          - short_text
-          - str
+      mandatory: True
+      list: True
+      display_name: 'Conditions'
+      desc: ''
+      value:
+        condition_name:
+          mandatory: True
+          list: False
+          display_name: 'Condition Name'
+          desc: ''
+          value: null
+          whitelist: False
+          input_type: short_text
         biological_replicates:
-          - 'optional'
-          - False
-          - 'Biological Replicates'
-          - 'A biological replicate is a biological distinct sample.'
-          - count:
-              - 'optional'
-              - False
-              - 'Count'
-              - ''
-              - null
-              - False
-              - number
-              - int
+          mandatory: False
+          list: False
+          display_name: 'Biological Replicates'
+          desc: 'A biological replicate is a biological distinct sample.'
+          value:
+            count:
+              mandatory: False
+              list: False
+              display_name: 'Count'
+              desc: ''
+              value: null
+              whitelist: False
+              input_type: number
             samples:
-              - 'optional'
-              - True
-              - 'Samples'
-              - ''
-              - sample_name:
-                  - 'mandatory'
-                  - False
-                  - 'Sample Name'
-                  - ''
-                  - null
-                  - False
-                  - long_text
-                  - str
+              mandatory: False
+              list: True
+              display_name: 'Samples'
+              desc: ''
+              value:
+                sample_name:
+                  mandatory: True
+                  list: False
+                  display_name: 'Sample Name'
+                  desc: ''
+                  value: null
+                  whitelist: False
+                  input_type: long_text
                 pooled:
-                  - 'mandatory'
-                  - False
-                  - 'Pooled'
-                  - ''
-                  - False
-                  - False
-                  - select
-                  - bool
+                  mandatory: True
+                  list: False
+                  display_name: 'Pooled'
+                  desc: ''
+                  value: False
+                  whitelist: False
+                  input_type: bool
                 number_of_measurements:
-                  - 'optional'
-                  - False
-                  - 'Number of Measurements'
-                  - ''
-                  - 1
-                  - False
-                  - number
-                  - int
+                  mandatory: False
+                  list: False
+                  display_name: 'Number of Measurements'
+                  desc: ''
+                  value: 1
+                  whitelist: False
+                  input_type: number
                 genotype:
-                  - 'optional'
-                  - False
-                  - 'Genotype'
-                  - ''
-                  - null
-                  - True
-                  - select
-                  - str
+                  mandatory: False
+                  list: False
+                  display_name: 'Genotype'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 gender:
-                  - 'optional'
-                  - False
-                  - 'Gender'
-                  - ''
-                  - null
-                  - True
-                  - select
-                  - str
+                  mandatory: False
+                  list: False
+                  display_name: 'Gender'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 life_stage:
-                  - 'optional'
-                  - False
-                  - 'Life stage'
-                  - ''
-                  - null
-                  - True
-                  - select
-                  - str
+                  mandatory: False
+                  list: False
+                  display_name: 'Life stage'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 age:
-                  - 'optional'
-                  - False
-                  - 'Age'
-                  - ''
-                  - value:
-                      - 'mandatory'
-                      - False
-                      - 'Value'
-                      - ''
-                      - null
-                      - False
-                      - number
-                      - int
+                  mandatory: False
+                  list: False
+                  display_name: 'Age'
+                  desc: ''
+                  value:
+                    value:
+                      mandatory: True
+                      list: False
+                      display_name: 'Value'
+                      desc: ''
+                      value: null
+                      whitelist: False
+                      input_type: number
                     unit:
-                      - 'mandatory'
-                      - False
-                      - 'Unit'
-                      - ''
-                      - null
-                      - True
-                      - select
-                      - str
+                      mandatory: True
+                      list: False
+                      display_name: 'Unit'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
                 ethnicity:
-                  - 'optional'
-                  - False
-                  - 'Ethnicity'
-                  - ''
-                  - null
-                  - True
-                  - select
-                  - str
+                  mandatory: False
+                  list: False
+                  display_name: 'Ethnicity'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 tissue:
-                  - 'optional'
-                  - True
-                  - 'Tissue'
-                  - ''
-                  - null
-                  - True
-                  - select
-                  - str
+                  mandatory: False
+                  list: True
+                  display_name: 'Tissue'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 cell_type:
-                  - 'optional'
-                  - False
-                  - 'Cell type'
-                  - ''
-                  - null
-                  - True
-                  - select
-                  - str
+                  mandatory: False
+                  list: False
+                  display_name: 'Cell type'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 gene:
-                  - 'optional'
-                  - False
-                  - 'Gene'
-                  - ''
-                  - gene_name:
-                      - 'mandatory'
-                      - False
-                      - 'Name'
-                      - ''
-                      - null
-                      - True
-                      - select
-                      - str
+                  mandatory: False
+                  list: False
+                  display_name: 'Gene'
+                  desc: ''
+                  special_case:
+                    merge: gene_name
+                  value:
+                    gene_name:
+                      mandatory: True
+                      list: False
+                      display_name: 'Gene Name'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
                     ensembl_id:
-                      - 'mandatory'
-                      - False
-                      - 'ENSEMBL-ID'
-                      - ''
-                      - null
-                      - True
-                      - select
-                      - str
-                  - merge: gene_name
+                      mandatory: True
+                      list: False
+                      display_name: 'ENSEMBL-ID'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
                 disease:
-                  - 'optional'
-                  - True
-                  - 'Disease'
-                  - ''
-                  - disease_type:
-                      - 'optional'
-                      - False
-                      - 'Type'
-                      - ''
-                      - null
-                      - True
-                      - select
-                      - str
+                  mandatory: False
+                  list: True
+                  display_name: 'Disease'
+                  desc: ''
+                  special_case:
+                    group: 'disease_type'
+                  value:
+                    disease_type:
+                      mandatory: False
+                      list: False
+                      display_name: 'Type'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
                     disease_status:
-                      - 'mandatory'
-                      - False
-                      - 'Status'
-                      - ''
-                      - null
-                      - True
-                      - select
-                      - str
+                      mandatory: True
+                      list: False
+                      display_name: 'Status'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
                     disease_stage:
-                      - 'optional'
-                      - False
-                      - 'Stage'
-                      - ''
-                      - null
-                      - True
-                      - select
-                      - str
-                  - 'disease_type'
+                      mandatory: False
+                      list: False
+                      display_name: 'Stage'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
                 treatment:
-                  - 'optional'
-                  - True
-                  - 'Treatment'
-                  - ''
-                  - treatment_type:
-                      - 'optional'
-                      - False
-                      - 'Type'
-                      - ''
-                      - null
-                      - True
-                      - select
-                      - str
+                  mandatory: False
+                  list: True
+                  display_name: 'Treatment'
+                  desc: ''
+                  value:
+                    treatment_type:
+                      mandatory: False
+                      list: False
+                      display_name: 'Type'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
                     treatment_status:
-                      - 'mandatory'
-                      - False
-                      - 'Status'
-                      - ''
-                      - null
-                      - True
-                      - select
-                      - str
+                      mandatory: True
+                      list: False
+                      display_name: 'Status'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
                     treatment_duration:
-                      - 'optional'
-                      - False
-                      - 'Duration'
-                      - ''
-                      - value:
-                          - 'mandatory'
-                          - False
-                          - 'Value'
-                          - ''
-                          - null
-                          - False
-                          - number
-                          - int
+                      mandatory: False
+                      list: False
+                      display_name: 'Duration'
+                      desc: ''
+                      special_case:
+                        group: 'treatment_type'
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: 'Value'
+                          desc: ''
+                          value: null
+                          whitelist: False
+                          input_type: number
                         unit:
-                          - 'mandatory'
-                          - False
-                          - 'Unit'
-                          - ''
-                          - null
-                          - True
-                          - select
-                          - str
-                  - 'treatment_type'
+                          mandatory: False
+                          list: False
+                          display_name: 'Unit'
+                          desc: ''
+                          value: null
+                          whitelist: True
+                          input_type: select
                 time_point:
-                  - 'optional'
-                  - False
-                  - 'Time Point'
-                  - ''
-                  - value:
-                      - 'mandatory'
-                      - False
-                      - 'Value'
-                      - ''
-                      - null
-                      - False
-                      - number
-                      - int
+                  mandatory: False
+                  list: False
+                  display_name: 'Time Point'
+                  desc: ''
+                  value:
+                    value:
+                      mandatory: False
+                      list: False
+                      display_name: 'Value'
+                      desc: ''
+                      value: null
+                      whitelist: False
+                      input_type: number
                     unit:
-                      - 'mandatory'
-                      - False
-                      - 'Unit'
-                      - ''
-                      - null
-                      - True
-                      - select
-                      - str
-                bmi:
-                  - 'optional'
-                  - False
-                  - 'BMI'
-                  - ''
-                  - null
-                  - False
-                  - number
-                  - int
+                      mandatory: False
+                      list: False
+                      display_name: 'Unit'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
+                body_mass_index:
+                  mandatory: False
+                  list: False
+                  display_name: 'Body-Mass-Index'
+                  desc: ''
+                  value: null
+                  whitelist: False
+                  input_type: number
                 flow:
-                  - 'optional'
-                  - False
-                  - 'Flow'
-                  - ''
-                  - null
-                  - True
-                  - select
-                  - str
+                  mandatory: False
+                  list: False
+                  display_name: 'Flow'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 knockdown:
-                  - 'optional'
-                  - False
-                  - 'Knockdown'
-                  - ''
-                  - null
-                  - True
-                  - select
-                  - str
+                  mandatory: False
+                  list: False
+                  display_name: 'Knockdown'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 enrichment:
-                  - 'optional'
-                  - False
-                  - 'Enrichment / Histone-Mark / Pull-Down'
-                  - 'Enrichment for bound protein/histone mark as a result of an antibody pulldown or similar procedure (e.g. ChIPSeq, Cut&Tag, RiboTag)'
-                  - null
-                  - True
-                  - select
-                  - str
+                  mandatory: False
+                  list: False
+                  display_name: 'Enrichment / Histone-Mark / Pull-Down'
+                  desc: 'Enrichment for bound protein/histone mark as a result of an antibody pulldown or similar procedure (e.g. ChIPSeq, Cut&Tag, RiboTag)'
+                  value: null
+                  whitelist: True
+                  input_type: select
                 donor_count:
-                  - 'mandatory'
-                  - False
-                  - 'Donor Count'
-                  - ''
-                  - 1
-                  - False
-                  - number
-                  - int
+                  mandatory: True
+                  list: False
+                  display_name: 'Donor Count'
+                  desc: ''
+                  value: 1
+                  whitelist: False
+                  input_type: number
                 technical_replicates:
-                  - 'mandatory'
-                  - False
-                  - 'Technical Replicates'
-                  - 'Technical replicates are generated by performing a test on a biological replicate multiple times.'
-                  - count:
-                      - 'mandatory'
-                      - False
-                      - 'Count'
-                      - ''
-                      - 1
-                      - False
-                      - number
-                      - int
+                  mandatory: True
+                  list: False
+                  display_name: 'Technical Replicates'
+                  desc: 'Technical replicates are generated by performing a test on a biological replicate multiple times.'
+                  value:
+                    count:
+                      mandatory: True
+                      list: False
+                      display_name: 'Count'
+                      desc: ''
+                      value: 1
+                      whitelist: False
+                      input_type: number
                     sample_name:
-                      - 'mandatory'
-                      - True
-                      - 'Samples'
-                      - ''
-                      - null
-                      - False
-                      - short_text
-                      - str
+                      mandatory: True
+                      list: True
+                      display_name: 'Samples'
+                      desc: ''
+                      value: null
+                      whitelist: False
+                      input_type: short_text
 
 technical_details:
-  - 'mandatory'
-  - False
-  - 'Technical Details'
-  - 'This part contains all technical details of the experiment including an analysis part that stores additional information e.g. about runs.'
-  - technique:
-      - 'optional'
-      - True
-      - 'Technique'
-      - ''
-      - null
-      - True
-      - select
-      - str
+  mandatory: True
+  list: False
+  display_name: 'Technical Details'
+  desc: 'This part contains all technical details of the experiment including an analysis part that stores additional information e.g. about runs.'
+  value:
+    technique:
+      mandatory: True
+      list: True
+      display_name: 'Technique'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: select
     analysis:
-      - 'optional'
-      - False
-      - 'Analysis'
-      - ''
-      - sample_preparation:
-          - 'optional'
-          - True
-          - 'Sample preparation'
-          - 'Here you can insert links to files or URLs that contain information regarding the sample preparation.'
-          - null
-          - False
-          - short_text
-          - str
+      mandatory: False
+      list: False
+      display_name: 'Analysis'
+      desc: ''
+      value:
+        sample_preparation:
+          mandatory: False
+          list: True
+          display_name: 'Sample preparation'
+          desc: 'Here you can insert links to files or URLs that contain information regarding the sample preparation.'
+          value: null
+          whitelist: False
+          input_type: short_text
         further_description:
-          - 'optional'
-          - True
-          - 'Further description'
-          - 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
-          - null
-          - False
-          - short_text
-          - str
+          mandatory: False
+          list: True
+          display_name: 'Further description'
+          desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
+          value: null
+          whitelist: False
+          input_type: short_text
         runs:
-          - 'optional'
-          - True
-          - 'Runs'
-          - ''
-          - date:
-              - 'optional'
-              - False
-              - 'Date'
-              - 'The date has the format dd.mm.yyyy'
-              - null
-              - False
-              - date
-              - date
+          mandatory: False
+          list: True
+          display_name:  'Runs'
+          desc:  ''
+          value:
+            date:
+              mandatory: True
+              list: False
+              display_name: 'Date'
+              desc: 'The date has the format dd.mm.yyyy'
+              value: null
+              whitelist: False
+              input_type: date
             reference_genome:
-              - 'optional'
-              - False
-              - 'Reference Genome'
-              - ''
-              - null
-              - True
-              - select
-              - str
+              mandatory: False
+              list: False
+              display_name: 'Reference Genome'
+              desc: ''
+              value: null
+              whitelist: True
+              input_type: select
             parameters:
-              - 'optional'
-              - True
-              - 'Parameters'
-              - 'Here you can insert links to files that contain the parameters used for the run.'
-              - null
-              - False
-              - short_text
-              - str
+              mandatory: False
+              list: True
+              display_name: 'Parameters'
+              desc: 'Here you can insert links to files that contain the parameters used for the run.'
+              value: null
+              whitelist: False
+              input_type: short_text
             output:
-              - 'optional'
-              - False
-              - 'Output'
-              - 'Here you can insert links to the output files of the run.'
-              - null
-              - False
-              - short_text
-              - str
+              mandatory: False
+              list: True
+              display_name: 'Output'
+              desc: 'Here you can insert links to the output files of the run.'
+              value: null
+              whitelist: False
+              input_type: short_text

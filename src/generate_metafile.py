@@ -118,16 +118,17 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
     """
 
     # test if the input value is of type list
-    if node[1]:
+    if node['list']:
 
         # test if one list element contains a dictionary
-        if isinstance(node[4], dict):
-
+        if isinstance(node['value'], dict) and not \
+                set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+                set(node['value'].keys()):
             # test if the input value is an experimental factor
             if is_factor:
 
                 # TODO:
-                value = fill_metadata_structure(node[4], item, {}, optional,
+                value = fill_metadata_structure(node['value'], item, {}, optional,
                                                 mandatory_mode, result_dict,
                                                 first_node, is_factor)
             else:
@@ -145,25 +146,24 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                                                  f'\nDo you want to add '
                                                  f'another {item}?')
         else:
-
             # enable the input of multiple elements of the whitelist
             value = get_input_list(node, item, result_dict)
 
     else:
 
         # test if the input value is an experimental factor and is either not
-        # a dictionary or a dictionary that contains the key 'merge' (means
-        # that the input is treated like a single value and then split into a
-        # dictionary, e.g. gene -> gene_name, ensembl_id)
-        if is_factor and (not isinstance(node[4], dict) or (
-                len(node) > 5 and isinstance(node[5], dict) and
-                list(node[5].keys())[0] == 'merge')):
+        # a dictionary or a dictionary that contains the key 'merge' as special
+        # case (means that the input is treated like a single value and then
+        # split into a dictionary, e.g. gene -> gene_name, ensembl_id)
+        if is_factor and (not isinstance(node['value'], dict) or (isinstance(node['value'], dict) and \
+                set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+                set(node['value'].keys()) or \
+                ('special_case' in node and 'merge' in node['special_case']))):
 
             # ask the user to put in a list of experimental factors
             value = get_input_list(node, item, result_dict)
 
         else:
-
             # call function to fill in value
             value = fill_metadata_structure(node, item, {}, optional,
                                             mandatory_mode, result_dict,
@@ -188,7 +188,9 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
     """
 
     # test if the given part of the metadata structure is a dictionary
-    if isinstance(node, dict):
+    if isinstance(node, dict) and not \
+            set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+            set(node.keys()):
 
         # test if the input is of type value_unit
         if len(node.keys()) == 2 and 'value' in node.keys() and 'unit' in \
@@ -231,7 +233,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                 elif item == 'conditions':
                     return_dict[item] = get_conditions(
                         copy.deepcopy(return_dict['experimental_factors']),
-                        node[item][4],
+                        node[item]['value'],
                         mandatory_mode, return_dict)
 
                 # test if the key is editable
@@ -239,7 +241,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
 
                     # TODO: specify function
                     # if the key is mandatory, call the ... function on it
-                    if node[item][0] == 'mandatory':
+                    if node[item]['mandatory']:
                         return_dict[item] = get_redo_value(node[item], item,
                                                            optional,
                                                            mandatory_mode,
@@ -249,9 +251,9 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                     else:
 
                         # TODO:
-                        if node[item][1] or item not in factor or is_factor:
+                        if node[item]['list'] or item not in factor or is_factor:
                             optionals.append(item)
-                            desc.append(node[item][3])
+                            desc.append(node[item]['desc'])
 
             # if there are optional keys and mandatory mode is not active, ask
             # the user whether he wants to add optional information
@@ -281,7 +283,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
 
                         # test if the value for the optional key is of type
                         # list
-                        if node[option][1]:
+                        if node[option]['list']:
 
                             # TODO: ??
                             if option in return_dict and all(
@@ -301,7 +303,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                 # list element of the optional key
                                 possible_keys = list(list(
                                     utils.find_keys(
-                                        key_yaml, option))[0][4].keys())
+                                        key_yaml, option))[0]['value'].keys())
 
                                 # create lists for list elements that contain
                                 # optional keys that have no value yet and the
@@ -405,7 +407,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                 # to a list if they are
                                                 # already filled
                                                 remove_keys = []
-                                                for k in part_node[4]:
+                                                for k in part_node['value']:
                                                     if k not in possible_input:
                                                         remove_keys.append(k)
 
@@ -413,7 +415,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                 # the metadata structure of
                                                 # the optional key
                                                 for k in remove_keys:
-                                                    part_node[4].pop(k)
+                                                    part_node['value'].pop(k)
 
                                                 # call the
                                                 # fill_metadata_structure
@@ -488,11 +490,10 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                         # True
                         if new_element:
 
-                            if len(node[option]) > 5 and isinstance(
-                                    node[option][5], dict) and \
-                                    list(node[option][5].keys())[0] == 'merge':
+                            if 'special_case' in node[option] and 'merge' in \
+                                    node[option]['special_case']:
                                 value = parse_input_value(option,
-                                                          node[option][3],
+                                                          node[option]['desc'],
                                                           True, 'str',
                                                           result_dict)
                                 return_dict[option] = value
@@ -503,7 +504,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                      mandatory_mode,
                                                      result_dict, False,
                                                      is_factor)
-                                if node[option][1]:
+                                if node[option]['list']:
                                     if option in return_dict:
                                         return_dict[option] += val
                                     else:
@@ -511,10 +512,9 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                 else:
                                     return_dict[option] = val
     else:
-        if node[0] == 'mandatory' or optional:
-            if len(node) > 5 and isinstance(node[5], dict) and \
-                    list(node[5].keys())[0] == 'merge':
-                value = parse_input_value(key, node[3], True, 'str',
+        if node['mandatory'] or optional:
+            if 'special_case' in node and 'merge' in node['special_case']:
+                value = parse_input_value(key, node['desc'], True, 'str',
                                           result_dict)
             else:
                 value = enter_information(node, key, return_dict, optional,
@@ -564,18 +564,21 @@ def get_experimental_factors(node, result_dict):
                                      False, True)
 
         # if the experimental factor contains a dictionary as value and the
-        # structure of the factor contains an ident_key than add the ident_key
-        # to the values
+        # structure of the factor contains a group key than add the group key
+        # to the values as ident_key
         # TODO: what is ident key for?
-        if isinstance(fac_node[4], dict) and len(
-                fac_node) > 5 and not isinstance(fac_node[5], dict):
-            used_values['ident_key'] = fac_node[5]
+        if isinstance(
+                fac_node['value'], dict) and not \
+                set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
+                <= set(fac_node['value'].keys()) and 'special_case' in \
+                fac_node and 'group' in fac_node['special_case']:
+            used_values['ident_key'] = fac_node['special_case']['group']
 
         # add a dictionary containing the experimental factor, its values and
         # if it contains a list to the experimental_factors list
         experimental_factors.append({'factor': fac,
                                      'values': used_values,
-                                     'is_list': fac_node[1]})
+                                     'is_list': fac_node['list']})
 
     # set the global parameter factor to the user chosen experimental factors
     global factor
@@ -775,7 +778,7 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict):
               f'{f"Condition: {condition}".center(size.columns, " ")}\n'
               f'{"".center(size.columns, "_")}\n\n'
               f'Please enter the number of biological replicates:')
-        bio = parse_input_value('count', '', False, 'int',
+        bio = parse_input_value('count', '', False, 'number',
                                 result_dict)
 
         # test if there are biological replicates
@@ -831,6 +834,7 @@ def fill_replicates(type, condition, bio, input_pooled, node,
     # whitelist for organism and matching the input organism with the whitelist
     organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'),
                                    result_dict)['whitelist']
+    print(result_dict['organism'])
     organism = organism[result_dict['organism']['organism_name']]
 
     # create a dictionary for the biological replicates and fill it with the
@@ -875,8 +879,8 @@ def fill_replicates(type, condition, bio, input_pooled, node,
             part_node = list(utils.find_keys(key_yaml, cond[0]))[0]
 
             # test if the value is of type value_unit
-            if isinstance(part_node[4], dict) and 'value' in part_node[4] and \
-                    'unit' in part_node[4]:
+            if isinstance(part_node['value'], dict) and 'value' in \
+                    part_node['value'] and 'unit' in part_node['value']:
 
                 # split the value of the factor into value and unit, save them
                 # in a dictionary and overwrite the value of the factor with
@@ -888,13 +892,13 @@ def fill_replicates(type, condition, bio, input_pooled, node,
             else:
 
                 # set the input input type for the factor
-                if len(part_node) > 6:
-                    input_type = part_node[7]
+                if 'input_type' in part_node:
+                    input_type = part_node['input_type']
                 else:
                     input_type = None
 
                 # test if the factor takes a list as value
-                if part_node[1]:
+                if part_node['list']:
 
                     # test if the value is a dictionary and if a key of the
                     # dictionary takes a value_unit as input
@@ -936,10 +940,9 @@ def fill_replicates(type, condition, bio, input_pooled, node,
         # by the fill_metadata_structure function called on the sample
         # structure
         samples = merge_dicts(
-            samples, fill_metadata_structure(node[type][4]['samples'][4],
-                                             'samples', samples, False,
-                                             mandatory_mode, result_dict,
-                                             False, False))
+            samples, fill_metadata_structure(
+                node[type]['value']['samples']['value'], 'samples', samples,
+                False, mandatory_mode, result_dict, False, False))
 
         # set number of measurements to 1 if it is not yet specified
         if 'number_of_measurements' not in samples:
@@ -968,12 +971,12 @@ def get_technical_replicates(sample_name, organism, nom):
 
     # prompt user to input number of technical replicates and parse user input
     print(f'\nPlease enter the number of technical replicates:')
-    count = parse_input_value('count', '', False, 'int', [])
+    count = parse_input_value('count', '', False, 'number', [])
 
     # print error message and redo input if number <1 was stated
     while count < 1:
         print(f'The number of technical replicates has to be at least 1.')
-        count = parse_input_value('count', '', False, 'int', [])
+        count = parse_input_value('count', '', False, 'number', [])
 
     # create a list to save the sample names
     samples = []
@@ -1125,34 +1128,37 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
     """
 
     # test if the key contains a dictionary
-    if isinstance(node[4], dict):
-
+    if isinstance(node['value'], dict) and \
+            not set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+            set(node['value'].keys()):
+        display_name = node['display_name']
         if first_node:
 
             # if the key is on top level, print a bigger caption
             print(f'{"".center(size.columns, "_")}\n\n'
-                  f'{f"{node[2]}".center(size.columns, " ")}\n'
+                  f'{f"{display_name}".center(size.columns, " ")}\n'
                   f'{"".center(size.columns, "_")}\n')
         else:
 
             # if the key is on a lower level, print a smaller caption
             print(f'\n'
                   f'{"".center(size.columns, "-")}\n'
-                  f'{f"{node[2]}".center(size.columns, " ")}\n'
+                  f'{f"{display_name}".center(size.columns, " ")}\n'
                   f'{"".center(size.columns, "-")}\n')
 
         # print a description if one is stated in the metadata structure
-        if node[3] != '':
-            print(f'{node[3]}\n')
+        if node['desc'] != '':
+            print(f'{node["desc"]}\n')
 
         # call fill_metadata_structure to fill in the dictionary
-        return fill_metadata_structure(node[4], key, return_dict, optional,
+        return fill_metadata_structure(node['value'], key, return_dict, optional,
                                        mandatory_mode, result_dict, False,
                                        is_factor)
 
     else:
         # call parse_input_value to fill in a single value
-        return parse_input_value(key, node[3], node[5], node[7], result_dict)
+        return parse_input_value(key, node['desc'], node['whitelist'],
+                                 node['input_type'], result_dict)
 
 
 def parse_list_choose_one(whitelist, header):
@@ -1290,22 +1296,11 @@ def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
                                                 value_type, result_dict)
 
             # test if input fits the input_type int and repeat the input if not
-            if value_type == 'int':
+            if value_type == 'number':
                 try:
                     input_value = int(input_value)
                 except ValueError:
                     print(f'Input must be of type int. Try again.')
-                    input_value = parse_input_value(key, desc, whitelist,
-                                                    value_type,
-                                                    result_dict)
-
-            # test if input fits the input_type float and repeat the input if
-            # not
-            elif value_type == 'float':
-                try:
-                    input_value = float(input_value)
-                except ValueError:
-                    print(f'Input must be of type float. Try again.')
                     input_value = parse_input_value(key, desc, whitelist,
                                                     value_type,
                                                     result_dict)
@@ -1397,7 +1392,7 @@ def parse_group_choose_one(whitelist, w, header):
 def get_short_name(condition, result_dict):
     conds = split_cond(condition)
     whitelist = utils.get_whitelist(os.path.join('abbrev', 'factor'),
-                                    result_dict)
+                                    result_dict)['whitelist']
     if whitelist and 'whitelist_type' in whitelist and whitelist[
             'whitelist_type'] == 'plain':
         whitelist = whitelist['whitelist']
@@ -1409,18 +1404,12 @@ def get_short_name(condition, result_dict):
             k = c[0]
         if isinstance(c[1], dict):
             cond_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]),
-                                                 result_dict)
-            if cond_whitelist and 'whitelist_type' in cond_whitelist and \
-                    cond_whitelist['whitelist_type'] == 'plain':
-                cond_whitelist = cond_whitelist['whitelist']
+                                                 result_dict)['whitelist']
             new_vals = {}
             for v in c[1]:
                 if cond_whitelist and v in cond_whitelist:
                     val_whitelist = utils.get_whitelist(
-                        os.path.join('abbrev', v), result_dict)
-                    if val_whitelist and 'whitelist_type' in val_whitelist \
-                            and val_whitelist['whitelist_type'] == 'plain':
-                        val_whitelist = val_whitelist['whitelist']
+                        os.path.join('abbrev', v), result_dict)['whitelist']
                     if val_whitelist and c[1][v].lower() in val_whitelist:
                         new_vals[cond_whitelist[v]] = val_whitelist[
                             c[1][v].lower()]
@@ -1431,12 +1420,11 @@ def get_short_name(condition, result_dict):
             short_cond.append(f'{k}#{val}')
         else:
             val_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]),
-                                                result_dict)
-            if val_whitelist and 'whitelist_type' in val_whitelist and \
-                    val_whitelist['whitelist_type'] == 'plain':
-                val_whitelist = val_whitelist['whitelist']
+                                                result_dict)['whitelist']
             if val_whitelist and c[1].lower() in val_whitelist:
                 short_cond.append(f'{k}.{val_whitelist[c[1].lower()]}')
+            elif val_whitelist and c[1] in val_whitelist:
+                short_cond.append(f'{k}.{val_whitelist[c[1]]}')
             else:
                 short_cond.append(f'{k}.{c[1]}')
     short_condition = '-'.join(short_cond)
@@ -1611,7 +1599,7 @@ def get_combis(values, key, multi):
 
 
 def get_input_list(node, item, filled_object):
-    if node[5]:
+    if 'whitelist' in node and node['whitelist'] or 'special_case' in node and 'merge' in node['special_case']:
         whitelist = utils.get_whitelist(item, filled_object)
         if whitelist:
             if len(whitelist['whitelist']) > 30:
@@ -1657,7 +1645,7 @@ def get_input_list(node, item, filled_object):
             print('No whitelist')
             used_values = [0]
     else:
-        value_type = node[7]
+        value_type = node['input_type']
         print(f'\nPlease enter a list of {value_type} values for experimental'
               f' factor {item} divided by comma:\n')
         used_values = parse_input_list(value_type, False)
@@ -1694,12 +1682,9 @@ def parse_input_list(options, terminable):
         else:
             try:
                 input_list = [x.strip() for x in input_list.split(',')]
-                if options == 'int':
+                if options == 'number':
                     for i in range(len(input_list)):
                         input_list[i] = int(input_list[i])
-                elif options == 'float':
-                    for i in range(len(input_list)):
-                        input_list[i] = float(input_list[i])
             except (ValueError, IndexError) as e:
                 print(f'Invalid entry. Please enter {options} numbers divided '
                       f'by comma.')

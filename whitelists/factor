@@ -14,5 +14,5 @@ whitelist:
     - time_point
     - flow
     - enrichment
-    - bmi
+    - body_mass_index
 
