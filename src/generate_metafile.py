@@ -116,7 +116,6 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
     :param is_factor:
     :return:
     """
-
     # test if the input value is of type list
     if node['list']:
 
@@ -512,7 +511,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                 else:
                                     return_dict[option] = val
     else:
-        if node['mandatory'] or optional:
+        if node['mandatory'] or optional or is_factor:
             if 'special_case' in node and 'merge' in node['special_case']:
                 value = parse_input_value(key, node['desc'], True, 'str',
                                           result_dict)
@@ -571,8 +570,11 @@ def get_experimental_factors(node, result_dict):
                 fac_node['value'], dict) and not \
                 set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
                 <= set(fac_node['value'].keys()) and 'special_case' in \
-                fac_node and 'group' in fac_node['special_case']:
-            used_values['ident_key'] = fac_node['special_case']['group']
+                fac_node:
+            if 'group' in fac_node['special_case']:
+                used_values['ident_key'] = fac_node['special_case']['group']
+            #elif 'merge' in fac_node['special_case']:
+            #    used_values['ident_key'] = fac_node['special_case']['merge']
 
         # add a dictionary containing the experimental factor, its values and
         # if it contains a list to the experimental_factors list
@@ -636,10 +638,6 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
     # iterate through experimental_factors
     for i in range(len(factors)):
 
-        # remove is_list key from result dictionary
-        if 'is_list' in result_dict['experimental_factors'][i]:
-            result_dict['experimental_factors'][i].pop('is_list')
-
         # if the values of the experimental factor are in a dictionary or the
         # factor contains a list (so the factor can occur multiple times in a
         # condition) than call the function get_combinations to create all
@@ -692,6 +690,10 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
 
                     # overwrite the value
                     factors[i]['values'][k] = new_val
+
+        # remove is_list key from result dictionary
+        if 'is_list' in result_dict['experimental_factors'][i]:
+            result_dict['experimental_factors'][i].pop('is_list')
 
     # parameter to declare if there are multiple conditions, default True
     multi_conditions = True
@@ -1126,7 +1128,6 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
     :param is_factor:
     :return:
     """
-
     # test if the key contains a dictionary
     if isinstance(node['value'], dict) and \
             not set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
@@ -1404,27 +1405,30 @@ def get_short_name(condition, result_dict):
             k = c[0]
         if isinstance(c[1], dict):
             cond_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]),
-                                                 result_dict)['whitelist']
+                                                 result_dict)
             new_vals = {}
             for v in c[1]:
-                if cond_whitelist and v in cond_whitelist:
+                if cond_whitelist and v in cond_whitelist['whitelist']:
                     val_whitelist = utils.get_whitelist(
-                        os.path.join('abbrev', v), result_dict)['whitelist']
-                    if val_whitelist and c[1][v].lower() in val_whitelist:
-                        new_vals[cond_whitelist[v]] = val_whitelist[
+                        os.path.join('abbrev', v), result_dict)
+                    if val_whitelist and c[1][v].lower() in val_whitelist['whitelist']:
+                        new_vals[cond_whitelist["whitelist"][v]] = val_whitelist["whitelist"][
                             c[1][v].lower()]
+                    elif val_whitelist and c[1][v] in val_whitelist['whitelist']:
+                        new_vals[cond_whitelist["whitelist"][v]] = val_whitelist["whitelist"][
+                            c[1][v]]
                     else:
-                        new_vals[cond_whitelist[v]] = c[1][v]
+                        new_vals[cond_whitelist["whitelist"][v]] = c[1][v]
             val = '+'.join([f'{x}.{new_vals[x].replace(" ", "")}' for x in
                             list(new_vals.keys())])
             short_cond.append(f'{k}#{val}')
         else:
             val_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]),
-                                                result_dict)['whitelist']
-            if val_whitelist and c[1].lower() in val_whitelist:
-                short_cond.append(f'{k}.{val_whitelist[c[1].lower()]}')
-            elif val_whitelist and c[1] in val_whitelist:
-                short_cond.append(f'{k}.{val_whitelist[c[1]]}')
+                                                result_dict)
+            if val_whitelist and c[1].lower() in val_whitelist['whitelist']:
+                short_cond.append(f'{k}.{val_whitelist["whitelist"][c[1].lower()]}')
+            elif val_whitelist and c[1] in val_whitelist['whitelist']:
+                short_cond.append(f'{k}.{val_whitelist["whitelist"][c[1]]}')
             else:
                 short_cond.append(f'{k}.{c[1]}')
     short_condition = '-'.join(short_cond)
@@ -1721,11 +1725,11 @@ def get_value_unit(result_dict):
 
 def get_list_value_unit(result_dict, factor):
     print(f'\nPlease enter the unit for factor {factor}:')
-    unit = parse_input_value('unit', '', True, str, result_dict)
+    unit = parse_input_value('unit', '', True, 'select', result_dict)
     val_un = []
     print(f'\nPlease enter int values for factor {factor} (in {unit}) '
           f'divided by comma:')
-    value = parse_input_list('int', False)
+    value = parse_input_list('number', False)
     for val in value:
         val_un.append({'unit': unit, 'value': val})
     return val_un

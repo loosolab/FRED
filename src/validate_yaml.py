@@ -325,7 +325,7 @@ def validate_logic(metafile):
 def validate_reference_genome(organisms, reference_genome):
     invalid = False
     message = None
-    ref_genome_whitelist = utils.get_whitelist('reference_genome', None)
+    ref_genome_whitelist = utils.get_whitelist('reference_genome', None)['whitelist']
     if not any([reference_genome in ref_genome_whitelist[organism] for organism in organisms]):
         invalid = True
         organisms = [f'\'{organism}\'' for organism in organisms]

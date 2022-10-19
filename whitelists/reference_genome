@@ -1,11 +1,12 @@
 whitelist_type: group
-human:
-  - hg38
-  - hg19
-mouse:
-  - mm10
-  - mm9
-  - mm38
-zebrafish:
-  - danrer11
-  - danrer10
+whitelist:
+    human:
+      - hg38
+      - hg19
+    mouse:
+      - mm10
+      - mm9
+      - mm38
+    zebrafish:
+      - danrer11
+      - danrer10
