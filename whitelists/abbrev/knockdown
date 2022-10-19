@@ -1,2 +1,3 @@
 whitelist_type: abbrev
-morpholino: mrph
+whitelist:
+    morpholino: mrph

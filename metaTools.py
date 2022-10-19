@@ -1,7 +1,7 @@
 import argparse
 import pathlib
 from src import metaTools_functions
-from src import generate
+from src import generate_metafile
 from src import find_metafiles
 
 def find(args):
@@ -19,8 +19,8 @@ def find(args):
         print('No matches found')
 
 
-def create(args):
-    generate.generate_file(args.path, args.id, args.name, args.mandatory_only)
+def generate(args):
+    generate_metafile.generate_file(args.path, args.id, args.name, args.mandatory_only)
 
 
 def main():
@@ -55,7 +55,7 @@ def main():
     create_function.add_argument('-mo', '--mandatory_only', default=False, action='store_true',
                                  help='If True, only mandatory keys will be filled out')
 
-    create_function.set_defaults(func=create)
+    create_function.set_defaults(func=generate)
     args = parser.parse_args()
     args.func(args)
 

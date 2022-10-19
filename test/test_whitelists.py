@@ -39,13 +39,13 @@ def test_whitelist(file, whitelist_path, depend):
                 return testing(file, whitelist['whitelist'], whitelist_path, headers, depend)
         elif whitelist['whitelist_type'] == 'group':
             res = 0
-            for elem in whitelist:
-                if whitelist[elem] is not None and elem != 'whitelist_type' and not isinstance(whitelist[elem], list) and os.path.isfile(os.path.join(whitelist_path, whitelist[elem])):
-                    res = test_whitelist(whitelist[elem], whitelist_path, None)
-                    whitelist[elem] = None
-            whitelist = [x for xs in list(whitelist.values()) if xs is not None
+            for elem in whitelist['whitelist']:
+                if whitelist['whitelist'][elem] is not None and elem != 'whitelist_type' and not isinstance(whitelist['whitelist'][elem], list) and os.path.isfile(os.path.join(whitelist_path, whitelist['whitelist'][elem])):
+                    res = test_whitelist(whitelist['whitelist'][elem], whitelist_path, None)
+                    whitelist['whitelist'][elem] = None
+            whitelist['whitelist'] = [x for xs in list(whitelist['whitelist'].values()) if xs is not None
                          for x in xs]
-            res2 = [res, testing(file, whitelist, whitelist_path, headers, depend)]
+            res2 = [res, testing(file, whitelist['whitelist'], whitelist_path, headers, depend)]
             return sum(filter(None, res2))
         elif whitelist['whitelist_type'] == 'depend':
             if whitelist['ident_key'] == 'organism_name':
@@ -80,14 +80,14 @@ def testing(file, whitelist, whitelist_path, headers, depend):
                 depend_elems = [x.split(' ')[0] for x in
                                 utils.read_whitelist('organism')['whitelist']]
             else:
-                depend_elems = utils.read_whitelist(abbrev['ident_key'])
+                depend_elems = utils.read_whitelist(abbrev['whitelist']['ident_key'])
             res = []
             for elem in depend_elems:
                 if depend is not None and elem == depend:
                     if elem in abbrev:
                         if os.path.isfile(os.path.join(whitelist_path, abbrev[elem])):
                             #TODO use function read_whitelist -> find error
-                            abbrev = utils.read_in_yaml(os.path.join(whitelist_path, abbrev[elem]))
+                            abbrev = utils.read_in_yaml(os.path.join(whitelist_path, abbrev[elem]))['whitelist']
                         res.append(testing2(elem, whitelist, abbrev, headers))
             return sum(filter(None, res))
 
@@ -96,7 +96,8 @@ def testing2(file, whitelist, abbrev, headers):
     for i in range(len(whitelist)):
         if abbrev is not None and whitelist[i].lower() in abbrev:
             whitelist[i] = abbrev[whitelist[i].lower()]
-
+        elif abbrev is not None and whitelist[i] in abbrev:
+            whitelist[i] = abbrev[whitelist[i]]
     if not headers:
         duplicates = [elem for elem, count in
                   collections.Counter(whitelist).items() if count > 1]

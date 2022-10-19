@@ -1,19 +1,21 @@
 whitelist_type: abbrev
-Lung cancer: LngCnc
-Asthma: Asth
-Pneumonia: pneum
-Pulmonary edema: PulmEd
-Pulmonary fibrosis: PulFib
-Bronchitis: brnch
-Pneumothorax: pnmthrx
-Pulmonary embolus: PulmEmb
-Covid: Cov
-Influenca: flu
-Coronary heart disease CHD: CHD
-Angina: Ang
-Blood pressure: BldPrs
-Heart failure: HrtFail
-Bypass surgery: BypSrg
-Breast cancer: BrstCnc
-Prostate cancer: PrstCnc
-Myocardial Infarction: MyoInf
+whitelist:
+    Lung cancer: LngCnc
+    Asthma: Asth
+    Pneumonia: pneum
+    Pulmonary edema: PulmEd
+    Pulmonary fibrosis: PulFib
+    Bronchitis: brnch
+    Pneumothorax: pnmthrx
+    Pulmonary embolus: PulmEmb
+    Covid: Cov
+    Influenca: flu
+    Coronary heart disease CHD: CHD
+    Angina: Ang
+    Blood pressure: BldPrs
+    Heart failure: HrtFail
+    Bypass surgery: BypSrg
+    Breast cancer: BrstCnc
+    Prostate cancer: PrstCnc
+    Myocardial Infarction: MyoInf
+    Duchenne muscular dystrophy: DMD

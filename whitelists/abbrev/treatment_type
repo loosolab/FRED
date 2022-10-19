@@ -1,8 +1,9 @@
 whitelist_type: abbrev
-Placebo: Plc
-Medication: Med
-Puromycin: Prmc
-Gemcitabine: Gctb
-Cardiotoxin: Crdtxn
-2-deoxyglucose: 2doxgl
-Saline: Sal
+whitelist:
+    Placebo: Plc
+    Medication: Med
+    Puromycin: Prmc
+    Gemcitabine: Gctb
+    Cardiotoxin: Crdtxn
+    2-deoxyglucose: 2doxgl
+    Saline: Sal

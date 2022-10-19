@@ -3,13 +3,14 @@ import sys
 sys.path.append('metadata-organizer')
 import src.utils as utils
 import src.wi_utils as wi_utils
-import src.generate as generate
+import src.generate_metafile as generate
 import src.metaTools_functions as metaTools_functions
 import os
 import copy
 import pytz
 from dateutil import parser
 import multiprocessing
+import time
 
 # This script contains all functions for generation of objects for the web
 # interface
@@ -47,10 +48,12 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
     input_disabled = True if pos.split(':')[-1] in ['condition_name',
                                                     'sample_name'] else False
     whitelist_type = None
-    if isinstance(node[4], dict):
+    if isinstance(node['value'], dict) and not \
+                set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+                set(node['value'].keys()):
         input_fields = []
 
-        if len(node) > 5 and isinstance(node[5], dict) and 'merge' in node[5]:
+        if 'special_case' in node and 'merge' in node['special_case']:
             input_type = 'select'
             if get_whitelists:
                 whitelist = utils.read_whitelist(pos.split(':')[-1])
@@ -88,16 +91,16 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
             if pos.split(':')[-1] == 'organism':
                 input_type = 'organism_name'
             part_object = {'position': pos,
-                   'mandatory': True if node[0] == 'mandatory' else False,
-                   'list': node[1], 'displayName': node[2], 'desc': node[3],
+                   'mandatory': node['mandatory'],
+                   'list': node['list'], 'displayName': node['display_name'], 'desc': node['desc'],
                    'value': None,
                    'whitelist': whitelist,
                    'whitelist_type': whitelist_type,
-                   'input_type': input_type, 'data_type': 'str',
+                   'input_type': input_type,
                    'input_disabled': input_disabled}
         else:
-            for key in node[4]:
-                input_fields.append(parse_empty(node[4][key], pos + ':' + key,
+            for key in node['value']:
+                input_fields.append(parse_empty(node['value'][key], pos + ':' + key,
                                                 key_yaml, get_whitelists))
             unit = False
             value = False
@@ -112,27 +115,26 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
             if unit and value:
 
                 part_object = {'position': pos,
-                       'mandatory': True if node[0] == 'mandatory' else False,
-                       'list': node[1], 'displayName': node[2],
-                       'desc': node[3], 'value': None, 'value_unit': None,
+                       'mandatory': node['mandatory'],
+                       'list': node['list'], 'displayName': node['display_name'],
+                       'desc': node['desc'], 'value': None, 'value_unit': None,
                        'whitelist': unit_whitelist, 'input_type': 'value_unit',
-                       'data_type': 'value_unit',
                        'input_disabled': input_disabled}
             else:
                 part_object = {'position': pos,
-                       'mandatory': True if node[0] == 'mandatory' else False,
-                       'list': node[1], 'title': node[2], 'desc': node[3],
+                       'mandatory': node['mandatory'],
+                       'list': node['list'], 'title': node['display_name'], 'desc': node['desc'],
                        'input_fields': input_fields,
                        'input_disabled': input_disabled}
-        if node[1]:
+        if node['list']:
             part_object['list_value'] = []
     else:
         if pos.split(':')[-1] == 'organism':
             input_type = 'organism_name'
         else:
-            input_type = node[6]
+            input_type = node['input_type']
         if get_whitelists:
-            if node[5]:
+            if node['whitelist']:
                 whitelist = utils.read_whitelist(pos.split(':')[-1])
                 if 'whitelist_type' in whitelist \
                         and whitelist['whitelist_type'] == 'plain' \
@@ -156,7 +158,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                     else:
                         whitelist_type = 'plain_group'
                         whitelist = whitelist['whitelist']
-            elif node[7] == 'bool':
+            elif node['input_type'] == 'bool':
                 whitelist = [True, False]
                 input_type = 'select'
             else:
@@ -167,22 +169,22 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                 # elif whitelist and len(whitelist) > 30:
                 #    input_type = 'searchable_select'
         else:
-            if node[5]:
+            if node['whitelist']:
                 whitelist = pos.split(':')[-1]
             else:
                 whitelist = None
-            if node[7] == 'bool':
+            if node['input_type'] == 'bool':
                 input_type = 'bool'
                 whitelist = pos.split(':')[-1]
         part_object = {'position': pos,
-               'mandatory': True if node[0] == 'mandatory' else False,
-               'list': node[1], 'displayName': node[2], 'desc': node[3],
-               'value': node[4],
+               'mandatory': node['mandatory'],
+               'list': node['list'], 'displayName': node['display_name'], 'desc': node['desc'],
+               'value': node['value'],
                'whitelist': whitelist,
                'whitelist_type': whitelist_type,
-               'input_type': input_type, 'data_type': node[7],
+               'input_type': input_type,
                'input_disabled': input_disabled}
-        if node[1]:
+        if node['list']:
             part_object['list_value'] = []
     return part_object
 
@@ -212,18 +214,19 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     organism = organism.split(' ')[0]
     input_type = list(utils.find_keys(key_yaml, key))
     if len(input_type) > 0:
-        if input_type[0][1]:
+        if input_type[0]['list']:
             is_list = True
-        if isinstance(input_type[0][4], dict):
-            if len(input_type[0][4].keys()) == 2 and 'value' in \
-                    input_type[0][4] and 'unit' in input_type[0][4]:
+        if isinstance(input_type[0]['value'], dict) and not \
+                set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+                set(input_type[0]['value'].keys()):
+            if len(input_type[0]['value'].keys()) == 2 and 'value' in \
+                    input_type[0]['value'] and 'unit' in input_type[0]['value']:
                 input_type = 'value_unit'
-            elif isinstance(input_type[0][5], dict) and 'merge' in \
-                    input_type[0][5]:
+            elif 'special_case' in input_type[0] and 'merge' in input_type[0]['special_case']:
                 input_type = 'select'
             else:
                 val = []
-                for k in input_type[0][4]:
+                for k in input_type[0]['value']:
                     k_val = {}
                     k_val['whitelist'], k_val['whitelist_type'], \
                         k_val['input_type'], \
@@ -233,9 +236,8 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                     node = list(utils.find_keys(key_yaml, k))[0]
                     if k_val['input_type'] == 'value_unit':
                         k_val['unit'] = None
-                    k_val['displayName'] = node[2]
-                    k_val['required'] = True \
-                        if node[0] == 'mandatory' else False
+                    k_val['displayName'] = node['display_name']
+                    k_val['required'] = node['mandatory']
                     k_val['position'] = k
                     k_val['value'] = []
                     val.append(k_val)
@@ -245,10 +247,10 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                 input_type = 'nested'
                 return val, whitelist_type, input_type, headers
         else:
-            if input_type[0][7] == 'bool':
+            if input_type[0]['input_type'] == 'bool':
                 input_type = 'bool'
             else:
-                input_type = input_type[0][6]
+                input_type = input_type[0]['input_type']
     else:
         input_type = 'short_text'
 
@@ -291,13 +293,13 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     #    input_type = 'searchable_select'
     if key == 'gene':
         input_type = 'gene'
-    elif key == 'enrichment':
-        whitelist = whitelist[:50]
-        input_type = 'select'
+    #elif key == 'enrichment':
+    #    whitelist = whitelist[:50]
+    #    input_type = 'select'
     if is_list:
         node = list(utils.find_keys(key_yaml, key))[0]
         new_w = [
-            {'whitelist': whitelist, 'position': key, 'displayName': node[2],
+            {'whitelist': whitelist, 'position': key, 'displayName': node['display_name'],
              'input_type': input_type, 'whitelist_type': whitelist_type},
             {'displayName': 'Multi', 'position': 'multi',
              'whitelist': [True, False], 'input_type': 'bool',
@@ -407,7 +409,6 @@ def get_samples(condition, sample):
                             sample[i].pop('whitelist')
                             sample[i].pop('whitelist_type')
                             sample[i].pop('input_type')
-                            sample[i].pop('data_type')
                     else:
                         sample[i]['value'] = c[1]
                 sample[i]['input_disabled'] = True
@@ -425,7 +426,6 @@ def get_samples(condition, sample):
                     sample[i].pop('whitelist')
                     sample[i].pop('whitelist_type')
                     sample[i].pop('input_type')
-                    sample[i].pop('data_type')
     return sample
 
 
@@ -459,14 +459,16 @@ def get_conditions(factors, organism_name):
             for key in empty_key:
                 factors[i]['values'][0].pop(key)
             node = list(utils.find_keys(key_yaml, factors[i]['factor']))
-            if len(node) > 0 and len(node[0]) > 5 and isinstance(node[0][4], dict):
-                ident_key = node[0][5]
+            if len(node) > 0 and 'special_case' in node[0] and 'group' in node[0]['special_case']:
+                ident_key = node[0]['special_case']['group']
             else:
                 ident_key = None
             factors[i]['values'][0]['ident_key'] = ident_key
             if 'multi' in factors[i]['values'][0]:
                 factor_info = list(utils.find_keys(key_yaml, factors[i]['factor']))[0]
-                if factor_info[1] and isinstance(factor_info[4], dict):
+                if factor_info['list'] and isinstance(factor_info['value'], dict) and not \
+                set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+                set(node['value'].keys()):
                     if factors[i]['values'][0]['multi'] and ident_key is None:
                         factors[i]['values'][0]['multi'] = False
                     factors[i]['values'] = generate.get_combis(
@@ -489,8 +491,8 @@ def get_conditions(factors, organism_name):
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
-    sample = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
-                         ['biological_replicates'][4]['samples'],
+    sample = parse_empty(key_yaml['experimental_setting']['value']['conditions']['value']
+                         ['biological_replicates']['value']['samples'],
                          'experimental_setting:conditions:biological_'
                          'replicates:samples', key_yaml, False)[
         'input_fields']
@@ -571,13 +573,174 @@ def parse_object(wi_object):
     for elem in wi_object['project']['input_fields']:
         if elem['position'].split(':')[-1] == 'id':
             project_id = elem['value']
-    arguments = [(wi_object[key], factors, '', project_id, 1) for key
-                 in wi_object]
-    pool_obj = multiprocessing.Pool()
-    answer = pool_obj.starmap(wi_utils.parse_part, arguments)
-    for i in range(len(answer)):
-        result[list(wi_object.keys())[i]] = answer[i]
+    for key in wi_object:
+        result[key] = parse_part(wi_object[key], factors, '', project_id, 1)
     return result
+
+def parse_part(wi_object, factors, organism, id, nom):
+    gn = None
+    embl = None
+    key_yaml = utils.read_in_yaml(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), '..',
+        'keys.yaml'))
+    if 'input_type' in wi_object and wi_object['input_type'] == 'gene':
+        if wi_object['value'] is not None:
+            gn, embl = wi_object['value'].split(' ')
+        sub_keys = list(utils.find_keys(key_yaml, wi_object['position'].split(':')[-1]))[0]['value'].keys()
+        new_samp = {'position': wi_object['position'],
+                    'mandatory': wi_object['mandatory'],
+                    'list': wi_object['list'],
+                    'title': wi_object['displayName'],
+                    'desc': wi_object['desc']}
+        input_fields = []
+        for key in sub_keys:
+            node = list(utils.find_keys(key_yaml, key))[0]
+            input_field = parse_empty(node, f'{wi_object["position"]}:{key}', key_yaml, False)
+            if gn is not None and embl is not None:
+                input_field['value'] = gn if key == 'gene_name' else embl
+            input_fields.append(input_field)
+        for elem in factors:
+            for i in range(len(elem)):
+                if 'headers' in elem[i] and elem[i]['factor'] == wi_object['position'].split(':')[-1]:
+                    for j in range(len(elem[i]['headers'].split(' '))):
+                        for f in input_fields:
+                            if f['position'].split(':')[-1] == elem[i]['headers'].split(' ')[j]:
+                                f['value'] = wi_object['value'].split(' ')[j]
+        new_samp['input_fields'] = input_fields
+        wi_object = new_samp
+    return_dict = {}
+
+    if isinstance(wi_object, dict):
+        #TODO: mehrere experimental settings?
+        if wi_object['position'].split(':')[-1] == 'experimental_setting':
+            organism = [o['value'] for o in wi_object['list_value'][0] if o['position'].split(':')[-1] == 'organism'][0].split(' ')[0]
+        #    else:
+        #        value = parse_part(wi_object[i], factors, organism, id, nom)
+        #        if ((isinstance(value, list) or isinstance(value,
+        #                                                   dict)) and len(
+        #            value) > 0) or (
+        #                not isinstance(value, list) and not isinstance(value,
+        #                                                               dict) and value is not None and value != ''):
+        #            if 'input_type' in wi_object[i] and wi_object[i][
+        #                    'input_type'] == 'date':
+        #                default_time = parser.parse(wi_object[i]['value'])
+        #                timezone = pytz.timezone("Europe/Berlin")
+        #                local_time = default_time.astimezone(timezone)
+        #                value = local_time.strftime("%d.%m.%Y")
+        #            return_dict[
+        #                wi_object[i]['position'].split(':')[-1]] = value
+        if wi_object['list']:
+            val = []
+            for elem in wi_object['list_value']:
+                if isinstance(elem, dict):
+                    if elem['position'].split(':')[-1] == 'condition':
+                        samples = []
+                        for sub_elem in elem['list_value']:
+                            nom = [x['value'] for x in sub_elem if x['position'].split(':')[-1] == 'number_of_measurements'][0]
+                            part_val = parse_part(sub_elem, factors, organism, id, nom)
+                            samples.append(part_val)
+                        val.append({'condition_name': elem['correct_value'],
+                                    'biological_replicates': {'count': len(samples),
+                                                              'samples': samples}})
+                    #else:
+                    #    print(elem['position'])
+                elif isinstance(elem, list):
+                    val.append(parse_list_part(elem, factors, organism, id, nom))
+                else:
+                    val.append(elem)
+        else:
+            if 'whitelist' in wi_object and wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
+                new_obj = {'position': wi_object['position'],
+                            'mandatory': wi_object['mandatory'],
+                            'list': wi_object['list'],
+                            'title': wi_object['displayName'],
+                            'desc': wi_object['desc']}
+                input_fields = []
+                for j in range(len(wi_object['whitelist']['headers'].split(' '))):
+                    node = list(utils.find_keys(key_yaml, wi_object['whitelist']['headers'].split(' ')[j]))[0]
+                    input_fields.append(parse_empty(node, f'{wi_object["position"]}:{wi_object["whitelist"]["headers"].split(" ")[j]}', key_yaml, False))
+                    input_fields[j]['value'] = wi_object['value'].split(' ')[j]
+                new_obj['input_fields'] = input_fields
+                wi_object = new_obj
+            if 'input_fields' in wi_object:
+                val = parse_part(wi_object['input_fields'], factors, organism, id, nom)
+            else:
+                if wi_object['value'] and wi_object[
+                        'input_type'] == 'value_unit':
+                    unit = wi_object['value_unit']
+                    value = wi_object['value']
+                    val =  {'unit': unit, 'value': value}
+                else:
+                    if 'correct_value' in wi_object:
+                        if wi_object['position'].split(':')[-1] == 'sample_name':
+                            sample_count = int(wi_object['value'].split('_')[-1])
+                            val = f'{wi_object["correct_value"]}_b{"{:02d}".format(sample_count)}'
+                        else:
+                            val = wi_object['correct_value']
+                    else:
+                        val = wi_object['value']
+    elif isinstance(wi_object, list):
+        return(parse_list_part(wi_object, factors, organism, id, nom))
+
+    return val
+
+
+def parse_list_part(wi_object, factors, organism, id, nom):
+    res = {}
+    for elem in wi_object:
+        val = parse_part(elem, factors, organism, id, nom)
+
+        if elem['position'].split(':')[-1] == 'technical_replicates':
+            sample_name = []
+            for c in range(val['count']):
+                for m in range(nom):
+                    sample_name.append(f'{id}_{organism}_'
+                                       f'{res["sample_name"]}'
+                                       f'_t{"{:02d}".format(c+1)}_'
+                                       f'm{"{:02d}".format(m+1)}')
+            val['sample_name'] = sample_name
+
+        #elif elem['position'].split(':')[-1] == 'experimental_factors':
+        #        res = []
+        #        all_factors = {}
+        #        i = 0
+        #        for elem in factors:
+        #            for d in elem:
+        #                if 'headers' in d:
+        #                    header = d['headers'].split(' ')
+        #                    d.pop('headers')
+        #                    for l in range(len(d['values'])):
+        #                        vals = d['values'][l].split(' ')
+        #                        d['values'][l] = {}
+        #                        for h in range(len(header)):
+        #                            d['values'][l][header[h]] = vals[h]
+        #                else:
+        #                    for j in range(len(d['values'])):
+        #                        if isinstance(d['values'][j], dict):
+        #                            empty_keys = []
+        #                            for key in d['values'][j]:
+        #                                if not isinstance(d['values'][j][key],list) or len(d['values'][j][key]) == 0:
+        #                                    empty_keys.append(key)
+        #                            for key in empty_keys:
+        #                                d['values'][j].pop(key)
+        #                            if all(k == d['factor'] for k in d['values'][j]):
+        #                                d['values'] = d['values'][j][d['factor']]
+        #                if not any(d['factor'] in y['factor'] for y in res):
+        #                    res.append(d)
+        #                    all_factors[d['factor']] = i
+        #                    i += 1
+        #                else:
+        #                    for x in d['values']:
+        #                        if x not in res[all_factors[d['factor']]][
+        #                                'values']:
+        #                            res[all_factors[d['factor']]][
+        #                                'values'].append(x)
+        #        return_dict['experimental_factors'] = res
+
+        if type(val) == bool or type(val) == int or (
+                val is not None and len(val) > 0):
+            res[elem['position'].split(':')[-1]] = val
+    return res
 
 
 def validate_object(wi_object):
@@ -786,9 +949,7 @@ def find_metadata(path, search_string):
 
 
 def get_gene_whitelist():
-    whitelist = utils.read_whitelist('gene')
-    whitelist.pop('whitelist_type')
-    whitelist.pop('ident_key')
+    whitelist = utils.read_whitelist('gene')['whitelist']
     paths = [whitelist[k] for k in whitelist]
 
     pool_obj = multiprocessing.Pool()
@@ -807,9 +968,11 @@ def get_search_keys(key_yaml, chained):
     res = []
     for key in key_yaml:
         d = {'key_name': key,
-             'display_name': list(utils.find_keys(key_yaml, key))[0][2]}
-        if isinstance(key_yaml[key][4], dict):
-            d['nested'] = get_search_keys(key_yaml[key][4],
+             'display_name': list(utils.find_keys(key_yaml, key))[0]['display_name']}
+        if isinstance(key_yaml[key]['value'], dict) and not \
+                set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+                set(node['value'].keys()):
+            d['nested'] = get_search_keys(key_yaml[key]['value'],
                                           f'{chained}{key}:'
                                           if chained != '' else f'{key}:')
         else:
@@ -847,8 +1010,8 @@ def edit_wi_object(path, project_id):
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
-    sample = parse_empty(key_yaml['experimental_setting'][4]['conditions'][4]
-                         ['biological_replicates'][4]['samples'],
+    sample = parse_empty(key_yaml['experimental_setting']['value']['conditions']['value']
+                         ['biological_replicates']['value']['samples'],
                          'experimental_setting:conditions:biological_'
                          'replicates:samples', key_yaml, False)[
         'input_fields']
@@ -916,7 +1079,7 @@ def fill_wi_object(wi_object, meta_yaml):
                                         if 'whitelist' in part and part[
                                                 'whitelist'] is not None:
                                             if part[
-                                                'data_type'] == \
+                                                'input_type'] == \
                                                     'value_unit':
                                                 part['whitelist'] = 'unit'
                                             else:
@@ -926,7 +1089,7 @@ def fill_wi_object(wi_object, meta_yaml):
                                 else:
                                     if 'whitelist' in field and field[
                                             'whitelist'] is not None:
-                                        if field['data_type'] == 'value_unit':
+                                        if field['input_type'] == 'value_unit':
                                             field['whitelist'] = 'unit'
                                         else:
                                             field['whitelist'] = \

@@ -1,3 +1,4 @@
 whitelist_type: abbrev
-healthy: hlth
-recovered: rcvd
+whitelist:
+    healthy: hlth
+    recovered: rcvd

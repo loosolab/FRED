@@ -1,4 +1,5 @@
 whitelist_type: abbrev
-not treated: not
-currently treated: curr
-formerly treated: form
+whitelist:
+    not treated: not
+    currently treated: curr
+    formerly treated: form

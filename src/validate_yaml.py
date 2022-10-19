@@ -8,7 +8,7 @@ from src import utils
 # ---------------------------------VALIDATION-----------------------------------
 
 generated = ['condition_name', 'sample_name']
-
+factor = None
 
 def validate_file(metafile):
     """
@@ -111,7 +111,7 @@ def print_warning(metafile, pool_warn, ref_genome_warn):
     print(f'{"".center(80, "-")}')
 
 
-# ---------------------------------UTILITIES------------------------------------
+#---------------------------------UTILITIES------------------------------------
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
              invalid_entry, invalid_value, input_type):
@@ -124,11 +124,22 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             elif key not in key_yaml:
                 invalid_keys.append(key)
             else:
+                if key == 'factor':
+                    global factor
+                    factor = metafile[key]
+                input_type = None
+                if key == 'values' and factor is not None:
+                    node = list(utils.find_keys(key_yaml, factor))
+                    if len(node) > 0:
+                        if 'input_type' in node:
+                            input_type = node['input_type']
+                elif 'input_type' in key_yaml[key]:
+                    input_type = key_yaml[key]['input_type']
                 res_keys, res_entries, res_values = new_test(metafile[key],
-                                                 key_yaml[key][4], sub_lists,
+                                                 key_yaml[key]['value'], sub_lists,
                                                  f'{key_name}:{key}' if
                                                  key_name != '' else key,
-                                                 invalid_keys, invalid_entry, invalid_value, key_yaml[key][7] if len(key_yaml[key]) > 6 else None)
+                                                 invalid_keys, invalid_entry, invalid_value, input_type)
                 invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
@@ -180,14 +191,14 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
             whitelist = utils.read_grouped_whitelist(whitelist, {})
-            whitelist = [x for xs in list(whitelist.values()) if xs is not None for x in xs]
+            whitelist = [x for xs in list(whitelist['whitelist'].values()) if xs is not None for x in xs]
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \
             and os.path.isfile(os.path.join(
             os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists',
             whitelist)):
         whitelist = utils.read_whitelist(whitelist)
-        if whitelist and whitelist['whitelist_type'] == 'plain':
+        if whitelist:
             whitelist = whitelist['whitelist']
     if whitelist and entry_value not in whitelist:
         return True
@@ -220,15 +231,16 @@ def get_missing_keys(node, metafile, invalid_keys, pre, missing):
     :param pre: a string to save and chain keys in order to save their position
     :param missing: a list to save the missing mandatory keys
     """
-    res = find_key(metafile, pre, node[1], node[4], invalid_keys)
+    res = find_key(metafile, pre, node['list'], node['value'], invalid_keys)
 
-    if node[0] == 'mandatory':
+    if node['mandatory']:
         missing += res
 
-    if node[0] == 'mandatory' or len(res) == 0:
-        if isinstance(node[4], dict):
-            for key in node[4]:
-                missing = get_missing_keys(node[4][key], metafile,
+    if node['mandatory'] or len(res) == 0:
+        if isinstance(node['value'], dict) and set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
+                set(node['value'].keys()):
+            for key in node['value']:
+                missing = get_missing_keys(node['value'][key], metafile,
                                            invalid_keys, pre + ':' + key,
                                            missing)
     return missing
@@ -253,7 +265,7 @@ def find_key(metafile, key, is_list, values, invalid_keys):
         for entry in metafile[0]:
             for value in entry:
                 if value not in invalid_keys:
-                    if values[value][0] == 'mandatory':
+                    if values[value]['mandatory']:
                         for y in metafile[0]:
                             if value not in y:
                                 missing_keys.append(key + ':' + value)
@@ -268,14 +280,10 @@ def validate_value(input_value, value_type, key):
             if input_value not in [True, False]:
                 valid = False
                 message = 'The value has to be of type bool (True or False).'
-        elif value_type == 'int':
+        elif value_type == 'number':
             if not isinstance(input_value, int):
                 valid = False
                 message = 'The value has to be an integer.'
-        elif value_type == 'float':
-            if not isinstance(input_value, float):
-                valid = False
-                message = 'The value has to be a float.'
         elif value_type == 'date':
             try:
                 input_date = input_value.split('.')
@@ -317,7 +325,7 @@ def validate_logic(metafile):
 def validate_reference_genome(organisms, reference_genome):
     invalid = False
     message = None
-    ref_genome_whitelist = utils.get_whitelist('reference_genome', None)
+    ref_genome_whitelist = utils.get_whitelist('reference_genome', None)['whitelist']
     if not any([reference_genome in ref_genome_whitelist[organism] for organism in organisms]):
         invalid = True
         organisms = [f'\'{organism}\'' for organism in organisms]
