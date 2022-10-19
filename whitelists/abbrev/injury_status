@@ -1,0 +1,4 @@
+whitelist_type: abbrev
+whitelist:
+    non-injured: ninj
+    injured: inj

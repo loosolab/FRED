@@ -15,4 +15,5 @@ whitelist:
     - flow
     - enrichment
     - body_mass_index
+    - injury
 

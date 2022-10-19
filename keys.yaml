@@ -407,6 +407,30 @@ experimental_setting:
                       value: null
                       whitelist: True
                       input_type: select
+                injury:
+                  mandatory: False
+                  list: True
+                  display_name: 'Injury'
+                  desc: ''
+                  special_case:
+                    group: injury_type
+                  value:
+                    injury_status:
+                      mandatory: True
+                      list: False
+                      display_name: 'Status'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    injury_type:
+                      mandatory: False
+                      list: False
+                      display_name: 'Type'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
                 treatment:
                   mandatory: False
                   list: True
