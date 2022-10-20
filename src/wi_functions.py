@@ -285,6 +285,8 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
         elif whitelist['whitelist_type'] == 'depend':
             whitelist = utils.read_depend_whitelist(whitelist, organism)
             whitelist_type = 'depend'
+            if 'headers' in whitelist:
+                headers = whitelist['headers']
     if isinstance(whitelist, dict) and 'whitelist' in whitelist:
         whitelist = whitelist['whitelist']
 
