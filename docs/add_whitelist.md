@@ -219,7 +219,8 @@ __Example:__
 <table>
 <tr>
 <th>
-Extract for disease from keys.yaml
+Extract for disease from <br>
+keys.yaml
 </th>
 <th>
 whitelists/abbrev/disease
