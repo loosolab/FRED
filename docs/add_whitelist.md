@@ -102,21 +102,21 @@ whitelists/organism
 <tr>
 <td> 
 <div>
-In this example, the whitelist for the <br>
-reference genome is represented as depending<br> 
-on the organism.For this reason, the <br>
-'ident_key' is assigned 'organism_name'.<br>
-The possible organisms form the keys <br>
-specified under 'whitelist'. Their values<br> 
-are those reference genomes that can be set<br> 
-for the respective organism.
+In this example, the whitelist for the reference<br>
+genome is represented as depending on the<br> 
+organism.For this reason, the 'ident_key' is<br> 
+assigned 'organism_name'. The possible organisms<br> 
+form the keys specified under 'whitelist'. Their<br>
+values are those reference genomes that can be<br> 
+set for the respective organism.
 </div>
 </td> 
 <td> 
 <div>
 The whitelist for 'organism_name' contains<br> 
 all allowed organisms as values. These form<br> 
-the keys in the dependent whitelist 'reference_genome'.
+the keys in the dependent whitelist<br> 
+'reference_genome'.
 </div>
 </td>
 </tr>
@@ -155,6 +155,12 @@ whitelist:
 </tr>
 </table>
 
+### Type 3: abbrev
+
+
+
+
+## 
 
 If the whitelists per key are very long, it makes sense to separate them into individual files. In this case the path to the whitelist within the folder 'whitelists' is specified as value instead of the whitelist itself. Since the path to the whitelist is specified explicitly, the naming of the whitelist can differ from the key and be chosen by the user. The whitelists can also be organized in subfolders.
 
