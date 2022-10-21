@@ -4,32 +4,45 @@ The whitelists for the project are located in the git repository inside the 'whi
 
 The naming of the whitelists is identical to the key for which it is created. For example, the whitelist for the key 'organism' is also named 'organism'. 
 
+The whitelist files have the format yaml. For each whitelist two mandatory keys must be specified. The first one is 'whitelist_type' and describes the nature of the whitelist and how it must be processed in the program. There are four different whitelist types, which are described in more detail in the sections below.
+The second mandatory key is called 'whitelist' and contains the values that can be accepted by the metadata field for which the whitelist was created.
+
 ## Whitelist types
 
-In the Project there are three different ways to file whitelists. The default is 'plain text', where the whitelist elements are listed one below the other in lines.
-Another option is 'group', where the whitelist items can be divided into subgroups to improve clarity.
-Finally, whitelists can be made dependent on input for other keys using the whitelist type 'depend'. This is useful e.g. for genes, which can be made dependent on the examined organism.
+### Type 1: plain
 
-### Type 1: plain text
-
-This type of whitelist is the simplest, as it contains all values in plain text format. One line of the text document corresponds to one value in the whitelist.
-
-__Example: whitelists/gender__
-```text
-male
-female
-mixed
-```
-
-### Type 2: group
-
-This whitelist type is used to group the values within the whitelist for better organization. The values are output in the same grouping as in the whitelist (as long as it is not longer than 30 values) when generating the metadata file. This is for better overview when creating and extending the whitelists, as well as when generating the metadata file. 
-
-With this whitelist type, the whitelist is represented in a yaml file. The key 'whitelist_type' is set with 'group'. Further keys in the whitelist serve as subheaders when displaying the whitelist values.
+Whitelists of type plain are the simplest way to set values for a metadata field. A simple list of potential values is specified for the key whitelist. 
 
 __Example:__
 
 <table>
+<tr>
+<th>
+whitelists/gender
+</th>
+</tr>
+<tr>
+<td>
+
+```yaml
+whitelist_type: plain
+whitelist:
+  - male
+  - female
+  - mixed
+```
+
+</td>
+</tr>
+</table>
+
+### Type 2: group
+
+This whitelist type is used to group the values within the whitelist for better organization. Here, the key whitelist receives a dictionary as value, whose keys represent subheadings. For these keys, thematically matching values are then stored in a list. When generating the metadata, the whitelist values are output in the same grouping as defined in the whitelist file. The aim of this whitelist type is to improve the clarity when creating and extending the whitelists as well as when generating the metadata file.
+
+__Example:__
+
+<table style="max-width:300px;">
 <tr>
 <th>
 whitelists/disease_type
@@ -47,19 +60,20 @@ The whitelist values for 'disease_type' were grouped based on the organs affecte
 
 ```yaml
 whitelist_type: group
-lung:
-  - lung cancer
-  - COPD
-  - PH
-  ...
-heart:
-  - Coronary heart disease CHD
-  - Angina
-  - Blood pressure
-  ...
-other:
-  - breast cancer
-  - prostate cancer
+whitelist:
+  lung:
+    - lung cancer
+    - COPD
+    - PH
+    ...
+  heart:
+    - Coronary heart disease CHD
+    - Angina
+    - Blood pressure
+    ...
+  other:
+    - breast cancer
+    - prostate cancer
 ```
 
 </td>
