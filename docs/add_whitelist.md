@@ -320,7 +320,132 @@ whitelist:
 
 ## Linking whitelists
 
-If the whitelists per key are very long, it makes sense to separate them into individual files. In this case the path to the whitelist within the folder 'whitelists' is specified as value instead of the whitelist itself. Since the path to the whitelist is specified explicitly, the naming of the whitelist can differ from the key and be chosen by the user. The whitelists can also be organized in subfolders.
+### Linking to existing whitelists
+
+In addition to specifying possible values in the form of a list under the key 'whitelist', it is also possible to link to existing whitelist files. This is useful if the possible values of two different metadata fields are the same. In this case it is sufficient to create the values for only one of these fields and to link to the already created values in the whitelist of the other field. This way the values only have to be maintained in one place.
+The following examples show how such a link can be built into various whitelists.
+
+__Example 1 : plain__
+
+This example shows what a link in a whitelist of type 'plain' can look like. Assume that a key setting_technique appears in the experimental setting section whereas a key technique is located in the technical details section. The former represents the sequencing technique used for the respective experimental setting. The latter summarizes all sequencing techniques used in the experiment. The possible techniques are the same in both fields.
+
+<table>
+<tr>
+<th>
+Extract for technique from <br>
+keys.yaml
+</th>
+<th>
+whitelists/technique
+</th>
+<th>
+whitelists/setting_technique<br>
+</th>
+</tr>
+<tr>
+<td> 
+<div>
+TBA
+</div>
+</td> 
+<td> 
+<div>
+TBA
+</div>
+</td>
+<td> 
+<div>
+TBA
+</div>
+</td>
+</tr>
+<tr>
+<td>
+
+```yaml
+TBA
+```
+
+</td>
+<td>
+
+```yaml
+whitelist_type: plain
+whitelist:
+    - bulk RNA-seq
+    - bulk RNA array
+    - bulk ATAC-seq
+    - bulk ChIP-seq
+    ...
+```
+
+</td>
+<td>
+
+```yaml
+whitelist_type: plain
+whitelist: technique
+```
+
+</td>
+</tr>
+</table>
+
+
+__Example 2 : group__
+
+TBA enrichment
+
+__Example 3 : depend__
+
+If independent whitelist files already exist for the keys and the files are located in the folder whitelists and named exatly like the respective key, those keys can be omitted and the metadata tool reads the existing files as whitelist. This is e.g. the case for the whitelist 'values'. The key 'values' in the metadata structure contains the examined values of the examined experimental factor. So the whitelist for 'values' depends on the whitelist 'factor'. Since each experimental factor has its own whitelist, the keys for the experimental factors in the whitelist for 'value' can be omitted. Thus, the existing files are read in as whitelist.
+
+
+
+<table>
+<tr>
+<td> 
+<b>whitelists/values</b><br>The whitelist for values depends on the entered 'factor'. The value 'factor' is therefore assigned to the 'ident_key'.
+</td> 
+<td> 
+<b>whitelists/factor</b><br>The key 'factor' also has a whitelist. All values specified in the whitelist 'factor' form possible keys in the whitelist 'values'.
+</td>
+<td> 
+<b>whitelists/genotype</b><br>For the values in the whitelist 'factor' (e.g. genotype) there are separate whitelists named after the respective value. The values therefore no longer have to be specified as keys in the whitelist 'values'. The metadata tool reads the already existing files as whitelist.
+</td> 
+</tr>
+<tr>
+<td>
+
+```yaml
+whitelist_type: depend
+ident_key: factor
+```
+
+</td>
+<td>
+
+```text
+genotype
+tissue
+cell_type
+knockdown
+gender
+...
+```
+</td>
+
+<td>
+
+```text
+Mut
+WT
+```
+</td>
+</tr>
+</table>
+
+### Subdivide whitelists into smaller files
 
 __Example:__
 
@@ -363,7 +488,6 @@ C1orf112_ENSG00000000460
 
 If independent whitelist files already exist for the keys and the files are located in the folder whitelists and named exatly like the respective key, those keys can be omitted and the metadata tool reads the existing files as whitelist. This is e.g. the case for the whitelist 'values'. The key 'values' in the metadata structure contains the examined values of the examined experimental factor. So the whitelist for 'values' depends on the whitelist 'factor'. Since each experimental factor has its own whitelist, the keys for the experimental factors in the whitelist for 'value' can be omitted. Thus, the existing files are read in as whitelist.
 
-__Example:__
 
 
 <table>
