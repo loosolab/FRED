@@ -159,7 +159,7 @@ whitelist:
 
 This type of whitelist must be provided for all experimental factors, their values, and for the organisms. The fields mentioned are those from which file names for samples are generated during metadata creation. Since file names are limited in length, the values must be shortened using the abbrev whitelist. In this process, all special characters are also removed from the values.
 Whitelists of type abbrev are located inside the 'whitelists' folder in the 'abbrev' folder. They are named after the key for whose values they contain the abbreviations.  
-Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary correspond to the values of the non-abbreviated whitelist. Each key receives its abbreviated version.
+Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary correspond to the values of the non-abbreviated whitelist. Each key receives its abbreviated version. If an non-abbreviated value has only a short length and does not contain any special characters, it does not have to be specified in the abbrev whitelist. In such a case it will be included unchanged in the filename.
 
 __Example:__
 
@@ -226,24 +226,40 @@ whitelists/abbrev/disease
 </th>
 <th>
 whitelists/abbrev/disease_status<br>
-whitelists/abbrev/disease_type<br>
-whitelists/abbrev/disease_stage
+whitelists/abbrev/disease_type
 </th>
 </tr>
 <tr>
 <td> 
 <div>
-TBA
+As shown in the extract from <br>
+keys.yaml, the experimental <br>
+factor disease is divided <br>
+into the subdomains status, <br>
+type, and stage using an <br>
+underlying dictionary.
 </div>
 </td> 
 <td> 
 <div>
-TBA
+Abbreviations must be created <br>
+for the keys disease_status, <br>
+disease_type and disease_stage<br> 
+which are included in disease,<br> 
+since these keys are also <br>
+written in the file name.
 </div>
 </td>
 <td> 
 <div>
-TBA
+Here you can see the <br>
+abbreviated whitelists for the <br>
+values of the keys. For <br>
+disease_stage no abbrev <br>
+whitelist was created, because <br>
+the included values are already<br>
+very short and do not contain <br>
+any special characters.
 </div>
 </td>
 </tr>
@@ -251,33 +267,68 @@ TBA
 <td>
 
 ```yaml
+disease:
+  mandatory: False
+  ...
+  value:
+    disease_type:
+      mandatory: False
+      list: False
+      display_name: 'Type'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: select
+    disease_status:
+      mandatory: True
+      list: False
+      display_name: 'Status'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: select
+    disease_stage:
+      mandatory: False
+      list: False
+      display_name: 'Stage'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: select                
+
+```
+
+</td>
+<td>
+
+```yaml
 whitelist_type: abbrev
 whitelist:
-  male: m
-  female: f
-  mixed: x
+  disease_status: sts
+  disease_type: tp
+  disease_stage: stg
 ```
 
 </td>
 <td>
+__disease_status:__
 
 ```yaml
-whitelist_type: plain
+whitelist_type: abbrev
 whitelist:
-  - male
-  - female
-  - mixed
+    healthy: hlth
+    recovered: rcvd
 ```
 
-</td>
-<td>
+__disease_type:__
 
 ```yaml
-whitelist_type: plain
+whitelist_type: abbrev
 whitelist:
-  - male
-  - female
-  - mixed
+    Lung cancer: LngCnc
+    Asthma: Asth
+    Pneumonia: pneum
+    ...
 ```
 
 </td>
