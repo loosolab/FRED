@@ -268,33 +268,14 @@ any special characters.
 
 ```yaml
 disease:
-  mandatory: False
   ...
   value:
     disease_type:
-      mandatory: False
-      list: False
-      display_name: 'Type'
-      desc: ''
-      value: null
-      whitelist: True
-      input_type: select
+      ...
     disease_status:
-      mandatory: True
-      list: False
-      display_name: 'Status'
-      desc: ''
-      value: null
-      whitelist: True
-      input_type: select
+      ...
     disease_stage:
-      mandatory: False
-      list: False
-      display_name: 'Stage'
-      desc: ''
-      value: null
-      whitelist: True
-      input_type: select                
+      ...              
 
 ```
 
@@ -311,7 +292,7 @@ whitelist:
 
 </td>
 <td>
-__disease_status:__
+<b>disease_status:</b>
 
 ```yaml
 whitelist_type: abbrev
@@ -320,7 +301,7 @@ whitelist:
     recovered: rcvd
 ```
 
-__disease_type:__
+<b>disease_type:</b>
 
 ```yaml
 whitelist_type: abbrev
@@ -336,7 +317,7 @@ whitelist:
 </table>
 
 
-## 
+## Linking whitelists
 
 If the whitelists per key are very long, it makes sense to separate them into individual files. In this case the path to the whitelist within the folder 'whitelists' is specified as value instead of the whitelist itself. Since the path to the whitelist is specified explicitly, the naming of the whitelist can differ from the key and be chosen by the user. The whitelists can also be organized in subfolders.
 
