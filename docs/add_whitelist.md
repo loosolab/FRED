@@ -42,7 +42,7 @@ This whitelist type is used to group the values within the whitelist for better 
 
 __Example:__
 
-<table style="max-width:300px;">
+<table>
 <tr>
 <th>
 whitelists/disease_type
@@ -51,7 +51,8 @@ whitelists/disease_type
 <tr>
 <td> 
 <div>
-The whitelist values for 'disease_type' were grouped based on the organs affected by the disease. This allows faster finding of diseases in the list, as well as a better overview.
+The whitelist values for 'disease_type' were grouped based on the organs affected by the disease.<br>
+This allows faster finding of diseases in the list, as well as a better overview.
 </div>
 </td> 
 </tr>
