@@ -155,9 +155,134 @@ whitelist:
 </tr>
 </table>
 
-### Type 3: abbrev
+### Type 4: abbrev
 
+This type of whitelist must be provided for all experimental factors, their values, and for the organisms. The fields mentioned are those from which file names for samples are generated during metadata creation. Since file names are limited in length, the values must be shortened using the abbrev whitelist. In this process, all special characters are also removed from the values.
+Whitelists of type abbrev are located inside the 'whitelists' folder in the 'abbrev' folder. They are named after the key for whose values they contain the abbreviations.  
+Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary correspond to the values of the non-abbreviated whitelist. Each key receives its abbreviated version.
 
+__Example:__
+
+<table>
+<tr>
+<th>
+whitelists/abbrev/gender
+</th>
+<th>
+whitelists/organism
+</th>
+</tr>
+<tr>
+<td> 
+<div>
+In this example, the abbrev whitelist was<br> 
+created for the experimental factor gender.
+</div>
+</td> 
+<td> 
+<div>
+Here you can see the non-abbreviated gender<br> 
+whitelist for comparison.
+</div>
+</td>
+</tr>
+<tr>
+<td>
+
+```yaml
+whitelist_type: abbrev
+whitelist:
+  male: m
+  female: f
+  mixed: x
+```
+
+</td>
+<td>
+
+```yaml
+whitelist_type: plain
+whitelist:
+  - male
+  - female
+  - mixed
+```
+
+</td>
+</tr>
+</table>
+
+A special case to be considered is when an experimental factor can take a dictionary as its value. In this case, not only the possible values for the keys within the dictionary, but also the key names themselves must be abbreviated.
+
+__Example:__
+
+<table>
+<tr>
+<th>
+Extract for disease from keys.yaml
+</th>
+<th>
+whitelists/abbrev/disease
+</th>
+<th>
+whitelists/abbrev/disease_status<br>
+whitelists/abbrev/disease_type<br>
+whitelists/abbrev/disease_stage
+</th>
+</tr>
+<tr>
+<td> 
+<div>
+TBA
+</div>
+</td> 
+<td> 
+<div>
+TBA
+</div>
+</td>
+<td> 
+<div>
+TBA
+</div>
+</td>
+</tr>
+<tr>
+<td>
+
+```yaml
+whitelist_type: abbrev
+whitelist:
+  male: m
+  female: f
+  mixed: x
+```
+
+</td>
+<td>
+
+```yaml
+whitelist_type: plain
+whitelist:
+  - male
+  - female
+  - mixed
+```
+
+</td>
+<td>
+
+```yaml
+whitelist_type: plain
+whitelist:
+  - male
+  - female
+  - mixed
+```
+
+</td>
+</tr>
+</table>
 
 
 ## 
