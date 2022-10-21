@@ -85,12 +85,8 @@ whitelist:
 
 ### Type 3: depend
 
-This type of whitelist is used when the values depend on the input of another key in the metadata structure. 
-The whitelist is organized here using a yaml file. Each whitelist of type 'depend' must contain the keys 'whitelist_type' and 'ident_key'.
-The 'whitelist_type' is set with the value 'depend'. This identifies how the whitelist must be read within the metadata tool.
-The key 'ident_key' names the key on whose input the whitelist should depend. For example, if you want to make the whitelist for genes dependent on the examined organism, you set the value for 'ident key' to 'organism'.
-
-The possible elements of the 'ident_key' (the values in the whitelist for the 'ident_key' are then specified as further keys. For the 'ident_key' 'organism' possible keys would be 'human_9606', 'mouse_10090', 'zebrafish_7955' etc. For each of these keys the whitelist can be entered as a list.
+This type of whitelist is used when the values depend on the input of another key in the metadata structure. Each whitelist file of type depend contains beside 'whitelist_type' and 'whitelist' the further mandatory key 'ident_key'. This identifies the key in the metadata structure on whose input the whitelist should depend. For example, if you want to make the whitelist for genes dependent on the organism under investigation, set the value for 'ident_key' to 'organism_name'.
+The key 'whitelist' receives a dictionary whose keys represent the possible values of the metadata field specified in 'ident_key'. These keys are then assigned the values in a list, which an input can accept depending on this key.
 
 __Example:__
 
@@ -106,14 +102,21 @@ whitelists/organism
 <tr>
 <td> 
 <div>
-The whitelist for the reference genome depends on the organism.
-For this reason, the 'ident_key' is assigned 'organism'. The organisms are the keys whose values are the whitelists.
+In this example, the whitelist for the <br>
+reference genome is represented as depending<br> 
+on the organism.For this reason, the <br>
+'ident_key' is assigned 'organism_name'.<br>
+The possible organisms form the keys <br>
+specified under 'whitelist'. Their values<br> 
+are those reference genomes that can be set<br> 
+for the respective organism.
 </div>
 </td> 
 <td> 
 <div>
-The whitelist for 'organism' contains all allowed organisms as values. 
-These form the keys in the dependent whitelist 'reference_genome'.
+The whitelist for 'organism_name' contains<br> 
+all allowed organisms as values. These form<br> 
+the keys in the dependent whitelist 'reference_genome'.
 </div>
 </td>
 </tr>
@@ -122,28 +125,31 @@ These form the keys in the dependent whitelist 'reference_genome'.
 
 ```yaml
 whitelist_type: depend
-ident_key: organism
-human_9606:
-  - hg38
-  - hg19
-mouse_10090:
-  - mm10
-  - mm9
-  - mm38
-zebrafish_7955:
-  - danrer11
-  - danrer10
-...
+ident_key: organism_name
+whitelist:
+  human_9606:
+    - hg38
+    - hg19
+  mouse_10090:
+    - mm10
+    - mm9
+    - mm38
+  zebrafish_7955:
+    - danrer11
+    - danrer10
+  ...
 ```
 
 </td>
 <td>
 
-```text
-human_9606
-mouse_10090
-zebrafish_7955
-...
+```yaml
+whitelist_type: plain
+whitelist:
+  - human_9606
+  - mouse_10090
+  - zebrafish_7955
+  ...
 ```
 </td>
 </tr>
