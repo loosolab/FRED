@@ -176,7 +176,7 @@ def get_whitelist(key, filled_object):
                 if whitelist['ident_key'] == 'organism_name':
                     depend = list(find_keys(filled_object, 'organism'))
             if len(depend) > 0:
-                whitelist = read_depend_whitelist(whitelist, depend[0].split(' ')[0])
+                whitelist = read_depend_whitelist(whitelist['whitelist'], depend[0].split(' ')[0])
             else:
                 stay_depend = True
     if group:

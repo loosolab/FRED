@@ -1,11 +1,12 @@
 whitelist_type: depend
 ident_key: organism_name
-human: genes/human
-mouse: genes/mouse
-zebrafish: genes/zebrafish
-rat: genes/rat
-pig: genes/pig
-medaka: genes/medaka
-chicken: genes/chicken
-drosophila: genes/drosophila
-yeast: genes/yeast
+whitelist:
+    human: genes/human
+    mouse: genes/mouse
+    zebrafish: genes/zebrafish
+    rat: genes/rat
+    pig: genes/pig
+    medaka: genes/medaka
+    chicken: genes/chicken
+    drosophila: genes/drosophila
+    yeast: genes/yeast
