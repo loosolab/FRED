@@ -283,7 +283,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                 input_type = 'select'
             input_type = 'group_select'
         elif whitelist['whitelist_type'] == 'depend':
-            whitelist = utils.read_depend_whitelist(whitelist, organism)
+            whitelist = utils.read_depend_whitelist(whitelist['whitelist'], organism)
             whitelist_type = 'depend'
             if 'headers' in whitelist:
                 headers = whitelist['headers']
