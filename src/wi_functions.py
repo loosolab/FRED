@@ -271,7 +271,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
             whitelist = utils.read_grouped_whitelist(whitelist, filled_object)
             if 'headers' in whitelist:
                 headers = whitelist['headers']
-            if 'whitelist' not in whitelist:
+            if isinstance(whitelist['whitelist'], dict):
                 new_w = []
                 for value in whitelist:
                     if value not in ['headers', 'whitelist_keys']:
@@ -344,31 +344,19 @@ def get_samples(condition, sample):
                         sample[i]['value'] = val
                     else:
                         if sample[i]['list']:
-                            sample[i]['list_value'].append(
-                                copy.deepcopy(sample[i]['input_fields']))
-                            for j in range(len(sample[i]['list_value'])):
-                                for k in range(
-                                        len(sample[i]['list_value'][j])):
-                                    for x in c[1]:
-                                        if sample[i]['list_value'][
-                                            j][k]['position'].split(
-                                                ':')[-1] == x:
-                                            if x in ['age', 'time_point',
-                                                        'treatment_duration']:
-                                                unit = c[1][x].lstrip(
-                                                    '0123456789')
-                                                value = c[1][x][
-                                                        :len(c[1][x]) - len(
-                                                            unit)]
-                                                sample[i]['list_value'][j][k][
-                                                    'value'] = int(value)
-                                                sample[i]['list_value'][j][k][
-                                                    'value_unit'] = unit
-                                            else:
-                                                sample[i]['list_value'][j][k][
-                                                    'value'] = c[1][x]
-                                            sample[i]['list_value'][j][k][
-                                                'input_disabled'] = True
+                            filled_sample = copy.deepcopy(sample[i]['input_fields'])
+                            for j in range(len(filled_sample)):
+                                for x in c[1]:
+                                    if filled_sample[j]['position'].split(':')[-1] == x:
+                                        if x in ['age', 'time_point', 'treatment_duration']:
+                                            unit = c[1][x].lstrip('0123456789')
+                                            value = c[1][x][:len(c[1][x]) - len(unit)]
+                                            filled_sample[j]['value'] = int(value)
+                                            filled_sample[j]['value_unit'] = unit
+                                        else:
+                                            filled_sample[j]['value'] = c[1][x]
+                                        filled_sample[j]['input_disabled'] = True
+                            sample[i]['list_value'].append(filled_sample)
                         else:
                             for j in range(len(sample[i]['input_fields'])):
                                 for x in c[1]:
