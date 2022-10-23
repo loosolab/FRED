@@ -603,7 +603,7 @@ def parse_part(wi_object, factors, organism, id, nom):
             input_fields.append(input_field)
         for elem in factors:
             for i in range(len(elem)):
-                if 'headers' in elem[i] and elem[i]['factor'] == wi_object['position'].split(':')[-1]:
+                if 'headers' in elem[i] and elem[i]['factor'] == wi_object['position'].split(':')[-1] and wi_object['value'] is not None:
                     for j in range(len(elem[i]['headers'].split(' '))):
                         for f in input_fields:
                             if f['position'].split(':')[-1] == elem[i]['headers'].split(' ')[j]:
