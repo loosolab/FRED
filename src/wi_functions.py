@@ -672,6 +672,11 @@ def parse_part(wi_object, factors, organism, id, nom):
                     unit = wi_object['value_unit']
                     value = wi_object['value']
                     val =  {'unit': unit, 'value': value}
+                elif wi_object['value'] and wi_object['input_type'] == 'date':
+                    default_time = parser.parse(wi_object['value'])
+                    timezone = pytz.timezone("Europe/Berlin")
+                    local_time = default_time.astimezone(timezone)
+                    val = local_time.strftime("%d.%m.%Y")
                 else:
                     if 'correct_value' in wi_object:
                         if wi_object['position'].split(':')[-1] == 'sample_name':
