@@ -275,7 +275,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                 new_w = []
                 for value in whitelist['whitelist']:
                     if value not in ['headers', 'whitelist_keys']:
-                        new_w.append({'title': value, 'whitelist': whitelist[value]})
+                        new_w.append({'title': value, 'whitelist': whitelist['whitelist'][value]})
                 whitelist = new_w
                 whitelist_type = 'group'
             else:
