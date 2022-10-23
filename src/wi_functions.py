@@ -470,7 +470,7 @@ def get_conditions(factors, organism_name):
                 factor_info = list(utils.find_keys(key_yaml, factors[i]['factor']))[0]
                 if factor_info['list'] and isinstance(factor_info['value'], dict) and not \
                 set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
-                set(node['value'].keys()):
+                set(factor_info['value'].keys()):
                     if factors[i]['values'][0]['multi'] and ident_key is None:
                         factors[i]['values'][0]['multi'] = False
                     factors[i]['values'] = generate.get_combis(
