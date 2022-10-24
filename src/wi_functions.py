@@ -70,10 +70,10 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                         'whitelist_type'] == 'group':
                     if isinstance(whitelist['whitelist'], dict):
                         new_w = []
-                        for key in whitelist:
+                        for key in whitelist['whitelist']:
                             if key != 'whitelist_type':
                                 new_w.append(
-                                    {'title': key, 'whitelist': whitelist[key]})
+                                    {'title': key, 'whitelist': whitelist['whitelist'][key]})
                         input_type = 'group_select'
                         whitelist = new_w
                         whitelist_type = whitelist['whitelist_type']
@@ -514,12 +514,10 @@ def get_whitelist_object(item, organism_name, whitelists):
         if input_type == 'select' or input_type == 'gene':
             whitelist = utils.get_whitelist(item['position'].split(':')[-1],
                                             {'organism': organism_name})
-            if isinstance(whitelist, dict):
-                if 'whitelist_type' in whitelist and whitelist[
-                        'whitelist_type'] == 'plain':
-                    whitelist = whitelist['whitelist']
-                else:
-                    input_type = 'group_select'
+            if whitelist['whitelist_type'] == 'plain':
+                whitelist = whitelist['whitelist']
+            if whitelist['whitelist_type'] == 'group':
+                input_type = 'group_select'
         elif input_type == 'bool':
             whitelist = [True, False]
             input_type = 'select'
@@ -538,8 +536,8 @@ def get_whitelist_object(item, organism_name, whitelists):
         item['input_type'] = input_type
         if input_type == 'group_select':
             w = []
-            for key in whitelist:
-                w.append({'title': key, 'whitelist': whitelist[key]})
+            for key in whitelist['whitelist']:
+                w.append({'title': key, 'whitelist': whitelist['whitelist'][key]})
             whitelist = w
         if whitelist:
             whitelists[item['position'].split(':')[-1]] = whitelist
