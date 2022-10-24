@@ -601,7 +601,11 @@ def parse_part(wi_object, factors, organism, id, nom):
     if isinstance(wi_object, dict):
         #TODO: mehrere experimental settings?
         if wi_object['position'].split(':')[-1] == 'experimental_setting':
-            organism = [o['value'] for o in wi_object['list_value'][0] if o['position'].split(':')[-1] == 'organism'][0].split(' ')[0]
+            organism = [o['value'] for o in wi_object['list_value'][0] if o['position'].split(':')[-1] == 'organism']
+            if len(organism) > 0:
+                organism = organism[0].split(' ')[0]
+            else:
+                organism = None
         #    else:
         #        value = parse_part(wi_object[i], factors, organism, id, nom)
         #        if ((isinstance(value, list) or isinstance(value,
