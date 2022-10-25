@@ -4,7 +4,7 @@ sys.path.append('metadata-organizer')
 import src.utils as utils
 import src.wi_utils as wi_utils
 import src.generate_metafile as generate
-import src.metaTools_functions as metaTools_functions
+import src.find_metafiles as find_metafiles
 import os
 import copy
 import pytz
@@ -887,7 +887,7 @@ def save_filenames(file_str, path):
 def get_meta_info(path, project_id):
     # If file must be searched
 
-    yaml = metaTools_functions.find(path, f'id:{project_id}', True)
+    yaml = find_metafiles.find_projects(path, f'id:{project_id}', True)
     if len(yaml) == 0:
         return f'No metadata found.'
     else:
@@ -924,7 +924,7 @@ def get_search_mask():
 
 
 def find_metadata(path, search_string):
-    files = metaTools_functions.find(path, search_string, True)
+    files = find_metafiles.find_projects(path, search_string, True)
     new_files = []
     for i in range(len(files)):
         for key in files[i]:
@@ -988,7 +988,7 @@ def get_search_keys(key_yaml, chained):
 
 
 def edit_wi_object(path, project_id):
-    meta_yaml = metaTools_functions.find(path, project_id, True)
+    meta_yaml = find_metafiles.find_projects(path, project_id, True)
     if len(meta_yaml) > 0:
         for elem in meta_yaml:
             for key in elem:
