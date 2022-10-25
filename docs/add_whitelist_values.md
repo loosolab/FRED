@@ -193,5 +193,6 @@ whitelist:
 ```
 
 </div>
-</td
+</td>
+</tr>
 </table>
