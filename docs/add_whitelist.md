@@ -551,7 +551,7 @@ Open this file. Inside Github you will see a blue button 'Open in Web IDE' in th
 
 Clicking on it will open an editor where you can edit the selected whitelist.
 
-### Step 2: Adding a new value to the file
+### Step 2: Adding new values to the file
 
 In the following table, the whitelist for 'reference_genome' is shown and expanded for each of the formats 'plain', 'group' and 'depend'.
 
@@ -609,7 +609,7 @@ whitelist:
 <td> 
 <div>
 
-The following snippet shows the whitelist
+The following snippet shows the whitelist<br>
 file for 'reference_genome' in type 'group'.
 
 ```yaml
@@ -655,7 +655,7 @@ whitelist:
 <td> 
 <div>
 
-The following snippet shows the whitelist
+The following snippet shows the whitelist<br>
 file for 'reference_genome' in type 'depend'.
 
 ```yaml
