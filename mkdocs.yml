@@ -10,7 +10,10 @@ nav:
             - File Searching: search.md
         - Data structure: 
             - General structure: structure.md
+            - Whitelists: whitelists.md
             - Extend structure:
-                - whitelists : add_whitelist.md
+                - Whitelists : 
+                    - Add values: add_whitelist_values.md
+                    - Add new Whitelist: add_whitelist.md
                 - Adding keys: add_keys.md
 theme: readthedocs
