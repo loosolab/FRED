@@ -1,21 +1,29 @@
 import argparse
 import pathlib
-from src import metaTools_functions
 from src import generate_metafile
 from src import find_metafiles
 
 def find(args):
     """
-    calls src.metaTools_functions.find to find matching yaml
+    calls script find_metafiles to find matching files and print results
     :param args:
-    path: a path containing metadata yaml
-    search: a string specifying search parameters linked via 'and', 'or' and
-    'not'
+        path: a path of a folder that should be searched for metadata files
+        search: a string specifying search parameters linked via 'and', 'or'
+                and 'not'
     """
-    result = metaTools_functions.find(args.path, args.search, True)
+
+    # call function find_projects in find_metafiles
+    result = find_metafiles.find_projects(args.path, args.search, True)
+
+    # test if matching metadata files were found
     if len(result) > 0:
+
+        # print summary of matching files
         print(find_metafiles.print_summary(result))
+
     else:
+
+        # print information that there are no matching files
         print('No matches found')
 
 
