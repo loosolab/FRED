@@ -599,7 +599,6 @@ def parse_part(wi_object, factors, organism, id, nom):
     return_dict = {}
 
     if isinstance(wi_object, dict):
-        #TODO: mehrere experimental settings?
         if wi_object['position'].split(':')[-1] == 'experimental_setting':
             if len(wi_object['list_value']) > 0:
                 organism = [o['value'] for o in wi_object['list_value'][0] if o['position'].split(':')[-1] == 'organism']
@@ -609,31 +608,20 @@ def parse_part(wi_object, factors, organism, id, nom):
                     organism = None
             else:
                 organism = None
-        #    else:
-        #        value = parse_part(wi_object[i], factors, organism, id, nom)
-        #        if ((isinstance(value, list) or isinstance(value,
-        #                                                   dict)) and len(
-        #            value) > 0) or (
-        #                not isinstance(value, list) and not isinstance(value,
-        #                                                               dict) and value is not None and value != ''):
-        #            if 'input_type' in wi_object[i] and wi_object[i][
-        #                    'input_type'] == 'date':
-        #                default_time = parser.parse(wi_object[i]['value'])
-        #                timezone = pytz.timezone("Europe/Berlin")
-        #                local_time = default_time.astimezone(timezone)
-        #                value = local_time.strftime("%d.%m.%Y")
-        #            return_dict[
-        #                wi_object[i]['position'].split(':')[-1]] = value
         if wi_object['list']:
             val = []
             for elem in wi_object['list_value']:
                 if isinstance(elem, dict):
                     if elem['position'].split(':')[-1] == 'condition':
+
                         samples = []
                         for sub_elem in elem['list_value']:
                             nom = [x['value'] for x in sub_elem if x['position'].split(':')[-1] == 'number_of_measurements'][0]
+
                             part_val = parse_part(sub_elem, factors, organism, id, nom)
+
                             samples.append(part_val)
+
                         val.append({'condition_name': elem['correct_value'],
                                     'biological_replicates': {'count': len(samples),
                                                               'samples': samples}})
@@ -699,43 +687,6 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                                        f'_t{"{:02d}".format(c+1)}_'
                                        f'm{"{:02d}".format(m+1)}')
             val['sample_name'] = sample_name
-
-        #elif elem['position'].split(':')[-1] == 'experimental_factors':
-        #        res = []
-        #        all_factors = {}
-        #        i = 0
-        #        for elem in factors:
-        #            for d in elem:
-        #                if 'headers' in d:
-        #                    header = d['headers'].split(' ')
-        #                    d.pop('headers')
-        #                    for l in range(len(d['values'])):
-        #                        vals = d['values'][l].split(' ')
-        #                        d['values'][l] = {}
-        #                        for h in range(len(header)):
-        #                            d['values'][l][header[h]] = vals[h]
-        #                else:
-        #                    for j in range(len(d['values'])):
-        #                        if isinstance(d['values'][j], dict):
-        #                            empty_keys = []
-        #                            for key in d['values'][j]:
-        #                                if not isinstance(d['values'][j][key],list) or len(d['values'][j][key]) == 0:
-        #                                    empty_keys.append(key)
-        #                            for key in empty_keys:
-        #                                d['values'][j].pop(key)
-        #                            if all(k == d['factor'] for k in d['values'][j]):
-        #                                d['values'] = d['values'][j][d['factor']]
-        #                if not any(d['factor'] in y['factor'] for y in res):
-        #                    res.append(d)
-        #                    all_factors[d['factor']] = i
-        #                    i += 1
-        #                else:
-        #                    for x in d['values']:
-        #                        if x not in res[all_factors[d['factor']]][
-        #                                'values']:
-        #                            res[all_factors[d['factor']]][
-        #                                'values'].append(x)
-        #        return_dict['experimental_factors'] = res
 
         if type(val) == bool or type(val) == int or (
                 val is not None and len(val) > 0):
@@ -971,7 +922,7 @@ def get_search_keys(key_yaml, chained):
              'display_name': list(utils.find_keys(key_yaml, key))[0]['display_name']}
         if isinstance(key_yaml[key]['value'], dict) and not \
                 set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
-                set(node['value'].keys()):
+                set(key_yaml[key]['value'].keys()):
             d['nested'] = get_search_keys(key_yaml[key]['value'],
                                           f'{chained}{key}:'
                                           if chained != '' else f'{key}:')
