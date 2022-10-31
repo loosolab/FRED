@@ -1,13 +1,3 @@
-# Information per parameter:
-# - 'mandatory' / 'optional' 							# is it mandatory?
-# - True / False 										# is it a list?
-# - '<name>'											# description name
-# - '<description>'										# description text
-# - <value> / null / <parameters if isDict or isList>	# default value
-# - True / False										# whitelist (only if leaf)
-# - input type											# input type (only if leaf)
-# - data type											# data type (only if leaf)
-
 project:
   mandatory: True
   list:  False
