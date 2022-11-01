@@ -30,7 +30,7 @@ group
 depend
 </th>
 </tr>
-<tr>
+<tr style="vertical-align:top">
 <td> 
 <div>
 
@@ -166,7 +166,7 @@ organism our reference <br>
 genomes are valid. For <br>
 this we look at the <br> 
 possible organisms in the<br>
- whitelist '[organism](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism)':
+ whitelist 'organism'[1]:
 
 ```yaml
 whitelist_type: plain
@@ -228,3 +228,5 @@ whitelist:
 </td>
 </tr>
 </table>
+
+[1] https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism
