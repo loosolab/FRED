@@ -34,10 +34,10 @@ depend
 <td> 
 <div>
 
-The following snippet shows<br> 
-the whitelist file for <br>
-'reference_genome' in type <br>
-'plain'.
+The following snippet <br>
+shows the whitelist file <br>
+for 'reference_genome' in<br> 
+type 'plain'.
 
 ```yaml
 whitelist_type: plain
@@ -49,11 +49,12 @@ whitelist:
   - mm38
 ```
 
-To add the reference genomes <br>
-'danrer10' and 'danrer11' to a <br>
-whitelist of type 'plain', they <br>
-are inserted into the list under<br>
-the key "whitelist":
+To add the reference <br>
+genomes 'danrer10' and <br>
+'danrer11' to a whitelist<br> 
+of type 'plain', they are<br> 
+inserted into the list <br>
+under key "whitelist":
 
 ```yaml
 whitelist_type: plain
@@ -72,8 +73,10 @@ whitelist:
 <td> 
 <div>
 
-The following snippet shows the whitelist<br>
-file for 'reference_genome' in type 'group'.
+The following snippet <br>
+shows the whitelist file <br>
+for 'reference_genome' in<br> 
+type 'group'.
 
 ```yaml
 whitelist_type: group
@@ -87,16 +90,23 @@ whitelist:
       - mm38
 ```
 
-In the 'group' type whitelist, the specified<br> 
-reference genomes are grouped according to <br>
-the organism to which they are assigned. To <br>
-add the reference genomes 'danrer10' and <br>
-'danrer11' of the organism zebrafish in a <br>
-meaningful way, we create the new category <br>
-'zebrafish' as a key within the dictionary <br>
-under 'whitelist'. This key 'zebrafish' then<br> 
-gets ' danrer10' and 'danrer11' in a list as<br> 
-value.
+In the 'group' type <br>
+whitelist, the specified<br> 
+reference genomes are <br>
+grouped according to the <br>
+organism to which they <br>
+are assigned. To add the <br>
+reference genomes <br>   
+'danrer10' and 'danrer11'<br> 
+of the organism zebrafish<br> 
+in a meaningful way, we <br>
+create the new category <br>
+'zebrafish' as a key <br>
+within the dictionary <br>
+under 'whitelist'. This <br>
+key 'zebrafish' then gets<br> 
+'danrer10' and 'danrer11'<br> 
+in a list as value.
 
 ```yaml
 whitelist_type: group
@@ -118,8 +128,10 @@ whitelist:
 <td> 
 <div>
 
-The following snippet shows the whitelist<br>
-file for 'reference_genome' in type 'depend'.
+The following snippet <br>
+shows the whitelist file <br>
+for 'reference_genome' in<br> 
+type 'depend'.
 
 ```yaml
 whitelist_type: depend
@@ -134,18 +146,28 @@ whitelist:
       - mm38
 ```
 
-The whitelist of type 'depend' is dependent <br>
-on the input of another metadata field. The <br>
-'ident_key' indicates that this metadata <br>
-field is the 'organism_name' in our example.<br> 
-This means that different whitelist values <br>
-can be entered for the reference genome <br>
-depending on the specified organism. Now, <br>
-to add the reference genomes 'danrer10' and<br> 
-'danrer11', we first have to decide for <br>
-which organism our reference genomes are <br>
-valid. For this we look at the possible <br>
-organisms in the [whitelist 'organism'](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism):
+The whitelist of type <br>
+'depend' is dependent on <br>
+the input of another <br>
+metadata field. The <br> 
+'ident_key' indicates <br>
+that this metadata field <br>
+is the 'organism_name' in<br> 
+our example. This means <br>
+that different whitelist <br>
+values can be entered for<br> 
+the reference genome <br>
+depending on the <br>    
+specified organism. Now, <br>
+to add the reference <br>
+genomes 'danrer10' and <br>
+'danrer11', we first have<br> 
+to decide for which <br> 
+organism our reference <br>
+genomes are valid. For <br>
+this we look at the <br> 
+possible organisms in the<br>
+ whitelist '[organism](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism)':
 
 ```yaml
 whitelist_type: plain
@@ -162,19 +184,31 @@ whitelist:
     - yeast 4932
 ```
 
-In this whitelist we find an entry for <br>
-zebrafish. From the header we see that the <br>
-entry is composed of the 'organism_name' and<br>
-the 'taxonomy_id'. So for the entry <br>
-'zebrafish 7955' we get the 'organism_name' <br>
-'zebrafish'. We now enter this as a key in <br>
-the dictionary under 'whitelist' in our <br>
-'reference_genome' whitelist. Note that the <br>
-syntax of the key must match the <br>
-'organism_name' specified in the 'organism' <br>
-whitelist. Then, this new key 'zebrafish' <br>
-receives a list containing the reference <br>
-genomes 'danrer10' and 'danrer11' as value.
+In this whitelist we find<br>
+an entry for zebrafish. <br>
+From the header we see <br>
+that the entry is <br>   
+composed of the <br>     
+'organism_name' and the <br>
+'taxonomy_id'. So for the<br> 
+entry 'zebrafish 7955' we<br> 
+get the 'organism_name' <br>
+'zebrafish'. We now enter<br> 
+this as a key in the <br>
+dictionary under <br>    
+'whitelist' in our <br>  
+'reference_genome' <br>  
+whitelist. Note that the <br>
+syntax of the key must <br>
+match the 'organism_name'<br> 
+specified in the <br>    
+'organism' whitelist. <br>
+Then, this new key <br>
+'zebrafish' receives a <br>
+list containing the <br>
+reference genomes <br>
+'danrer10' and 'danrer11'<br> 
+as value.
 
 ```yaml
 whitelist_type: depend
