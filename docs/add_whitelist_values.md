@@ -126,7 +126,6 @@ whitelist:
 </div>
 </td>
 <td markdown="1"> 
-<div>
 
 The following snippet <br>
 shows the whitelist file <br>
@@ -226,7 +225,6 @@ whitelist:
       - danrer11
 ```
 
-</div>
 </td>
 </tr>
 </table>
