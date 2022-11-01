@@ -30,7 +30,7 @@ group
 depend
 </th>
 </tr>
-<tr style="vertical-align:top">
+<tr valign="top">
 <td> 
 <div>
 
@@ -229,4 +229,4 @@ whitelist:
 </tr>
 </table>
 
-[1] https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism
+[1] [https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism)
