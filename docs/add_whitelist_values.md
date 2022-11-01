@@ -125,7 +125,7 @@ whitelist:
 
 </div>
 </td>
-<td> 
+<td markdown="1"> 
 <div>
 
 The following snippet <br>
