@@ -95,8 +95,6 @@ experimental_setting:
                   ...
 ```
 
-TODO: special case group
-
 ### Step 2: Add experimental factor to 'factor' whitelist
 
 In the second step, the new experimental factor must be added to the whitelist 'factor'. The steps required for this are described in more detail under '[Add values to whitelist](add_whitelist_values.md)'. 
