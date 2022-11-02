@@ -28,7 +28,12 @@ def find(args):
 
 
 def generate(args):
-    generate_metafile.generate_file(args.path, args.id, args.name, args.mandatory_only)
+    """
+    calls script generate_metafile to start dialog
+    :param args:
+    """
+    generate_metafile.generate_file(args.path, args.id, args.name,
+                                    args.mandatory_only)
 
 
 def main():
@@ -60,8 +65,10 @@ def main():
     create_group.add_argument('-n', '--name', type=str,
                                  required=True,
                                  help='The name of the experiment')
-    create_function.add_argument('-mo', '--mandatory_only', default=False, action='store_true',
-                                 help='If True, only mandatory keys will be filled out')
+    create_function.add_argument('-mo', '--mandatory_only', default=False,
+                                 action='store_true',
+                                 help='If True, only mandatory keys will '
+                                      'be filled out')
 
     create_function.set_defaults(func=generate)
     args = parser.parse_args()

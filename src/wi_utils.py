@@ -1,11 +1,23 @@
 import src.utils as utils
 import src.validate_yaml as validate_yaml
+import src.wi_functions as wi_functions
 from dateutil import parser
 import pytz
 import os
 
 
+# This script contains all functions that are called in parallel for the web
+# interface.
+
 def read_gene_whitelist(path):
+    """
+    This function reads the whitelist for the genes of an organism and
+    separates the values into gene name and ensembl id. It is called for all
+    organisms at the same time.
+    :param path: the path to the gene whitelist file of one organism
+    :return: gene_name: a list containing all gene names
+             ensembl_id: a list containing all ensembl_ids
+    """
     gene_name = []
     ensembl_id = []
     sublist = utils.read_whitelist(path)['whitelist']
@@ -16,6 +28,24 @@ def read_gene_whitelist(path):
 
 
 def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
+    """
+    This function is used to validate a part of the WI object. If an error or a
+    warning is found than it is added to the description of the key whose value
+    contains the error/warning. This function is called simultaneously for the
+    parts 'project', 'experimental_setting' and 'technical_details'.
+    :param elem: the key of the part that is being validated
+    :param wi_object: the object that is validated
+    :param warnings: a list containing all warnings
+    :param pooled: a boolean that states if the samples were pooled
+    :param organisms: a list of all contained organisms
+    :param errors: a list containing all errors
+    :return: elem: the key of the part that is being validated
+             wi_object: the validated object containing error and warn messages
+             pooled: a boolean stating if the samples are pooled
+             organisms: a list of all contained organisms
+             warnings: a list containing all found warnings
+             errors: a list containing all found errors
+    """
     error_desc = ''
     warning_desc = ''
     if isinstance(wi_object, dict):
@@ -27,35 +57,41 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
                 error = False
                 messages = []
                 for sub_elem in wi_object['list_value']:
-                    valid, message = validate_yaml.validate_value(sub_elem,
-                                                                  wi_object[
-                                                                      'input_type'],
-                                                                  wi_object[
-                                                                      'position'].split(
-                                                                      ':')[-1])
+                    valid, message = validate_yaml.validate_value(
+                        sub_elem, wi_object['input_type'],
+                        wi_object['position'].split(':')[-1])
                     if not valid:
                         error = True
                         messages.append((sub_elem, message))
                         errors.append(
-                            f'{wi_object["position"]}: Value {sub_elem} - {message}')
+                            f'{wi_object["position"]}: Value {sub_elem} - '
+                            f'{message}')
+
                 wi_object['error'] = error
                 if error:
                     message = ', '.join(
                         [f'{msg[0]}: {msg[1]}' for msg in messages])
-                    error_desc = f'{error_desc}{"<br>" if error_desc != "" else ""}<font color="red">{message}</font>'
-                wi_object[
-                    'desc'] = f'{wi_object["backup_desc"]}{"<br>" if wi_object["backup_desc"] != "" else ""}{error_desc}{"<br>" if error_desc != "" else ""}{warning_desc}'
+                    error_desc = f'{error_desc}' \
+                                 f'{"<br>" if error_desc != "" else ""}' \
+                                 f'<font color="red">{message}</font>'
+                wi_object['desc'] = \
+                    f'{wi_object["backup_desc"]}' \
+                    f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
+                    f'{error_desc}{"<br>" if error_desc != "" else ""}' \
+                    f'{warning_desc}'
             else:
                 elem, wi_object[
-                    'list_value'], pooled, organisms, warnings, errors = validate_part(
-                    elem, wi_object['list_value'], warnings, pooled, organisms,
-                    errors)
+                    'list_value'], pooled, organisms, warnings, errors = \
+                    validate_part(
+                        elem, wi_object['list_value'], warnings, pooled,
+                        organisms, errors)
         else:
             if 'input_fields' in wi_object:
                 elem, wi_object[
-                    'input_fields'], pooled, organisms, warnings, errors = validate_part(elem,
-                    wi_object['input_fields'], warnings, pooled, organisms,
-                    errors)
+                    'input_fields'], pooled, organisms, warnings, errors = \
+                    validate_part(
+                        elem, wi_object['input_fields'], warnings, pooled,
+                        organisms, errors)
             else:
                 if wi_object['value'] is not None and wi_object['value'] != '':
                     if wi_object['input_type'] == 'date':
@@ -65,40 +101,47 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
                         value = local_time.strftime("%d.%m.%Y")
                     else:
                         value = wi_object['value']
-                    valid, message = validate_yaml.validate_value(value,
-                                                                  wi_object[
-                                                                      'input_type'],
-                                                                  wi_object[
-                                                                      'position'].split(
-                                                                      ':')[-1])
+                    valid, message = validate_yaml.validate_value(
+                        value, wi_object['input_type'],
+                        wi_object['position'].split(':')[-1])
                     wi_object['error'] = not valid
                     if not valid:
                         errors.append(f'{wi_object["position"]}: {message}')
-                        error_desc = f'{error_desc}{"<br>" if error_desc != "" else ""}<font color="red">{message}</font>'
-
+                        error_desc = f'{error_desc}' \
+                                     f'{"<br>" if error_desc != "" else ""}' \
+                                     f'<font color="red">{message}</font>'
                     warning = False
                     warn_text = None
                     key = wi_object['position'].split(':')[-1]
                     if key == 'pooled':
                         pooled = wi_object['value']
                     elif key == 'donor_count':
-                        warning, warn_text = validate_yaml.validate_donor_count(
-                            pooled, wi_object['value'])
+                        warning, warn_text = \
+                            validate_yaml.validate_donor_count(
+                                pooled, wi_object['value'])
                     elif key == 'organism':
                         organisms.append(wi_object['value'].split(' ')[0])
                     elif key == 'reference_genome':
-                        warning, warn_text = validate_yaml.validate_reference_genome(
-                            organisms, wi_object['value'])
+                        warning, warn_text = \
+                            validate_yaml.validate_reference_genome(
+                                organisms, wi_object['value'])
                     wi_object['warning'] = warning
                     if warning:
                         warnings.append(
                             f'{wi_object["position"]}: {warn_text}')
-                        warning_desc = f'{warning_desc}{"<br>" if warning_desc != "" else ""}<font color="orange">{warn_text}</font>'
-                    wi_object[
-                        'desc'] = f'{wi_object["backup_desc"]}{"<br>" if wi_object["backup_desc"] != "" else ""}{error_desc}{"<br>" if error_desc != "" else ""}{warning_desc}'
+                        warning_desc = \
+                            f'{warning_desc}' \
+                            f'{"<br>" if warning_desc != "" else ""}' \
+                            f'<font color="orange">{warn_text}</font>'
+                    wi_object['desc'] = \
+                        f'{wi_object["backup_desc"]}' \
+                        f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
+                        f'{error_desc}{"<br>" if error_desc != "" else ""}' \
+                        f'{warning_desc}'
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
-            elem, wi_object[i], pooled, organisms, warnings, errors = validate_part(
+            elem, wi_object[
+                i], pooled, organisms, warnings, errors = validate_part(
                 elem, wi_object[i], warnings, pooled, organisms, errors)
     return elem, wi_object, pooled, organisms, warnings, errors
 
@@ -112,7 +155,10 @@ def parse_part(wi_object, factors, organism, id, nom):
     if 'input_type' in wi_object and wi_object['input_type'] == 'gene':
         if wi_object['value'] is not None:
             gn, embl = wi_object['value'].split(' ')
-        sub_keys = list(utils.find_keys(key_yaml, wi_object['position'].split(':')[-1]))[0]['value'].keys()
+        sub_keys = \
+            list(utils.find_keys(
+                key_yaml,
+                wi_object['position'].split(':')[-1]))[0]['value'].keys()
         new_samp = {'position': wi_object['position'],
                     'mandatory': wi_object['mandatory'],
                     'list': wi_object['list'],
@@ -121,154 +167,107 @@ def parse_part(wi_object, factors, organism, id, nom):
         input_fields = []
         for key in sub_keys:
             node = list(utils.find_keys(key_yaml, key))[0]
-            input_field = parse_empty(node, f'{wi_object["position"]}:{key}', key_yaml, False)
+            input_field = wi_functions.parse_empty(
+                node, f'{wi_object["position"]}:{key}', key_yaml, False)
             if gn is not None and embl is not None:
                 input_field['value'] = gn if key == 'gene_name' else embl
             input_fields.append(input_field)
         for elem in factors:
             for i in range(len(elem)):
-                if 'headers' in elem[i] and elem[i]['factor'] == wi_object['position'].split(':')[-1]:
+                if 'headers' in elem[i] and elem[i]['factor'] == \
+                        wi_object['position'].split(':')[-1] and \
+                        wi_object['value'] is not None:
                     for j in range(len(elem[i]['headers'].split(' '))):
                         for f in input_fields:
-                            if f['position'].split(':')[-1] == elem[i]['headers'].split(' ')[j]:
+                            if f['position'].split(':')[-1] == \
+                                    elem[i]['headers'].split(' ')[j]:
                                 f['value'] = wi_object['value'].split(' ')[j]
         new_samp['input_fields'] = input_fields
         wi_object = new_samp
-    return_dict = {}
 
     if isinstance(wi_object, dict):
-        if wi_object['list']:
-            test = []
-            for elem in wi_object['list_value']:
-                if not isinstance(elem, dict) and not isinstance(elem, list):
-                    test.append(elem)
+        if wi_object['position'].split(':')[-1] == 'experimental_setting':
+            if len(wi_object['list_value']) > 0:
+                organism = [o['value'] for o in wi_object['list_value'][0] if
+                            o['position'].split(':')[-1] == 'organism']
+                if len(organism) > 0:
+                    organism = organism[0].split(' ')[0]
                 else:
-                    for sub_elem in elem:
-                        if sub_elem['position'].split(':')[-1] == 'number_of_measurements':
-                            nom = sub_elem['value']
-                    if all(sub_elem['position'].split(':')[-1] == wi_object['position'].split(':')[-1] for sub_elem in elem):
-                        for sub_elem in elem:
-                            test.append(sub_elem['value'])
-                    else:
-                        test.append(parse_part(elem, factors, organism, id, nom))
-            return test
+                    organism = None
+            else:
+                organism = None
+        if wi_object['list']:
+            val = []
+            for elem in wi_object['list_value']:
+                if isinstance(elem, dict):
+                    if elem['position'].split(':')[-1] == 'condition':
+                        samples = []
+                        for sub_elem in elem['list_value']:
+                            nom = [x['value'] for x in sub_elem if
+                                   x['position'].split(':')[
+                                       -1] == 'number_of_measurements'][0]
+                            part_val = parse_part(sub_elem, factors, organism,
+                                                  id, nom)
+                            samples.append(part_val)
+
+                        val.append({'condition_name': elem['correct_value'],
+                                    'biological_replicates': {
+                                        'count': len(samples),
+                                        'samples': samples}})
+                elif isinstance(elem, list):
+                    val.append(
+                        parse_list_part(elem, factors, organism, id, nom))
+                else:
+                    val.append(elem)
         else:
-            if 'whitelist' in wi_object and wi_object['whitelist'] and 'headers' in wi_object['whitelist']:
+            if 'whitelist' in wi_object and wi_object[
+                    'whitelist'] and 'headers' in wi_object['whitelist']:
                 new_obj = {'position': wi_object['position'],
-                            'mandatory': wi_object['mandatory'],
-                            'list': wi_object['list'],
-                            'title': wi_object['displayName'],
-                            'desc': wi_object['desc']}
+                           'mandatory': wi_object['mandatory'],
+                           'list': wi_object['list'],
+                           'title': wi_object['displayName'],
+                           'desc': wi_object['desc']}
                 input_fields = []
-                for j in range(len(wi_object['whitelist']['headers'].split(' '))):
-                    node = list(utils.find_keys(key_yaml, wi_object['whitelist']['headers'].split(' ')[j]))[0]
-                    input_fields.append(parse_empty(node, f'{wi_object["position"]}:{wi_object["whitelist"]["headers"].split(" ")[j]}', key_yaml, False))
+                for j in range(
+                        len(wi_object['whitelist']['headers'].split(' '))):
+                    node = list(utils.find_keys(key_yaml,
+                                                wi_object['whitelist'][
+                                                    'headers'].split(' ')[j]))[
+                        0]
+                    input_fields.append(wi_functions.parse_empty(
+                        node,
+                        f'{wi_object["position"]}:'
+                        f'{wi_object["whitelist"]["headers"].split(" ")[j]}',
+                        key_yaml, False))
                     input_fields[j]['value'] = wi_object['value'].split(' ')[j]
                 new_obj['input_fields'] = input_fields
                 wi_object = new_obj
             if 'input_fields' in wi_object:
-                return parse_part(wi_object['input_fields'], factors, organism, id, nom)
+                val = parse_part(wi_object['input_fields'], factors, organism,
+                                 id, nom)
             else:
                 if wi_object['value'] and wi_object[
                         'input_type'] == 'value_unit':
                     unit = wi_object['value_unit']
                     value = wi_object['value']
-                    return {'unit': unit, 'value': value}
+                    val = {'unit': unit, 'value': value}
+                elif wi_object['value'] and wi_object['input_type'] == 'date':
+                    default_time = parser.parse(wi_object['value'])
+                    timezone = pytz.timezone("Europe/Berlin")
+                    local_time = default_time.astimezone(timezone)
+                    val = local_time.strftime("%d.%m.%Y")
                 else:
                     if 'correct_value' in wi_object:
-                        if wi_object['position'].split(':')[-1] == 'sample_name':
-                            sample_count = int(wi_object['value'].split('_')[-1])
-                            return f'{wi_object["correct_value"]}_b{"{:02d}".format(sample_count)}'
-                        return wi_object['correct_value']
+                        if wi_object['position'].split(':')[
+                                -1] == 'sample_name':
+                            sample_count = int(
+                                wi_object['value'].split('_')[-1])
+                            val = f'{wi_object["correct_value"]}_b' \
+                                  f'{"{:02d}".format(sample_count)}'
+                        else:
+                            val = wi_object['correct_value']
                     else:
-                        return wi_object['value']
+                        val = wi_object['value']
     elif isinstance(wi_object, list):
-        for i in range(len(wi_object)):
-            if wi_object[i]['position'].split(':')[-1] == 'organism':
-                organism = wi_object[i]['value'].split(' ')[0]
-
-            if wi_object[i]['position'].split(':')[-1] == 'conditions':
-                test = []
-                for j in range(len(wi_object[i]['list_value'])):
-                    value = parse_part(wi_object[i]['list_value'][j], factors, organism, id, nom)
-                    if ((isinstance(value, list) or isinstance(value,
-                                                               dict)) and len(
-                        value) > 0) or (
-                            not isinstance(value, list) and not isinstance(
-                        value,
-                        dict) and value is not None and value != ''):
-                        test.append({'condition_name':
-                                         wi_object[i]['list_value'][j][
-                                             'correct_value'],
-                                     'biological_replicates': {
-                                         'count': len(value),
-                                         'samples': value}})
-                    else:
-                        test.append({'condition_name':
-                                         wi_object[i]['list_value'][j][
-                                             'correct_value']})
-                return_dict['conditions'] = test
-            elif wi_object[i]['position'].split(':')[
-                -1] == 'technical_replicates':
-                technical_replicates = parse_part(wi_object[i], factors, organism, id, nom)
-                sample_name = []
-                for c in range(technical_replicates['count']):
-                    for m in range(nom):
-                        sample_name.append(
-                            f'{id}_{organism}_{return_dict["sample_name"]}_t{"{:02d}".format(c+1)}_m{"{:02d}".format(m+1)}')
-                technical_replicates['sample_name'] = sample_name
-                return_dict['technical_replicates'] = technical_replicates
-            elif wi_object[i]['position'].split(':')[
-                -1] == 'experimental_factors':
-                res = []
-                all_factors = {}
-                i = 0
-                for elem in factors:
-                    for d in elem:
-                        if 'headers' in d:
-                            header = d['headers'].split(' ')
-                            d.pop('headers')
-                            for l in range(len(d['values'])):
-                                vals = d['values'][l].split(' ')
-                                d['values'][l] = {}
-                                for h in range(len(header)):
-                                    d['values'][l][header[h]] = vals[h]
-                        else:
-                            for j in range(len(d['values'])):
-                                if isinstance(d['values'][j], dict):
-                                    empty_keys = []
-                                    for key in d['values'][j]:
-                                        if not isinstance(d['values'][j][key],list) or len(d['values'][j][key]) == 0:
-                                            empty_keys.append(key)
-                                    for key in empty_keys:
-                                        d['values'][j].pop(key)
-                                    if all(k == d['factor'] for k in d['values'][j]):
-                                        d['values'] = d['values'][j][d['factor']]
-                        if not any(d['factor'] in y['factor'] for y in res):
-                            res.append(d)
-                            all_factors[d['factor']] = i
-                            i += 1
-                        else:
-                            for x in d['values']:
-                                if x not in res[all_factors[d['factor']]][
-                                        'values']:
-                                    res[all_factors[d['factor']]][
-                                        'values'].append(x)
-                return_dict['experimental_factors'] = res
-
-            else:
-                value = parse_part(wi_object[i], factors, organism, id, nom)
-                if ((isinstance(value, list) or isinstance(value,
-                                                           dict)) and len(
-                    value) > 0) or (
-                        not isinstance(value, list) and not isinstance(value,
-                                                                       dict) and value is not None and value != ''):
-                    if 'input_type' in wi_object[i] and wi_object[i][
-                            'input_type'] == 'date':
-                        default_time = parser.parse(wi_object[i]['value'])
-                        timezone = pytz.timezone("Europe/Berlin")
-                        local_time = default_time.astimezone(timezone)
-                        value = local_time.strftime("%d.%m.%Y")
-                    return_dict[
-                        wi_object[i]['position'].split(':')[-1]] = value
-    return return_dict
+        return parse_list_part(wi_object, factors, organism, id, nom)
+    return val

@@ -17,6 +17,7 @@ not_editable = ['id', 'project_name', 'sample_name', 'pooled', 'donor_count',
                 'technical_replicates']
 id = ''
 
+
 class WhitelistCompleter:
     def __init__(self, whitelist):
         self.whitelist = whitelist
@@ -41,7 +42,6 @@ def generate_file(path, input_id, name, mandatory_mode):
     :param mandatory_mode: if True only mandatory files are filled out
     """
 
-    # TODO:
     global id
     id = input_id
 
@@ -101,33 +101,33 @@ def generate_file(path, input_id, name, mandatory_mode):
     print_sample_names(result_dict, input_id, path)
 
 
-# TODO: add docs
-# TODO: rename function
 def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                    first_node, is_factor):
     """
-
-    :param node:
-    :param item:
-    :param optional:
-    :param mandatory_mode:
-    :param result_dict:
-    :param first_node:
-    :param is_factor:
-    :return:
+    This function tests whether a list must be specified for a value and,
+    depending on this, calls a function to enter the value.
+    :param node: a part of the keys.yaml that is being iterated over
+    :param item: the name of the key that is being filled
+    :param optional: a bool that states if a key is optional
+    :param mandatory_mode: a bool that states if the mandatory mode is active
+    :param result_dict: a dictionary that contains the filled metadata
+    :param first_node: a bool that states how a header should be printed
+    :param is_factor: a bool that states if the current value is an
+                      experimental factor
+    :return: value: the value that was entered for the key
     """
     # test if the input value is of type list
     if node['list']:
 
         # test if one list element contains a dictionary
         if isinstance(node['value'], dict) and not \
-                set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
-                set(node['value'].keys()):
+                set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
+                <= set(node['value'].keys()):
             # test if the input value is an experimental factor
             if is_factor:
 
-                # TODO:
-                value = fill_metadata_structure(node['value'], item, {}, optional,
+                value = fill_metadata_structure(node['value'], item, {},
+                                                optional,
                                                 mandatory_mode, result_dict,
                                                 first_node, is_factor)
             else:
@@ -154,10 +154,14 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
         # a dictionary or a dictionary that contains the key 'merge' as special
         # case (means that the input is treated like a single value and then
         # split into a dictionary, e.g. gene -> gene_name, ensembl_id)
-        if is_factor and (not isinstance(node['value'], dict) or (isinstance(node['value'], dict) and \
-                set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
-                set(node['value'].keys()) or \
-                ('special_case' in node and 'merge' in node['special_case']))):
+        if is_factor and \
+                (not isinstance(node['value'], dict) or
+                    (isinstance(node['value'], dict) and
+                        set(
+                            ['mandatory', 'list', 'desc', 'display_name',
+                             'value']) <= set(node['value'].keys()) or
+                        ('special_case' in node and 'merge' in
+                            node['special_case']))):
 
             # ask the user to put in a list of experimental factors
             value = get_input_list(node, item, result_dict)
@@ -170,20 +174,21 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
     return value
 
 
-# TODO: add docs
 def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                             result_dict, first_node, is_factor):
     """
-
-    :param node:
-    :param key:
-    :param return_dict:
-    :param optional:
-    :param mandatory_mode:
-    :param result_dict:
-    :param first_node:
-    :param is_factor:
-    :return:
+    This function calls other functions to fill in metadata information for a
+    key depending on its type.
+    :param node: a part of the keys.yaml that contains the key to be filled
+    :param key: tha name of the key to be filled
+    :param return_dict: a dictionary that contains all filled in information
+    :param optional: a bool that states if a key is optional
+    :param mandatory_mode: a bool that states if mandatory mode is active
+    :param result_dict: a dictionary that contains all filled in information
+    :param first_node: a bool that states how a header should be printed
+    :param is_factor: a bool that states if the current value is an
+                      experimental factor
+    :return: return_dict: a dictionary containing the filled information
     """
 
     # test if the given part of the metadata structure is a dictionary
@@ -250,7 +255,8 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                     else:
 
                         # TODO:
-                        if node[item]['list'] or item not in factor or is_factor:
+                        if node[item]['list'] or item not in factor or \
+                                is_factor:
                             optionals.append(item)
                             desc.append(node[item]['desc'])
 
@@ -530,7 +536,7 @@ def get_experimental_factors(node, result_dict):
     """
     This function prompts the user to specify the examined experimental
     factors, as well as the analyzed values for each selected factor.
-    :param node: TODO
+    :param node: a part of the keys.yaml
     :param result_dict: a dictionary that contains all the information already
                         specified by the user
     :return: experimental_factors: a list containing a dictionary for every
@@ -590,46 +596,17 @@ def get_experimental_factors(node, result_dict):
     return experimental_factors
 
 
-# elif fac_node[5]:
-#    value_list = utils.get_whitelist(fac, result_dict)
-#    if value_list and 'headers' in value_list:
-#        headers = value_list['headers']
-#    else:
-#        headers = None
-#    if value_list and 'whitelist_keys' in value_list:
-#        whitelist_keys = value_list['whitelist_keys']
-#    else:
-#        whitelist_keys = None
-#    if value_list and 'whitelist_type' in value_list:
-#        whitelist_type = value_list['whitelist_type']
-#        value_list = value_list['whitelist']
-#    else:
-#        whitelist_type = None
-#    used_values = []
-#    if whitelist_type == 'group':
-#        if whitelist_keys is not None:
-#            for i in range(len(used_values)):
-#                for w_key in whitelist_keys:
-#                    if used_values[i].endswith(f' ({w_key})'):
-#                        used_values[i] = used_values[i].replace(f' ({w_key})', '')
-#                        if headers is not None and w_key in headers:
-#                            part_vals = used_values[i].split(' ')
-#                           header = headers[w_key].split(' ')
-#                            new_val = {}
-#                            for j in range(len(header)):
-#                                new_val[header[j]] = part_vals[j]
-#                            used_values[i] = new_val
-#                        break
-
-
 def get_conditions(factors, node, mandatory_mode, result_dict):
     """
-
-    :param factors:
-    :param node:
-    :param mandatory_mode:
-    :param result_dict:
-    :return:
+    This function generates all combinations of the specified experimental
+    factors and their values and lets the user choose which of those he likes
+    to use as conditions.
+    :param factors: a dictionary containing the entered experimental factors
+                    and their values
+    :param node: a part of the keys.yaml
+    :param mandatory_mode: a bool that states if mandatory mode is active
+    :param result_dict: a dictionary containing all already filled information
+    :return: conditions: the analyzed conditions chosen by the user
     """
 
     # list to save all experimental factors that contain a dictionary
@@ -653,7 +630,6 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
 
             # overwrite the values with the combinations
             factors[i]['values'] = get_combinations(factors[i]['values'],
-                                                    factors[i]['factor'],
                                                     factors[i]['factor'])
 
             # remove ident_key from result dictionary
@@ -756,12 +732,15 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
 
 def get_replicate_count(conditions, node, mandatory_mode, result_dict):
     """
-
-    :param conditions:
-    :param node:
-    :param mandatory_mode:
-    :param result_dict:
-    :return:
+    This function is used to ask the user for the number of biological
+    replicates for every condition. Per replicate, it calls a function to fill
+    in information for samples.
+    :param conditions: a lsit of all chosen conditions
+    :param node: a part of the keys.yaml
+    :param mandatory_mode: a bool that states if mandatory mode is active
+    :param result_dict: a dictionary containing already entered information
+    :return: condition_infos: a list containing sample information for every
+                              condition
     """
 
     # create a list to save the information for every condition
@@ -798,7 +777,7 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict):
             # call fill_replicates to enter information for the replicate and
             # save it in the replicates dictionary
             replicates['biological_replicates'] = fill_replicates(
-                'biological_replicates', condition, bio, input_pooled,
+                condition, bio, input_pooled,
                 node, mandatory_mode, result_dict)
 
             # add the replicates dictionary to the list containing
@@ -809,18 +788,18 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict):
     return condition_infos
 
 
-def fill_replicates(type, condition, bio, input_pooled, node,
+def fill_replicates(condition, bio, input_pooled, node,
                     mandatory_mode, result_dict):
     """
-
-    :param type:
-    :param condition:
-    :param bio:
-    :param input_pooled:
-    :param node:
-    :param mandatory_mode:
-    :param result_dict:
-    :return:
+    This function is used to enter information for biological replicates.
+    :param condition: the condition for which the biological replicated are
+                      filled
+    :param bio: the number of biological replicates
+    :param input_pooled: a bool that states if the samples were pooled
+    :param node: a part of the keys.yaml
+    :param mandatory_mode: a bool that states if mandatory mode is active
+    :param result_dict: a dictionary containing all filled information
+    :return: replicates: the replicates with information
     """
 
     # read in metadata structure
@@ -943,7 +922,8 @@ def fill_replicates(type, condition, bio, input_pooled, node,
         # structure
         samples = merge_dicts(
             samples, fill_metadata_structure(
-                node[type]['value']['samples']['value'], 'samples', samples,
+                node['biological_replicated']
+                ['value']['samples']['value'], 'samples', samples,
                 False, mandatory_mode, result_dict, False, False))
 
         # set number of measurements to 1 if it is not yet specified
@@ -964,11 +944,13 @@ def fill_replicates(type, condition, bio, input_pooled, node,
 
 def get_technical_replicates(sample_name, organism, nom):
     """
-
-    :param sample_name:
-    :param organism:
-    :param nom:
-    :return:
+    This function is used to ask for the number of technical replicates and to
+    create the filenames.
+    :param sample_name: the name of the biological replicate
+    :param organism: the specified organism
+    :param nom: the number of measurements
+    :return: a dictionary containing the number of technical replicates and the
+             filenames
     """
 
     # prompt user to input number of technical replicates and parse user input
@@ -1063,11 +1045,12 @@ def get_condition_combinations(factors):
 
 def print_summary(result, depth, is_list):
     """
-
-    :param result:
-    :param depth:
-    :param is_list:
-    :return:
+    This function parses the dictionary into a string with the same structure
+    as it will be saved to the yaml file.
+    :param result: the filled dictionary
+    :param depth: an integer that specifies the depth of indentation
+    :param is_list: a bool that states if a key contains a list
+    :return: summary: a string that contains all entered information
     """
     summary = ''
     if isinstance(result, dict):
@@ -1090,6 +1073,13 @@ def print_summary(result, depth, is_list):
 
 
 def print_sample_names(result, input_id, path):
+    """
+    This function creates a string out of all generated filenames that can be
+    printed.
+    :param result: the filled metadata dictionary
+    :param input_id: the id of the project
+    :param path: the path were the metadata should be saved to
+    """
     samples = list(
         utils.find_list_key(result, 'technical_replicates:sample_name'))
     print(f'{"".center(size.columns, "-")}\n'
@@ -1117,21 +1107,22 @@ def print_sample_names(result, input_id, path):
 def enter_information(node, key, return_dict, optional, mandatory_mode,
                       result_dict, first_node, is_factor):
     """
-
-    :param node:
-    :param key:
-    :param return_dict:
-    :param optional:
-    :param mandatory_mode:
-    :param result_dict:
-    :param first_node:
-    :param is_factor:
-    :return:
+    This function is used to create prompts for the user to enter information
+    and parses the input.
+    :param node: a part of the keys.yaml
+    :param key: the name of the key that should be filled
+    :param return_dict: a dictionary containing input information
+    :param optional: a bool to state if the key is optional
+    :param mandatory_mode: a bool to state if mandatory mode is active
+    :param result_dict: a dictionary containing all filled information
+    :param first_node: a bool to state how a header should be printed
+    :param is_factor: a bool to state if the key is an experimental factor
+    :return: the filled key
     """
     # test if the key contains a dictionary
     if isinstance(node['value'], dict) and \
-            not set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
-            set(node['value'].keys()):
+            not set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
+            <= set(node['value'].keys()):
         display_name = node['display_name']
         if first_node:
 
@@ -1152,7 +1143,8 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
             print(f'{node["desc"]}\n')
 
         # call fill_metadata_structure to fill in the dictionary
-        return fill_metadata_structure(node['value'], key, return_dict, optional,
+        return fill_metadata_structure(node['value'], key, return_dict,
+                                       optional,
                                        mandatory_mode, result_dict, False,
                                        is_factor)
 
@@ -1189,13 +1181,13 @@ def parse_list_choose_one(whitelist, header):
 
 def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
     """
-
-    :param key:
-    :param desc:
-    :param has_whitelist:
-    :param value_type:
-    :param result_dict:
-    :return:
+    This function lets the user enter an input and tests if the input is valid.
+    :param key: the key that should be filled
+    :param desc: a description that should be printed
+    :param has_whitelist: a bool to state if the key has a whitelist
+    :param value_type: the type that is expected for the value
+    :param result_dict: a dictionary containing filled information
+    :return: input_value: the value that was input by the user
     """
 
     # read in whitelist if the key has one or set the whitelist to None
@@ -1352,10 +1344,11 @@ def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
 
 def parse_group_choose_one(whitelist, w, header):
     """
-
-    :param whitelist:
-    :param w:
-    :param header:
+    This function prints a grouped whitelist with indexes and lets the user
+    choose one value.
+    :param whitelist: the grouped whitelist as a dictionary
+    :param w: a list containing all whitelist values
+    :param header: a header that should be printed
     :return:
     """
 
@@ -1391,6 +1384,12 @@ def parse_group_choose_one(whitelist, w, header):
 
 
 def get_short_name(condition, result_dict):
+    """
+    This function creates an abbreviated version of a condition.
+    :param condition: the condition that should be abbreviated
+    :param result_dict: a dictionary containing all filled information
+    :return: short_condition: an abbreviated version of the condition
+    """
     conds = split_cond(condition)
     whitelist = utils.get_whitelist(os.path.join('abbrev', 'factor'),
                                     result_dict)['whitelist']
@@ -1411,11 +1410,15 @@ def get_short_name(condition, result_dict):
                 if cond_whitelist and v in cond_whitelist['whitelist']:
                     val_whitelist = utils.get_whitelist(
                         os.path.join('abbrev', v), result_dict)
-                    if val_whitelist and c[1][v].lower() in val_whitelist['whitelist']:
-                        new_vals[cond_whitelist["whitelist"][v]] = val_whitelist["whitelist"][
+                    if val_whitelist and c[1][v].lower() in \
+                            val_whitelist['whitelist']:
+                        new_vals[cond_whitelist["whitelist"][v]] = \
+                            val_whitelist["whitelist"][
                             c[1][v].lower()]
-                    elif val_whitelist and c[1][v] in val_whitelist['whitelist']:
-                        new_vals[cond_whitelist["whitelist"][v]] = val_whitelist["whitelist"][
+                    elif val_whitelist and c[1][v] in \
+                            val_whitelist['whitelist']:
+                        new_vals[cond_whitelist["whitelist"][v]] = \
+                            val_whitelist["whitelist"][
                             c[1][v]]
                     else:
                         new_vals[cond_whitelist["whitelist"][v]] = c[1][v]
@@ -1426,7 +1429,8 @@ def get_short_name(condition, result_dict):
             val_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]),
                                                 result_dict)
             if val_whitelist and c[1].lower() in val_whitelist['whitelist']:
-                short_cond.append(f'{k}.{val_whitelist["whitelist"][c[1].lower()]}')
+                short_cond.append(
+                    f'{k}.{val_whitelist["whitelist"][c[1].lower()]}')
             elif val_whitelist and c[1] in val_whitelist['whitelist']:
                 short_cond.append(f'{k}.{val_whitelist["whitelist"][c[1]]}')
             else:
@@ -1436,6 +1440,12 @@ def get_short_name(condition, result_dict):
 
 
 def split_cond(condition):
+    """
+    This function splits the conditions into keys and value.
+    :param condition: a list of conditions that should be split
+    :return: conditions: a nested list containing the split keys and value of
+                         all factors in every condition
+    """
     conditions = []
     sub_cond = {}
     sub = False
@@ -1478,6 +1488,13 @@ def split_cond(condition):
 
 
 def merge_dicts(a, b):
+    """
+    This function merges two dictionaries with the same structure to create
+    one.
+    :param a: the first dictionary
+    :param b: the second dictionary
+    :return: res: the merged dictionary
+    """
     if isinstance(a, list):
         res = []
         for i in range(len(a)):
@@ -1498,7 +1515,16 @@ def merge_dicts(a, b):
     return res
 
 
-def get_combinations(values, key, key_name):
+def get_combinations(values, key):
+    """
+    This function creates combinations for experimental factors that can occur
+    multiple times in one condition and lets the user choose those that were
+    analyzed.
+    :param values: the possible values of the factor
+    :param key: the name of the experimental factor
+    :return: used_values: the combinations of the experimental factor that were
+                          used in the conditions
+    """
     is_dict = False
     if 'ident_key' in values:
         is_dict = True
@@ -1506,13 +1532,13 @@ def get_combinations(values, key, key_name):
                 values[values['ident_key']]) > 1:
             multi = parse_list_choose_one(
                 [True, False],
-                f'\nCan one sample contain multiple {key_name}s?')
+                f'\nCan one sample contain multiple {key}s?')
         else:
             multi = False
             values.pop('ident_key')
     else:
         multi = parse_list_choose_one(
-            [True, False], f'\nCan one sample contain multiple {key_name}s?')
+            [True, False], f'\nCan one sample contain multiple {key}s?')
 
     if multi or is_dict:
         merge_values = get_combis(values, key, multi)
@@ -1527,6 +1553,16 @@ def get_combinations(values, key, key_name):
 
 
 def get_combis(values, key, multi):
+    """
+    This function creates all combinations for one experimental factor that can
+    occur multiple tims in one conditions.
+    :param values: the chosen values for the experimental factor
+    :param key: the name of the experimental factor
+    :param multi: a bool to state if the experimental factor occurs multiple
+                  times in one sample
+    :return: disease_values: a list of all possible combinations of the
+                             experimental factor
+    """
     if 'multi' in values:
         values.pop('multi')
     if 'ident_key' in values and (
@@ -1603,7 +1639,16 @@ def get_combis(values, key, multi):
 
 
 def get_input_list(node, item, filled_object):
-    if 'whitelist' in node and node['whitelist'] or 'special_case' in node and 'merge' in node['special_case']:
+    """
+    This function asks the user to enter a list of values divided by comma and
+    parses the input.
+    :param node: a part of the keys.yaml
+    :param item: the key that should be filled
+    :param filled_object: a dictionary containing filled information
+    :return: used_values: the filled in list of values
+    """
+    if 'whitelist' in node and node['whitelist'] or 'special_case' in node \
+            and 'merge' in node['special_case']:
         whitelist = utils.get_whitelist(item, filled_object)
         if whitelist:
             if len(whitelist['whitelist']) > 30:
@@ -1657,6 +1702,11 @@ def get_input_list(node, item, filled_object):
 
 
 def print_option_list(options, desc):
+    """
+    This function prints an indexed whitelist.
+    :param options: the whitelist values
+    :param desc: a description to be printed
+    """
     if desc:
         data = [[f'{i + 1}:', f'{options[i]}', desc[i]] for i in
                 range(len(options))]
@@ -1672,6 +1722,12 @@ def print_option_list(options, desc):
 
 
 def parse_input_list(options, terminable):
+    """
+    This function parses the user input for a list.
+    :param options: possible input options
+    :param terminable: a bool to state in nothing can be input
+    :return: input_list: a list containing the input values
+    """
     input_list = input()
     if terminable and input_list.lower() == 'n':
         return None
@@ -1698,10 +1754,11 @@ def parse_input_list(options, terminable):
 
 def complete_input(whitelist, key):
     """
-
-    :param whitelist:
-    :param key:
-    :return:
+    This function uses a completer to autofill user input and print matching
+    values.
+    :param whitelist: a whitelist with possible values
+    :param key: the key that should be filled
+    :return: inpu_value: the value that was input by the user
     """
     print(f'\nPress tab once for autofill if'
           f' possible or to get a list of up to'
@@ -1718,16 +1775,27 @@ def complete_input(whitelist, key):
 
 
 def get_value_unit(result_dict):
+    """
+    This function prompts the user to input a value_unit.
+    :param result_dict: a dictionary containing filled information
+    :return: val_un: a dictionary containing the unit and value
+    """
     val_un = {'unit': parse_input_value('unit', '', True, str, result_dict),
               'value': parse_input_value('value', '', False, int, result_dict)}
     return val_un
 
 
-def get_list_value_unit(result_dict, factor):
-    print(f'\nPlease enter the unit for factor {factor}:')
+def get_list_value_unit(result_dict, ex_factor):
+    """
+    This function prompts the user to enter a list of value_units.
+    :param result_dict: a dictionary containing filled information
+    :param factor: the experimental factor that contains the value_unit
+    :return: a dictionary containing a unit and a list of values
+    """
+    print(f'\nPlease enter the unit for factor {ex_factor}:')
     unit = parse_input_value('unit', '', True, 'select', result_dict)
     val_un = []
-    print(f'\nPlease enter int values for factor {factor} (in {unit}) '
+    print(f'\nPlease enter int values for factor {ex_factor} (in {unit}) '
           f'divided by comma:')
     value = parse_input_list('number', False)
     for val in value:
