@@ -327,7 +327,7 @@ The following examples show how such a link can be built into various whitelists
 
 __Example 1 : plain__
 
-This example shows what a link in a whitelist of type 'plain' can look like. Assume that a key setting_technique appears in the experimental setting section whereas a key technique is located in the technical details section. The former represents the sequencing technique used for the respective experimental setting. The latter summarizes all sequencing techniques used in the experiment. The possible techniques are the same in both fields.
+This example shows what a link in a whitelist of type 'plain' can look like. Assume that a key setting_technique appears in the experimental setting section whereas a key technique is located in the technical details section. The former represents the measurement technique used for the respective experimental setting. The latter summarizes all measurement techniques used in the experiment. The possible techniques are the same in both fields.
 
 <table>
 <tr>
@@ -345,17 +345,30 @@ whitelists/setting_technique<br>
 <tr>
 <td> 
 <div>
-TBA
+For this example it is assumed that<br> 
+under 'experimental_setting' a new <br>
+key 'setting_technique' is added, <br>
+which contains the measurement of <br>
+the samples per experimental <br>  
+setting. All used techniques are <br>
+then summarized again in a list <br>
+under 'technical_details'.
 </div>
 </td> 
 <td> 
 <div>
-TBA
+In the whitelist for technique all <br>
+possible techniques for sample <br>
+measurement are already defined.
 </div>
 </td>
 <td> 
 <div>
-TBA
+For the whitelist <br>
+'setting_technique' the values can <br>
+be adopted from the whitelist <br>
+'technique' by specifying its path <br>
+under the key 'whitelist'. 
 </div>
 </td>
 </tr>
@@ -363,7 +376,29 @@ TBA
 <td>
 
 ```yaml
-TBA
+experimental_setting:
+  ...
+  value:
+    setting_technique:
+      mandatory: True
+      list: False
+      display_name: 'Technique'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: select
+technical_details:
+  ...
+  value:
+    technique:
+      mandatory: True
+      list: True
+      display_name: 'Technique'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: select
+
 ```
 
 </td>
@@ -394,52 +429,168 @@ whitelist: technique
 
 __Example 2 : group__
 
-TBA enrichment
-
-__Example 3 : depend__
-
-If independent whitelist files already exist for the keys and the files are located in the folder whitelists and named exatly like the respective key, those keys can be omitted and the metadata tool reads the existing files as whitelist. This is e.g. the case for the whitelist 'values'. The key 'values' in the metadata structure contains the examined values of the examined experimental factor. So the whitelist for 'values' depends on the whitelist 'factor'. Since each experimental factor has its own whitelist, the keys for the experimental factors in the whitelist for 'value' can be omitted. Thus, the existing files are read in as whitelist.
-
-
+This example shows how a link in a whitelist of type "group" can look like. For this we consider the whitelist of 'enrichment'.
 
 <table>
 <tr>
+<th>
+whitelists/enrichment
+</th>
+<th>
+whitelists/gene
+</th>
+</tr>
+<tr>
 <td> 
-<b>whitelists/values</b><br>The whitelist for values depends on the entered 'factor'. The value 'factor' is therefore assigned to the 'ident_key'.
-</td> 
-<td> 
-<b>whitelists/factor</b><br>The key 'factor' also has a whitelist. All values specified in the whitelist 'factor' form possible keys in the whitelist 'values'.
+<div>
+The whitelist for enrichment is grouped into 'histone marks', 'proteins'<br>
+and 'other'. The proteins correspond to the genes specified in the gene<br>
+whitelist for each organism. By specifying the path to 'gene' whitelist,<br>
+it can be linked under 'proteins', so that for this section the values<br>
+from gene whitelist are adopted.
+</div>
 </td>
 <td> 
-<b>whitelists/genotype</b><br>For the values in the whitelist 'factor' (e.g. genotype) there are separate whitelists named after the respective value. The values therefore no longer have to be specified as keys in the whitelist 'values'. The metadata tool reads the already existing files as whitelist.
+<div>
+The gene whitelist depends on the organism. This means that the 'proteins'<br>
+part of the 'enrichment' whitelist is also dependent on the organism.
+</div>
+</td>
+</tr>
+<tr>
+<td>
+
+```yaml
+whitelist_type: group
+whitelist:
+    histone marks:
+        - H2BK12ac
+        - H2BK20ac
+        ...
+    proteins: gene
+    other:
+        - dmR24
+        - dmR24delta
+        ...
+```
+
+</td>
+<td>
+
+```yaml
+whitelist_type: depend
+ident_key: organism_name
+whitelist:
+    human: genes/human
+    mouse: genes/mouse
+    zebrafish: genes/zebrafish
+    rat: genes/rat
+    pig: genes/pig
+    medaka: genes/medaka
+    chicken: genes/chicken
+    drosophila: genes/drosophila
+    yeast: genes/yeast
+```
+
+</td>
+</tr>
+</table>
+
+
+__Example 3 : depend__
+
+Links can also be added for dependent whitelists. There are two ways to do this. Firstly, the paths to existing whitelists can be specified, as has already been done for 'plain' and 'group'. On the other hand, the keys under 'whitelist' can be omitted if the linked whitelist is named the same as the value it depends on. The following table shows both possibilities using the example of the whitelist for the key 'values'.
+
+<table>
+<tr>
+<th> 
+whitelists/factor
+</th>
+<th> 
+whitelists/values
+</th> 
+<th> 
+whitelists/values
+</th> 
+</tr>
+<tr>
+<td> 
+The whitelist for the experimental factors<br> 
+is displayed here for overview. The values<br>
+ in the whitelist for 'values' depend on <br>
+ the factor entered from this list.          
+</td>                                      
+<td>                                       
+The whitelist for values depends on the <br>
+entered value under 'factor' and the <br>  
+possible values should correspond to the <br>
+values of the selected factor. For this <br>
+reason, for each key under 'whitelist', <br>
+the corresponding whitelist of the <br>   
+experimental factor is linked.            
+</td>                                     
+<td>                                      
+Each key in column two under 'whitelist' <br>
+represents an experimental factor. The <br>
+linked whitelist files show that the <br> 
+respective whitelist is named the same as <br>
+the factor whose possible values it <br>
+contains. For this reason, it is possible <br>
+to omit the keys for the experimental <br>
+factors, since the program automatically <br>
+searches for a whitelist with the same <br>
+name as the key/experimental factor.
 </td> 
 </tr>
 <tr>
 <td>
 
 ```yaml
+whitelist_type: plain
+whitelist:
+    - genotype
+    - tissue
+    - cell_type
+    - knockdown
+    - gender
+    - life_stage
+    - age
+    - ethnicity
+    - gene
+    - disease
+    - treatment
+    - time_point
+    - flow
+    - enrichment
+    - body_mass_index
+    - injury
+```
+
+</td>
+<td>
+
+```yaml
 whitelist_type: depend
 ident_key: factor
+whitelist:
+  genotype: genotype
+  tissue: tissue
+  cell_type: cell_type
+  knockdown: knockdown
+  gender: gender
+  life_stage: life_stage
+  ethnicity: ethnicity
+  gene: gene
+  flow: flow
+  enrichment: enrichment
 ```
-
 </td>
+
 <td>
 
-```text
-genotype
-tissue
-cell_type
-knockdown
-gender
-...
-```
-</td>
-
-<td>
-
-```text
-Mut
-WT
+```yaml
+whitelist_type: depend
+ident_key: factor
 ```
 </td>
 </tr>
@@ -447,16 +598,31 @@ WT
 
 ### Subdivide whitelists into smaller files
 
-__Example:__
+If whitelists are very long, it may make sense to split them into smaller whitelists. This is especially helpful if the files are in a dependent whitelist. This way a separate whitelist file can be created for each key under 'whitelist'. This speeds up reading and processing, because in this case not all whitelist values have to be imported, but only those that fulfill the dependency. The following example shows the splitting of the whitelists for the whitelist 'gene'.
 
+__Example:__
 
 <table>
 <tr>
+<th> 
+whitelists/gene
+</th> 
+<th> 
+whitelists/genes/human
+</th>
+</tr>
+<tr>
 <td> 
-<b>whitelists/gene</b><br>The whitelists for the genes per organism are very long, which is why they are outsourced to individual files. The keys are named after the organisms and the path to the respective whitelist is given as value. 
+The whitelists for the genes per organism are very long, which is<br>
+why they are outsourced to individual files. The keys are named <br>
+after the organisms and the path to the respective whitelist is <br>
+given as value. 
 </td> 
 <td> 
-<b>whitelists/genes/human</b><br>For the whitelists per organism a new folder 'genes' was created. The whitelists are named after the organism for which they contain the genes. The naming of the files does not follow any fixed rule but is subject to personal preference. 
+For the whitelists per organism a new folder 'genes' was created.<br>
+The whitelists are named after the organism for which they <br>
+contain the genes. The naming of the files does not follow any <br>
+fixed rule but is subject to personal preference. 
 </td>
 </tr>
 <tr>
@@ -482,53 +648,6 @@ DPM1_ENSG00000000419
 SCYL3_ENSG00000000457
 C1orf112_ENSG00000000460
 ...
-```
-</td>
-</tr>
-</table>
-
-If independent whitelist files already exist for the keys and the files are located in the folder whitelists and named exatly like the respective key, those keys can be omitted and the metadata tool reads the existing files as whitelist. This is e.g. the case for the whitelist 'values'. The key 'values' in the metadata structure contains the examined values of the examined experimental factor. So the whitelist for 'values' depends on the whitelist 'factor'. Since each experimental factor has its own whitelist, the keys for the experimental factors in the whitelist for 'value' can be omitted. Thus, the existing files are read in as whitelist.
-
-
-
-<table>
-<tr>
-<td> 
-<b>whitelists/values</b><br>The whitelist for values depends on the entered 'factor'. The value 'factor' is therefore assigned to the 'ident_key'.
-</td> 
-<td> 
-<b>whitelists/factor</b><br>The key 'factor' also has a whitelist. All values specified in the whitelist 'factor' form possible keys in the whitelist 'values'.
-</td>
-<td> 
-<b>whitelists/genotype</b><br>For the values in the whitelist 'factor' (e.g. genotype) there are separate whitelists named after the respective value. The values therefore no longer have to be specified as keys in the whitelist 'values'. The metadata tool reads the already existing files as whitelist.
-</td> 
-</tr>
-<tr>
-<td>
-
-```yaml
-whitelist_type: depend
-ident_key: factor
-```
-
-</td>
-<td>
-
-```text
-genotype
-tissue
-cell_type
-knockdown
-gender
-...
-```
-</td>
-
-<td>
-
-```text
-Mut
-WT
 ```
 </td>
 </tr>

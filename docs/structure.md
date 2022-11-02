@@ -6,20 +6,22 @@ For each key, its properties are stored within a list. The keys are distinguishe
 
 The following properties are defined for each key in the specified order:
 
-Position | Description | Value
+Property | Description | Value
 -------- | -------- | --------
-1   | A boolean value indicating weather the key is mandatory   | True/False
-2   | A boolean value indicating weather the key is a list   | True/False
-3   | A name to describe the key    |  '[name]' or '' if there is no name
-4   | A text to descripe the key    |  '[description]' or '' if there is no description
-5   | A default value to the key    |  '[value]' or None or [key]:[properties] if the value is a dictionary
-6   | A boolean value indicating whether there is a whitelist of allowed values for the value of the key | True/False
-7   | The HTML input type for the key value | input type
-8   | The HTML data type for the key value | data type
+mandatory | True/False  | A boolean value indicating weather<br>the key is mandatory   
+list  | True/False |      A boolean value indicating weather<br>the key is a list   
+display_name   |          '[name]' or '' if there <br>is no name | A name to describe the key   
+desc  |  '[description]' or '' if <br>there is no description | A text to descripe the key    
+value |  '[value]' or None or <br>[key]:[properties] if the<br>value is a dictionary  | A default value to the key    
+whitelist  | True/False | A boolean value indicating whether<br>there is a whitelist of allowed <br>values for the value of the key 
+input_type  | input type | The input type for the key value 
 
-The properties 6-8 are only be specified for leaf nodes.
+The properties 'whitelist' and 'input_type' are specified only for keys that expect direct user input.
+Detailed instructions on how to add the properties for new keys can be found under [Adding keys](add_keys.md).
 
 # Included keys
+
+The following extract shows all keys that have already been created in the metadata structure under 'keys.yaml'.
 
 ```yaml
 project:
@@ -72,6 +74,9 @@ experimental_setting:
                         disease_status:
                         disease_type:
                         disease_stage:
+                injury:
+                    injury_status:
+                    injury_type:
                 treatment_information:
                     treated:
                     treatment:
@@ -85,6 +90,7 @@ experimental_setting:
                     unit:
                 flow:
                 knockdown:
+                body_mass_index:
                 donor_count:
                 technical_replicates:
                     count:

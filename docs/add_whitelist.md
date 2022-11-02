@@ -36,3 +36,14 @@ ident_key: 'organism_name'
 whitelist:
 
 ```
+
+#### abbrev
+
+An abbreviation whitelist is located inside the 'whitelists' folder in the subfolder 'abbrev' and is named after the key for whose values it contains a whitelist. Per whitelist the 'whitelist_type' is defined again, in this case with 'abbrev'. Under the key 'whitelist' all values are specified as key, which should be abbreviated, as well as their abbreviations. Detailed instructions for adding values are described under '[Add values to whitelist](add_whitelist_values.md)'.
+
+```yaml
+whitelist_type: 'abbrev'
+whitelist:
+
+```
+

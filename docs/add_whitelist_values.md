@@ -230,3 +230,83 @@ whitelist:
 </table>
 
 [1] [https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism)
+
+__abbrev__:
+
+Abbreviation whitelists are created for all values and keys that can occur in generated file names. This concerns all experimental factors and their values, as well as all organism names. In this example, an experimental factor 'injury' was added to the whitelist 'factor', for which an abbreviation must now be created in the abbreviation whitelist of 'factor'.
+
+<table>
+<tr>
+<th>
+factor
+</th>
+<th>
+abbrev/factor
+</th>
+</tr>
+<tr>
+<td>
+The illustrated yaml file shows the whitelist for experimental <br>
+factors where 'injury' has been added.
+</td>
+<td>
+A new key must now be added to the abbreviation whitelist for <br>
+'injury'. This key 'injury' then contains an abbreviation as <br>
+value. Abbreviations may only contain letters and numbers. <br>
+Please note that the created abbreviation may only appear once <br>
+in the whitelist. For 'injury' the abbreviation 'inj' was <br>
+defined.
+</td>
+</tr>
+<tr valign="top">
+<td> 
+<div>
+
+```yaml
+whitelist_type: plain
+whitelist:
+    - genotype
+    - tissue
+    - cell_type
+    - knockdown
+    - gender
+    - life_stage
+    - age
+    - ethnicity
+    - gene
+    - disease
+    - treatment
+    - time_point
+    - flow
+    - enrichment
+    - body_mass_index
+    - injury
+```
+
+</div>
+</td> 
+<td> 
+<div>
+
+```yaml
+whitelist_type: abbrev
+whitelist:
+    genotype: gnt
+    tissue: tis
+    cell_type: clt
+    knockdown: knd
+    gender: gnd
+    life_stage: lfs
+    ethnicity: eth
+    disease: dis
+    treatment: trt
+    time_point: tmp
+    enrichment: enr
+    bode_mass_index: bmi
+    injury: inj
+```
+
+</div>
+</td>
+</tr>
+</table>
