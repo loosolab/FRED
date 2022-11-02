@@ -227,7 +227,7 @@ whitelist:
 <td> 
 <div>
 
- ```yaml
+```yaml
 whitelist_type: abbrev
 whitelist:
     cryoinjury: cryo
