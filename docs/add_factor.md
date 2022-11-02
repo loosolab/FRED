@@ -166,7 +166,8 @@ injury_status
 injury_type
 </th>
 </tr>
-<tr valign="top">
+
+<tr>
 <td> 
 <div>
 
@@ -182,7 +183,7 @@ whitelist:
 <td> 
 <div>
 
- ```yaml
+```yaml
 whitelist_type: plain
 whitelist:
     - cryoinjury
