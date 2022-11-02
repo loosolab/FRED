@@ -5,7 +5,7 @@ To add a key to the data structure the file [keys.yaml](https://gitlab.gwdg.de/l
 ### Example
 
 The following code fragment shows a section of the '[keys.yaml](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/keys.yaml)'. You can see the 'project' part, which contains an 'id'. 
-In this example, first a key "owner" is added to the 'project' part to create a new subsection. Step-by-step instructions are given in section [A](#a:-adding-a-key-as-section). Then, a key 'name' is added to the 'owner' section, which expects input from the user. The instructions for adding this key are described in section [B](#b:-adding-a-key-with-value).
+In this example, first a key "owner" is added to the 'project' part to create a new subsection. Step-by-step instructions are given in [section A](#a---adding-a-key-as-section). Then, a key 'name' is added to the 'owner' section, which expects input from the user. The instructions for adding this key are described in [section B](#b---adding-a-key-with-value).
 
 ```yaml
 project:
@@ -24,7 +24,7 @@ project:
       input_type: 'short_text'
 ```
 
-#### A: Adding a key as section
+#### A - Adding a key as section
 
 To add the key 'owner' to [keys.yaml](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/keys.yaml), you first have to find the place where you want to add it. In this example the 'owner' key should be on the same level as 'id' and is therefore added in the same list element as 'id' and with the same indentation.
 
@@ -92,7 +92,7 @@ The element 'desc' of the property list specifies a description of the key as it
 
 ##### 5. Value
 
-The last property to be specified is 'value'. For keys that act as section headers, the subordinate keys are specified here. If the subordinate key is to contain further keys, the steps from section [A](#a:-adding-a-key-as-section) must be repeated in order to add it. If the user is expected to enter a value for the subordinate key, the steps from section [B](#b:-adding-a-key-with-value) must be followed to include it. In this example, a name is to be defined for the 'owner'. For the name a direct user input is required. Therefore, the steps in section [B](#b:-adding-a-key-with-value) must be followed to add the key 'name'.
+The last property to be specified is 'value'. For keys that act as section headers, the subordinate keys are specified here. If the subordinate key is to contain further keys, the steps from [section A](#a---adding-a-key-as-section) must be repeated in order to add it. If the user is expected to enter a value for the subordinate key, the steps from section [section B](#b---adding-a-key-with-value) must be followed to include it. In this example, a name is to be defined for the 'owner'. For the name a direct user input is required. Therefore, the steps in section [section B](#b---adding-a-key-with-value) must be followed to add the key 'name'.
 
 ```yaml
     owner:
@@ -103,7 +103,7 @@ The last property to be specified is 'value'. For keys that act as section heade
       value:
 ```
 
-#### B: Adding a Key with value
+#### B - Adding a Key with value
 
 To add a key, you must first find the appropriate position and indentation for it in the [keys.yaml](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/keys.yaml). In this example we add a key 'name' to the 'owner' added in section A. It is placed inside the 'owner' under 'value'. 
 

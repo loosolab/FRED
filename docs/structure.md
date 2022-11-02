@@ -17,7 +17,7 @@ whitelist  | True/False | A boolean value indicating whether<br>there is a white
 input_type  | input type | The input type for the key value 
 
 The properties 'whitelist' and 'input_type' are specified only for keys that expect direct user input.
-Detailed instructions on how to add the properties for new keys can be found under [Adding keys](add_keys.md).
+Detailed instructions on how to add the properties for new keys can be found under [Add keys](add_keys.md).
 
 # Included keys
 

@@ -14,5 +14,6 @@ nav:
         - Extend structure:
             - Add values to whitelist: add_whitelist_values.md
             - Add new Whitelist: add_whitelist.md
-            - Adding keys: add_keys.md
+            - Add keys: add_keys.md
+            - Add experimental factor: add_factor.md 
 theme: readthedocs

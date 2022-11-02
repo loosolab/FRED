@@ -6,7 +6,7 @@ In this example, we want to add a new experimental factor that can be used to sp
 ### Step 1: Add experimental factor to general structure
 
 In the first step, the new experimental factor 'injury' must be added to 'keys.yaml'. The key should serve as a heading for a new section containing the subordinate keys 'injury_status' and 'injury_type'.
-For the key 'injury' the instructions from section A on adding keys have to be followed. The position for experimental factors is fixed in the 'keys.yaml'. They must be located within the 'experimental_setting' under 'conditions',  'biological_replicates' and there under 'samples' in the key 'value'. Within the keys in 'value' the new experimental factor should be below the mandatory fields 'sample_name'. 'pooled' and 'number_of_measurements' and above 'donor_count' and 'technical_replicates' to maintain clarity. After following the steps described in section A, the resulting structure in 'keys.yaml' is shown below. 
+For the key 'injury' the instructions from section A on adding keys have to be followed. The position for experimental factors is fixed in the 'keys.yaml'. They must be located within the 'experimental_setting' under 'conditions',  'biological_replicates' and there under 'samples' in the key 'value'. Within the keys in 'value' the new experimental factor should be below the mandatory fields 'sample_name'. 'pooled' and 'number_of_measurements' and above 'donor_count' and 'technical_replicates' to maintain clarity. After following the steps described in section A under '[Add keys](add_keys.md)', the resulting structure in 'keys.yaml' is shown below. 
 
 ```yaml
 experimental_setting:
@@ -43,7 +43,7 @@ experimental_setting:
                   ...
 ```
 
-Now the keys 'injury_status' and 'injury_type' must be added under 'value' in the key 'injury'. A user input is expected for these keys, so the instructions from section B for adding keys must be followed for each key. The following snippet shows the resulting structure.
+Now the keys 'injury_status' and 'injury_type' must be added under 'value' in the key 'injury'. A user input is expected for these keys, so the instructions from section B under '[Add keys](add_keys.md)' for adding keys must be followed for each key. The following snippet shows the resulting structure.
 
 ```yaml
 experimental_setting:
