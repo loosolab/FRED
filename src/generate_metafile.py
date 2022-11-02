@@ -45,13 +45,15 @@ def generate_file(path, input_id, name, mandatory_mode):
     global id
     id = input_id
 
-    # TODO: overwrite?
     # test if metadata for give id already exists
     if os.path.exists(
             os.path.join(path, f'{input_id}_metadata.yaml')) or os.path.exists(
             os.path.join(path, f'{input_id}_metadata.yml')):
-        sys.exit(
-            f'The metadata file for ID {input_id} already exists.')
+        print(f'The metadata file for ID {input_id} already exists.')
+        overwrite = parse_list_choose_one([True, False],
+                              f'\nDo you want to overwrite the file?')
+        if not overwrite:
+            sys.exit(f'Program terminated.')
 
     # read in structure file
     key_yaml = utils.read_in_yaml(
