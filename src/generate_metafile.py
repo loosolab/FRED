@@ -924,7 +924,7 @@ def fill_replicates(condition, bio, input_pooled, node,
         # structure
         samples = merge_dicts(
             samples, fill_metadata_structure(
-                node['biological_replicated']
+                node['biological_replicates']
                 ['value']['samples']['value'], 'samples', samples,
                 False, mandatory_mode, result_dict, False, False))
 
