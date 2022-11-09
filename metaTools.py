@@ -1,5 +1,7 @@
 import argparse
 import pathlib
+import git
+import os
 from src import generate_metafile
 from src import find_metafiles
 
@@ -76,4 +78,12 @@ def main():
 
 
 if __name__ == "__main__":
+
+    if not os.path.exists('metadata_whitelists'):
+        git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', 'metadata_whitelists')
+    else:
+        repo = git.Repo('metadata_whitelists')
+        o = repo.remotes.origin
+        o.pull()
+        
     main()
