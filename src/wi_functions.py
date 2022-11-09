@@ -24,6 +24,9 @@ def get_empty_wi_object():
     :return: wi_object: object containing all information from the keys.yaml
     in a format readable by the web interface
     """
+    os.system('git submodule update --recursive --remote')
+
+
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
