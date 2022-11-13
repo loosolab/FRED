@@ -27,10 +27,12 @@ def get_empty_wi_object():
     """
     if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists')):
         git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
+        print('CLONE')
     else:
         repo = git.Repo(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
         o = repo.remotes.origin
         o.pull()
+        print('PULL')
 
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
