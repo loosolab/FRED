@@ -10,6 +10,7 @@ import copy
 import pytz
 from dateutil import parser
 import multiprocessing
+import git
 import time
 
 # This script contains all functions for generation of objects for the web
@@ -24,8 +25,12 @@ def get_empty_wi_object():
     :return: wi_object: object containing all information from the keys.yaml
     in a format readable by the web interface
     """
-    os.system('git submodule update --recursive --remote')
-
+    if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists')):
+        git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
+    else:
+        repo = git.Repo(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
+        o = repo.remotes.origin
+        o.pull()
 
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
