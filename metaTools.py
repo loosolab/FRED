@@ -85,5 +85,5 @@ if __name__ == "__main__":
         repo = git.Repo('metadata_whitelists')
         o = repo.remotes.origin
         o.pull()
-        
+
     main()

@@ -91,7 +91,7 @@ def read_whitelist(key):
     try:
         whitelist = read_in_yaml(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
-                         'whitelists', key))
+                         'metadata_whitelists', 'whitelists', key))
     except (AttributeError, FileNotFoundError):
         try:
             whitelist = [w for w in open(
@@ -116,7 +116,8 @@ def read_grouped_whitelist(whitelist, filled_object):
         if not isinstance(whitelist['whitelist'][key], list) and \
                 os.path.isfile(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                             '..', 'whitelists', whitelist['whitelist'][key])):
+                             '..', 'metadata_whitelists', 'whitelists',
+                             whitelist['whitelist'][key])):
             whitelist['whitelist'][key] = \
                 get_whitelist(whitelist['whitelist'][key], filled_object)
             if isinstance(whitelist['whitelist'][key], dict):
@@ -163,11 +164,13 @@ def read_depend_whitelist(whitelist, depend):
     if depend in whitelist:
         whitelist = whitelist[depend]
     elif os.path.isfile(os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), '..', 'whitelists', depend)):
+            os.path.abspath(__file__)), '..', 'metadata_whitelists',
+            'whitelists', depend)):
         whitelist = read_whitelist(depend)
     if not isinstance(whitelist, list) and not isinstance(whitelist, dict) \
             and os.path.isfile(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists',
+            os.path.dirname(os.path.abspath(__file__)), '..',
+            'metadata_whitelists', 'whitelists',
             whitelist)):
         whitelist = read_whitelist(whitelist)
     return whitelist
