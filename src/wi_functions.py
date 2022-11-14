@@ -34,7 +34,7 @@ def get_empty_wi_object():
         o.pull()
         print('PULL')
 
-    tech1 = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists', 'technique'))
+    tech1 = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists', 'whitelists', 'technique'))
     print(tech1)
 
     tech2 = utils.get_whitelist('technique', {})
