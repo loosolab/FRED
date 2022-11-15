@@ -115,7 +115,6 @@ def read_grouped_whitelist(whitelist, filled_object):
             whitelist['whitelist'][key] = \
                 get_whitelist(whitelist['whitelist'][key], filled_object)
             if isinstance(whitelist['whitelist'][key], dict):
-
                 if whitelist['whitelist'][key]['whitelist_type'] == 'depend':
                     if whitelist['whitelist'] and 'whitelist' in \
                             whitelist['whitelist']:
@@ -136,12 +135,13 @@ def read_grouped_whitelist(whitelist, filled_object):
     w = [f'{x}' for xs in list(whitelist['whitelist'].keys()) if
          whitelist['whitelist'][xs] is not None for x in
          whitelist['whitelist'][xs] if x is not None]
+
     if len(w) > 30:
         new_whitelist = copy.deepcopy(whitelist)
         new_whitelist['whitelist'] = w
         new_whitelist['whitelist_keys'] = list(whitelist['whitelist'].keys())
-        whitelist['whitelist'] = new_whitelist
-        whitelist['whitelist_type'] = 'group'
+        whitelist = new_whitelist
+        whitelist['whitelist_type'] = 'plain_group'
     if len(list(headers.keys())) > 0:
         whitelist['headers'] = headers
     return whitelist
@@ -182,6 +182,7 @@ def get_whitelist(key, filled_object):
     plain = False
     abbrev = False
     whitelist = read_whitelist(key)
+
     while isinstance(whitelist,
                      dict) and not group and not stay_depend and not \
             plain and not abbrev:
@@ -202,12 +203,14 @@ def get_whitelist(key, filled_object):
                                                   depend[0].split(' ')[0])
             else:
                 stay_depend = True
+
     if group:
-        for key in whitelist['whitelist']:
-            if whitelist['whitelist'][key] is not None and key != 'headers' \
-                    and key != 'whitelist_type' and key != 'whitelist_keys':
-                whitelist['whitelist'][key] = sorted(
-                    whitelist['whitelist'][key])
+        if whitelist['whitelist_type']!= 'plain_group':
+            for key in whitelist['whitelist']:
+                if whitelist['whitelist'][key] is not None and key != 'headers' \
+                        and key != 'whitelist_type' and key != 'whitelist_keys':
+                    whitelist['whitelist'][key] = sorted(
+                        whitelist['whitelist'][key])
 
     elif whitelist and not stay_depend and not plain and not abbrev:
         whitelist = sorted(whitelist)

@@ -599,7 +599,8 @@ def get_whitelist_object(item, organism_name, whitelists):
                                             {'organism': organism_name})
             if whitelist['whitelist_type'] == 'group':
                 input_type = 'group_select'
-            if whitelist['whitelist_type'] == 'plain':
+            if whitelist['whitelist_type'] == 'plain' or \
+                    whitelist['whitelist_type'] == 'plain_group':
                 whitelist = whitelist['whitelist']
         elif input_type == 'bool':
             whitelist = [True, False]
