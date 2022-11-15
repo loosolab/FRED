@@ -243,8 +243,8 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \
             and os.path.isfile(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..', 'whitelists',
-            whitelist)):
+            os.path.dirname(os.path.abspath(__file__)), '..',
+            'metadata_whitelists', 'whitelists', whitelist)):
         whitelist = utils.read_whitelist(whitelist)
         if whitelist:
             whitelist = whitelist['whitelist']
