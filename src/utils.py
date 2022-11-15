@@ -93,13 +93,7 @@ def read_whitelist(key):
             os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                          'metadata_whitelists', 'whitelists', key))
     except (AttributeError, FileNotFoundError):
-        try:
-            whitelist = [w for w in open(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
-                             'whitelists', key)).read().splitlines() if
-                         w.strip()]
-        except FileNotFoundError:
-            whitelist = None
+        whitelist = None
     return whitelist
 
 
