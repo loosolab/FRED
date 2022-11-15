@@ -27,18 +27,10 @@ def get_empty_wi_object():
     """
     if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists')):
         git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
-        print('CLONE')
     else:
         repo = git.Repo(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
         o = repo.remotes.origin
         o.pull()
-        print('PULL')
-
-    tech1 = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists', 'whitelists', 'technique'))
-    print(tech1)
-
-    tech2 = utils.get_whitelist('technique', {})
-    print(tech2)
 
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
@@ -1058,6 +1050,13 @@ def get_search_mask():
     :return: a dictionary containing all keys of the metadata structure and a
              whitelist object
     """
+    if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists')):
+        git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
+    else:
+        repo = git.Repo(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
+        o = repo.remotes.origin
+        o.pull()
+
     key_yaml = utils.read_in_yaml(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                      'keys.yaml'))
