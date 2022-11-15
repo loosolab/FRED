@@ -283,8 +283,6 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                     k_val['position'] = k
                     k_val['value'] = []
                     val.append(k_val)
-                if len(val) == 1:
-                    val[0]['required'] = True
                 val.append({'displayName': 'Multi', 'position': 'multi',
                             'whitelist': [True, False], 'input_type': 'bool',
                             'value': False})
@@ -348,7 +346,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
         node = list(utils.find_keys(key_yaml, key))[0]
         new_w = [
             {'whitelist': whitelist, 'position': key,
-             'displayName': node['display_name'],
+             'displayName': node['display_name'], 'required': True,
              'input_type': input_type, 'whitelist_type': whitelist_type},
             {'displayName': 'Multi', 'position': 'multi',
              'whitelist': [True, False], 'input_type': 'bool',
