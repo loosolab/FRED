@@ -983,7 +983,7 @@ def save_object(dictionary, path, filename):
     :param filename: the name of the file
     :return: new_filename: the name under which the file was saved
     """
-    metafiles = metaTools_functions.find(path,
+    metafiles = find_metafiles.find_projects(path,
                                          f'id:"{dictionary["project"]["id"]}"',
                                          False)
     if len(metafiles) > 0:
