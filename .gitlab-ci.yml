@@ -3,11 +3,7 @@ image: python:3.8-buster
 before_script:
   - pip install -r requirements.txt
 
-test_whitelists:
-  stage: test
-  script:
-    - test/test_whitelists.py
-      
+
 pages:
   stage: deploy
   script:
