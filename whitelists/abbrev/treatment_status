@@ -1,5 +1,0 @@
-whitelist_type: abbrev
-whitelist:
-    not treated: not
-    currently treated: curr
-    formerly treated: form

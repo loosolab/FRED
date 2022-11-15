@@ -1,4 +1,0 @@
-whitelist_type: abbrev
-whitelist:
-    injury_status: sts
-    injury_type: tp
