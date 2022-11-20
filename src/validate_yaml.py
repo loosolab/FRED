@@ -24,6 +24,7 @@ def validate_file(metafile):
     invalid_keys: a list containing the invalid keys
     invalid_entries: a list containing the invalid entries -> (key, [values])
     """
+    print(metafile)
     valid = True
     key_yaml = utils.read_in_yaml(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
@@ -378,7 +379,6 @@ def validate_logic(metafile):
     ref_genome_warn = []
     samples = list(utils.find_keys(metafile, 'samples'))
     for cond in samples:
-        print(cond)
         for sample in cond:
             warning, warn_message = validate_donor_count(sample['pooled'],
                                                          sample['donor_count'])
