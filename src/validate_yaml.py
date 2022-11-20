@@ -379,6 +379,7 @@ def validate_logic(metafile):
     samples = list(utils.find_keys(metafile, 'samples'))
     for cond in samples:
         for sample in cond:
+            print(sample)
             warning, warn_message = validate_donor_count(sample['pooled'],
                                                          sample['donor_count'])
             if warning:
