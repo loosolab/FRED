@@ -24,7 +24,8 @@ def validate_file(metafile):
     invalid_keys: a list containing the invalid keys
     invalid_entries: a list containing the invalid entries -> (key, [values])
     """
-    print(metafile)
+    pool_warn = []
+    ref_genome_warn = []
     valid = True
     key_yaml = utils.read_in_yaml(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
@@ -36,7 +37,8 @@ def validate_file(metafile):
     if len(missing_mandatory_keys) > 0 or len(invalid_keys) > 0 or len(
             invalid_entries) > 0 or len(invalid_value) > 0:
         valid = False
-    pool_warn, ref_genome_warn = validate_logic(metafile)
+    #else:
+    #    pool_warn, ref_genome_warn = validate_logic(metafile)
     return valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
         invalid_value, pool_warn, ref_genome_warn
 
@@ -155,6 +157,8 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                 if len(new_yaml) > 0:
                     if key not in new_yaml[0]['value']:
                         invalid_keys.append(key)
+                    elif isinstance(metafile[key], list) != new_yaml[0]['list']:
+                        invalid_keys.append(key)
                 else:
                     invalid_keys.append(key)
             elif key not in key_yaml:
@@ -171,6 +175,8 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     if len(node) > 0:
                         if 'input_type' in node:
                             input_type = node['input_type']
+                elif isinstance(metafile[key], list) != key_yaml[key]['list']:
+                    invalid_keys.append(key)
                 elif 'input_type' in key_yaml[key]:
                     input_type = key_yaml[key]['input_type']
                 res_keys, res_entries, res_values = new_test(
@@ -266,11 +272,11 @@ def test_for_mandatory(metafile, key_yaml, invalid_keys):
     missing_keys = []
     for key in key_yaml:
         missing_keys += get_missing_keys(key_yaml[key], metafile,
-                                         invalid_keys, key, [])
+                                         invalid_keys, key, [], len(metafile[key]) if key in metafile and key_yaml[key]['list'] else 1)
     return missing_keys
 
 
-def get_missing_keys(node, metafile, invalid_keys, pre, missing):
+def get_missing_keys(node, metafile, invalid_keys, pre, missing, list_len):
     """
     This function tests if all mandatory keys from the structure file
     'keys.yaml' are present in the metadata file.
@@ -280,24 +286,36 @@ def get_missing_keys(node, metafile, invalid_keys, pre, missing):
     :param pre: a string to save and chain keys in order to save their position
     :param missing: a list to save the missing mandatory keys
     """
-    res = find_key(metafile, pre, node['list'], node['value'], invalid_keys)
 
-    if node['mandatory']:
-        missing += res
+    metafile = find_key(metafile, pre)
 
-    if node['mandatory'] or len(res) == 0:
-        if isinstance(node['value'], dict) and set(['mandatory', 'list',
+    if len(metafile) == 0:
+        if node['mandatory']:
+            missing.append(pre)
+    else:
+         if pre.split(':')[-1] not in invalid_keys:
+            if isinstance(node['value'], dict) and not set(['mandatory', 'list',
                                                     'desc', 'display_name',
                                                     'value']) <= \
-                set(node['value'].keys()):
-            for key in node['value']:
-                missing = get_missing_keys(node['value'][key], metafile,
+            set(node['value'].keys()):
+                if isinstance(metafile[0], list):
+                    for elem in metafile[0]:
+                        for key in node['value']:
+                            missing = get_missing_keys(node['value'][key], elem,
                                            invalid_keys, pre + ':' + key,
-                                           missing)
-    return missing
+                                           missing, len(metafile[0]) if node['list'] else 1)
+                else:
+                    for key in node['value']:
+                        missing = get_missing_keys(node['value'][key], metafile[0],
+                                                   invalid_keys,
+                                                   pre + ':' + key,
+                                                   missing,
+                                                   len(metafile[0]) if node[
+                                                       'list'] else 1)
+    return list(set(missing))
 
 
-def find_key(metafile, key, is_list, values, invalid_keys):
+def find_key(metafile, key):
     """
     This function searches for a key of the keys.yaml in the metafile.
     :param metafile: the read in metadata file
@@ -307,20 +325,9 @@ def find_key(metafile, key, is_list, values, invalid_keys):
     :param invalid_keys: a list containing invalid keys that should be ignored
     :return: missing_keys: a list containing the missing mandatory keys
     """
-    missing_keys = []
     for k in key.split(':'):
-        metafile = list(utils.find_keys(metafile, k))
-    if len(metafile) == 0:
-        missing_keys.append(key)
-    elif is_list and isinstance(values, list):
-        for entry in metafile[0]:
-            for value in entry:
-                if value not in invalid_keys:
-                    if values[value]['mandatory']:
-                        for y in metafile[0]:
-                            if value not in y:
-                                missing_keys.append(key + ':' + value)
-    return missing_keys
+        new_metafile = list(utils.find_keys(metafile, k))
+    return new_metafile
 
 
 def validate_value(input_value, value_type, key):
