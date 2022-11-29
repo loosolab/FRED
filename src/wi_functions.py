@@ -714,21 +714,27 @@ def parse_part(wi_object, factors, organism, id, nom):
                 if isinstance(elem, dict):
                     if elem['position'].split(':')[-1] == 'condition':
 
+                        start = time.time()
                         samples = []
                         for sub_elem in elem['list_value']:
-                            nom = [x['value'] for x in sub_elem if
-                                   x['position'].split(':')[-1] ==
-                                   'number_of_measurements'][0]
 
-                            part_val = parse_part(sub_elem, factors, organism,
-                                                  id, nom)
+                            samples.append(get_sample(sub_elem, id, organism))
+                            #nom = [x['value'] for x in sub_elem if
+                            #       x['position'].split(':')[-1] ==
+                            #       'number_of_measurements'][0]
 
-                            samples.append(part_val)
+                            #part_val = parse_part(sub_elem, factors, organism,
+                            #                      id, nom)
+
+                            #samples.append(part_val)
 
                         val.append({'condition_name': elem['correct_value'],
                                     'biological_replicates':
                                         {'count': len(samples),
                                          'samples': samples}})
+
+                        end = time.time()
+                        print(end-start)
                     #else:
                     #    print(elem['position'])
                 elif isinstance(elem, list):
@@ -789,6 +795,56 @@ def parse_part(wi_object, factors, organism, id, nom):
         return parse_list_part(wi_object, factors, organism, id, nom)
 
     return val
+
+def get_sample(sub_elem, id, organism):
+    sample = {}
+    for elem in sub_elem:
+        if elem['list']:
+            if 'input_fields' in elem:
+                r = get_sample(elem['input_fields'], id, organism)
+                if len(r) > 0:
+                    sample[elem['position'].split(':')[-1]] = r
+            else:
+                res = []
+                for el in elem['list_value']:
+                    res.append(get_sample(el, id, organism))
+                if len(res) > 0:
+                    sample[elem['position'].split(':')[-1]] = res
+        else:
+            if 'correct_value' in elem:
+                sample_count = int(elem['value'].split('_')[-1])
+                sample[elem['position'].split(':')[-1]] = f'{elem["correct_value"]}_b{"{:02d}".format(sample_count)}'
+            elif 'value' in elem:
+                if elem['value'] is not None:
+                    if elem['input_type'] == 'value_unit':
+                        unit = elem['value_unit']
+                        value = elem['value']
+                        val = {'unit': unit, 'value': value}
+                    elif elem['input_type'] == 'date':
+                        default_time = parser.parse(elem['value'])
+                        timezone = pytz.timezone("Europe/Berlin")
+                        local_time = default_time.astimezone(timezone)
+                        val = local_time.strftime("%d.%m.%Y")
+                    else:
+                        val = elem['value']
+                    sample[elem['position'].split(':')[-1]] = val
+            else:
+                if elem['position'].split(':')[-1] == 'technical_replicates':
+                    sample_name = []
+                    count = [x['value'] for x in elem['input_fields'] if x['position'].split(':')[-1] == 'count'][0]
+                    for c in range(count):
+                        for m in range(sample['number_of_measurements']):
+                            sample_name.append(f'{id}_{organism}_'
+                                           f'{sample["sample_name"]}'
+                                           f'_t{"{:02d}".format(c + 1)}_'
+                                           f'm{"{:02d}".format(m + 1)}')
+                    sample['technical_replicates'] = {'count': count,
+                                                  'sample_name': sample_name}
+                else:
+                    res = get_sample(elem['input_fields'], id, organism)
+                    if len(res) > 0:
+                        sample[elem['position'].split(':')[-1]] = res
+    return sample
 
 
 def parse_list_part(wi_object, factors, organism, id, nom):
