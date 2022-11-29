@@ -800,16 +800,14 @@ def get_sample(sub_elem, id, organism):
     sample = {}
     for elem in sub_elem:
         if elem['list']:
-            if 'input_fields' in elem:
-                r = get_sample(elem['input_fields'], id, organism)
-                if len(r) > 0:
-                    sample[elem['position'].split(':')[-1]] = r
-            else:
-                res = []
-                for el in elem['list_value']:
-                    res.append(get_sample(el, id, organism))
-                if len(res) > 0:
-                    sample[elem['position'].split(':')[-1]] = res
+            res = []
+            for el in elem['list_value']:
+                r = get_sample(el, id, organism)
+                if isinstance(r, dict) and len(r.keys()) == 1 and list(r.keys())[0] == elem['position'].split(':')[-1]:
+                    r = r[elem['position'].split(':')[-1]]
+                res.append(r)
+            if len(res) > 0:
+                sample[elem['position'].split(':')[-1]] = res
         else:
             if 'correct_value' in elem:
                 sample_count = int(elem['value'].split('_')[-1])
