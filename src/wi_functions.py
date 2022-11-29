@@ -714,27 +714,16 @@ def parse_part(wi_object, factors, organism, id, nom):
                 if isinstance(elem, dict):
                     if elem['position'].split(':')[-1] == 'condition':
 
-                        start = time.time()
                         samples = []
                         for sub_elem in elem['list_value']:
 
                             samples.append(get_sample(sub_elem, id, organism))
-                            #nom = [x['value'] for x in sub_elem if
-                            #       x['position'].split(':')[-1] ==
-                            #       'number_of_measurements'][0]
-
-                            #part_val = parse_part(sub_elem, factors, organism,
-                            #                      id, nom)
-
-                            #samples.append(part_val)
 
                         val.append({'condition_name': elem['correct_value'],
                                     'biological_replicates':
                                         {'count': len(samples),
                                          'samples': samples}})
 
-                        end = time.time()
-                        print(end-start)
                     #else:
                     #    print(elem['position'])
                 elif isinstance(elem, list):
