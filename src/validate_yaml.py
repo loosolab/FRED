@@ -365,8 +365,7 @@ def validate_value(input_value, value_type, key):
             except (IndexError, ValueError, SyntaxError) as e:
                 valid = False
                 message = f'Input must be of type \'DD.MM.YYYY\'.'
-        elif value_type == 'str' and \
-                ('\"' in input_value or '{' in input_value or '}' in
+        elif type(input_value) == str and ('\"' in input_value or '{' in input_value or '}' in
                  input_value or '|' in input_value) and key not in generated:
             valid = False
             message = 'The value contains an invalid character ' \
