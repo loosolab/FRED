@@ -50,7 +50,7 @@ def generate_file(path, input_id, name, mandatory_mode):
             os.path.join(path, f'{input_id}_metadata.yaml')) or os.path.exists(
             os.path.join(path, f'{input_id}_metadata.yml')):
         print(f'The metadata file for ID {input_id} already exists.')
-        overwrite = parse_list_choose_one([True, False],
+        overwrite = parse_list_choose_one(['True ', 'False '],
                               f'\nDo you want to overwrite the file?')
         if not overwrite:
             sys.exit(f'Program terminated.')
@@ -143,7 +143,7 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                         fill_metadata_structure(node, item, {}, optional,
                                                 mandatory_mode, result_dict,
                                                 first_node, is_factor))
-                    redo = parse_list_choose_one([True, False],
+                    redo = parse_list_choose_one(['True ', 'False '],
                                                  f'\nDo you want to add '
                                                  f'another {item}?')
         else:
@@ -768,7 +768,7 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict):
         if bio > 0:
 
             # parse user input to declare if the samples are pooled
-            input_pooled = parse_list_choose_one([True, False],
+            input_pooled = parse_list_choose_one(['True ', 'False '],
                                                  f'\nAre the samples pooled?')
 
             # print a caption for the biological replicate
@@ -817,7 +817,6 @@ def fill_replicates(condition, bio, input_pooled, node,
     # whitelist for organism and matching the input organism with the whitelist
     organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'),
                                    result_dict)['whitelist']
-    print(result_dict['organism'])
     organism = organism[result_dict['organism']['organism_name']]
 
     # create a dictionary for the biological replicates and fill it with the
@@ -1093,7 +1092,7 @@ def print_sample_names(result, input_id, path):
             sample_names += f'- {name}\n'
     print(sample_names)
     save = parse_list_choose_one(
-        [True, False], 'Do you want to save the sample names into a file?')
+        ['True ', 'False '], 'Do you want to save the sample names into a file?')
     if save:
         text_file = open(os.path.join(path, f'{input_id}_samples.txt'), 'w')
         text_file.write(sample_names)
@@ -1176,6 +1175,11 @@ def parse_list_choose_one(whitelist, header):
         print(f'Invalid entry. Please enter a number between 1 and '
               f'{len(whitelist)}')
         value = parse_list_choose_one(whitelist, header)
+
+    if value == 'True ':
+        value = True
+    elif value == 'False ':
+        value = False
 
     # return the user input
     return value
@@ -1273,7 +1277,7 @@ def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
         # prompt the user to choose between True and False if the input value
         # is of type boolean
         if value_type == 'bool':
-            input_value = parse_list_choose_one([True, False],
+            input_value = parse_list_choose_one(['True ', 'False '],
                                                 f'Is the sample {key}')
 
         else:
@@ -1533,14 +1537,14 @@ def get_combinations(values, key):
         if values['ident_key'] in values and len(
                 values[values['ident_key']]) > 1:
             multi = parse_list_choose_one(
-                [True, False],
+                ['True ', 'False '],
                 f'\nCan one sample contain multiple {key}s?')
         else:
             multi = False
             values.pop('ident_key')
     else:
         multi = parse_list_choose_one(
-            [True, False], f'\nCan one sample contain multiple {key}s?')
+            ['True ', 'False '], f'\nCan one sample contain multiple {key}s?')
 
     if multi or is_dict:
         merge_values = get_combis(values, key, multi)
@@ -1664,7 +1668,7 @@ def get_input_list(node, item, filled_object):
                     if input_value in whitelist['whitelist']:
                         used_values.append(input_value)
                         redo = parse_list_choose_one(
-                            [True, False],
+                            ['True ', 'False '],
                             f'\nDo you want to add another {item}?')
                     else:
                         print(f'The value you entered does not match the '
