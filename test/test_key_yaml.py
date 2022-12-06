@@ -3,8 +3,8 @@ import sys
 import yaml.parser
 import yaml.scanner
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-import src.utils as utils
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+import utils
 
 #TODO: test special_case
 
