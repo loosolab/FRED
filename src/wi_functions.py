@@ -698,16 +698,6 @@ def parse_part(wi_object, factors, organism, id, nom):
     return_dict = {}
 
     if isinstance(wi_object, dict):
-        if wi_object['position'].split(':')[-1] == 'experimental_setting':
-            if len(wi_object['list_value']) > 0:
-                organism = [o['value'] for o in wi_object['list_value'][0] if
-                            o['position'].split(':')[-1] == 'organism']
-                if len(organism) > 0:
-                    organism = organism[0].split(' ')[0]
-                else:
-                    organism = None
-            else:
-                organism = None
         if wi_object['list']:
             val = []
             for elem in wi_object['list_value']:
@@ -785,6 +775,7 @@ def parse_part(wi_object, factors, organism, id, nom):
 
     return val
 
+
 def get_sample(sub_elem, id, organism):
     short_organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'),
                                          {'organism_name': organism})['whitelist']
@@ -851,8 +842,10 @@ def parse_list_part(wi_object, factors, organism, id, nom):
     """
     res = {}
     for elem in wi_object:
+        if elem['position'].split(':')[
+                -1] == 'organism':
+            organism = elem['value'].split(' ')[0]
         val = parse_part(elem, factors, organism, id, nom)
-
         if elem['position'].split(':')[-1] == 'technical_replicates':
             sample_name = []
             for c in range(val['count']):
