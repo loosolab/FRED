@@ -786,6 +786,10 @@ def parse_part(wi_object, factors, organism, id, nom):
     return val
 
 def get_sample(sub_elem, id, organism):
+    short_organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'),
+                                         {'organism_name': organism})['whitelist']
+    short_organism = short_organism[organism]
+
     sample = {}
     for elem in sub_elem:
         if elem['list']:
@@ -821,7 +825,7 @@ def get_sample(sub_elem, id, organism):
                     count = [x['value'] for x in elem['input_fields'] if x['position'].split(':')[-1] == 'count'][0]
                     for c in range(count):
                         for m in range(sample['number_of_measurements']):
-                            sample_name.append(f'{id}_{organism}_'
+                            sample_name.append(f'{id}_{short_organism}_'
                                            f'{sample["sample_name"]}'
                                            f'_t{"{:02d}".format(c + 1)}_'
                                            f'm{"{:02d}".format(m + 1)}')
