@@ -130,11 +130,11 @@ def read_grouped_whitelist(whitelist, filled_object):
                         headers[key] = whitelist['whitelist'][key]['headers']
                     whitelist['whitelist'][key] = \
                         whitelist['whitelist'][key]['whitelist']
-    #w = [f'{x} ({xs})' for xs in list(whitelist.keys()) if whitelist[xs] is
-    #not None for x in whitelist[xs] if x is not None]
-    w = [f'{x}' for xs in list(whitelist['whitelist'].keys()) if
-         whitelist['whitelist'][xs] is not None for x in
-         whitelist['whitelist'][xs] if x is not None]
+    w = [f'{x} ({xs})' for xs in list(whitelist['whitelist'].keys()) if whitelist['whitelist'][xs] is
+    not None for x in whitelist['whitelist'][xs] if x is not None]
+    #w = [f'{x}' for xs in list(whitelist['whitelist'].keys()) if
+    #     whitelist['whitelist'][xs] is not None for x in
+    #     whitelist['whitelist'][xs] if x is not None]
 
     if len(w) > 30:
         new_whitelist = copy.deepcopy(whitelist)

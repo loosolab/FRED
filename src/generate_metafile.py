@@ -531,7 +531,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
     return return_dict
 
 
-#---------------------------EXPERIMENTAL SETTING-------------------------------
+# --------------------------EXPERIMENTAL SETTING-------------------------------
 
 
 def get_experimental_factors(node, result_dict):
@@ -626,13 +626,10 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
                 and 'unit' not in factors[i]['values']) \
                 or ('is_list' in factors[i] and factors[i]['is_list']):
 
-            # add the factor to is_dict if it contains a dictionary
-            if isinstance(factors[i]['values'], dict):
-                is_dict.append(factors[i]['factor'])
-
             # overwrite the values with the combinations
             factors[i]['values'] = get_combinations(factors[i]['values'],
                                                     factors[i]['factor'])
+            is_dict.append(f'{factors[i]["values"]}')
 
             # remove ident_key from result dictionary
             if 'ident_key' in result_dict['experimental_factors'][i]['values']:
@@ -645,9 +642,6 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
         elif isinstance(factors[i]['values'], list) and (
                 any(isinstance(elem, dict) and 'value' not in elem and 'unit'
                     not in elem for elem in factors[i]['values'])):
-
-            # add the factor to is_dict
-            is_dict.append(factors[i]['factor'])
 
             # iterate through the values
             for k in range(len(factors[i]['values'])):
@@ -669,6 +663,9 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
                     # overwrite the value
                     factors[i]['values'][k] = new_val
 
+                    # add the factor to is_dict
+                    is_dict.append(f'{factors[i]["factor"]}:{factors[i]["values"][k]}')
+
         # remove is_list key from result dictionary
         if 'is_list' in result_dict['experimental_factors'][i]:
             result_dict['experimental_factors'][i].pop('is_list')
@@ -689,22 +686,21 @@ def get_conditions(factors, node, mandatory_mode, result_dict):
     # iterate through all factors
     for fac in factors:
 
-        # test if the factor contains a dictionary
-        if fac['factor'] in is_dict:
+        # create a list to store the dictionaries that represent the value
+        # of the experimental factors
+        vals = []
 
-            # create a list to store the dictionaries that represent the value
-            # of the experimental factors
-            vals = []
-
-            # iterate through the values of the factor, split them into
-            # a list of tuples containing factor and values and save the values
-            # in vals
-            for cond in fac['values']:
+        # iterate through the values of the factor, split them into
+        # a list of tuples containing factor and values and save the values
+        # in vals
+        for cond in fac['values']:
+            if f'{fac["factor"]}:{cond}' in is_dict:
                 val = ([x[1] for x in split_cond(cond)])
                 for y in val:
                     vals.append(y)
 
-            # remove duplicates in vals
+        # remove duplicates in vals
+        if len(vals) > 0:
             vals = [dict(t) for t in {tuple(d.items()) for d in vals}]
 
             # TODO: if value_unit
@@ -1248,24 +1244,49 @@ def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
             input_value = parse_list_choose_one(whitelist['whitelist'],
                                                 f'{key}:')
 
+        w_key = None
+        if whitelist['whitelist_type'] == 'plain_group':
+            for k in whitelist['whitelist_keys']:
+                if input_value.endswith(f' ({k})'):
+                    input_value = input_value.replace(f' ({k})', '')
+                    w_key = k
+
         # test if the whitelist contains the key 'headers'
         if 'headers' in whitelist:
 
-            # split the headers and the input value at ' ' and save each to
-            # a list
-            headers = whitelist['headers'].split(' ')
-            vals = input_value.split(' ')
+            if whitelist['whitelist_type'] == 'group' or whitelist['whitelist_type'] == 'plain_group' and w_key is not None:
+                if w_key in whitelist['headers']:
+                    headers = whitelist['headers'][w_key].split(' ')
+                    vals = input_value.split(' ')
 
-            # create a dictionary to store the new value
-            value = {}
+                    # create a dictionary to store the new value
+                    value = {}
 
-            # iterate through the headers and save the header and value of the
-            # same index into a dictionary with header as key
-            for i in range(len(headers)):
-                value[headers[i]] = vals[i]
+                    # iterate through the headers and save the header and value of the
+                    # same index into a dictionary with header as key
+                    for i in range(len(headers)):
+                        value[headers[i]] = vals[i]
 
-            # overwrite the input value with the dictionary
-            input_value = value
+                    # overwrite the input value with the dictionary
+                    input_value = value
+
+            else:
+
+                # split the headers and the input value at ' ' and save each to
+                # a list
+                headers = whitelist['headers'].split(' ')
+                vals = input_value.split(' ')
+
+                # create a dictionary to store the new value
+                value = {}
+
+                # iterate through the headers and save the header and value of the
+                # same index into a dictionary with header as key
+                for i in range(len(headers)):
+                    value[headers[i]] = vals[i]
+
+                # overwrite the input value with the dictionary
+                input_value = value
 
     # if there is no whitelist
     else:
@@ -1574,14 +1595,26 @@ def get_combis(values, key, multi):
     if 'ident_key' in values and (
             values['ident_key'] not in values or values['ident_key'] is None):
         values.pop('ident_key')
+
     if isinstance(values, list):
         if multi:
             possible_values = []
             for i in range(len(values)):
-                s = f'{key}:"{values[i]}"'
+                print(values[i])
+                if isinstance(values[i], dict):
+                    v = '|'.join([f'{k}:"{values[i][k]}"' for k in values[i]])
+                    s = f'{key}:{"{"}{v}{"}"}'
+                else:
+                    s = f'{key}:"{values[i]}"'
                 possible_values.append(s)
                 for j in range(i + 1, len(values)):
-                    s = f'{s}-{key}:"{values[j]}"'
+                    if isinstance(values[j], dict):
+                        v = '|'.join(
+                            [f'{k}:"{values[j][k]}"' for k in values[j]])
+                        s2 = f'{key}:{"{"}{v}{"}"}'
+                    else:
+                        s2 = f'{key}:"{values[i]}"'
+                    s = f'{s}-{s2}"'
                     possible_values.append(s)
             return possible_values
         else:
@@ -1675,7 +1708,7 @@ def get_input_list(node, item, filled_object):
                               f'whitelist. Try tab for autocomplete.')
             else:
                 print('\nPlease enter the list')
-                if whitelist['whitelist_type'] == 'plain':
+                if whitelist['whitelist_type'] == 'plain' or whitelist['whitelist_type'] == 'plain_group':
                     print_option_list(whitelist['whitelist'], '')
                     used_values = parse_input_list(whitelist['whitelist'],
                                                    False)
@@ -1689,13 +1722,31 @@ def get_input_list(node, item, filled_object):
                             print(f'{i}: {value}')
                             i += 1
                     used_values = parse_input_list(w, False)
-            if 'headers' in whitelist:
-                headers = whitelist['headers'].split(' ')
+
+            w_keys = []
+            if whitelist['whitelist_type'] == 'plain_group':
                 for i in range(len(used_values)):
-                    vals = used_values[i].split(' ')
-                    used_values[i] = {}
-                    for j in range(len(headers)):
-                        used_values[i][headers[j]] = vals[j]
+                    for k in whitelist['whitelist_keys']:
+                        if used_values[i].endswith(f' ({k})'):
+                            used_values[i] = used_values[i].replace(f' ({k})', '')
+                            w_keys.append(k)
+
+            if 'headers' in whitelist:
+                if whitelist['whitelist_type'] == 'group' or whitelist['whitelist_type'] == 'plain_group' and len(w_keys)>0:
+                    for i in range(len(used_values)):
+                        if w_keys[i] in whitelist['headers']:
+                            headers = whitelist['headers'][w_keys[i]].split(' ')
+                            vals = used_values[i].split(' ')
+                            used_values[i] = {}
+                            for j in range(len(headers)):
+                                used_values[i][headers[j]] = vals[j]
+                else:
+                    headers = whitelist['headers'].split(' ')
+                    for i in range(len(used_values)):
+                        vals = used_values[i].split(' ')
+                        used_values[i] = {}
+                        for j in range(len(headers)):
+                            used_values[i][headers[j]] = vals[j]
         else:
             print('No whitelist')
             used_values = [0]
