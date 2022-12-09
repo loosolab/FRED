@@ -303,6 +303,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
             headers = whitelist['headers']
         if whitelist['whitelist_type'] == 'group':
             whitelist = utils.read_grouped_whitelist(whitelist, filled_object)
+            input_type = 'group_select'
             if 'headers' in whitelist:
                 headers = whitelist['headers']
             if isinstance(whitelist['whitelist'], dict):
@@ -317,7 +318,6 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
             else:
                 whitelist_type = 'plain_group'
                 input_type = 'select'
-            input_type = 'group_select'
         elif whitelist['whitelist_type'] == 'depend':
             whitelist = utils.read_depend_whitelist(whitelist['whitelist'],
                                                     organism)
