@@ -30,7 +30,7 @@ def validate_file(metafile):
     key_yaml = utils.read_in_yaml(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
     invalid_keys, invalid_entries, invalid_value = \
-        new_test(metafile, key_yaml, [], '', [], [], [], None, False, None)
+        new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
                                                 [x.split(':')[-1] for x in
                                                  invalid_keys])
@@ -123,11 +123,11 @@ def print_warning(metafile, pool_warn, ref_genome_warn):
     print(f'{"".center(80, "-")}')
 
 
-#---------------------------------UTILITIES------------------------------------
+# --------------------------------UTILITIES------------------------------------
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
              invalid_entry, invalid_value, input_type, is_factor,
-             local_factor):
+             local_factor, full_metadata):
     """
     This function test if all keys in the metadata file are valid.
     :param metafile: the metadata file
@@ -149,12 +149,31 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
     if isinstance(metafile, dict) and not (
             'value' in metafile and 'unit' in metafile):
         for key in metafile:
-            if not key_yaml and is_factor and local_factor is not None:
-                new_yaml = utils.read_in_yaml(os.path.join(
+            if not key_yaml and key_name.split(':')[-1] in is_factor or (key_name.split(':')[-1] == 'values' and local_factor is not None):
+                new_yaml1 = utils.read_in_yaml(os.path.join(
                     os.path.dirname(os.path.abspath(__file__)), '..',
                     'keys.yaml'))
-                new_yaml = list(utils.find_keys(new_yaml, local_factor))
+                if key_name.split(':')[-1] in is_factor:
+                    new_yaml = list(utils.find_keys(new_yaml1, key_name.split(':')[-1]))
+                else:
+                    new_yaml = list(utils.find_keys(new_yaml1, local_factor))
                 if len(new_yaml) > 0:
+                    if new_yaml[0]['whitelist']:
+                        if key_name.split(':')[-1] in is_factor:
+                            w = utils.get_whitelist(key_name.split(':')[-1],
+                                                    full_metadata)
+                        else:
+                            w = utils.get_whitelist(local_factor, full_metadata)
+                        if w and 'headers' in w:
+                            if isinstance(w['headers'], dict):
+                                if 'whitelist_keys' in w:
+                                    headers = []
+                                    for w_k in w['whitelist_keys']:
+                                        if w_k in w['headers']:
+                                            headers += w['headers'][w_k].split(' ')
+                            else:
+                                headers = w['headers'].split(' ')
+                            new_yaml[0]['value'] = headers
                     if key not in new_yaml[0]['value']:
                         invalid_keys.append(key)
                     elif isinstance(metafile[key], list) != new_yaml[0]['list']:
@@ -168,7 +187,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     global factor
                     factor = metafile[key]
                     local_factor = metafile[key]
-                    is_factor = True
+                    is_factor.append(metafile[key])
                 input_type = None
                 if key == 'values' and factor is not None:
                     node = list(utils.find_keys(key_yaml, factor))
@@ -183,7 +202,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     metafile[key], key_yaml[key]['value'], sub_lists,
                     f'{key_name}:{key}' if key_name != '' else key,
                     invalid_keys, invalid_entry, invalid_value, input_type,
-                    is_factor, local_factor)
+                    is_factor, local_factor, full_metadata)
                 invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
@@ -191,7 +210,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             res_keys, res_entries, res_values = new_test(
                 item, key_yaml, sub_lists, key_name, invalid_keys,
                 invalid_entry, invalid_value, input_type, is_factor,
-                local_factor)
+                local_factor, full_metadata)
             invalid_keys = res_keys
             sub_lists = sub_lists[:-1]
     else:
