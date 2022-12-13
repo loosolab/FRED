@@ -65,15 +65,27 @@ def generate_file(path, input_id, name, mandatory_mode):
 
     # parse through metadata structure and fill it for every key
     for item in key_yaml:
-        if item in result_dict:
-            result_dict[item] = {**result_dict[item],
-                                 **get_redo_value(key_yaml[item], item, False,
-                                                  mandatory_mode, result_dict,
-                                                  True, False)}
-        else:
-            result_dict[item] = get_redo_value(key_yaml[item], item, False,
-                                               mandatory_mode, result_dict,
-                                               True, False)
+        correct = False
+        while not correct:
+            if item in result_dict:
+                result_dict[item] = {**result_dict[item],
+                                     **get_redo_value(key_yaml[item], item, False,
+                                                      mandatory_mode, result_dict,
+                                                      True, False)}
+            else:
+                result_dict[item] = get_redo_value(key_yaml[item], item, False,
+                                                   mandatory_mode, result_dict,
+                                                   True, False)
+            print(f'{"".center(size.columns, "-")}\n'
+                  f'{"SUMMARY".center(size.columns, " ")}\n'
+                  f'{"".center(size.columns, "-")}\n')
+            sum = print_summary(result_dict[item], 1, False)
+            print(sum)
+            print(f'\n\n')
+            print(f'{"".center(size.columns, "-")}\n')
+
+            correct = parse_list_choose_one(['True ', 'False '],
+                                          f'\nIs the input correct? You can redo it by selecting \'False\'')
 
     # TODO: extra function for summary
     # print summary
