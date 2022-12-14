@@ -594,6 +594,11 @@ def get_whitelist_object(item, organism_name, whitelists):
             if whitelist['whitelist_type'] == 'plain' or \
                     whitelist['whitelist_type'] == 'plain_group':
                 whitelist = whitelist['whitelist']
+                if item['position'].split(':')[-1] == 'enrichment':
+                    histone = [x for x in whitelist if '(histone mark)' in x]
+                    other = [x for x in whitelist if '(other)' in x]
+                    proteins = [x for x in whitelist if '(other)' in x]
+                    whitelist = histone + proteins[:10] + other
         elif input_type == 'bool':
             whitelist = [True, False]
             input_type = 'select'
