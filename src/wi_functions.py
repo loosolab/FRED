@@ -535,15 +535,38 @@ def get_conditions(factors, organism_name):
                     factors[i]['values'] = generate.get_combis(
                         factors[i]['values'][0][factors[i]['factor']],
                         factors[i]['factor'], factors[i]['values'][0]['multi'])
+
         if 'headers' in factors[i]:
-            headers = factors[i]['headers'].split(' ')
-            for j in range(len(factors[i]['values'])):
-                val = factors[i]['values'][j].split(' ')
-                v = f'{factors[i]["factor"]}:{"{"}'
-                for k in range(len(headers)):
-                    v = f'{v}{"|" if k > 0 else ""}{headers[k]}:"{val[k]}"'
-                v = f'{v}{"}"}'
-                factors[i]['values'][j] = v
+            if isinstance(factors[i]['headers'], dict):
+
+                for j in range(len(factors[i]['values'])):
+                    for k in list(factors[i]['headers'].keys()):
+                        if factors[i]['values'][j].endswith(f' ({k})'):
+                            factors[i]['values'][j] = factors[i]['values'][j].replace(f' ({k})', '')
+                            w_key = k
+
+                    headers = factors[i]['headers'][w_key].split(' ')
+                    vals = factors[i]['values'][j].split(' ')
+
+                    # create a dictionary to store the new value
+                    value = {}
+
+                    # iterate through the headers and save the header and value of the
+                    # same index into a dictionary with header as key
+                    for i in range(len(headers)):
+                        value[headers[i]] = vals[i]
+
+                    # overwrite the input value with the dictionary
+                    factors[i]['values'][j] = value
+            else:
+                headers = factors[i]['headers'].split(' ')
+                for j in range(len(factors[i]['values'])):
+                    val = factors[i]['values'][j].split(' ')
+                    v = f'{factors[i]["factor"]}:{"{"}'
+                    for k in range(len(headers)):
+                        v = f'{v}{"|" if k > 0 else ""}{headers[k]}:"{val[k]}"'
+                    v = f'{v}{"}"}'
+                    factors[i]['values'][j] = v
     conditions = generate.get_condition_combinations(factors)
     condition_object = []
 
