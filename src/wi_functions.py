@@ -553,8 +553,8 @@ def get_conditions(factors, organism_name):
 
                     # iterate through the headers and save the header and value of the
                     # same index into a dictionary with header as key
-                    for i in range(len(headers)):
-                        value[headers[i]] = vals[i]
+                    for l in range(len(headers)):
+                        value[headers[l]] = vals[l]
 
                     # overwrite the input value with the dictionary
                     factors[i]['values'][j] = value
