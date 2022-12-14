@@ -80,9 +80,11 @@ def main():
 if __name__ == "__main__":
 
     if not os.path.exists('metadata_whitelists'):
-        git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', 'metadata_whitelists')
+        repo = git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', 'metadata_whitelists')
+        repo.git.checkout('update_enrichment')
     else:
         repo = git.Repo('metadata_whitelists')
+        repo.git.checkout('update_enrichment')
         o = repo.remotes.origin
         o.pull()
 
