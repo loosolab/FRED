@@ -1,0 +1,63 @@
+whitelist_type: plain
+whitelist:
+    - Embryonic stem cells
+    - Endothelial cells
+    - Endothelial cells umbilical vein
+    - Endothelial cells pulmonary artery
+    - Endothelial cells dermal lymphatic
+    - Smooth muscle cells
+    - Fibroblasts
+    - Macrophages
+    - Mast cells
+    - T-cells
+    - Plasma cells
+    - Adipocyte
+    - Alpha cells
+    - Alveolar cells type 1
+    - Alveolar cells type 2
+    - Ascending Loop of Henle cells
+    - B-cells
+    - Beta cells
+    - Bone Marrow Neutrophils
+    - Cardiomyocytes
+    - Ductal cells
+    - Eccrine sweat gland cells
+    - Enteric glia cells
+    - Erythroid cells
+    - Exocrine glandular cells
+    - Gastric enteroendocrine cells
+    - Gastric mucous cells
+    - Hair cortex cells
+    - Hepatocytes
+    - Keratinocyte (granular)
+    - Keratinocyte (other)
+    - Langerhans cells
+    - Liver Neutrophils
+    - Melanocytes
+    - Mitotic cells
+    - Neutrophils
+    - NK-cells
+    - Parafollicular cells
+    - Peritoneal cavity Neutrophils
+    - Peripheral blood Neutrophils
+    - Peritubular cells
+    - Podocytes
+    - Prostate basal glandular cells
+    - Prostate glandular cells
+    - Proximal tubular cells
+    - Respiratory ciliated cells
+    - Skeletal myocytes
+    - Spermatids
+    - Spleen Neutrophils
+    - HL60
+    - A549
+    - JURKAT
+    - HepG2
+    - RPTEC
+    - SCLC
+    - HaCaT
+    - MFC7
+    - HUVEC
+    - ASC TERT1
+    - HEL
+    - RPE1

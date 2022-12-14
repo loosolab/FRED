@@ -1,0 +1,19 @@
+whitelist_type: plain
+whitelist:
+    - genotype
+    - tissue
+    - cell_type
+    - knockdown
+    - gender
+    - life_stage
+    - age
+    - ethnicity
+    - gene
+    - disease
+    - treatment
+    - time_point
+    - flow
+    - enrichment
+    - body_mass_index
+    - injury
+

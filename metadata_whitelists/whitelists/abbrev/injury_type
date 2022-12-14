@@ -1,0 +1,5 @@
+whitelist_type: abbrev
+whitelist:
+    cryoinjury: cryo
+    cardiotoxin injection: ctx
+    amputation: amp

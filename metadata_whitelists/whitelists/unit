@@ -1,0 +1,14 @@
+whitelist_type: plain
+whitelist:
+    - seconds
+    - minutes
+    - hours
+    - days
+    - weeks
+    - months
+    - years
+    - ml
+    - l
+    - nl
+    - mol
+

@@ -1,0 +1,11 @@
+whitelist_type: plain
+whitelist:
+    - Placebo
+    - Medication
+    - Puromycin
+    - Gemcitabine
+    - Cardiotoxin
+    - 2-deoxyglucose
+    - Saline
+
+
