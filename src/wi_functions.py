@@ -334,7 +334,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     if key == 'gene':
         input_type = 'gene'
     elif key == 'enrichment':
-        input_type = 'enrichment'
+        #input_type = 'enrichment'
         histone = [x for x in whitelist if '(histone marks)' in x]
         other = [x for x in whitelist if '(other)' in x]
         proteins = [x for x in whitelist if '(proteins)' in x]
