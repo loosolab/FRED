@@ -331,9 +331,12 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     #    input_type = 'searchable_select'
     if key == 'gene':
         input_type = 'gene'
-    #elif key == 'enrichment':
-    #    whitelist = whitelist[:50]
-    #    input_type = 'select'
+    elif key == 'enrichment':
+        input_type = 'enrichment'
+        histone = [x for x in whitelist if '(histone mark)' in x]
+        other = [x for x in whitelist if '(other)' in x]
+        proteins = [x for x in whitelist if '(proteins)' in x]
+        whitelist = histone + proteins[:10] + other
     if is_list:
         node = list(utils.find_keys(key_yaml, key))[0]
         new_w = [
@@ -597,7 +600,7 @@ def get_whitelist_object(item, organism_name, whitelists):
                 if item['position'].split(':')[-1] == 'enrichment':
                     histone = [x for x in whitelist if '(histone mark)' in x]
                     other = [x for x in whitelist if '(other)' in x]
-                    proteins = [x for x in whitelist if '(other)' in x]
+                    proteins = [x for x in whitelist if '(proteins)' in x]
                     whitelist = histone + proteins[:10] + other
         elif input_type == 'bool':
             whitelist = [True, False]
