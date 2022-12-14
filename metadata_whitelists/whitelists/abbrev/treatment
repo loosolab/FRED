@@ -1,5 +1,0 @@
-whitelist_type: abbrev
-whitelist:
-    treatment_type: type
-    treatment_status: status
-    treatment_duration: duration

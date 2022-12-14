@@ -1,0 +1,3 @@
+[submodule "metadata_whitelists"]
+	path = metadata_whitelists
+	url = https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git

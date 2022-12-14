@@ -26,9 +26,11 @@ def get_empty_wi_object():
     in a format readable by the web interface
     """
     if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists')):
-        git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
+        repo = git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
+        repo.git.checkout('update_enrichment')
     else:
         repo = git.Repo(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
+        repo.git.checkout('update_enrichment')
         o = repo.remotes.origin
         o.pull()
 
@@ -333,7 +335,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
         input_type = 'gene'
     elif key == 'enrichment':
         input_type = 'enrichment'
-        histone = [x for x in whitelist if '(histone mark)' in x]
+        histone = [x for x in whitelist if '(histone marks)' in x]
         other = [x for x in whitelist if '(other)' in x]
         proteins = [x for x in whitelist if '(proteins)' in x]
         whitelist = histone + proteins[:10] + other
@@ -598,7 +600,7 @@ def get_whitelist_object(item, organism_name, whitelists):
                     whitelist['whitelist_type'] == 'plain_group':
                 whitelist = whitelist['whitelist']
                 if item['position'].split(':')[-1] == 'enrichment':
-                    histone = [x for x in whitelist if '(histone mark)' in x]
+                    histone = [x for x in whitelist if '(histone marks)' in x]
                     other = [x for x in whitelist if '(other)' in x]
                     proteins = [x for x in whitelist if '(proteins)' in x]
                     whitelist = histone + proteins[:10] + other
