@@ -218,12 +218,14 @@ def get_factors(organism):
     factor_value = {'factor': utils.read_whitelist('factor')['whitelist']}
     values = {}
     for factor in factor_value['factor']:
-        whitelist, whitelist_type, input_type, headers = \
+        whitelist, whitelist_type, input_type, headers, w_keys = \
             get_whitelist_with_type(factor, key_yaml, organism, None)
         values[factor] = {'whitelist': whitelist, 'input_type': input_type,
                           'whitelist_type': whitelist_type}
         if headers is not None:
             values[factor]['headers'] = headers
+        if w_keys is not None:
+            values[factor]['whitelist_keys'] = w_keys
     factor_value['values'] = values
     return factor_value
 
@@ -243,6 +245,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     """
     whitelist_type = None
     is_list = False
+    whitelist_keys = None
     filled_object = {'organism': copy.deepcopy(organism)}
     organism = organism.split(' ')[0]
     input_type = list(utils.find_keys(key_yaml, key))
@@ -265,10 +268,12 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                     k_val = {}
                     k_val['whitelist'], k_val['whitelist_type'], \
                         k_val['input_type'], \
-                        header = get_whitelist_with_type(
+                        header, whitelist_keys = get_whitelist_with_type(
                         k, key_yaml, organism, headers)
                     if header is not None:
                         k_val['headers'] = header
+                    if whitelist_keys is not None:
+                        k_val['whitelist_keys'] = whitelist_keys
                     node = list(utils.find_keys(key_yaml, k))[0]
                     if k_val['input_type'] == 'value_unit':
                         k_val['unit'] = None
@@ -281,7 +286,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                             'whitelist': [True, False], 'input_type': 'bool',
                             'value': False})
                 input_type = 'nested'
-                return val, whitelist_type, input_type, headers
+                return val, whitelist_type, input_type, headers, whitelist_keys
         else:
             if input_type[0]['input_type'] == 'bool':
                 input_type = 'bool'
@@ -308,6 +313,8 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
             input_type = 'group_select'
             if 'headers' in whitelist:
                 headers = whitelist['headers']
+            if 'whitelist_keys' in whitelist:
+                whitelist_keys = whitelist['whitelist_keys']
             if isinstance(whitelist['whitelist'], dict):
                 new_w = []
                 for value in whitelist['whitelist']:
@@ -351,7 +358,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
         whitelist = new_w
         whitelist_type = 'list_select'
         input_type = 'nested'
-    return whitelist, whitelist_type, input_type, headers
+    return whitelist, whitelist_type, input_type, headers, whitelist_keys
 
 
 def get_samples(condition, sample):
