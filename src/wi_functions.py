@@ -367,6 +367,7 @@ def get_samples(condition, sample):
         if sample[i][
             'position'] == 'experimental_setting:conditions:biological_' \
                            'replicates:samples:sample_name':
+            print(condition)
             sample_name = generate.get_short_name(condition, {})
             sample[i]['value'] = sample_name \
                 .replace(':', ': ') \
