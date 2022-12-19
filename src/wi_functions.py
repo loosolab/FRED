@@ -367,7 +367,6 @@ def get_samples(condition, sample):
         if sample[i][
             'position'] == 'experimental_setting:conditions:biological_' \
                            'replicates:samples:sample_name':
-            print(condition)
             sample_name = generate.get_short_name(condition, {})
             sample[i]['value'] = sample_name \
                 .replace(':', ': ') \
@@ -415,23 +414,30 @@ def get_samples(condition, sample):
                                             True
                             sample[i]['list_value'].append(filled_sample)
                         else:
-                            for j in range(len(sample[i]['input_fields'])):
-                                for x in c[1]:
-                                    if sample[i]['input_fields'][j][
-                                            'position'].split(':')[-1] == x:
-                                        if x in ['age', 'time_point',
-                                                 'treatment_duration']:
-                                            unit = c[1][x].lstrip(
-                                                '0123456789')
-                                            value = c[1][x][
-                                                    :len(c[1][x]) - len(unit)]
-                                            sample[i]['input_fields'][j][
-                                                'value'] = int(value)
-                                            sample[i]['input_fields'][j][
-                                                'value_unit'] = unit
-                                        else:
-                                            sample[i]['input_fields'][j][
-                                                'value'] = c[1][x]
+                            if 'input_fields' in sample[i]:
+                                for j in range(len(sample[i]['input_fields'])):
+                                    for x in c[1]:
+                                        if sample[i]['input_fields'][j][
+                                                'position'].split(':')[-1] == x:
+                                            if x in ['age', 'time_point',
+                                                     'treatment_duration']:
+                                                unit = c[1][x].lstrip(
+                                                    '0123456789')
+                                                value = c[1][x][
+                                                        :len(c[1][x]) - len(unit)]
+                                                sample[i]['input_fields'][j][
+                                                    'value'] = int(value)
+                                                sample[i]['input_fields'][j][
+                                                    'value_unit'] = unit
+                                            else:
+                                                sample[i]['input_fields'][j][
+                                                    'value'] = c[1][x]
+                            else:
+                                val = ""
+                                for key in c[1]:
+                                    val = f'{val}{" " if val != "" else ""}{c[1][key]}'
+                                sample[i]['value'] = val
+
                 else:
                     if sample[i]['list']:
                         if len(sample[i]['list_value']) > 0:
@@ -554,11 +560,13 @@ def get_conditions(factors, organism_name):
 
                     # iterate through the headers and save the header and value of the
                     # same index into a dictionary with header as key
+                    v = f'{factors[i]["factor"]}:{"{"}'
                     for l in range(len(headers)):
-                        value[headers[l]] = vals[l]
+                        v = f'{v}{"|" if l > 0 else ""}{headers[l]}:"{vals[l]}"'
+                    v = f'{v}{"}"}'
 
                     # overwrite the input value with the dictionary
-                    factors[i]['values'][j] = value
+                    factors[i]['values'][j] = v
             else:
                 headers = factors[i]['headers'].split(' ')
                 for j in range(len(factors[i]['values'])):
