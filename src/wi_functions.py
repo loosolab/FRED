@@ -550,31 +550,27 @@ def get_conditions(factors, organism_name):
                         factors[i]['values'][0][factors[i]['factor']],
                         factors[i]['factor'], factors[i]['values'][0]['multi'])
 
-        if 'headers' in factors[i]:
-            if isinstance(factors[i]['headers'], dict):
+        if 'whitelist_keys' in factors[i]:
+            for j in range(len(factors[i]['values'])):
+                for k in factors[i]['whitelist_keys']:
+                    if factors[i]['values'][j].endswith(f' ({k})'):
+                        factors[i]['values'][j] = factors[i]['values'][j].replace(f' ({k})', '')
+                        w_key = k
+                        if 'headers' in factors[i] and w_key in factors[i]['headers']:
+                            headers = factors[i]['headers'][w_key].split(' ')
+                            vals = factors[i]['values'][j].split(' ')
 
-                for j in range(len(factors[i]['values'])):
-                    for k in list(factors[i]['headers'].keys()):
-                        if factors[i]['values'][j].endswith(f' ({k})'):
-                            factors[i]['values'][j] = factors[i]['values'][j].replace(f' ({k})', '')
-                            w_key = k
+                            # iterate through the headers and save the header and value of the
+                            # same index into a dictionary with header as key
+                            v = f'{factors[i]["factor"]}:{"{"}'
+                            for l in range(len(headers)):
+                                v = f'{v}{"|" if l > 0 else ""}{headers[l]}:"{vals[l]}"'
+                            v = f'{v}{"}"}'
 
-                    headers = factors[i]['headers'][w_key].split(' ')
-                    vals = factors[i]['values'][j].split(' ')
-
-                    # create a dictionary to store the new value
-                    value = {}
-
-                    # iterate through the headers and save the header and value of the
-                    # same index into a dictionary with header as key
-                    v = f'{factors[i]["factor"]}:{"{"}'
-                    for l in range(len(headers)):
-                        v = f'{v}{"|" if l > 0 else ""}{headers[l]}:"{vals[l]}"'
-                    v = f'{v}{"}"}'
-
-                    # overwrite the input value with the dictionary
-                    factors[i]['values'][j] = v
-            else:
+                            # overwrite the input value with the dictionary
+                            factors[i]['values'][j] = v
+        else:
+            if 'headers' in factors[i]:
                 headers = factors[i]['headers'].split(' ')
                 for j in range(len(factors[i]['values'])):
                     val = factors[i]['values'][j].split(' ')
