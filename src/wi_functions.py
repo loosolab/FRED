@@ -755,7 +755,7 @@ def parse_part(wi_object, factors, organism, id, nom):
         new_samp['input_fields'] = input_fields
         wi_object = new_samp
 
-    if wi_object['position'].split(':')[-1] == 'enrichment':
+    if isinstance(wi_object, dict) and wi_object['position'].split(':')[-1] == 'enrichment':
         whitelist = utils.read_whitelist('enrichment')
         whitelist_keys = whitelist.keys()
         for k in factors[i]['whitelist_keys']:
