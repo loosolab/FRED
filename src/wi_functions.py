@@ -691,7 +691,7 @@ def parse_object(wi_object):
     :param wi_object: the filled wi object
     :return: result: a dictionary matching the metadata yaml structure
     """
-    factors = wi_object['all_factors']
+    factors = copy.deepcopy(wi_object['all_factors'])
     wi_object.pop('all_factors')
     new_object = {}
     for part in ['project', 'experimental_setting', 'technical_details']:
@@ -742,40 +742,44 @@ def parse_part(wi_object, factors, organism, id, nom):
             if gn is not None and embl is not None:
                 input_field['value'] = gn if key == 'gene_name' else embl
             input_fields.append(input_field)
-        for elem in factors:
-            for i in range(len(elem)):
-                if 'headers' in elem[i] and elem[i]['factor'] == \
-                        wi_object['position'].split(':')[-1] and \
-                        wi_object['value'] is not None:
-                    for j in range(len(elem[i]['headers'].split(' '))):
-                        for f in input_fields:
-                            if f['position'].split(':')[-1] == \
-                                    elem[i]['headers'].split(' ')[j]:
-                                f['value'] = wi_object['value'].split(' ')[j]
+        #for elem in factors:
+        #    for i in range(len(elem)):
+        #        if 'headers' in elem[i] and elem[i]['factor'] == \
+        #                wi_object['position'].split(':')[-1] and \
+        #                wi_object['value'] is not None:
+        #            for j in range(len(elem[i]['headers'].split(' '))):
+        #                for f in input_fields:
+        #                    if f['position'].split(':')[-1] == \
+        #                            elem[i]['headers'].split(' ')[j]:
+        #                        f['value'] = wi_object['value'].split(' ')[j]
         new_samp['input_fields'] = input_fields
         wi_object = new_samp
 
     if isinstance(wi_object, dict):
         if wi_object['list']:
             val = []
-            for elem in wi_object['list_value']:
-                if isinstance(elem, dict):
-                    if elem['position'].split(':')[-1] == 'condition':
+            for i in range(len(wi_object['list_value'])):
+                if isinstance(wi_object['list_value'][i], dict):
+                    if wi_object['list_value'][i]['position'].split(':')[-1] == 'condition':
 
                         samples = []
-                        for sub_elem in elem['list_value']:
+                        for sub_elem in wi_object['list_value'][i]['list_value']:
 
                             samples.append(get_sample(sub_elem, id, organism))
 
-                        val.append({'condition_name': elem['correct_value'],
+                        val.append({'condition_name': wi_object['list_value'][i]['correct_value'],
                                     'biological_replicates':
                                         {'count': len(samples),
                                          'samples': samples}})
 
                     #else:
                     #    print(elem['position'])
-                elif isinstance(elem, list):
-                    val.append(parse_list_part(elem, factors, organism, id,
+                elif isinstance(wi_object['list_value'][i], list):
+                    if wi_object['position'].split(':')[-1] == 'experimental_setting':
+                        val.append(parse_list_part(wi_object['list_value'][i], factors[i], organism, id,
+                                               nom))
+                    else:
+                        val.append(parse_list_part(wi_object['list_value'][i], factors, organism, id,
                                                nom))
                 else:
                     val.append(elem)
@@ -899,12 +903,12 @@ def parse_list_part(wi_object, factors, organism, id, nom):
     :return: res: the parsed part in yaml structure
     """
     res = {}
-    for elem in wi_object:
-        if elem['position'].split(':')[
+    for i in range(len(wi_object)):
+        if wi_object[i]['position'].split(':')[
                 -1] == 'organism':
-            organism = elem['value'].split(' ')[0]
-        val = parse_part(elem, factors, organism, id, nom)
-        if elem['position'].split(':')[-1] == 'technical_replicates':
+            organism = wi_object[i]['value'].split(' ')[0]
+        val = parse_part(wi_object[i], factors, organism, id, nom)
+        if wi_object[i]['position'].split(':')[-1] == 'technical_replicates':
             sample_name = []
             for c in range(val['count']):
                 for m in range(nom):
@@ -913,10 +917,33 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                                        f'_t{"{:02d}".format(c+1)}_'
                                        f'm{"{:02d}".format(m+1)}')
             val['sample_name'] = sample_name
+        elif wi_object[i]['position'].split(':')[-1] == 'experimental_factors':
+            for r in range(len(factors)):
+                if 'whitelist_keys' in factors[r]:
+                    w_keys = factors[r]['whitelist_keys']
+                    factors[r].pop('whitelist_keys')
+                    if 'headers' in factors[r]:
+                        headers = factors[r]['headers']
+                        factors[r].pop('headers')
+                    else:
+                        headers = None
+                    for j in range(len(factors[r]['values'])):
+                        for k in w_keys:
+                            print(factors[r]['values'][j])
+                            if factors[r]['values'][j].endswith(f' ({k})'):
+                                factors[r]['values'][j] = factors[r]['values'][j].replace(f' ({k})', '')
+                                if headers is not None and k in headers:
+                                    new_val = {}
+                                    for l in range(len(headers[k].split(' '))):
+                                        new_val[headers[k].split(' ')[l]] = factors[r]['values'][j].split(' ')[l]
+                                    factors[r]['values'][j] = new_val
+                                break
+
+            res[wi_object[i]['position'].split(':')[-1]] = factors
 
         if type(val) == bool or type(val) == int or (
                 val is not None and len(val) > 0):
-            res[elem['position'].split(':')[-1]] = val
+            res[wi_object[i]['position'].split(':')[-1]] = val
     return res
 
 
