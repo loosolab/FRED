@@ -755,38 +755,6 @@ def parse_part(wi_object, factors, organism, id, nom):
         new_samp['input_fields'] = input_fields
         wi_object = new_samp
 
-    if isinstance(wi_object, dict) and wi_object['position'].split(':')[-1] == 'enrichment':
-        whitelist = utils.read_whitelist('enrichment')
-        whitelist_keys = whitelist.keys()
-        for k in factors[i]['whitelist_keys']:
-            if wi_object['value'].endswith(f' ({k})'):
-                wi_object['value'] = wi_object['value'].replace(f' ({k})', '')
-                w_key = k
-
-                if w_key in whitelist['headers']:
-                    headers = whitelist['headers'][w_key].split(' ')
-                    gn, embl = wi_object['value'].split(' ')
-
-                    sub_keys = list(
-                        utils.find_keys(key_yaml,'gene')[0]['value'].keys())
-                    new_samp = {'position': wi_object['position'],
-                                'mandatory': wi_object['mandatory'],
-                                'list': wi_object['list'],
-                                'title': wi_object['displayName'],
-                                'desc': wi_object['desc']}
-                    input_fields = []
-                    for key in sub_keys:
-                        node = list(utils.find_keys(key_yaml, key))[0]
-                        input_field = parse_empty(
-                            node, f'{wi_object["position"]}:{key}', key_yaml,
-                            False)
-                        if gn is not None and embl is not None:
-                            input_field[
-                                'value'] = gn if key == 'gene_name' else embl
-                        input_fields.append(input_field)
-                    new_samp['input_fields'] = input_fields
-                    wi_object = new_samp
-
     if isinstance(wi_object, dict):
         if wi_object['list']:
             val = []
