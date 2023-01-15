@@ -943,7 +943,7 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                     factors[r].pop('headers')
                     for j in range(len(factors[r]['values'])):
                         new_val = {}
-                        for l in range(len(headers).split(' ')):
+                        for l in range(len(headers.split(' '))):
                             new_val[headers.split(' ')[l]] = factors[r]['values'][j].split(' ')[l]
                         factors[r]['values'][j] = new_val
 
