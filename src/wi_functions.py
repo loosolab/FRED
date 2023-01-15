@@ -838,6 +838,30 @@ def get_sample(sub_elem, id, organism):
                         local_time = default_time.astimezone(timezone)
                         val = local_time.strftime("%d.%m.%Y")
                     else:
+                        if 'whitelist_keys' in elem:
+                            for k in elem['whitelist_keys']:
+                                if elem['value'].endswith(f' ({k})'):
+                                    elem['value'] = elem[
+                                        'value'].replace(f' ({k})', '')
+                                if 'headers' in elem and k in elem[
+                                    'headers']:
+                                    new_val = {}
+                                    for l in range(len(
+                                            elem['headers'][k].split(
+                                                    ' '))):
+                                        new_val[
+                                            elem['headers'][k].split(' ')[
+                                                l]] = \
+                                        elem['value'].split(' ')[l]
+                                    elem['value'] = new_val
+                                    break
+                        elif 'headers' in elem:
+                            new_val = {}
+                            for l in range(
+                                    len(elem['headers'].split(' '))):
+                                new_val[elem['headers'].split(' ')[l]] = \
+                                elem['value'].split(' ')[l]
+                            elem['value'] = new_val
                         val = elem['value']
                     sample[elem['position'].split(':')[-1]] = val
             else:
