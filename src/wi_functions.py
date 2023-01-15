@@ -757,7 +757,7 @@ def parse_part(wi_object, factors, organism, id, nom):
                 else:
                     val.append(wi_object['list_value'][i])
         else:
-            if 'whitelist' in wi_object and wi_object['whitelist'] and 'whitelist_keys' in wi_object:
+            if 'whitelist_keys' in wi_object:
                 for k in wi_object['whitelist_keys']:
                     if wi_object['value'].endswith(f' ({k})'):
                         wi_object['value'] = wi_object['value'].replace(f' ({k})', '')
@@ -767,8 +767,7 @@ def parse_part(wi_object, factors, organism, id, nom):
                             new_val[wi_object['headers'][k].split(' ')[l]] = wi_object['value'].split(' ')[l]
                         wi_object['value'] = new_val
                         break
-            elif 'whitelist' in wi_object and wi_object['whitelist'] and \
-                    'headers' in wi_object:
+            elif 'headers' in wi_object:
                 new_val = {}
                 for l in range(len(wi_object['headers'].split(' '))):
                     new_val[wi_object['headers'].split(' ')[l]] = wi_object['value'].split(' ')[l]
