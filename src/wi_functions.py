@@ -782,7 +782,7 @@ def parse_part(wi_object, factors, organism, id, nom):
                         val.append(parse_list_part(wi_object['list_value'][i], factors, organism, id,
                                                nom))
                 else:
-                    val.append(elem)
+                    val.append(wi_object['list_value'][i])
         else:
             if 'whitelist' in wi_object and wi_object['whitelist'] and \
                     'headers' in wi_object['whitelist']:
@@ -938,6 +938,14 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                                         new_val[headers[k].split(' ')[l]] = factors[r]['values'][j].split(' ')[l]
                                     factors[r]['values'][j] = new_val
                                 break
+                elif 'headers' in factors[r]:
+                    headers = factors[r]['headers']
+                    factors[r].pop('headers')
+                    for j in range(len(factors[r]['values'])):
+                        new_val = {}
+                        for l in range(len(headers).split(' ')):
+                            new_val[headers.split(' ')[l]] = factors[r]['values'][j].split(' ')[l]
+                        factors[r]['values'][j] = new_val
 
             res[wi_object[i]['position'].split(':')[-1]] = factors
 
