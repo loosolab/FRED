@@ -843,18 +843,18 @@ def get_sample(sub_elem, id, organism):
                                 if elem['value'].endswith(f' ({k})'):
                                     elem['value'] = elem[
                                         'value'].replace(f' ({k})', '')
-                                if 'headers' in elem and k in elem[
-                                    'headers']:
-                                    new_val = {}
-                                    for l in range(len(
-                                            elem['headers'][k].split(
-                                                    ' '))):
-                                        new_val[
-                                            elem['headers'][k].split(' ')[
-                                                l]] = \
-                                        elem['value'].split(' ')[l]
-                                    elem['value'] = new_val
-                                    break
+                                    if 'headers' in elem and k in elem[
+                                        'headers']:
+                                        new_val = {}
+                                        for l in range(len(
+                                                elem['headers'][k].split(
+                                                        ' '))):
+                                            new_val[
+                                                elem['headers'][k].split(' ')[
+                                                    l]] = \
+                                            elem['value'].split(' ')[l]
+                                        elem['value'] = new_val
+                                        break
                         elif 'headers' in elem:
                             new_val = {}
                             for l in range(
@@ -921,7 +921,6 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                         headers = None
                     for j in range(len(factors[r]['values'])):
                         for k in w_keys:
-                            print(factors[r]['values'][j])
                             if factors[r]['values'][j].endswith(f' ({k})'):
                                 factors[r]['values'][j] = factors[r]['values'][j].replace(f' ({k})', '')
                                 if headers is not None and k in headers:
