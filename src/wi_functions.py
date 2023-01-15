@@ -643,6 +643,11 @@ def get_whitelist_object(item, organism_name, whitelists):
         if input_type == 'select' or input_type == 'gene':
             whitelist = utils.get_whitelist(item['position'].split(':')[-1],
                                             {'organism': organism_name})
+            if 'headers' in whitelist:
+                item['headers'] = whitelist['headers']
+            if 'whitelist_keys' in whitelist:
+                item['whitelist_keys'] = whitelist['whitelist_keys']
+                
             if whitelist['whitelist_type'] == 'group':
                 input_type = 'group_select'
             if whitelist['whitelist_type'] == 'plain' or \
