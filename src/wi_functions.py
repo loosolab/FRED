@@ -647,7 +647,7 @@ def get_whitelist_object(item, organism_name, whitelists):
                 item['headers'] = whitelist['headers']
             if 'whitelist_keys' in whitelist:
                 item['whitelist_keys'] = whitelist['whitelist_keys']
-                
+
             if whitelist['whitelist_type'] == 'group':
                 input_type = 'group_select'
             if whitelist['whitelist_type'] == 'plain' or \
@@ -727,38 +727,6 @@ def parse_part(wi_object, factors, organism, id, nom):
     key_yaml = utils.read_in_yaml(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..',
         'keys.yaml'))
-    if 'input_type' in wi_object and wi_object['input_type'] == 'gene':
-        if wi_object['value'] is not None:
-            gn, embl = wi_object['value'].split(' ')
-        sub_keys = list(
-            utils.find_keys(
-                key_yaml,
-                wi_object['position'].split(':')[-1]))[0]['value'].keys()
-        new_samp = {'position': wi_object['position'],
-                    'mandatory': wi_object['mandatory'],
-                    'list': wi_object['list'],
-                    'title': wi_object['displayName'],
-                    'desc': wi_object['desc']}
-        input_fields = []
-        for key in sub_keys:
-            node = list(utils.find_keys(key_yaml, key))[0]
-            input_field = parse_empty(
-                node, f'{wi_object["position"]}:{key}', key_yaml, False)
-            if gn is not None and embl is not None:
-                input_field['value'] = gn if key == 'gene_name' else embl
-            input_fields.append(input_field)
-        #for elem in factors:
-        #    for i in range(len(elem)):
-        #        if 'headers' in elem[i] and elem[i]['factor'] == \
-        #                wi_object['position'].split(':')[-1] and \
-        #                wi_object['value'] is not None:
-        #            for j in range(len(elem[i]['headers'].split(' '))):
-        #                for f in input_fields:
-        #                    if f['position'].split(':')[-1] == \
-        #                            elem[i]['headers'].split(' ')[j]:
-        #                        f['value'] = wi_object['value'].split(' ')[j]
-        new_samp['input_fields'] = input_fields
-        wi_object = new_samp
 
     if isinstance(wi_object, dict):
         if wi_object['list']:
@@ -789,27 +757,23 @@ def parse_part(wi_object, factors, organism, id, nom):
                 else:
                     val.append(wi_object['list_value'][i])
         else:
-            if 'whitelist' in wi_object and wi_object['whitelist'] and \
-                    'headers' in wi_object['whitelist']:
-                new_obj = {'position': wi_object['position'],
-                           'mandatory': wi_object['mandatory'],
-                           'list': wi_object['list'],
-                           'title': wi_object['displayName'],
-                           'desc': wi_object['desc']}
-                input_fields = []
-                for j in range(len(wi_object['whitelist']['headers'].split(
-                        ' '))):
-                    node = list(utils.find_keys(
-                        key_yaml,
-                        wi_object['whitelist']['headers'].split(' ')[j]))[0]
-                    input_fields.append(parse_empty(
-                        node,
-                        f'{wi_object["position"]}:'
-                        f'{wi_object["whitelist"]["headers"].split(" ")[j]}',
-                        key_yaml, False))
-                    input_fields[j]['value'] = wi_object['value'].split(' ')[j]
-                new_obj['input_fields'] = input_fields
-                wi_object = new_obj
+            if 'whitelist' in wi_object and wi_object['whitelist'] and 'whitelist_keys' in wi_object:
+                for k in wi_object['whitelist_keys']:
+                    if wi_object['value'].endswith(f' ({k})'):
+                        wi_object['value'] = wi_object['value'].replace(f' ({k})', '')
+                    if 'headers' in wi_object and k in wi_object['headers']:
+                        new_val = {}
+                        for l in range(len(wi_object['headers'][k].split(' '))):
+                            new_val[wi_object['headers'][k].split(' ')[l]] = wi_object['value'].split(' ')[l]
+                        wi_object['value'] = new_val
+                        break
+            elif 'whitelist' in wi_object and wi_object['whitelist'] and \
+                    'headers' in wi_object:
+                new_val = {}
+                for l in range(len(wi_object['headers'].split(' '))):
+                    new_val[wi_object['headers'].split(' ')[l]] = wi_object['value'].split(' ')[l]
+                wi_object['value'] = new_val
+
             if 'input_fields' in wi_object:
                 val = parse_part(wi_object['input_fields'], factors, organism,
                                  id, nom)
