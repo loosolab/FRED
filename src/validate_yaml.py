@@ -158,7 +158,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                 else:
                     new_yaml = list(utils.find_keys(new_yaml1, local_factor))
                 if len(new_yaml) > 0:
-                    if new_yaml[0]['whitelist']:
+                    if 'whitelist' in new_yaml[0] and new_yaml[0]['whitelist']:
                         if key_name.split(':')[-1] in is_factor:
                             w = utils.get_whitelist(key_name.split(':')[-1],
                                                     full_metadata)
