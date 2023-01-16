@@ -68,18 +68,19 @@ def find_values(node, kv):
                 yield x
     elif isinstance(node, dict):
         for val in node.values():
-            if ((type(kv) is int or type(
-                    kv) is float) and (
-                        type(val) is int or type(val) is float)) or (
-                    type(kv) is bool and type(val) is bool):
-                if kv == val:
-                    yield kv
+            if isinstance(val, dict) or isinstance(val, list):
+                for x in find_values(val, kv):
+                    yield x
             else:
-                if str(kv) in str(val):
-                    yield kv
-        for j in node.values():
-            for x in find_values(j, kv):
-                yield x
+                if ((type(kv) is int or type(
+                        kv) is float) and (
+                            type(val) is int or type(val) is float)) or (
+                        type(kv) is bool and type(val) is bool):
+                    if kv == val:
+                        yield kv
+                else:
+                    if str(kv).lower() in str(val).lower():
+                        yield val
 
 
 def read_whitelist(key):
@@ -205,7 +206,7 @@ def get_whitelist(key, filled_object):
                 stay_depend = True
 
     if group:
-        if whitelist['whitelist_type']!= 'plain_group':
+        if whitelist['whitelist_type'] != 'plain_group':
             for key in whitelist['whitelist']:
                 if whitelist['whitelist'][key] is not None and key != 'headers' \
                         and key != 'whitelist_type' and key != 'whitelist_keys':
