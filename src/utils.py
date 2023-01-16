@@ -79,7 +79,7 @@ def find_values(node, kv):
                     if kv == val:
                         yield kv
                 else:
-                    if str(kv).lower() in str(val).lower():
+                    if all(elem in str(val).lower() for elem in str(kv).lower().split(' ')):
                         yield val
 
 
