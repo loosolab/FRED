@@ -443,7 +443,7 @@ def find_entry(metafile, targets, target_value):
         # test if the search value is a substring of the metadata value if they
         # are of type string and return True if that is the case
         else:
-            if all(elem in str(value).lower() for elem in str(target_value).lower().split(' ')):
+            if all(elem in str(target_value).lower() for elem in str(value).lower().split(' ')):
                 return True
 
     # return False if no match was found
