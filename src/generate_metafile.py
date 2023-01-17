@@ -70,11 +70,11 @@ def generate_file(path, input_id, name, mandatory_mode):
             result_dict[item] = {**result_dict[item],
                                  **get_redo_value(key_yaml[item], item, False,
                                                   mandatory_mode, result_dict,
-                                                  True, False)}
+                                                  True, False, True)}
         else:
             result_dict[item] = get_redo_value(key_yaml[item], item, False,
                                                mandatory_mode, result_dict,
-                                               True, False)
+                                               True, False, True)
         print(f'{"".center(size.columns, "-")}\n'
               f'{"SUMMARY".center(size.columns, " ")}\n'
               f'{"".center(size.columns, "-")}\n')
@@ -133,7 +133,7 @@ def edit_item(key_name, item, key_yaml, result_dict, mandatory_mode):
     
     if isinstance(item, list):
         if all(not isinstance(x, dict) for x in item):
-            item = get_redo_value(key_yaml, key_name, False, mandatory_mode, result_dict, True, False)
+            item = get_redo_value(key_yaml, key_name, False, mandatory_mode, result_dict, True, False, True)
         else:
             all_options = []
             for i in range(len(item)):
@@ -161,7 +161,7 @@ def edit_item(key_name, item, key_yaml, result_dict, mandatory_mode):
         options = parse_input_list(options, False)
         if 'all' in options:
             new_item = get_redo_value(key_yaml, key_name, False,
-                    mandatory_mode, result_dict, True, False)
+                    mandatory_mode, result_dict, True, False, False)
             if isinstance(new_item, list):
                 item = new_item
             else:
@@ -170,7 +170,7 @@ def edit_item(key_name, item, key_yaml, result_dict, mandatory_mode):
         else:
             for key in options:
                 if key == 'organism':
-                    item[key] = get_redo_value(key_yaml['value'][key], key, False, mandatory_mode, result_dict, True, False)
+                    item[key] = get_redo_value(key_yaml['value'][key], key, False, mandatory_mode, result_dict, True, False, True)
                     item['experimental_factors'] = get_experimental_factors(key_yaml['value'], result_dict)
                     item['conditions'] = get_conditions(item['experimental_factors'], key_yaml['value']['conditions']['value'], mandatory_mode, item)
                 elif key == 'experimental_factors' and 'organism' not in options:
@@ -184,14 +184,14 @@ def edit_item(key_name, item, key_yaml, result_dict, mandatory_mode):
                     if key in item:
                         item[key] = edit_item(key, item[key], key_yaml['value'][key], result_dict, mandatory_mode)
                     else:
-                        item[key] = get_redo_value(key_yaml['value'][key], key, False, mandatory_mode, result_dict, True, False)
+                        item[key] = get_redo_value(key_yaml['value'][key], key, False, mandatory_mode, result_dict, True, False, True)
     else:
         item = parse_input_value(key_name, key_yaml['desc'], key_yaml['whitelist'], key_yaml['input_type'], item)
     return item
 
 
 def get_redo_value(node, item, optional, mandatory_mode, result_dict,
-                   first_node, is_factor):
+                   first_node, is_factor, do_redo):
     """
     This function tests whether a list must be specified for a value and,
     depending on this, calls a function to enter the value.
@@ -228,9 +228,12 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                         fill_metadata_structure(node['value'], item, {}, optional,
                                                 mandatory_mode, result_dict,
                                                 first_node, is_factor))
-                    redo = parse_list_choose_one(['True ', 'False '],
+                    if do_redo:
+                        redo = parse_list_choose_one(['True ', 'False '],
                                                  f'\nDo you want to add '
                                                  f'another {item}?')
+                    else:
+                        redo = False
         else:
             # enable the input of multiple elements of the whitelist
             value = get_input_list(node, item, result_dict)
@@ -336,7 +339,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                            optional,
                                                            mandatory_mode,
                                                            return_dict, False,
-                                                           is_factor)
+                                                           is_factor, True)
 
                     else:
 
@@ -546,7 +549,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                     possible_input[0],
                                                     optional, mandatory_mode,
                                                     result_dict, False,
-                                                    is_factor)
+                                                    is_factor, True)
 
                                                 # save the now filled key in
                                                 # the dictionary
@@ -594,7 +597,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                      optional,
                                                      mandatory_mode,
                                                      result_dict, False,
-                                                     is_factor)
+                                                     is_factor, True)
                                 if node[option]['list']:
                                     if option in return_dict:
                                         return_dict[option] += val
@@ -652,7 +655,7 @@ def get_experimental_factors(node, result_dict):
         # call the get_redo_value function to fill in the values for the
         # experimental factor
         used_values = get_redo_value(fac_node, fac, False, False, result_dict,
-                                     False, True)
+                                     False, True, True)
 
         # if the experimental factor contains a dictionary as value and the
         # structure of the factor contains a group key than add the group key
