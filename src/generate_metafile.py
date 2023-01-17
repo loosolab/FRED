@@ -16,7 +16,8 @@ factor = []
 not_editable = ['id', 'project_name', 'sample_name', 'pooled', 'donor_count',
                 'technical_replicates']
 id = ''
-
+exp_fac = {}
+list_def = []
 
 class WhitelistCompleter:
     def __init__(self, whitelist):
@@ -65,17 +66,28 @@ def generate_file(path, input_id, name, mandatory_mode):
 
     # parse through metadata structure and fill it for every key
     for item in key_yaml:
-        correct = False
+        if item in result_dict:
+            result_dict[item] = {**result_dict[item],
+                                 **get_redo_value(key_yaml[item], item, False,
+                                                  mandatory_mode, result_dict,
+                                                  True, False)}
+        else:
+            result_dict[item] = get_redo_value(key_yaml[item], item, False,
+                                               mandatory_mode, result_dict,
+                                               True, False)
+        print(f'{"".center(size.columns, "-")}\n'
+              f'{"SUMMARY".center(size.columns, " ")}\n'
+              f'{"".center(size.columns, "-")}\n')
+        sum = print_summary(result_dict[item], 1, False)
+        print(sum)
+        print(f'\n\n')
+        print(f'{"".center(size.columns, "-")}\n')
+
+        correct = parse_list_choose_one(['True ', 'False '],
+                                        f'\nIs the input correct? You can redo it by selecting \'False\'')
         while not correct:
-            if item in result_dict:
-                result_dict[item] = {**result_dict[item],
-                                     **get_redo_value(key_yaml[item], item, False,
-                                                      mandatory_mode, result_dict,
-                                                      True, False)}
-            else:
-                result_dict[item] = get_redo_value(key_yaml[item], item, False,
-                                                   mandatory_mode, result_dict,
-                                                   True, False)
+            result_dict[item] = edit_item(item, result_dict[item], key_yaml[item], result_dict, mandatory_mode)
+
             print(f'{"".center(size.columns, "-")}\n'
                   f'{"SUMMARY".center(size.columns, " ")}\n'
                   f'{"".center(size.columns, "-")}\n')
@@ -85,7 +97,8 @@ def generate_file(path, input_id, name, mandatory_mode):
             print(f'{"".center(size.columns, "-")}\n')
 
             correct = parse_list_choose_one(['True ', 'False '],
-                                          f'\nIs the input correct? You can redo it by selecting \'False\'')
+                                            f'\nIs the input correct? You can redo it by selecting \'False\'')
+
 
     # TODO: extra function for summary
     # print summary
@@ -115,6 +128,68 @@ def generate_file(path, input_id, name, mandatory_mode):
     print_sample_names(result_dict, input_id, path)
 
 
+def edit_item(key_name, item, key_yaml, result_dict, mandatory_mode):
+    # TODO: add + remove list elements
+    
+    if isinstance(item, list):
+        if all(not isinstance(x, dict) for x in item):
+            item = get_redo_value(key_yaml, key_name, False, mandatory_mode, result_dict, True, False)
+        else:
+            all_options = []
+            for i in range(len(item)):
+                if isinstance(item[i], dict):
+                    all_options.append('\n'.join(f'{x}: {item[i][x]}' for x in item[i]))
+                else:
+                    all_options.append(item[i])
+            if len(all_options) > 1:
+                print(f'Please choose the list elements you want to edit (1-{len(item)}) divided by comma.')
+                print_option_list(all_options, False)
+                chosen_options = parse_input_list(all_options, False)
+                options = []
+                for i in range(len(all_options)):
+                    if all_options[i] in chosen_options:
+                        options.append(i)
+                for i in options:
+                    item[i] = edit_item(key_name, item[i], key_yaml, result_dict, mandatory_mode)
+            else:
+                item = edit_item(key_name, item[0], key_yaml, result_dict, mandatory_mode)
+    elif isinstance(item, dict):
+        print(f'Please choose the keys (1-{len(item.keys())}) you want to edit divided by comma.')
+        options = [key for key in key_yaml['value'] if key not in not_editable]
+        options.insert(0, 'all')
+        print_option_list(options, False)
+        options = parse_input_list(options, False)
+        if 'all' in options:
+            new_item = get_redo_value(key_yaml, key_name, False,
+                    mandatory_mode, result_dict, True, False)
+            if isinstance(new_item, list):
+                item = new_item
+            else:
+                item = {**result_dict[key_name],
+                        **new_item}
+        else:
+            for key in options:
+                if key == 'organism':
+                    item[key] = get_redo_value(key_yaml['value'][key], key, False, mandatory_mode, result_dict, True, False)
+                    item['experimental_factors'] = get_experimental_factors(key_yaml['value'], result_dict)
+                    item['conditions'] = get_conditions(item['experimental_factors'], key_yaml['value']['conditions']['value'], mandatory_mode, item)
+                elif key == 'experimental_factors' and 'organism' not in options:
+                    item[key] = get_experimental_factors(key_yaml['value'], result_dict)
+                    item['conditions'] = get_conditions(item[key], key_yaml['value']['conditions']['value'], mandatory_mode, item)
+                elif key == 'conditions' and 'experimental_factors' not in options and 'organism' not in options:
+                    for elem in item['experimental_factors']:
+                        elem['is_list'] = True if elem['factor'] in list_def else False
+                    item[key] = get_conditions(item['experimental_factors'], key_yaml['value']['conditions']['value'], mandatory_mode, item)
+                else:
+                    if key in item:
+                        item[key] = edit_item(key, item[key], key_yaml['value'][key], result_dict, mandatory_mode)
+                    else:
+                        item[key] = get_redo_value(key_yaml['value'][key], key, False, mandatory_mode, result_dict, True, False)
+    else:
+        item = parse_input_value(key_name, key_yaml['desc'], key_yaml['whitelist'], key_yaml['input_type'], item)
+    return item
+
+
 def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                    first_node, is_factor):
     """
@@ -132,7 +207,6 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
     """
     # test if the input value is of type list
     if node['list']:
-
         # test if one list element contains a dictionary
         if isinstance(node['value'], dict) and not \
                 set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
@@ -145,14 +219,13 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                                                 mandatory_mode, result_dict,
                                                 first_node, is_factor)
             else:
-
                 # repeat the input prompt for the keys of the list element
                 # until the user specifies it is complete
                 redo = True
                 value = []
                 while redo:
                     value.append(
-                        fill_metadata_structure(node, item, {}, optional,
+                        fill_metadata_structure(node['value'], item, {}, optional,
                                                 mandatory_mode, result_dict,
                                                 first_node, is_factor))
                     redo = parse_list_choose_one(['True ', 'False '],
@@ -209,7 +282,6 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
     if isinstance(node, dict) and not \
             set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
             set(node.keys()):
-
         # test if the input is of type value_unit
         if len(node.keys()) == 2 and 'value' in node.keys() and 'unit' in \
                 node.keys():
@@ -598,6 +670,9 @@ def get_experimental_factors(node, result_dict):
 
         # add a dictionary containing the experimental factor, its values and
         # if it contains a list to the experimental_factors list
+        if fac_node['list']:
+            global list_def
+            list_def.append(fac)
         experimental_factors.append({'factor': fac,
                                      'values': used_values,
                                      'is_list': fac_node['list']})
@@ -859,7 +934,7 @@ def fill_replicates(condition, bio, input_pooled, node,
         # set the donor_count to 1 otherwise and save it into the sample
         # dictionary
         samples['donor_count'] = parse_input_value(
-            'donor_count', '', False, 'int', result_dict) if input_pooled \
+            'donor_count', '', False, 'number', result_dict) if input_pooled \
             else 1
 
         # iterate through factors and values in the condition
