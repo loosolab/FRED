@@ -79,6 +79,7 @@ def main():
 
 if __name__ == "__main__":
 
+    print('Fetching whitelists...\n')
     if not os.path.exists('metadata_whitelists'):
         repo = git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', 'metadata_whitelists')
         repo.git.checkout('update_enrichment')
