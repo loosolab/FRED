@@ -4,7 +4,7 @@ For this example, we will extend the whitelist for 'reference_genome' with the r
 
 ### Step 1: Finding the whitelist file and opening it in the web editor
 
-Go to the [whitelist folder](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/tree/main/whitelists) in the repository. There, look for the file whose name matches the key whose possible values you want to extend. In this example, this is the file named 'reference_genome'.
+Go to the [whitelist folder](https://gitlab.gwdg.de/loosolab/software/metadata_whitelists/-/tree/main/whitelists) in the repository. There, look for the file whose name matches the key whose possible values you want to extend. In this example, this is the file named 'reference_genome'.
 
 ![](images/whitelist_selection.png)
 
@@ -229,7 +229,7 @@ whitelist:
 </tr>
 </table>
 
-[1] [https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism)
+[1] [https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/whitelists/organism](https://gitlab.gwdg.de/loosolab/software/metadata_whitelists/-/tree/main/whitelists/organism)
 
 __abbrev__:
 

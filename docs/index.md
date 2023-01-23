@@ -24,7 +24,7 @@ conda create -n metadata
 2\. Install the requirements into the 'metadata' environment. Type 'y' when conda asks you to proceed.
 
 ```bash
-conda install -n metadata "pyyaml>=5.1" "tabulate>=0.8.10"
+conda install -n metadata "pyyaml>=5.1" "tabulate>=0.8.10" "GitPython>=3.1.18"
 ```
 
 3\. Activate the 'metadata' environment to use the metadata tool.
