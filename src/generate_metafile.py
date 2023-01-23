@@ -170,16 +170,27 @@ def edit_item(key_name, item, key_yaml, result_dict, mandatory_mode):
         else:
             for key in options:
                 if key == 'organism':
-                    item[key] = get_redo_value(key_yaml['value'][key], key, False, mandatory_mode, result_dict, True, False, True)
-                    item['experimental_factors'] = get_experimental_factors(key_yaml['value'], result_dict)
-                    item['conditions'] = get_conditions(item['experimental_factors'], key_yaml['value']['conditions']['value'], mandatory_mode, item)
+                    item = get_redo_value(key_yaml, 'experimental_setting', False, mandatory_mode, result_dict, True, False, False)
                 elif key == 'experimental_factors' and 'organism' not in options:
-                    item[key] = get_experimental_factors(key_yaml['value'], result_dict)
-                    item['conditions'] = get_conditions(item[key], key_yaml['value']['conditions']['value'], mandatory_mode, item)
+                    new_yaml = copy.deepcopy(key_yaml)
+                    new_yaml['value'].pop('organism')
+                    item = get_redo_value(new_yaml, 'experimental_setting',
+                                          False, mandatory_mode, copy.deepcopy(item),
+                                          True, False, False)
                 elif key == 'conditions' and 'experimental_factors' not in options and 'organism' not in options:
-                    for elem in item['experimental_factors']:
-                        elem['is_list'] = True if elem['factor'] in list_def else False
-                    item[key] = get_conditions(item['experimental_factors'], key_yaml['value']['conditions']['value'], mandatory_mode, item)
+                    for i in range(len(item['experimental_factors'])):
+                        for fac in list_def:
+                            if item['experimental_factors'][i]['factor'] == fac['factor']:
+                                item['experimental_factors'][i] = fac
+                                break
+                    print(item['experimental_factors'])
+                    new_yaml = copy.deepcopy(key_yaml)
+                    new_yaml['value'].pop('organism')
+                    new_yaml['value'].pop('experimental_factors')
+                    item = get_redo_value(new_yaml, 'experimental_setting',
+                                          False, mandatory_mode,
+                                          copy.deepcopy(item),
+                                          True, False, False)
                 else:
                     if key in item:
                         item[key] = edit_item(key, item[key], key_yaml['value'][key], result_dict, mandatory_mode)
@@ -317,6 +328,8 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                 # choose the analyzed experimental factors and their respective
                 # values and save them into the metadata dictionary
                 if item == 'experimental_factors':
+                    if 'organism' not in return_dict and 'organism' in result_dict:
+                        return_dict['organism'] = result_dict['organism']
                     return_dict[item] = get_experimental_factors(node,
                                                                  return_dict)
 
@@ -324,6 +337,10 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                 # choose the analyzed conditions from the entered experimental
                 # factors  and save them into the metadata dictionary
                 elif item == 'conditions':
+                    if 'organism' not in return_dict and 'organism' in result_dict:
+                        return_dict['organism'] = result_dict['organism']
+                    if 'experimental_factors' not in return_dict and 'experimental_factors' in result_dict:
+                        return_dict['experimental_factors'] = result_dict['experimental_factors']
                     return_dict[item] = get_conditions(
                         copy.deepcopy(return_dict['experimental_factors']),
                         node[item]['value'],
@@ -673,17 +690,20 @@ def get_experimental_factors(node, result_dict):
 
         # add a dictionary containing the experimental factor, its values and
         # if it contains a list to the experimental_factors list
-        if fac_node['list']:
-            global list_def
-            list_def.append(fac)
+
         experimental_factors.append({'factor': fac,
                                      'values': used_values,
                                      'is_list': fac_node['list']})
+        global list_def
+        if {'factor': fac, 'values': used_values, 'is_list': fac_node['list']} not in list_def:
+            list_def.append({'factor': fac,
+                                         'values': copy.deepcopy(used_values),
+                                         'is_list': fac_node['list']})
 
     # set the global parameter factor to the user chosen experimental factors
     global factor
     factor = used_factors
-
+    print(experimental_factors)
     # return all chosen experimental factors with their values
     return experimental_factors
 
@@ -1303,11 +1323,10 @@ def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
                 input_value = complete_input(w, key)
 
                 # repeat if the input value does not match the whitelist
-                if input_value not in w:
+                while input_value not in w:
                     print(f'The value you entered does not match the '
                           f'whitelist. Try tab for autocomplete.')
-                    input_value = parse_input_value(
-                        key, desc, has_whitelist, value_type, result_dict)
+                    input_value = complete_input(w, key)
 
             else:
 
@@ -1321,19 +1340,17 @@ def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
             input_value = complete_input(whitelist['whitelist'], key)
 
             # repeat if the input value does not match the whitelist
-            if input_value not in whitelist['whitelist']:
+            while input_value not in whitelist['whitelist']:
                 print(f'The value you entered does not match the '
                       f'whitelist. Try tab for autocomplete.')
-                input_value = parse_input_value(key, desc, has_whitelist,
-                                                value_type,
-                                                result_dict)
+                input_value = complete_input(whitelist['whitelist'], key)
 
         # call parse_list_choose_one to print indexed whitelist and parse user
         # input
         else:
             input_value = parse_list_choose_one(whitelist['whitelist'],
                                                 f'{key}:')
-
+        print(input_value)
         w_key = None
         if whitelist['whitelist_type'] == 'plain_group':
             for k in whitelist['whitelist_keys']:
@@ -1343,7 +1360,8 @@ def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
 
         # test if the whitelist contains the key 'headers'
         if 'headers' in whitelist:
-
+            print(whitelist['whitelist_type'])
+            print(w_key)
             if whitelist['whitelist_type'] == 'group' or whitelist['whitelist_type'] == 'plain_group' and w_key is not None:
                 if w_key in whitelist['headers']:
                     headers = whitelist['headers'][w_key].split(' ')
