@@ -27,10 +27,8 @@ def get_empty_wi_object():
     """
     if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists')):
         repo = git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
-        repo.git.checkout('update_enrichment')
     else:
         repo = git.Repo(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists'))
-        repo.git.checkout('update_enrichment')
         o = repo.remotes.origin
         o.pull()
 
@@ -341,11 +339,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     if key == 'gene':
         input_type = 'gene'
     elif key == 'enrichment':
-        #input_type = 'enrichment'
-        histone = [x for x in whitelist if '(histone marks)' in x]
-        other = [x for x in whitelist if '(other)' in x]
-        proteins = [x for x in whitelist if '(proteins)' in x]
-        whitelist = histone + proteins[:10] + other
+        input_type = 'enrichment'
     if is_list:
         node = list(utils.find_keys(key_yaml, key))[0]
         new_w = [
@@ -653,11 +647,6 @@ def get_whitelist_object(item, organism_name, whitelists):
             if whitelist['whitelist_type'] == 'plain' or \
                     whitelist['whitelist_type'] == 'plain_group':
                 whitelist = whitelist['whitelist']
-                if item['position'].split(':')[-1] == 'enrichment':
-                    histone = [x for x in whitelist if '(histone marks)' in x]
-                    other = [x for x in whitelist if '(other)' in x]
-                    proteins = [x for x in whitelist if '(proteins)' in x]
-                    whitelist = histone + proteins[:10] + other
         elif input_type == 'bool':
             whitelist = [True, False]
             input_type = 'select'
@@ -673,6 +662,10 @@ def get_whitelist_object(item, organism_name, whitelists):
             if 'whitelist' in whitelist:
                 whitelist = whitelist['whitelist']
             input_type = 'gene'
+        if item['position'].split(':')[-1] == 'enrichment':
+            if 'whitelist' in whitelist:
+                whitelist = whitelist['whitelist']
+            input_type = 'enrichment'
         item['input_type'] = input_type
         if input_type == 'group_select':
             w = []
