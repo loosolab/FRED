@@ -120,10 +120,12 @@ def generate_file(path, input_id, name, mandatory_mode):
         validate_yaml.print_validation_report(
             result_dict, missing_mandatory_keys, invalid_keys,
             invalid_entries, invalid_values)
+    elif len(pool_warn) > 0 or len(ref_genome_warn) > 0:
+        validate_yaml.print_warning(result_dict, pool_warn, ref_genome_warn)
     else:
         print(f'Validation complete. No errors found.\n')
 
-        utils.save_as_yaml(result_dict,
+    utils.save_as_yaml(result_dict,
                            os.path.join(path, f'{input_id}_metadata.yaml'))
     print_sample_names(result_dict, input_id, path)
 
@@ -183,7 +185,6 @@ def edit_item(key_name, item, key_yaml, result_dict, mandatory_mode):
                             if item['experimental_factors'][i]['factor'] == fac['factor']:
                                 item['experimental_factors'][i] = fac
                                 break
-                    print(item['experimental_factors'])
                     new_yaml = copy.deepcopy(key_yaml)
                     new_yaml['value'].pop('organism')
                     new_yaml['value'].pop('experimental_factors')
@@ -703,7 +704,6 @@ def get_experimental_factors(node, result_dict):
     # set the global parameter factor to the user chosen experimental factors
     global factor
     factor = used_factors
-    print(experimental_factors)
     # return all chosen experimental factors with their values
     return experimental_factors
 
@@ -1350,7 +1350,6 @@ def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
         else:
             input_value = parse_list_choose_one(whitelist['whitelist'],
                                                 f'{key}:')
-        print(input_value)
         w_key = None
         if whitelist['whitelist_type'] == 'plain_group':
             for k in whitelist['whitelist_keys']:
@@ -1360,8 +1359,6 @@ def parse_input_value(key, desc, has_whitelist, value_type, result_dict):
 
         # test if the whitelist contains the key 'headers'
         if 'headers' in whitelist:
-            print(whitelist['whitelist_type'])
-            print(w_key)
             if whitelist['whitelist_type'] == 'group' or whitelist['whitelist_type'] == 'plain_group' and w_key is not None:
                 if w_key in whitelist['headers']:
                     headers = whitelist['headers'][w_key].split(' ')
@@ -1708,7 +1705,6 @@ def get_combis(values, key, multi):
         if multi:
             possible_values = []
             for i in range(len(values)):
-                print(values[i])
                 if isinstance(values[i], dict):
                     v = '|'.join([f'{k}:"{values[i][k]}"' for k in values[i]])
                     s = f'{key}:{"{"}{v}{"}"}'

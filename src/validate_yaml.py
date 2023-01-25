@@ -37,8 +37,8 @@ def validate_file(metafile):
     if len(missing_mandatory_keys) > 0 or len(invalid_keys) > 0 or len(
             invalid_entries) > 0 or len(invalid_value) > 0:
         valid = False
-    #else:
-    #    pool_warn, ref_genome_warn = validate_logic(metafile)
+    else:
+        pool_warn, ref_genome_warn = validate_logic(metafile)
     return valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
         invalid_value, pool_warn, ref_genome_warn
 
