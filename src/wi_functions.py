@@ -42,6 +42,14 @@ def get_empty_wi_object():
     return wi_object
 
 
+def get_single_whitelist(ob):
+    whitelist = utils.get_whitelist(ob['key_name'], {'organism': ob['organism']})
+    if 'whitelist' in whitelist:
+        return whitelist['whitelist']
+    else:
+        return None
+    
+
 def parse_empty(node, pos, key_yaml, get_whitelists):
     """
     This function parses a part of the key.yaml into an object readable by the
