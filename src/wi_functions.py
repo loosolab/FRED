@@ -92,11 +92,15 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                         whitelist_type = 'plain_group'
             else:
                 whitelist = None
-            if input_type != 'group_select':
-                if isinstance(whitelist, dict):
-                    input_type = 'dependable'
-            if pos.split(':')[-1] == 'gene':
-                input_type = 'gene'
+            if whitelist and len(whitelist) > 30:
+                if node['list']:
+                    input_type = 'multi_autofill'
+                else:
+                    input_type = 'single_autofill'
+                whitelist = None
+            #if input_type != 'group_select':
+            #    if isinstance(whitelist, dict):
+            #        input_type = 'dependable'
             if pos.split(':')[-1] == 'organism':
                 input_type = 'organism_name'
             part_object = {'position': pos, 'mandatory': node['mandatory'],
@@ -180,8 +184,13 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
             if input_type != 'group_select':
                 if isinstance(whitelist, dict):
                     input_type = 'dependable_select'
-                # elif whitelist and len(whitelist) > 30:
-                #    input_type = 'searchable_select'
+                elif whitelist and len(whitelist) > 30:
+                    if node['list']:
+                        input_type = 'multi_autofill'
+                        whitelist = None
+                    else:
+                        input_type = 'single_autofill'
+                        whitelist = None
         else:
             if node['whitelist']:
                 whitelist = pos.split(':')[-1]
@@ -198,8 +207,11 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                        'whitelist_type': whitelist_type,
                        'input_type': input_type,
                        'input_disabled': input_disabled}
-        if node['list']:
+        if node['list'] or node['input_type'] == 'single_autofill':
             part_object['list_value'] = []
+        if node['input_type'] == 'single_autofill' or node['input_type'] == 'multi_autofill':
+            part_object['search_info'] = {'organism': None, 'key_name': part_object['position'].split(':')[-1]}
+
     return part_object
 
 
@@ -219,7 +231,8 @@ def get_factors(organism):
         whitelist, whitelist_type, input_type, headers, w_keys = \
             get_whitelist_with_type(factor, key_yaml, organism, None)
         values[factor] = {'whitelist': whitelist, 'input_type': input_type,
-                          'whitelist_type': whitelist_type}
+                          'whitelist_type': whitelist_type,
+                          'search_info': {'organism': organism, 'key_name': factor}}
         if headers is not None:
             values[factor]['headers'] = headers
         if w_keys is not None:
@@ -334,12 +347,9 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     if isinstance(whitelist, dict) and 'whitelist' in whitelist:
         whitelist = whitelist['whitelist']
 
-    # if whitelist and len(whitelist) > 30:
-    #    input_type = 'searchable_select'
-    if key == 'gene':
-        input_type = 'gene'
-    elif key == 'enrichment':
-        input_type = 'enrichment'
+    if whitelist and len(whitelist) > 30:
+        input_type = 'multi_autofill'
+        whitelist = None
     if is_list:
         node = list(utils.find_keys(key_yaml, key))[0]
         new_w = [
@@ -479,6 +489,8 @@ def get_samples(condition, sample, real_val):
                             sample[i]['value'] = real_val[c[1]]
                         else:
                             sample[i]['value'] = c[1]
+                        if sample[i]['input_type'] == 'single_autofill':
+                            sample[i]['list_value'] = [] if sample[i]['value'] is None else [sample[i]['value']]
                 sample[i]['input_disabled'] = True
             elif not any(sample[i]['position'] ==
                          f'experimental_setting:conditions:'
@@ -491,6 +503,8 @@ def get_samples(condition, sample, real_val):
                     new_samp['position'] = \
                         f'{new_samp["position"]}:' \
                         f'{new_samp["position"].split(":")[-1]}'
+                    if new_samp['input_type'] == 'single_autofill':
+                        new_samp['list_value'] = [] if new_samp['value'] is None else [new_samp['value']]
                     sample[i]['input_fields'] = [new_samp]
                     sample[i]['title'] = copy.deepcopy(
                         sample[i]['displayName'])
@@ -634,7 +648,7 @@ def get_whitelist_object(item, organism_name, whitelists):
     """
     if 'input_type' in item:
         input_type = item['input_type']
-        if input_type == 'select' or input_type == 'gene':
+        if input_type == 'select' or input_type == 'single_autofill' or input_type == 'multi_autofill' or input_type == 'dependable':
             whitelist = utils.get_whitelist(item['position'].split(':')[-1],
                                             {'organism': organism_name})
             if 'headers' in whitelist:
@@ -658,14 +672,17 @@ def get_whitelist_object(item, organism_name, whitelists):
                 whitelist = whitelist['whitelist']
         else:
             whitelist = None
-        if item['position'].split(':')[-1] == 'gene':
-            if 'whitelist' in whitelist:
-                whitelist = whitelist['whitelist']
-            input_type = 'gene'
-        if item['position'].split(':')[-1] == 'enrichment':
-            if 'whitelist' in whitelist:
-                whitelist = whitelist['whitelist']
-            input_type = 'enrichment'
+
+        item['whitelist'] = item['position'].split(':')[-1] if whitelist is not None else None
+        if whitelist and isinstance(whitelist, list) and len(whitelist) > 30:
+            if item['list']:
+                input_type = 'multi_autofill'
+            else:
+                input_type = 'single_autofill'
+            item['search_info'] = {'organism': organism_name,
+                                   'key_name': item['position'].split(':')[-1]}
+            if not 'list_value' in item:
+                item['list_value'] = []
         item['input_type'] = input_type
         if input_type == 'group_select':
             w = []

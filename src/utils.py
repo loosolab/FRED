@@ -1,6 +1,7 @@
 import yaml
 import os
 import copy
+import json
 
 # The following functions were copied from Mampok
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/utils.py
@@ -24,6 +25,13 @@ def read_in_yaml(yaml_file):
     """
     with open(yaml_file) as file:
         output = yaml.load(file, Loader=yaml.FullLoader)
+    low_output = {k.lower(): v for k, v in output.items()}
+    return low_output
+
+
+def read_in_json(json_file):
+    with open(json_file) as file:
+        output = json.load(file)
     low_output = {k.lower(): v for k, v in output.items()}
     return low_output
 
@@ -90,11 +98,16 @@ def read_whitelist(key):
     :return: whitelist: the read in whitelist
     """
     try:
-        whitelist = read_in_yaml(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
-                         'metadata_whitelists', 'whitelists', key))
+        whitelist = read_in_json(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists', 'misc', 'json', key))
+        print('READING JSON')
     except (AttributeError, FileNotFoundError):
-        whitelist = None
+        try:
+            whitelist = read_in_yaml(
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                         'metadata_whitelists', 'whitelists', key))
+            print('READING YAML')
+        except (AttributeError, FileNotFoundError):
+            whitelist = None
     return whitelist
 
 
