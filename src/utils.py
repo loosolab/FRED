@@ -99,13 +99,11 @@ def read_whitelist(key):
     """
     try:
         whitelist = read_in_json(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists', 'misc', 'json', key))
-        print('READING JSON')
     except (AttributeError, FileNotFoundError):
         try:
             whitelist = read_in_yaml(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
                          'metadata_whitelists', 'whitelists', key))
-            print('READING YAML')
         except (AttributeError, FileNotFoundError):
             whitelist = None
     return whitelist
