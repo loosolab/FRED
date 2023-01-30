@@ -241,7 +241,7 @@ def get_factors(organism):
         values[factor] = {'whitelist': whitelist, 'input_type': input_type,
                           'whitelist_type': whitelist_type}
         if input_type == 'single_autofill' or input_type == 'multi_autofill':
-            values[factor]['search_info']: {'organism': organism, 'key_name': factor}
+            values[factor]['search_info'] = {'organism': organism, 'key_name': factor}
         if headers is not None:
             values[factor]['headers'] = headers
         if w_keys is not None:
