@@ -48,7 +48,7 @@ def get_single_whitelist(ob):
         return whitelist['whitelist']
     else:
         return None
-    
+
 
 def parse_empty(node, pos, key_yaml, get_whitelists):
     """
@@ -412,11 +412,12 @@ def get_samples(condition, sample, real_val):
                         sample[i]['value'] = real_val[val]
                     else:
                         if 'input_type' in sample[i] and sample[i][
-                                'input_type'] == 'gene':
-                            val = ""
-                            for key in c[1]:
-                                val = f'{val}{" " if val != "" else ""}{c[1][key]}'
-                            sample[i]['value'] = val
+                                'input_type'] == 'genes':
+                            pass
+                            #val = ""
+                            #for key in c[1]:
+                            #    val = f'{val}{" " if val != "" else ""}{c[1][key]}'
+                            #sample[i]['value'] = val
                         else:
                             if sample[i]['list']:
                                 filled_sample = copy.deepcopy(sample[i]
@@ -497,8 +498,10 @@ def get_samples(condition, sample, real_val):
                             sample[i]['value'] = real_val[c[1]]
                         else:
                             sample[i]['value'] = c[1]
-                        if sample[i]['input_type'] == 'single_autofill':
-                            sample[i]['list_value'] = [] if sample[i]['value'] is None else [sample[i]['value']]
+                if sample[i]['input_type'] == 'single_autofill':
+                    sample[i]['list_value'] = [] if sample[i][
+                                                        'value'] is None else [
+                        sample[i]['value']]
                 sample[i]['input_disabled'] = True
             elif not any(sample[i]['position'] ==
                          f'experimental_setting:conditions:'
