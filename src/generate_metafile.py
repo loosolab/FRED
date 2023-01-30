@@ -5,7 +5,6 @@ import src.validate_yaml as validate_yaml
 import datetime
 import os
 import readline
-import re
 import copy
 
 try:
