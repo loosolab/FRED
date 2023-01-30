@@ -239,8 +239,9 @@ def get_factors(organism):
         whitelist, whitelist_type, input_type, headers, w_keys = \
             get_whitelist_with_type(factor, key_yaml, organism, None)
         values[factor] = {'whitelist': whitelist, 'input_type': input_type,
-                          'whitelist_type': whitelist_type,
-                          'search_info': {'organism': organism, 'key_name': factor}}
+                          'whitelist_type': whitelist_type}
+        if input_type == 'single_autofill' or input_type == 'multi_autofill':
+            values[factor]['search_info']: {'organism': organism, 'key_name': factor}
         if headers is not None:
             values[factor]['headers'] = headers
         if w_keys is not None:
@@ -411,60 +412,52 @@ def get_samples(condition, sample, real_val):
                     if val in real_val:
                         sample[i]['value'] = real_val[val]
                     else:
-                        if 'input_type' in sample[i] and sample[i][
-                                'input_type'] == 'genes':
-                            pass
-                            #val = ""
-                            #for key in c[1]:
-                            #    val = f'{val}{" " if val != "" else ""}{c[1][key]}'
-                            #sample[i]['value'] = val
+                        if sample[i]['list']:
+                            filled_sample = copy.deepcopy(sample[i]
+                                                          ['input_fields'])
+                            for j in range(len(filled_sample)):
+                                for x in c[1]:
+                                    if filled_sample[
+                                        j]['position'].split(':')[-1] == x:
+                                        if x in ['age', 'time_point',
+                                                 'treatment_duration']:
+                                            unit = c[1][x].lstrip('0123456789')
+                                            value = c[1][x][:len(c[1][x]) -
+                                                             len(unit)]
+                                            filled_sample[j]['value'] = \
+                                                int(value)
+                                            filled_sample[j]['value_unit'] = \
+                                                unit
+                                        else:
+                                            filled_sample[j]['value'] = c[1][x]
+                                        filled_sample[j]['input_disabled'] = \
+                                            True
+                            sample[i]['list_value'].append(filled_sample)
                         else:
-                            if sample[i]['list']:
-                                filled_sample = copy.deepcopy(sample[i]
-                                                              ['input_fields'])
-                                for j in range(len(filled_sample)):
+                            if 'input_fields' in sample[i]:
+                                for j in range(len(sample[i]['input_fields'])):
                                     for x in c[1]:
-                                        if filled_sample[
-                                                j]['position'].split(':')[-1] == x:
+                                        if sample[i]['input_fields'][j][
+                                            'position'].split(':')[-1] == x:
                                             if x in ['age', 'time_point',
                                                      'treatment_duration']:
-                                                unit = c[1][x].lstrip('0123456789')
-                                                value = c[1][x][:len(c[1][x]) -
-                                                                len(unit)]
-                                                filled_sample[j]['value'] = \
-                                                    int(value)
-                                                filled_sample[j]['value_unit'] = \
-                                                    unit
+                                                unit = c[1][x].lstrip(
+                                                    '0123456789')
+                                                value = c[1][x][
+                                                        :len(c[1][x]) - len(
+                                                            unit)]
+                                                sample[i]['input_fields'][j][
+                                                    'value'] = int(value)
+                                                sample[i]['input_fields'][j][
+                                                    'value_unit'] = unit
                                             else:
-                                                filled_sample[j]['value'] = c[1][x]
-                                            filled_sample[j]['input_disabled'] = \
-                                                True
-                                sample[i]['list_value'].append(filled_sample)
+                                                sample[i]['input_fields'][j][
+                                                    'value'] = c[1][x]
                             else:
-                                if 'input_fields' in sample[i]:
-                                    for j in range(len(sample[i]['input_fields'])):
-                                        for x in c[1]:
-                                            if sample[i]['input_fields'][j][
-                                                    'position'].split(':')[-1] == x:
-                                                if x in ['age', 'time_point',
-                                                         'treatment_duration']:
-                                                    unit = c[1][x].lstrip(
-                                                        '0123456789')
-                                                    value = c[1][x][
-                                                            :len(c[1][x]) - len(unit)]
-                                                    sample[i]['input_fields'][j][
-                                                        'value'] = int(value)
-                                                    sample[i]['input_fields'][j][
-                                                        'value_unit'] = unit
-                                                else:
-                                                    sample[i]['input_fields'][j][
-                                                        'value'] = c[1][x]
-                                else:
-                                    val = ""
-                                    for key in c[1]:
-                                        val = f'{val}{" " if val != "" else ""}{c[1][key]}'
-                                    sample[i]['value'] = val
-
+                                val = ""
+                                for key in c[1]:
+                                    val = f'{val}{" " if val != "" else ""}{c[1][key]}'
+                                sample[i]['value'] = val
                 else:
                     if sample[i]['list']:
                         if len(sample[i]['list_value']) > 0:
