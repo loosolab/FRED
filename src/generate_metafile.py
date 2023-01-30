@@ -25,7 +25,7 @@ class WhitelistCompleter:
 
     def complete(self, text, state):
         results = [x for x in self.whitelist if
-                   re.search(text, x, re.IGNORECASE) is not None] + [None]
+                   text.lower() in x.lower()] + [None]
         if len(results) > 30:
             results = results[:30]
         return results[state]
