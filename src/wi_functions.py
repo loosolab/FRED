@@ -491,7 +491,7 @@ def get_samples(condition, sample, real_val):
                             sample[i]['value'] = real_val[c[1]]
                         else:
                             sample[i]['value'] = c[1]
-                if sample[i]['input_type'] == 'single_autofill':
+                if 'input_type' in sample[i] and sample[i]['input_type'] == 'single_autofill':
                     sample[i]['list_value'] = [] if sample[i][
                                                         'value'] is None else [
                         sample[i]['value']]
