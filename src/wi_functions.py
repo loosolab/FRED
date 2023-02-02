@@ -968,10 +968,14 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                         value = int(factors[r]['values'][j][:len(factors[r]['values'][j]) - len(unit)])
                         factors[r]['values'][j] = {'unit': unit, 'value': value}
 
-                if isinstance(factors[r]['values'], dict):
-                    for elem in range(len(factors[r]['values'])):
-                        if len(factors[r]['values'][elem]) == 0:
-                            factors[r]['values'].pop(elem)
+                for j in range(len(factors[r]['values'])):
+                    if isinstance(factors[r]['values'][j], dict):
+                        remove = []
+                        for elem in factors[r]['values'][j]:
+                            if factors[r]['values'][j][elem] == None or elem == 'multi' or ((isinstance(factors[r]['values'][j][elem], list) or isinstance(factors[r]['values'][j][elem], dict)) and len(factors[r]['values'][j][elem]) == 0):
+                                remove.append(elem)
+                        for elem in remove:
+                            factors[r]['values'][j].pop(elem)
 
             res[wi_object[i]['position'].split(':')[-1]] = factors
 
