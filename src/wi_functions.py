@@ -743,7 +743,7 @@ def parse_part(wi_object, factors, organism, id, nom):
     key_yaml = utils.read_in_yaml(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..',
         'keys.yaml'))
-
+    val = None
     if isinstance(wi_object, dict):
         if wi_object['list'] or 'input_type' in wi_object and (wi_object['input_type'] == 'single_autofill' or wi_object['input_type'] == 'multi_autofill'):
             val = []
@@ -818,9 +818,7 @@ def parse_part(wi_object, factors, organism, id, nom):
                         val = wi_object['value']
     elif isinstance(wi_object, list):
         return parse_list_part(wi_object, factors, organism, id, nom)
-
     return val
-
 
 def get_sample(sub_elem, id, organism):
     short_organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'),
