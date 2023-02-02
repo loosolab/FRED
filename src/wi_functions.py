@@ -827,7 +827,7 @@ def get_sample(sub_elem, id, organism):
 
     sample = {}
     for elem in sub_elem:
-        if not isinstance(elem, list):
+        if isinstance(elem, dict):
             if elem['list'] or 'input_type' in elem and (elem['input_type'] == 'single_autofill' or elem['input_type'] == 'multi_autofill'):
                 res = []
                 for el in elem['list_value']:
