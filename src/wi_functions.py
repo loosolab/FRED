@@ -743,7 +743,7 @@ def parse_part(wi_object, factors, organism, id, nom):
     key_yaml = utils.read_in_yaml(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..',
         'keys.yaml'))
-    val = None
+
     if isinstance(wi_object, dict):
         if wi_object['list'] or 'input_type' in wi_object and (wi_object['input_type'] == 'single_autofill' or wi_object['input_type'] == 'multi_autofill'):
             val = []
@@ -803,7 +803,7 @@ def parse_part(wi_object, factors, organism, id, nom):
                     timezone = pytz.timezone("Europe/Berlin")
                     local_time = default_time.astimezone(timezone)
                     val = local_time.strftime("%d.%m.%Y")
-                elif wi_object['value'] and len(wi_object['value']) > 0:
+                else:
                     if 'correct_value' in wi_object:
                         if wi_object['position'].split(':')[-1] == \
                                 'sample_name':
@@ -818,7 +818,9 @@ def parse_part(wi_object, factors, organism, id, nom):
                         val = wi_object['value']
     elif isinstance(wi_object, list):
         return parse_list_part(wi_object, factors, organism, id, nom)
+
     return val
+
 
 def get_sample(sub_elem, id, organism):
     short_organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'),
@@ -827,77 +829,76 @@ def get_sample(sub_elem, id, organism):
 
     sample = {}
     for elem in sub_elem:
-        if isinstance(elem, dict):
-            if elem['list'] or 'input_type' in elem and (elem['input_type'] == 'single_autofill' or elem['input_type'] == 'multi_autofill'):
-                res = []
-                for el in elem['list_value']:
-                    r = get_sample(el, id, organism)
-                    if isinstance(r, dict) and len(r.keys()) == 1 and list(r.keys())[0] == elem['position'].split(':')[-1]:
-                        r = r[elem['position'].split(':')[-1]]
-                    res.append(r)
-                if len(res) > 0:
-                    sample[elem['position'].split(':')[-1]] = res
-            else:
-                if 'correct_value' in elem:
-                    sample_count = int(elem['value'].split('_')[-1])
-                    sample[elem['position'].split(':')[-1]] = f'{elem["correct_value"]}_b{"{:02d}".format(sample_count)}'
-                elif 'value' in elem:
-                    if elem['value'] is not None:
-                        if elem['input_type'] == 'value_unit':
-                            unit = elem['value_unit']
-                            value = elem['value']
-                            val = {'unit': unit, 'value': value}
-                        elif elem['input_type'] == 'date':
-                            default_time = parser.parse(elem['value'])
-                            timezone = pytz.timezone("Europe/Berlin")
-                            local_time = default_time.astimezone(timezone)
-                            val = local_time.strftime("%d.%m.%Y")
-                        else:
-                            if 'whitelist_keys' in elem:
-                                for k in elem['whitelist_keys']:
-                                    if elem['value'].endswith(f' ({k})'):
-                                        elem['value'] = elem[
-                                            'value'].replace(f' ({k})', '')
-                                        if 'headers' in elem and k in elem[
-                                            'headers']:
-                                            new_val = {}
-                                            for l in range(len(
-                                                    elem['headers'][k].split(
-                                                            ' '))):
-                                                new_val[
-                                                    elem['headers'][k].split(' ')[
-                                                        l]] = \
-                                                elem['value'].split(' ')[l]
-                                            elem['value'] = new_val
-                                            break
-                            elif 'headers' in elem:
-                                new_val = {}
-                                for l in range(
-                                        len(elem['headers'].split(' '))):
-                                    new_val[elem['headers'].split(' ')[l]] = \
-                                    elem['value'].split(' ')[l]
-                                elem['value'] = new_val
-                            val = elem['value']
-                        if len('value') > 0:
-                            sample[elem['position'].split(':')[-1]] = val
-                else:
-                    if elem['position'].split(':')[-1] == 'technical_replicates':
-                        sample_name = []
-                        count = [x['value'] for x in elem['input_fields'] if x['position'].split(':')[-1] == 'count'][0]
-                        for c in range(count):
-                            for m in range(sample['number_of_measurements']):
-                                sample_name.append(f'{id}_{short_organism}_'
-                                               f'{sample["sample_name"]}'
-                                               f'_t{"{:02d}".format(c + 1)}_'
-                                               f'm{"{:02d}".format(m + 1)}')
-                        sample['technical_replicates'] = {'count': count,
-                                                      'sample_name': sample_name}
-                    else:
-                        res = get_sample(elem['input_fields'], id, organism)
-                        if len(res) > 0:
-                            sample[elem['position'].split(':')[-1]] = res
+        if elem['list']:
+            res = []
+            for el in elem['list_value']:
+                r = get_sample(el, id, organism)
+                if isinstance(r, dict) and len(r.keys()) == 1 and list(r.keys())[0] == elem['position'].split(':')[-1]:
+                    r = r[elem['position'].split(':')[-1]]
+                res.append(r)
+            if len(res) > 0:
+                sample[elem['position'].split(':')[-1]] = res
         else:
-            print(elem)
+            if 'correct_value' in elem:
+                sample_count = int(elem['value'].split('_')[-1])
+                sample[elem['position'].split(':')[-1]] = f'{elem["correct_value"]}_b{"{:02d}".format(sample_count)}'
+            elif 'value' in elem:
+                if elem['input_type'] == 'multi_autofill' or elem['input_type'] == 'single_autofill' and elem['list_value'] > 0:
+                    elem['value'] = elem['list_value'][0]
+                if elem['value'] is not None:
+                    if elem['input_type'] == 'value_unit':
+                        unit = elem['value_unit']
+                        value = elem['value']
+                        val = {'unit': unit, 'value': value}
+                    elif elem['input_type'] == 'date':
+                        default_time = parser.parse(elem['value'])
+                        timezone = pytz.timezone("Europe/Berlin")
+                        local_time = default_time.astimezone(timezone)
+                        val = local_time.strftime("%d.%m.%Y")
+                    else:
+                        if 'whitelist_keys' in elem:
+                            for k in elem['whitelist_keys']:
+                                if elem['value'].endswith(f' ({k})'):
+                                    elem['value'] = elem[
+                                        'value'].replace(f' ({k})', '')
+                                    if 'headers' in elem and k in elem[
+                                        'headers']:
+                                        new_val = {}
+                                        for l in range(len(
+                                                elem['headers'][k].split(
+                                                        ' '))):
+                                            new_val[
+                                                elem['headers'][k].split(' ')[
+                                                    l]] = \
+                                            elem['value'].split(' ')[l]
+                                        elem['value'] = new_val
+                                        break
+                        elif 'headers' in elem:
+                            new_val = {}
+                            for l in range(
+                                    len(elem['headers'].split(' '))):
+                                new_val[elem['headers'].split(' ')[l]] = \
+                                elem['value'].split(' ')[l]
+                            elem['value'] = new_val
+                        val = elem['value']
+                    if len('value') > 0:
+                        sample[elem['position'].split(':')[-1]] = val
+            else:
+                if elem['position'].split(':')[-1] == 'technical_replicates':
+                    sample_name = []
+                    count = [x['value'] for x in elem['input_fields'] if x['position'].split(':')[-1] == 'count'][0]
+                    for c in range(count):
+                        for m in range(sample['number_of_measurements']):
+                            sample_name.append(f'{id}_{short_organism}_'
+                                           f'{sample["sample_name"]}'
+                                           f'_t{"{:02d}".format(c + 1)}_'
+                                           f'm{"{:02d}".format(m + 1)}')
+                    sample['technical_replicates'] = {'count': count,
+                                                  'sample_name': sample_name}
+                else:
+                    res = get_sample(elem['input_fields'], id, organism)
+                    if len(res) > 0:
+                        sample[elem['position'].split(':')[-1]] = res
     return sample
 
 
@@ -964,8 +965,13 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                 elif len(infos) > 0 and isinstance(infos[0]['value'], dict) and len(infos[0]['value']) == 2 and 'unit' in infos[0]['value'] and 'value' in infos[0]['value']:
                     for j in range(len(factors[r]['values'])):
                         unit = factors[r]['values'][j].lstrip('0123456789')
-                        value = factors[r]['values'][j][:len(factors[r]['values'][j]) - len(unit)]
+                        value = int(factors[r]['values'][j][:len(factors[r]['values'][j]) - len(unit)])
                         factors[r]['values'][j] = {'unit': unit, 'value': value}
+
+                if isinstance(factors[r]['values'], dict):
+                    for elem in range(len(factors[r]['values'])):
+                        if len(factors[r]['values'][elem]) == 0:
+                            factors[r]['values'].pop(elem)
 
             res[wi_object[i]['position'].split(':')[-1]] = factors
 
