@@ -843,7 +843,7 @@ def get_sample(sub_elem, id, organism):
                 sample_count = int(elem['value'].split('_')[-1])
                 sample[elem['position'].split(':')[-1]] = f'{elem["correct_value"]}_b{"{:02d}".format(sample_count)}'
             elif 'value' in elem:
-                if elem['input_type'] == 'multi_autofill' or elem['input_type'] == 'single_autofill' and elem['list_value'] > 0:
+                if elem['input_type'] == 'multi_autofill' or elem['input_type'] == 'single_autofill' and len(elem['list_value']) > 0:
                     elem['value'] = elem['list_value'][0]
                 if elem['value'] is not None:
                     if elem['input_type'] == 'value_unit':
