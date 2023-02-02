@@ -486,6 +486,8 @@ def get_samples(condition, sample, real_val):
                             sample[i].pop('whitelist')
                             sample[i].pop('whitelist_type')
                             sample[i].pop('input_type')
+                            if 'search_info' in sample[i]:
+                                sample[i].pop('search_info')
                     else:
                         if c[1] in real_val:
                             sample[i]['value'] = real_val[c[1]]
@@ -743,7 +745,7 @@ def parse_part(wi_object, factors, organism, id, nom):
         'keys.yaml'))
 
     if isinstance(wi_object, dict):
-        if wi_object['list']:
+        if wi_object['list'] or 'input_type' in wi_object and (wi_object['input_type'] == 'single_autofill' or wi_object['input_type'] == 'multi_autofill'):
             val = []
             for i in range(len(wi_object['list_value'])):
                 if isinstance(wi_object['list_value'][i], dict):
@@ -801,7 +803,7 @@ def parse_part(wi_object, factors, organism, id, nom):
                     timezone = pytz.timezone("Europe/Berlin")
                     local_time = default_time.astimezone(timezone)
                     val = local_time.strftime("%d.%m.%Y")
-                else:
+                elif wi_object['value'] and len(wi_object['value'] > 0):
                     if 'correct_value' in wi_object:
                         if wi_object['position'].split(':')[-1] == \
                                 'sample_name':
@@ -827,7 +829,7 @@ def get_sample(sub_elem, id, organism):
 
     sample = {}
     for elem in sub_elem:
-        if elem['list']:
+        if elem['list'] or 'input_type' in elem and (elem['input_type'] == 'single_autofill' or elem['input_type'] == 'multi_autofill'):
             res = []
             for el in elem['list_value']:
                 r = get_sample(el, id, organism)
@@ -877,7 +879,8 @@ def get_sample(sub_elem, id, organism):
                                 elem['value'].split(' ')[l]
                             elem['value'] = new_val
                         val = elem['value']
-                    sample[elem['position'].split(':')[-1]] = val
+                    if len('value') > 0:
+                        sample[elem['position'].split(':')[-1]] = val
             else:
                 if elem['position'].split(':')[-1] == 'technical_replicates':
                     sample_name = []
@@ -913,7 +916,10 @@ def parse_list_part(wi_object, factors, organism, id, nom):
         if wi_object[i]['position'].split(':')[
                 -1] == 'organism':
             organism = wi_object[i]['value'].split(' ')[0]
-        val = parse_part(wi_object[i], factors, organism, id, nom)
+            val = {'organism_name': wi_object[i]['value'].split(' ')[0],
+                               'taxonomy_id': wi_object[i]['value'].split(' ')[1]}
+        else:
+            val = parse_part(wi_object[i], factors, organism, id, nom)
         if wi_object[i]['position'].split(':')[-1] == 'technical_replicates':
             sample_name = []
             for c in range(val['count']):
@@ -924,7 +930,10 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                                        f'm{"{:02d}".format(m+1)}')
             val['sample_name'] = sample_name
         elif wi_object[i]['position'].split(':')[-1] == 'experimental_factors':
+            key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
             for r in range(len(factors)):
+                infos = list(utils.find_keys(key_yaml, factors[r]['factor']))
                 if 'whitelist_keys' in factors[r]:
                     w_keys = factors[r]['whitelist_keys']
                     factors[r].pop('whitelist_keys')
@@ -951,6 +960,11 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                         for l in range(len(headers.split(' '))):
                             new_val[headers.split(' ')[l]] = factors[r]['values'][j].split(' ')[l]
                         factors[r]['values'][j] = new_val
+                elif len(infos) > 0 and isinstance(infos[0]['value'], dict) and len(infos[0]['value']) == 2 and 'unit' in infos[0]['value'] and 'value' in infos[0]['value']:
+                    for j in range(len(factors[r]['values'])):
+                        unit = factors[r]['values'][j].lstrip('0123456789')
+                        value = factors[r]['values'][j][:len(factors[r]['values'][j]) - len(unit)]
+                        factors[r]['values'][j] = {'unit': unit, 'value': value}
 
             res[wi_object[i]['position'].split(':')[-1]] = factors
 
