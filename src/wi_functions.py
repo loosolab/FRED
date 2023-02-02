@@ -803,7 +803,7 @@ def parse_part(wi_object, factors, organism, id, nom):
                     timezone = pytz.timezone("Europe/Berlin")
                     local_time = default_time.astimezone(timezone)
                     val = local_time.strftime("%d.%m.%Y")
-                elif wi_object['value'] and len(wi_object['value'] > 0):
+                elif wi_object['value'] and len(wi_object['value']) > 0:
                     if 'correct_value' in wi_object:
                         if wi_object['position'].split(':')[-1] == \
                                 'sample_name':
