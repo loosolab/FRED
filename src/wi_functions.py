@@ -368,6 +368,9 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
             {'displayName': 'Multi', 'position': 'multi',
              'whitelist': [True, False], 'input_type': 'bool',
              'value': False}]
+        for i in range(len(new_w)):
+            if new_w[i]['input_type'] == 'multi_autofill' or new_w[i]['input_type'] == 'single_autofill':
+                new_w[i]['search_info'] = {'key_name': key, 'organism': organism}
         whitelist = new_w
         whitelist_type = 'list_select'
         input_type = 'nested'
