@@ -363,7 +363,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
         node = list(utils.find_keys(key_yaml, key))[0]
         new_w = [
             {'whitelist': whitelist, 'position': key,
-             'displayName': node['display_name'], 'required': True,
+             'displayName': node['display_name'], 'required': True, 'value': [],
              'input_type': input_type, 'whitelist_type': whitelist_type},
             {'displayName': 'Multi', 'position': 'multi',
              'whitelist': [True, False], 'input_type': 'bool',
