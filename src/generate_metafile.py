@@ -1566,7 +1566,8 @@ def get_short_name(condition, result_dict):
                 short_cond.append(f'{k}.{val_whitelist["whitelist"][c[1]]}')
             else:
                 short_cond.append(f'{k}.{c[1]}')
-    short_condition = '-'.join(short_cond)
+    # TODO: abbrev unit
+    short_condition = '-'.join(short_cond).replace('/', '')
     return short_condition
 
 

@@ -43,7 +43,14 @@ def get_empty_wi_object():
 
 
 def get_single_whitelist(ob):
-    whitelist = utils.get_whitelist(ob['key_name'], {'organism': ob['organism']})
+    if 'organism' in ob:
+        infos = {'organism': ob['organism']}
+        all_plain = False
+    else:
+        infos = {}
+        all_plain = True
+
+    whitelist = utils.get_whitelist(ob['key_name'], infos, all_plain)
     if 'whitelist' in whitelist:
         return whitelist['whitelist']
     else:
@@ -644,6 +651,7 @@ def get_whitelist_object(item, organism_name, whitelists):
                                    'key_name': item['position'].split(':')[-1]}
             if not 'list_value' in item:
                 item['list_value'] = []
+            whitelist = None
         item['input_type'] = input_type
         if input_type == 'group_select':
             w = []
@@ -1230,26 +1238,6 @@ def find_metadata(path, search_string):
     return new_files
 
 
-def get_gene_whitelist():
-    """
-    This function reads in the gene whitelist for all organisms.
-    :return: a dictionary containing the gene names and ensembl ids
-    """
-    whitelist = utils.read_whitelist('gene')['whitelist']
-    paths = [whitelist[k] for k in whitelist]
-
-    pool_obj = multiprocessing.Pool()
-    answer = pool_obj.map(wi_utils.read_gene_whitelist, paths)
-    gene_name = []
-    ensembl_id = []
-    for elem in answer:
-        gene_name += list(set(elem[0]))
-        ensembl_id += list(set(elem[1]))
-    gene_name = list(set(gene_name))
-    ensembl_id = list(set(ensembl_id))
-    return {'gene_name': gene_name, 'ensembl_id': ensembl_id}
-
-
 def get_search_keys(key_yaml, chained):
     """
     This function returns all keys of the metadata structure in a nested way.
@@ -1264,7 +1252,7 @@ def get_search_keys(key_yaml, chained):
                  key_yaml, key))[0]['display_name']}
         if isinstance(key_yaml[key]['value'], dict) and not \
                 set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
-                <= set(key_yaml[key]['value'].keys()):
+                <= set(key_yaml[key]['value'].keys()) and not ('special_case' in key_yaml[key] and 'merge' in key_yaml[key]['special_case']):
             d['nested'] = get_search_keys(key_yaml[key]['value'],
                                           f'{chained}{key}:'
                                           if chained != '' else f'{key}:')
@@ -1272,10 +1260,11 @@ def get_search_keys(key_yaml, chained):
             d['chained_keys'] = f'{chained}{key}:' \
                 if chained != '' else f'{key}:'
             d['nested'] = []
-        if key == 'gene_name' or key == 'ensembl_id':
-            d['whitelist'] = True
-        else:
-            d['whitelist'] = False
+
+        if 'whitelist' in key_yaml[key]:
+            d['whitelist'] = key_yaml[key]['whitelist']
+            if d['whitelist']:
+                d['search_info'] = {'key_name': key}
         res.append(d)
     return res
 

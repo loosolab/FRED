@@ -109,7 +109,7 @@ def read_whitelist(key):
     return whitelist
 
 
-def read_grouped_whitelist(whitelist, filled_object):
+def read_grouped_whitelist(whitelist, filled_object, all_plain = False):
     """
     This function parses a whitelist of type 'group'. If there are more than 30
     values it is formed into a plain whitelist.
@@ -125,7 +125,7 @@ def read_grouped_whitelist(whitelist, filled_object):
                              '..', 'metadata_whitelists', 'whitelists',
                              whitelist['whitelist'][key])):
             whitelist['whitelist'][key] = \
-                get_whitelist(whitelist['whitelist'][key], filled_object)
+                get_whitelist(whitelist['whitelist'][key], filled_object, all_plain)
             if isinstance(whitelist['whitelist'][key], dict):
                 if whitelist['whitelist'][key]['whitelist_type'] == 'depend':
                     if whitelist['whitelist'] and 'whitelist' in \
@@ -142,11 +142,14 @@ def read_grouped_whitelist(whitelist, filled_object):
                         headers[key] = whitelist['whitelist'][key]['headers']
                     whitelist['whitelist'][key] = \
                         whitelist['whitelist'][key]['whitelist']
-    w = [f'{x} ({xs})' for xs in list(whitelist['whitelist'].keys()) if whitelist['whitelist'][xs] is
-    not None for x in whitelist['whitelist'][xs] if x is not None]
-    #w = [f'{x}' for xs in list(whitelist['whitelist'].keys()) if
-    #     whitelist['whitelist'][xs] is not None for x in
-    #     whitelist['whitelist'][xs] if x is not None]
+    if all_plain:
+        w = [f'{x}' for xs in list(whitelist['whitelist'].keys()) if
+             whitelist['whitelist'][xs] is not None for x in
+             whitelist['whitelist'][xs] if x is not None]
+    else:
+        w = [f'{x} ({xs})' for xs in list(whitelist['whitelist'].keys()) if
+             whitelist['whitelist'][xs] is not None for x in
+             whitelist['whitelist'][xs] if x is not None]
 
     if len(w) > 30:
         new_whitelist = copy.deepcopy(whitelist)
@@ -182,7 +185,7 @@ def read_depend_whitelist(whitelist, depend):
     return whitelist
 
 
-def get_whitelist(key, filled_object):
+def get_whitelist(key, filled_object, all_plain = False):
     """
     This function reads in a whitelist and parses it depending on its type.
     :param key: the key that contains a whitelist
@@ -199,7 +202,7 @@ def get_whitelist(key, filled_object):
                      dict) and not group and not stay_depend and not \
             plain and not abbrev:
         if whitelist['whitelist_type'] == 'group':
-            whitelist = read_grouped_whitelist(whitelist, filled_object)
+            whitelist = read_grouped_whitelist(whitelist, filled_object, all_plain)
             group = True
         elif whitelist['whitelist_type'] == 'plain':
             plain = True
@@ -214,18 +217,44 @@ def get_whitelist(key, filled_object):
                 whitelist = read_depend_whitelist(whitelist['whitelist'],
                                                   depend[0].split(' ')[0])
             else:
-                stay_depend = True
+                if all_plain:
+                    new_whitelist = []
+                    paths = []
+                    for key in whitelist['whitelist']:
+                        if not isinstance(whitelist['whitelist'][key], list) and os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists', 'whitelists',whitelist['whitelist'][key])):
+                            paths.append(whitelist['whitelist'][key])
+                        else:
+                            new_whitelist += whitelist['whitelist'][key]
+                    for elem in paths:
+                        w_list = get_whitelist(elem, {}, True)
+                        new_whitelist += w_list['whitelist']
 
-    if group:
-        if whitelist['whitelist_type'] != 'plain_group':
+                    whitelist['whitelist'] = list(set(new_whitelist))
+                    whitelist['whitelist_type'] = 'plain'
+                    plain = True
+                else:
+                    stay_depend = True
+
+    if group and whitelist['whitelist_type'] != 'plain_group' and all_plain:
+        new_whitelist = []
+        for key in whitelist['whitelist']:
+            if whitelist['whitelist'][key] is not None:
+                new_whitelist += whitelist['whitelist'][key]
+        whitelist['whitelist'] = new_whitelist
+        whitelist['whitelist_type'] = 'plain'
+
+    if whitelist:
+        if all_plain:
+            whitelist['whitelist'] = sorted(list(set([x.lower() for x in whitelist['whitelist']])))
+        elif group and whitelist['whitelist_type'] != 'plain_group':
             for key in whitelist['whitelist']:
                 if whitelist['whitelist'][key] is not None and key != 'headers' \
                         and key != 'whitelist_type' and key != 'whitelist_keys':
                     whitelist['whitelist'][key] = sorted(
                         whitelist['whitelist'][key])
+        elif not stay_depend and not abbrev:
+            whitelist['whitelist'] = sorted(whitelist['whitelist'])
 
-    elif whitelist and not stay_depend and not plain and not abbrev:
-        whitelist = sorted(whitelist)
     return whitelist
 
 

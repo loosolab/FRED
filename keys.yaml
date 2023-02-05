@@ -496,9 +496,23 @@ experimental_setting:
                   list: False
                   display_name: 'Body-Mass-Index'
                   desc: ''
-                  value: null
-                  whitelist: False
-                  input_type: number
+                  value:
+                    value:
+                      mandatory: False
+                      list: False
+                      display_name: 'Value'
+                      desc: ''
+                      value: null
+                      whitelist: False
+                      input_type: number
+                    unit:
+                      mandatory: False
+                      list: False
+                      display_name: 'Unit'
+                      desc: ''
+                      value: 'kg/m2'
+                      whitelist: True
+                      input_type: select
                 flow:
                   mandatory: False
                   list: False
