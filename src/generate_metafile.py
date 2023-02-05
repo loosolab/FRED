@@ -1716,8 +1716,8 @@ def get_combis(values, key, multi):
                             [f'{k}:"{values[j][k]}"' for k in values[j]])
                         s2 = f'{key}:{"{"}{v}{"}"}'
                     else:
-                        s2 = f'{key}:"{values[i]}"'
-                    s = f'{s}-{s2}"'
+                        s2 = f'{key}:"{values[j]}"'
+                    s = f'{s}-{s2}'
                     possible_values.append(s)
             return possible_values
         else:

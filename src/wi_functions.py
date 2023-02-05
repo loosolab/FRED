@@ -463,34 +463,8 @@ def get_samples(condition, sample, real_val):
                                 sample[i]['value'] = val
                 else:
                     if sample[i]['list']:
-                        if len(sample[i]['list_value']) > 0:
-                            new_val = copy.deepcopy(sample[i]['input_fields']
-                                                    [0])
-                            new_val['value'] = c[1]
-                            new_val['input_disabled'] = True
-                            sample[i]['list_value'].append([new_val])
-                        else:
-                            new_samp = copy.deepcopy(sample[i])
-                            new_samp.pop('list_value')
-                            new_samp['list'] = False
-                            new_samp[
-                                'position'] = \
-                                f'{new_samp["position"]}:' \
-                                f'{new_samp["position"].split(":")[-1]}'
-                            sample[i]['input_fields'] = [new_samp]
-                            new_val = copy.deepcopy(new_samp)
-                            new_val['value'] = c[1]
-                            new_val['input_disabled'] = True
-                            sample[i]['list_value'].append([new_val])
-                            sample[i]['title'] = copy.deepcopy(
-                                sample[i]['displayName'])
-                            sample[i].pop('displayName')
-                            sample[i].pop('value')
-                            sample[i].pop('whitelist')
-                            sample[i].pop('whitelist_type')
-                            sample[i].pop('input_type')
-                            if 'search_info' in sample[i]:
-                                sample[i].pop('search_info')
+                        sample[i]['list_value'].append(c[1])
+                        sample[i]['input_disabled'] = True
                     else:
                         if c[1] in real_val:
                             sample[i]['value'] = real_val[c[1]]
@@ -501,27 +475,6 @@ def get_samples(condition, sample, real_val):
                                                         'value'] is None else [
                         sample[i]['value']]
                 sample[i]['input_disabled'] = True
-            elif not any(sample[i]['position'] ==
-                         f'experimental_setting:conditions:'
-                         f'biological_replicates:samples:{x[0]}'
-                         for x in conds):
-                if sample[i]['list'] and 'title' not in sample[i]:
-                    new_samp = copy.deepcopy(sample[i])
-                    new_samp.pop('list_value')
-                    new_samp['list'] = False
-                    new_samp['position'] = \
-                        f'{new_samp["position"]}:' \
-                        f'{new_samp["position"].split(":")[-1]}'
-                    if new_samp['input_type'] == 'single_autofill':
-                        new_samp['list_value'] = [] if new_samp['value'] is None else [new_samp['value']]
-                    sample[i]['input_fields'] = [new_samp]
-                    sample[i]['title'] = copy.deepcopy(
-                        sample[i]['displayName'])
-                    sample[i].pop('displayName')
-                    sample[i].pop('value')
-                    sample[i].pop('whitelist')
-                    sample[i].pop('whitelist_type')
-                    sample[i].pop('input_type')
     return sample
 
 
@@ -577,7 +530,6 @@ def get_conditions(factors, organism_name):
                     factors[i]['values'] = generate.get_combis(
                         factors[i]['values'][0][factors[i]['factor']],
                         factors[i]['factor'], factors[i]['values'][0]['multi'])
-
         if 'whitelist_keys' in factors[i]:
             for j in range(len(factors[i]['values'])):
                 for k in factors[i]['whitelist_keys']:
