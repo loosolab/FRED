@@ -50,7 +50,7 @@ def get_single_whitelist(ob):
         infos = {}
         all_plain = True
     whitelist = utils.get_whitelist(ob['key_name'], infos, all_plain)
-    if 'whitelist' in whitelist:
+    if whitelist and 'whitelist' in whitelist:
         return whitelist['whitelist']
     else:
         return None
@@ -1269,8 +1269,11 @@ def get_search_keys(key_yaml, chained):
 
         if 'whitelist' in key_yaml[key]:
             d['whitelist'] = key_yaml[key]['whitelist']
-            if d['whitelist']:
-                d['search_info'] = {'key_name': key}
+        elif 'special_case' in key_yaml[key] and 'merge' in key_yaml[key]['special_case']:
+            d['whitelist'] = key_yaml[key]['value'][key_yaml[key]['special_case']['merge']]['whitelist']
+
+        if 'whitelist' in d and d['whitelist']:
+            d['search_info'] = {'key_name': key}
         res.append(d)
     return res
 

@@ -1,3 +1,5 @@
+import time
+
 import yaml
 import os
 import copy
@@ -224,12 +226,12 @@ def get_whitelist(key, filled_object, all_plain = False):
                         if not isinstance(whitelist['whitelist'][key], list) and os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists', 'whitelists',whitelist['whitelist'][key])):
                             paths.append(whitelist['whitelist'][key])
                         else:
-                            new_whitelist += whitelist['whitelist'][key]
+                            new_whitelist += [x.lower() for x in whitelist['whitelist'][key]]
                     for elem in paths:
                         w_list = get_whitelist(elem, {}, True)
-                        new_whitelist += w_list['whitelist']
-
+                        new_whitelist += [x.lower() for x in w_list['whitelist']]
                     whitelist['whitelist'] = list(set(new_whitelist))
+
                     whitelist['whitelist_type'] = 'plain'
                     plain = True
                 else:
@@ -239,13 +241,13 @@ def get_whitelist(key, filled_object, all_plain = False):
         new_whitelist = []
         for key in whitelist['whitelist']:
             if whitelist['whitelist'][key] is not None:
-                new_whitelist += whitelist['whitelist'][key]
-        whitelist['whitelist'] = new_whitelist
+                new_whitelist += [x.lower() for x in whitelist['whitelist'][key]]
+        whitelist['whitelist'] = list(set(new_whitelist))
         whitelist['whitelist_type'] = 'plain'
 
     if whitelist:
         if all_plain:
-            whitelist['whitelist'] = sorted(list(set([x.lower() for x in whitelist['whitelist']])))
+            whitelist['whitelist'] = list(set(whitelist['whitelist']))
         elif group and whitelist['whitelist_type'] != 'plain_group':
             for key in whitelist['whitelist']:
                 if whitelist['whitelist'][key] is not None and key != 'headers' \
