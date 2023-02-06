@@ -147,7 +147,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                                'list': node['list'],
                                'displayName': node['display_name'],
                                'desc': node['desc'], 'value': None,
-                               'value_unit': None, 'whitelist': unit_whitelist,
+                               'value_unit': node['value']['unit']['value'], 'whitelist': unit_whitelist,
                                'input_type': 'value_unit',
                                'input_disabled': input_disabled}
             else:
@@ -633,7 +633,8 @@ def get_whitelist_object(item, organism_name, whitelists):
             whitelist = [True, False]
             input_type = 'select'
         elif input_type == 'value_unit':
-            item['value_unit'] = None
+            if 'value_unit' not in item:
+                item['value_unit'] = None
             whitelist = utils.read_whitelist('unit')
             if 'whitelist_type' in whitelist and whitelist[
                     'whitelist_type'] == 'plain':
