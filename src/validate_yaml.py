@@ -180,7 +180,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                         invalid_keys.append(key)
                 else:
                     invalid_keys.append(key)
-            elif key not in key_yaml:
+            elif key_yaml and key not in key_yaml:
                 invalid_keys.append(key)
             else:
                 if key == 'factor':
