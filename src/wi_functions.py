@@ -717,7 +717,7 @@ def parse_part(wi_object, factors, organism, id, nom):
 
                         samples = []
                         for sub_elem in wi_object['list_value'][i]['list_value']:
-                            samples.append(get_sample(sub_elem, id, organism))
+                            samples.append(get_sample(sub_elem, id, organism, factors, nom))
 
                         val.append({'condition_name': wi_object['list_value'][i]['correct_value'],
                                     'biological_replicates':
@@ -785,7 +785,7 @@ def parse_part(wi_object, factors, organism, id, nom):
     return val
 
 
-def get_sample(sub_elem, id, organism):
+def get_sample(sub_elem, id, organism, factors, nom):
     short_organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'),
                                          {'organism_name': organism})['whitelist']
     short_organism = short_organism[organism]
@@ -794,15 +794,25 @@ def get_sample(sub_elem, id, organism):
         if elem['list']:
             res = []
             for el in elem['list_value']:
-                if isinstance(el, dict):
-                    r = get_sample(el, id, organism)
-                    if isinstance(r, dict) and len(r.keys()) == 1 and \
-                            list(r.keys())[0] == elem['position'].split(':')[
-                        -1]:
-                        r = r[elem['position'].split(':')[-1]]
-                    res.append(r)
-                else:
-                    res.append(el)
+                part_dict = {}
+                for d in el:
+                    if isinstance(d, dict):
+                        val_ = parse_part(d, factors, organism, id, nom)
+                        if val_:
+                            part_dict[d['position'].split(':')[-1]] = val_
+                    else:
+                        print(d)
+                if len(part_dict)>0:
+                    res.append(part_dict)
+                # if isinstance(el, dict):
+                #    r = get_sample(el, id, organism)
+                #    if isinstance(r, dict) and len(r.keys()) == 1 and \
+                #            list(r.keys())[0] == elem['position'].split(':')[
+                #        -1]:
+                #        r = r[elem['position'].split(':')[-1]]
+                #    res.append(r)
+                # else:
+                #    res.append(el)
             if len(res) > 0:
                 sample[elem['position'].split(':')[-1]] = res
         else:
@@ -813,7 +823,7 @@ def get_sample(sub_elem, id, organism):
             elif 'value' in elem:
                 if elem['input_type'] == 'multi_autofill' or elem[
                     'input_type'] == 'single_autofill' and len(
-                        elem['list_value']) > 0:
+                    elem['list_value']) > 0:
                     elem['value'] = elem['list_value'][0]
                 if elem['value'] is not None:
                     if elem['input_type'] == 'value_unit':
@@ -838,7 +848,8 @@ def get_sample(sub_elem, id, organism):
                                                 elem['headers'][k].split(
                                                     ' '))):
                                             new_val[
-                                                elem['headers'][k].split(' ')[
+                                                elem['headers'][k].split(
+                                                    ' ')[
                                                     l]] = \
                                                 elem['value'].split(' ')[l]
                                         elem['value'] = new_val
@@ -854,7 +865,8 @@ def get_sample(sub_elem, id, organism):
                     if len('value') > 0:
                         sample[elem['position'].split(':')[-1]] = val
             else:
-                if elem['position'].split(':')[-1] == 'technical_replicates':
+                if elem['position'].split(':')[
+                    -1] == 'technical_replicates':
                     sample_name = []
                     count = [x['value'] for x in elem['input_fields'] if
                              x['position'].split(':')[-1] == 'count'][0]
@@ -867,9 +879,12 @@ def get_sample(sub_elem, id, organism):
                     sample['technical_replicates'] = {'count': count,
                                                       'sample_name': sample_name}
                 else:
-                    res = get_sample(elem['input_fields'], id, organism)
+                    res = get_sample(elem['input_fields'], id, organism,
+                                     factors, nom)
+                    print(res)
                     if len(res) > 0:
                         sample[elem['position'].split(':')[-1]] = res
+
     return sample
 
 

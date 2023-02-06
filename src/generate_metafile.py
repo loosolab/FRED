@@ -296,10 +296,11 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
     if isinstance(node, dict) and not \
             set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
             set(node.keys()):
+
         # test if the input is of type value_unit
         if len(node.keys()) == 2 and 'value' in node.keys() and 'unit' in \
                 node.keys():
-
+            print("TOO")
             if is_factor:
 
                 # call function to get a list of value_units if the input value

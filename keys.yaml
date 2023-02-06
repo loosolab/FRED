@@ -427,7 +427,7 @@ experimental_setting:
                   display_name: 'Treatment'
                   desc: ''
                   special_case:
-                    group: treatment_type
+                    group: 'treatment_type'
                   value:
                     treatment_type:
                       mandatory: False
@@ -450,8 +450,6 @@ experimental_setting:
                       list: False
                       display_name: 'Duration'
                       desc: ''
-                      special_case:
-                        group: 'treatment_type'
                       value:
                         value:
                           mandatory: True
