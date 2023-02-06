@@ -1941,8 +1941,8 @@ def get_value_unit(result_dict):
     :param result_dict: a dictionary containing filled information
     :return: val_un: a dictionary containing the unit and value
     """
-    val_un = {'unit': parse_input_value('unit', '', True, str, result_dict),
-              'value': parse_input_value('value', '', False, int, result_dict)}
+    val_un = {'unit': parse_input_value('unit', '', True, 'select', result_dict),
+              'value': parse_input_value('value', '', False, 'number', result_dict)}
     return val_un
 
 
