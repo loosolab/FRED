@@ -1202,8 +1202,7 @@ def get_search_mask():
         {'key_name': 'All keys', 'display_name': 'All Fields', 'nested': [],
          'whitelist': False, 'chained_keys': ''}]
     keys += get_search_keys(key_yaml, '')
-    whitelist_object = get_gene_whitelist()
-    return {'keys': keys, 'whitelist_object': whitelist_object}
+    return {'keys': keys}
 
 
 def find_metadata(path, search_string):
