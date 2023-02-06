@@ -49,7 +49,6 @@ def get_single_whitelist(ob):
     else:
         infos = {}
         all_plain = True
-
     whitelist = utils.get_whitelist(ob['key_name'], infos, all_plain)
     if 'whitelist' in whitelist:
         return whitelist['whitelist']
@@ -794,25 +793,17 @@ def get_sample(sub_elem, id, organism, factors, nom):
         if elem['list']:
             res = []
             for el in elem['list_value']:
-                part_dict = {}
-                for d in el:
-                    if isinstance(d, dict):
-                        val_ = parse_part(d, factors, organism, id, nom)
-                        if val_:
-                            part_dict[d['position'].split(':')[-1]] = val_
-                    else:
-                        print(d)
-                if len(part_dict)>0:
-                    res.append(part_dict)
-                # if isinstance(el, dict):
-                #    r = get_sample(el, id, organism)
-                #    if isinstance(r, dict) and len(r.keys()) == 1 and \
-                #            list(r.keys())[0] == elem['position'].split(':')[
-                #        -1]:
-                #        r = r[elem['position'].split(':')[-1]]
-                #    res.append(r)
-                # else:
-                #    res.append(el)
+                if isinstance(el, list):
+                    part_dict = {}
+                    for d in el:
+                        if isinstance(d, dict):
+                            val_ = parse_part(d, factors, organism, id, nom)
+                            if val_:
+                                part_dict[d['position'].split(':')[-1]] = val_
+                    if len(part_dict)>0:
+                        res.append(part_dict)
+                else:
+                    res.append(el)
             if len(res) > 0:
                 sample[elem['position'].split(':')[-1]] = res
         else:
