@@ -914,10 +914,6 @@ def parse_list_part(wi_object, factors, organism, id, nom):
             for r in range(len(factors)):
                 infos = list(utils.find_keys(key_yaml, factors[r]['factor']))
 
-                if len(factors[r]['values']) == 1 and isinstance(factors[r]['values'][0], dict):
-                    if all(x in [factors[r]['factor'], 'multi'] for x in list(factors[r]['values'][0].keys())):
-                        factors[r]['values'] = factors[r]['values'][0][factors[r]['factor']]
-
                 if 'whitelist_keys' in factors[r]:
                     w_keys = factors[r]['whitelist_keys']
                     factors[r].pop('whitelist_keys')
@@ -949,16 +945,17 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                         unit = factors[r]['values'][j].lstrip('0123456789')
                         value = int(factors[r]['values'][j][:len(factors[r]['values'][j]) - len(unit)])
                         factors[r]['values'][j] = {'unit': unit, 'value': value}
-
-                for j in range(len(factors[r]['values'])):
-                    if isinstance(factors[r]['values'][j], dict):
+                elif len(factors[r]['values']) == 1 and isinstance(factors[r]['values'][0], dict):
+                    if all(x in [factors[r]['factor'], 'multi'] for x in list(factors[r]['values'][0].keys())):
+                        factors[r]['values'] = factors[r]['values'][0][factors[r]['factor']]
+                    else: 
+                        factors[r]['values'] = factors[r]['values'][0]
                         remove = []
-                        for elem in factors[r]['values'][j]:
-                            if factors[r]['values'][j][elem] == None or elem == 'multi' or ((isinstance(factors[r]['values'][j][elem], list) or isinstance(factors[r]['values'][j][elem], dict)) and len(factors[r]['values'][j][elem]) == 0):
+                        for elem in factors[r]['values']:
+                            if factors[r]['values'][elem] == None or elem == 'multi' or ((isinstance(factors[r]['values'][elem], list) or isinstance(factors[r]['values'][elem], dict)) and len(factors[r]['values'][elem]) == 0):
                                 remove.append(elem)
                         for elem in remove:
-                            factors[r]['values'][j].pop(elem)
-                        factors[r]['values'] = factors[r]['values'][0]
+                            factors[r]['values'].pop(elem)
 
             res[wi_object[i]['position'].split(':')[-1]] = factors
 
