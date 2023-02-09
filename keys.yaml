@@ -300,6 +300,8 @@ experimental_setting:
                   list: False
                   display_name: 'Age'
                   desc: ''
+                  special_case:
+                    value_unit: time
                   value:
                     value:
                       mandatory: True
@@ -450,6 +452,8 @@ experimental_setting:
                       list: False
                       display_name: 'Duration'
                       desc: ''
+                      special_case:
+                        value_unit: time
                       value:
                         value:
                           mandatory: True
@@ -472,6 +476,8 @@ experimental_setting:
                   list: False
                   display_name: 'Time Point'
                   desc: ''
+                  special_case:
+                    value_unit: time
                   value:
                     value:
                       mandatory: False
@@ -494,6 +500,8 @@ experimental_setting:
                   list: False
                   display_name: 'Body-Mass-Index'
                   desc: ''
+                  special_case:
+                    value_unit: bmi
                   value:
                     value:
                       mandatory: False

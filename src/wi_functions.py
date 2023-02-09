@@ -43,6 +43,17 @@ def get_empty_wi_object():
 
 
 def get_single_whitelist(ob):
+    """
+    This functions returns a sigle whitelist of type 'plain' for a key that is
+    specified within a given dictionary. If the organism is specified as well,
+    dependent whitelists only contain the values for said organism.
+    (-> used for metadata generation and editing) If no organism is given, the
+    whitelists of multiple organisms are merged together. (-> used for
+    searching)
+    :param ob: a dictionary containing the key 'key_name' and optionally the
+    key 'organism'
+    :return: either a whitelist or None if no whitelist exists
+    """
     if 'organism' in ob:
         infos = {'organism': ob['organism']}
         all_plain = False
@@ -392,6 +403,9 @@ def get_samples(condition, sample, real_val):
     :return: sample: the pre-filled sample
     """
     conds = generate.split_cond(condition)
+    key_yaml = utils.read_in_yaml(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
     for i in range(len(sample)):
         if sample[i][
             'position'] == 'experimental_setting:conditions:biological_' \
@@ -408,7 +422,8 @@ def get_samples(condition, sample, real_val):
             if sample[i][
                 'position'] == f'experimental_setting:conditions:biological_' \
                                f'replicates:samples:{c[0]}':
-                if c[0] in ['age', 'time_point', 'treatment_duration']:
+                info = list(utils.find_keys(key_yaml, c[0]))
+                if len(info)>0 and 'special_case' in info[0] and 'value_unit' in info[0]['special_case']:
                     unit = c[1].lstrip('0123456789')
                     value = c[1][:len(c[1]) - len(unit)]
                     sample[i]['value'] = int(value)
@@ -428,8 +443,8 @@ def get_samples(condition, sample, real_val):
                                 for x in c[1]:
                                     if filled_sample[
                                         j]['position'].split(':')[-1] == x:
-                                        if x in ['age', 'time_point',
-                                                 'treatment_duration']:
+                                        sub_info = utils.find_keys(key_yaml, x)
+                                        if len(sub_info)>0 and 'special_case' in sub_info[0] and 'value_unit' in sub_info[0]['special_case']:
                                             unit = c[1][x].lstrip('0123456789')
                                             value = c[1][x][:len(c[1][x]) -
                                                              len(unit)]
@@ -448,8 +463,9 @@ def get_samples(condition, sample, real_val):
                                     for x in c[1]:
                                         if sample[i]['input_fields'][j][
                                             'position'].split(':')[-1] == x:
-                                            if x in ['age', 'time_point',
-                                                     'treatment_duration']:
+                                            sub_info = utils.find_keys(
+                                                key_yaml, x)
+                                            if len(sub_info) > 0 and 'special_case' in sub_info[0] and 'value_unit' in sub_info[0]['special_case']:
                                                 unit = c[1][x].lstrip(
                                                     '0123456789')
                                                 value = c[1][x][
@@ -948,7 +964,7 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                 elif len(factors[r]['values']) == 1 and isinstance(factors[r]['values'][0], dict):
                     if all(x in [factors[r]['factor'], 'multi'] for x in list(factors[r]['values'][0].keys())):
                         factors[r]['values'] = factors[r]['values'][0][factors[r]['factor']]
-                    else: 
+                    else:
                         factors[r]['values'] = factors[r]['values'][0]
                         remove = []
                         for elem in factors[r]['values']:
