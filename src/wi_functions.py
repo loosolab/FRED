@@ -958,6 +958,7 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                                 remove.append(elem)
                         for elem in remove:
                             factors[r]['values'][j].pop(elem)
+                        factors[r]['values'] = factors[r]['values'][0]
 
             res[wi_object[i]['position'].split(':')[-1]] = factors
 
