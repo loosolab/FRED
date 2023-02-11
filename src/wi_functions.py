@@ -1101,9 +1101,9 @@ def get_color(depth):
     :return: color: the color in which the key should be colored
     """
     if depth %2 == 0:
-        color = '#d95965'
-    else:
         color = '26a69a'
+    else:
+        color = '#d95965'
     return color
 
 
