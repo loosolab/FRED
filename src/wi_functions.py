@@ -1386,9 +1386,7 @@ def fill_wi_object(wi_object, meta_yaml):
     """
     if 'list' in wi_object and wi_object['list']:
         if 'input_fields' in wi_object:
-            if wi_object['position'].split(':')[-1] == 'experimental_factors':
-                pass
-            else:
+            if wi_object['position'].split(':')[-1] != 'experimental_factors':
                 for elem in meta_yaml:
                     list_value = []
                     for field in wi_object['input_fields']:
