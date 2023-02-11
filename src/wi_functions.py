@@ -1100,14 +1100,10 @@ def get_color(depth):
     :param depth: the depth of indentation
     :return: color: the color in which the key should be colored
     """
-    if depth < 1:
-        color = '26a69a'
-    elif depth < 2:
+    if depth %2 == 0:
         color = '#d95965'
-    elif depth < 3:
-        color = '2fccbd'
     else:
-        color = 'fc6875'
+        color = '26a69a'
     return color
 
 
