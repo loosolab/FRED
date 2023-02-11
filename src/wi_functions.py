@@ -1071,19 +1071,19 @@ def object_to_html(yaml_object, depth, margin, is_list):
             if key == list(yaml_object.keys())[0] and is_list:
                 input_text = object_to_html(yaml_object[key],
                                             depth + 1, margin + 1.5, is_list)
-                html_str = f'{html_str}<ul style="list-style-type: circle;">' \
+                html_str = f'{html_str}<ul class="list-style-type-circle">' \
                            f'<li><p><font color={get_color(depth)}>{key}' \
                            f'</font>: {input_text}</p></li></ul>'
             else:
                 input_text = object_to_html(yaml_object[key],
                                             depth + 1, margin + 1.5, is_list)
-                html_str = f'{html_str}<ul style="list-style: none;"><li><p>' \
+                html_str = f'{html_str}<ul class="list-style-none"><li><p>' \
                            f'<font color={get_color(depth)}>{key}</font>: ' \
                            f'{input_text}</p></li></ul>'
     elif isinstance(yaml_object, list):
         for elem in yaml_object:
             if not isinstance(elem, list) and not isinstance(elem, dict):
-                html_str = f'{html_str}<ul style="list-style-type: circle;">' \
+                html_str = f'{html_str}<ul class="list-style-type-circle">' \
                            f'<li><p>{elem}</p></li></ul>'
             else:
                 html_str = f'{html_str}' \
