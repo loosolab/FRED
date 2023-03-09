@@ -11,7 +11,7 @@ generated = ['condition_name', 'sample_name']
 factor = None
 
 
-def validate_file(metafile):
+def validate_file(metafile, mode, logical_validation=True, yaml=None):
     """
     In this function all functions for the validation of a metadata file are
     called. The validation is based on the data in the file 'keys.yaml'. It is
@@ -24,11 +24,13 @@ def validate_file(metafile):
     invalid_keys: a list containing the invalid keys
     invalid_entries: a list containing the invalid entries -> (key, [values])
     """
-    pool_warn = []
-    ref_genome_warn = []
+    logical_warn = []
     valid = True
-    key_yaml = utils.read_in_yaml(os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
+    if yaml is not None:
+        key_yaml = utils.read_in_yaml(yaml)
+    else:
+        key_yaml = utils.read_in_yaml(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
     invalid_keys, invalid_entries, invalid_value = \
         new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
@@ -37,10 +39,10 @@ def validate_file(metafile):
     if len(missing_mandatory_keys) > 0 or len(invalid_keys) > 0 or len(
             invalid_entries) > 0 or len(invalid_value) > 0:
         valid = False
-    else:
-        pool_warn, ref_genome_warn = validate_logic(metafile)
+    if logical_validation:
+        logical_warn = validate_logic(metafile, mode)
     return valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
-        invalid_value, pool_warn, ref_genome_warn
+        invalid_value, logical_warn
 
 
 # -----------------------------------REPORT-------------------------------------
@@ -58,6 +60,7 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     :param invalid_keys: a list containing all invalid keys
     :param invalid_values: a list containing all invalid values
     """
+    report = ''
     try:
         input_id = metafile['project']['id']
     except KeyError:
@@ -76,32 +79,35 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     value = []
     for v in invalid_value:
         value.append(f'{v[0]}: {v[1]} -> {v[2]}')
-    print(f'{"ERROR".center(80, "-")}\n'
-          f'Project ID: {input_id}\n'
-          f'Path: {path}\n\n'
-          f'Report:\n')
+    report += f'{"ERROR".center(80, "-")}\n'\
+              f'Project ID: {input_id}\n'\
+              f'Path: {path}\n\n'\
+              f'Report:\n'
     if len(invalid_keys) > 0:
-        print(f'The following keys were invalid:\n'
-              f'- {invalid_entries}\n')
+        report += f'The following keys were invalid:\n'\
+                  f'- {invalid_entries}\n'
     if len(missing_mandatory_keys) > 0:
-        print(f'The following mandatory keys were missing:\n'
-              f'- {missing}\n')
+        report += f'The following mandatory keys were missing:\n' \
+                  f'- {missing}\n'
     if len(invalid_values) > 0:
-        print(f'The following values do not match the whitelist:\n'
-              f'- {"- ".join(whitelist_values)}')
+        report += f'The following values do not match the whitelist:\n' \
+                  f'- {"- ".join(whitelist_values)}\n'
     if len(invalid_value) > 0:
-        print(f'The following values are invalid:\n'
-              f'- {"- ".join(value)}')
-    print(f'{"".center(80, "-")}')
+        report += f'The following values are invalid:\n' \
+                  f'- {"- ".join(value)}\n'
+    report += f'{"".center(80, "-")}\n'
+    return report
 
 
-def print_warning(metafile, pool_warn, ref_genome_warn):
+def print_warning(metafile, logical_warn):
     """
     This function prints a warning message.
     :param metafile: the metafile that contains the warning
     :param pool_warn: a list of warnings concerning pooled and donor_count
     :param ref_genome_warn: a list of warnings concerning the reference_genome
     """
+
+    report = ''
     try:
         input_id = metafile['project']['id']
     except KeyError:
@@ -110,18 +116,21 @@ def print_warning(metafile, pool_warn, ref_genome_warn):
         path = metafile['path']
     except KeyError:
         path = 'missing'
-    print(f'{"WARNING".center(80, "-")}\n'
-          f'Project ID: {input_id}\n'
-          f'Path: {path}\n\n'
-          f'Report:\n')
-    if len(pool_warn) > 0:
-        for elem in pool_warn:
-            print(f'- Sample \'{elem[0]}\':\n{elem[1]}')
-    if len(ref_genome_warn) > 0:
-        for elem in ref_genome_warn:
-            print(f'- Run from {elem[0]}:\n{elem[1]}')
-    print(f'{"".center(80, "-")}')
-
+    report += f'{"WARNING".center(80, "-")}\n'\
+              f'Project ID: {input_id}\n'\
+              f'Path: {path}\n\n'\
+              f'Report:\n'
+    if len(logical_warn) > 0:
+        for elem in logical_warn:
+            report += f'- {elem[0]}:\n{elem[1]}\n'
+    #if len(pool_warn) > 0:
+    #    for elem in pool_warn:
+    #        print(f'- Sample \'{elem[0]}\':\n{elem[1]}')
+    #if len(ref_genome_warn) > 0:
+    #    for elem in ref_genome_warn:
+    #        print(f'- Run from {elem[0]}:\n{elem[1]}')
+    report += f'{"".center(80, "-")}\n'
+    return(report)
 
 # --------------------------------UTILITIES------------------------------------
 
@@ -392,7 +401,7 @@ def validate_value(input_value, value_type, key):
     return valid, message
 
 
-def validate_logic(metafile):
+def validate_logic(metafile, mode='metadata'):
     """
     This functions tests the logic of the input data.
     :param metafile: the metafile to be validated
@@ -400,25 +409,31 @@ def validate_logic(metafile):
     pool_warn: a list containing warnings about the donor_count and pooled
     ref_genome_warn: a list containing warnings about the reference genome
     """
-    pool_warn = []
-    ref_genome_warn = []
-    samples = list(utils.find_keys(metafile, 'samples'))
-    for cond in samples:
-        for sample in cond:
-            warning, warn_message = validate_donor_count(sample['pooled'],
-                                                         sample['donor_count'])
-            if warning:
-                pool_warn.append((sample['sample_name'], warn_message))
-    organisms = list(utils.find_keys(metafile, 'organism_name'))
-    runs = list(utils.find_keys(metafile, 'runs'))
-    if len(runs) > 0:
-        for run in runs[0]:
-            if 'reference_genome' in run:
-                warning, warn_message = validate_reference_genome(
-                    organisms, run['reference_genome'])
+    logical_warn = []
+
+    if mode == 'metadata':
+        samples = list(utils.find_keys(metafile, 'samples'))
+        for cond in samples:
+            for sample in cond:
+                warning, warn_message = validate_donor_count(sample['pooled'],
+                                                             sample['donor_count'])
                 if warning:
-                    ref_genome_warn.append((run['date'], warn_message))
-    return pool_warn, ref_genome_warn
+                    logical_warn.append((f'Sample \'{sample["sample_name"]}\'', warn_message))
+        organisms = list(utils.find_keys(metafile, 'organism_name'))
+        runs = list(utils.find_keys(metafile, 'runs'))
+        if len(runs) > 0:
+            for run in runs[0]:
+                if 'reference_genome' in run:
+                    warning, warn_message = validate_reference_genome(
+                        organisms, run['reference_genome'])
+                    if warning:
+                        logical_warn.append((f'Run from {run["date"]}', warn_message))
+    elif mode == 'mamplan':
+        if 'tags' in metafile and 'organization' in metafile['tags']:
+            if 'public' in metafile['tags']['organization']:
+                if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:
+                    logical_warn.append(('tags:pubmedid', 'The pubmed ID is missing for this public project'))
+    return logical_warn
 
 
 def validate_reference_genome(organisms, reference_genome):
@@ -438,7 +453,7 @@ def validate_reference_genome(organisms, reference_genome):
                 organism in organisms]):
         invalid = True
         organisms = [f'\'{organism}\'' for organism in organisms]
-        message = (f'The reference genome \'{reference_genome}\' does not '
+        message = (f'  The reference genome \'{reference_genome}\' does not '
                    f'match the input organism ({", ".join(organisms)}).')
     return invalid, message
 
@@ -456,10 +471,10 @@ def validate_donor_count(pooled, donor_count):
     message = None
     if pooled and donor_count <= 1:
         invalid = True
-        message = (f'Found donor count {donor_count} for pooled sample. '
+        message = (f'  Found donor count {donor_count} for pooled sample. '
                    f'The donor count should be greater than 1.')
     elif not pooled and donor_count > 1:
         invalid = True
-        message = (f'Found donor count {donor_count} for sample that is not '
+        message = (f'  Found donor count {donor_count} for sample that is not '
                    f'pooled. The donor count should be 1.')
     return invalid, message
