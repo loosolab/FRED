@@ -1,9 +1,14 @@
 import argparse
 import pathlib
+import time
+
 import git
 import os
 from src import generate_metafile
 from src import find_metafiles
+from src import validate_yaml
+from src import file_reading
+from src import utils
 
 def find(args):
     """
@@ -36,6 +41,55 @@ def generate(args):
     """
     generate_metafile.generate_file(args.path, args.id, args.name,
                                     args.mandatory_only)
+
+
+def validate(args):
+    logical_validation = False if args.skip_logic else True
+    validation_reports = {'errors': {'count': 0, 'report': []},
+                          'warnings': {'count': 0, 'report': []}}
+    if os.path.isdir(args.path):
+        metafiles, validation_reports = file_reading.iterate_dir_metafiles([args.path], mode=args.mode, logical_validation=logical_validation, yaml=args.yaml)
+    else:
+        metafile = utils.read_in_yaml(args.path)
+        valid, missing_mandatory_keys, invalid_keys, \
+        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, args.mode, logical_validation=logical_validation, yaml=args.yaml)
+        metafile['path'] = args.path
+        if not valid:
+            validation_reports['errors']['count'] += 1
+            validation_reports['errors']['report'].append((metafile, missing_mandatory_keys, invalid_keys, invalid_entries, invalid_values))
+        if len(logical_warn) > 0:
+            validation_reports['warnings']['count'] += 1
+            validation_reports['warnings']['report'].append((metafile, logical_warn))
+
+    print(f'Found {validation_reports["errors"]["count"]} errors and {validation_reports["warnings"]["count"]} warnings.')
+    res = []
+    if validation_reports['errors']['count'] > 0 or validation_reports['warnings']['count'] > 0:
+        options = ['print report', 'save report to file']
+        print(f'Do you want to see a report? Choose from the following options (1,...,{len(options)} or n)')
+        generate_metafile.print_option_list(options, '')
+        res = generate_metafile.parse_input_list(options, True)
+    if 'save report to file' in res:
+        timestamp = time.time()
+        filename = f'validation_report_{str(timestamp).split(".")[0]}.txt'
+        f = open(filename, 'w')
+
+    if validation_reports['errors']['count'] > 0:
+        for rep in validation_reports['errors']['report']:
+            report = validate_yaml.print_validation_report(rep[0], rep[1], rep[2], rep[3], rep[4])
+            if 'save report to file' in res:
+                f.write(report)
+            if 'print report' in res:
+                print(report)
+    if validation_reports['warnings']['count'] > 0:
+        for rep in validation_reports['warnings']['report']:
+            report = validate_yaml.print_warning(rep[0], rep[1])
+            if 'save report to file' in res:
+                f.write(report)
+            if 'print report' in res:
+                print(report)
+    if 'save report to file' in res:
+        print(f'The report was saved to the file \'{filename}\'.')
+        f.close()
 
 
 def main():
@@ -71,8 +125,18 @@ def main():
                                  action='store_true',
                                  help='If True, only mandatory keys will '
                                       'be filled out')
-
     create_function.set_defaults(func=generate)
+
+    validate_function = subparsers.add_parser('validate',
+                                              help='')
+    validate_group = validate_function.add_argument_group('mandatory arguments')
+    validate_group.add_argument('-p', '--path', type=pathlib.Path, required=True)
+    validate_function.add_argument('-l', '--skip_logic', default=False,
+                                   action='store_true')
+    validate_function.add_argument('-y', '--yaml', type=pathlib.Path, default='keys.yaml')
+    validate_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
+    validate_function.set_defaults(func=validate)
+
     args = parser.parse_args()
 
     try:
