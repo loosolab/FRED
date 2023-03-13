@@ -185,7 +185,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                         invalid_keys.append(key)
                 else:
                     invalid_keys.append(key)
-            elif key_yaml and key not in key_yaml:
+            elif not key_yaml or (key_yaml and key not in key_yaml):
                 invalid_keys.append(key)
             else:
                 if key == 'factor':
@@ -399,8 +399,6 @@ def validate_value(input_value, value_type, key, mode='metadata'):
             valid = False
             message = 'The value contains an invalid character ' \
                       '(\", {, } or |).'
-        else:
-            print(key)
     return valid, message
 
 
