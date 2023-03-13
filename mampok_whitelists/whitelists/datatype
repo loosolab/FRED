@@ -3,3 +3,6 @@ whitelist:
     - scrna
     - scatac
     - RNA
+    - bulk RNA-seq
+    - bulk ATAC-seq
+    - bulk ChIP-seq
