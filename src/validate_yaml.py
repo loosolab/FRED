@@ -11,7 +11,7 @@ generated = ['condition_name', 'sample_name']
 factor = None
 
 
-def validate_file(metafile, mode, logical_validation=True, yaml=None):
+def validate_file(metafile, mode, logical_validation=True, yaml=None, whitelist_path=None):
     """
     In this function all functions for the validation of a metadata file are
     called. The validation is based on the data in the file 'keys.yaml'. It is
@@ -27,12 +27,13 @@ def validate_file(metafile, mode, logical_validation=True, yaml=None):
     logical_warn = []
     valid = True
     if yaml is not None:
-        key_yaml = utils.read_in_yaml(yaml)
+        key_yaml_path = yaml
     else:
-        key_yaml = utils.read_in_yaml(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
+        key_yaml_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml')
+    key_yaml = utils.read_in_yaml(key_yaml_path)
     invalid_keys, invalid_entries, invalid_value = \
-        new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile)
+        new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
                                                 [x.split(':')[-1] for x in
                                                  invalid_keys])
@@ -48,7 +49,28 @@ def validate_file(metafile, mode, logical_validation=True, yaml=None):
 # -----------------------------------REPORT-------------------------------------
 
 
-def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
+def print_full_report(metafile, errors, warnings):
+    report = ''
+    try:
+        input_id = metafile['project']['id']
+    except KeyError:
+        input_id = 'missing'
+    try:
+        path = metafile['path']
+    except KeyError:
+        path = 'missing'
+    report += f'{"VALIDATION REPORT".center(80, "-")}\n' \
+              f'Project ID: {input_id}\n' \
+              f'Path: {path}\n\n' \
+
+    if errors is not None:
+        report += f'{print_validation_report(errors[0], errors[1], errors[2], errors[3])}\n'
+    if warnings is not None:
+        report += f'{print_warning(warnings)}\n'
+    return report
+
+
+def print_validation_report(missing_mandatory_keys, invalid_keys,
                             invalid_values, invalid_value):
     """
     This function outputs a report on invalid files. The report contains the ID
@@ -60,15 +82,6 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     :param invalid_keys: a list containing all invalid keys
     :param invalid_values: a list containing all invalid values
     """
-    report = ''
-    try:
-        input_id = metafile['project']['id']
-    except KeyError:
-        input_id = 'missing'
-    try:
-        path = metafile['path']
-    except KeyError:
-        path = 'missing'
     invalid_entries = '\n- '.join(invalid_keys)
     missing = '\n- '.join(missing_mandatory_keys)
     whitelist_values = []
@@ -79,10 +92,8 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     value = []
     for v in invalid_value:
         value.append(f'{v[0]}: {v[1]} -> {v[2]}')
-    report += f'{"ERROR".center(80, "-")}\n'\
-              f'Project ID: {input_id}\n'\
-              f'Path: {path}\n\n'\
-              f'Report:\n'
+    report = ''
+    report += f'{"ERROR".center(80, "-")}\n\n'
     if len(invalid_keys) > 0:
         report += f'The following keys were invalid:\n'\
                   f'- {invalid_entries}\n'
@@ -95,11 +106,10 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     if len(invalid_value) > 0:
         report += f'The following values are invalid:\n' \
                   f'- {"- ".join(value)}\n'
-    report += f'{"".center(80, "-")}\n'
     return report
 
 
-def print_warning(metafile, logical_warn):
+def print_warning(logical_warn):
     """
     This function prints a warning message.
     :param metafile: the metafile that contains the warning
@@ -108,18 +118,7 @@ def print_warning(metafile, logical_warn):
     """
 
     report = ''
-    try:
-        input_id = metafile['project']['id']
-    except KeyError:
-        input_id = 'missing'
-    try:
-        path = metafile['path']
-    except KeyError:
-        path = 'missing'
-    report += f'{"WARNING".center(80, "-")}\n'\
-              f'Project ID: {input_id}\n'\
-              f'Path: {path}\n\n'\
-              f'Report:\n'
+    report += f'{"WARNING".center(80, "-")}\n\n'
     if len(logical_warn) > 0:
         for elem in logical_warn:
             report += f'- {elem[0]}:\n{elem[1]}\n'
@@ -129,14 +128,13 @@ def print_warning(metafile, logical_warn):
     #if len(ref_genome_warn) > 0:
     #    for elem in ref_genome_warn:
     #        print(f'- Run from {elem[0]}:\n{elem[1]}')
-    report += f'{"".center(80, "-")}\n'
-    return(report)
+    return report
 
 # --------------------------------UTILITIES------------------------------------
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
              invalid_entry, invalid_value, input_type, is_factor,
-             local_factor, full_metadata):
+             local_factor, full_metadata, key_yaml_path, whitelist_path=None, mode='metadata'):
     """
     This function test if all keys in the metadata file are valid.
     :param metafile: the metadata file
@@ -159,9 +157,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             'value' in metafile and 'unit' in metafile):
         for key in metafile:
             if not key_yaml and key_name.split(':')[-1] in is_factor or (key_name.split(':')[-1] == 'values' and local_factor is not None):
-                new_yaml1 = utils.read_in_yaml(os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)), '..',
-                    'keys.yaml'))
+                new_yaml1 = utils.read_in_yaml(key_yaml_path)
                 if key_name.split(':')[-1] in is_factor:
                     new_yaml = list(utils.find_keys(new_yaml1, key_name.split(':')[-1]))
                 else:
@@ -170,9 +166,9 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     if 'whitelist' in new_yaml[0] and new_yaml[0]['whitelist']:
                         if key_name.split(':')[-1] in is_factor:
                             w = utils.get_whitelist(key_name.split(':')[-1],
-                                                    full_metadata)
+                                                    full_metadata, whitelist_path=whitelist_path)
                         else:
-                            w = utils.get_whitelist(local_factor, full_metadata)
+                            w = utils.get_whitelist(local_factor, full_metadata, whitelist_path=whitelist_path)
                         if w and 'headers' in w:
                             if isinstance(w['headers'], dict):
                                 if 'whitelist_keys' in w:
@@ -211,7 +207,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     metafile[key], key_yaml[key]['value'], sub_lists,
                     f'{key_name}:{key}' if key_name != '' else key,
                     invalid_keys, invalid_entry, invalid_value, input_type,
-                    is_factor, local_factor, full_metadata)
+                    is_factor, local_factor, full_metadata, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
                 invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
@@ -219,17 +215,17 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             res_keys, res_entries, res_values = new_test(
                 item, key_yaml, sub_lists, key_name, invalid_keys,
                 invalid_entry, invalid_value, input_type, is_factor,
-                local_factor, full_metadata)
+                local_factor, full_metadata, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
             invalid_keys = res_keys
             sub_lists = sub_lists[:-1]
     else:
         invalid = new_test_for_whitelist(key_name.split(':')[-1], metafile,
-                                         sub_lists)
+                                         sub_lists, whitelist_path=whitelist_path)
         if invalid:
             invalid_entry.append(f'{key_name}:{metafile}')
 
         inv_value, message = validate_value(metafile, input_type,
-                                            key_name.split(':')[-1])
+                                            key_name.split(':')[-1], mode=mode)
 
         if not inv_value:
             invalid_value.append((key_name, metafile, message))
@@ -237,7 +233,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
     return invalid_keys, invalid_entry, invalid_value
 
 
-def new_test_for_whitelist(entry_key, entry_value, sublists):
+def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None):
     """
     This function tests if the value of a key matches the whitelist.
     :param entry_key: the key that is tested
@@ -246,7 +242,7 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
                       value
     :return: True if the entry does not match the whitelist else False
     """
-    whitelist = utils.read_whitelist(entry_key)
+    whitelist = utils.read_whitelist(entry_key, whitelist_path=whitelist_path)
     if whitelist and whitelist['whitelist_type'] == 'plain':
         whitelist = whitelist['whitelist']
     if isinstance(whitelist, dict):
@@ -267,20 +263,20 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
             if value[0] in whitelist:
                 whitelist = whitelist[value[0]]
             else:
-                whitelist = utils.read_whitelist(value[0])
+                whitelist = utils.read_whitelist(value[0], whitelist_path=whitelist_path)
                 if whitelist and whitelist['whitelist_type'] == 'plain':
                     whitelist = whitelist['whitelist']
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
+            #TODO: linked whitelists
             whitelist = utils.read_grouped_whitelist(whitelist, {})
             whitelist = [x for xs in list(whitelist['whitelist'].values())
                          if xs is not None for x in xs]
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \
             and os.path.isfile(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..',
-            'metadata_whitelists', 'whitelists', whitelist)):
-        whitelist = utils.read_whitelist(whitelist)
+            whitelist_path, 'whitelists', whitelist)):
+        whitelist = utils.read_whitelist(whitelist, whitelist_path=whitelist_path)
         if whitelist:
             whitelist = whitelist['whitelist']
     if whitelist and entry_value not in whitelist:
@@ -358,7 +354,7 @@ def find_key(metafile, key):
     return new_metafile
 
 
-def validate_value(input_value, value_type, key):
+def validate_value(input_value, value_type, key, mode='metadata'):
     """
     This function tests if an entered value matches its type and contains
     invalid characters.
@@ -383,7 +379,12 @@ def validate_value(input_value, value_type, key):
                 message = 'The value has to be an integer.'
         elif value_type == 'date':
             try:
-                input_date = input_value.split('.')
+                if mode == 'metadata':
+                    input_date = input_value.split('.')
+                    date_message = f'Input must be of type \'DD.MM.YYYY\'.'
+                elif mode == 'mamplan':
+                    input_date = input_value.split('/')
+                    date_message = f'Input must be of type \'DD/MM/YYYY\'.'
                 if len(input_date) != 3 or len(input_date[0]) != 2 or len(
                         input_date[1]) != 2 or len(input_date[2]) != 4:
                     raise SyntaxError
@@ -392,7 +393,7 @@ def validate_value(input_value, value_type, key):
                                             int(input_date[0]))
             except (IndexError, ValueError, SyntaxError) as e:
                 valid = False
-                message = f'Input must be of type \'DD.MM.YYYY\'.'
+                message = date_message
         elif type(input_value) == str and ('\"' in input_value or '{' in input_value or '}' in
                  input_value or '|' in input_value) and key not in generated:
             valid = False

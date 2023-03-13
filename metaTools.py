@@ -20,6 +20,7 @@ def find(args):
     """
 
     # call function find_projects in find_metafiles
+    fetch_whitelists()
     result = find_metafiles.find_projects(args.path, args.search, True)
 
     # test if matching metadata files were found
@@ -39,57 +40,73 @@ def generate(args):
     calls script generate_metafile to start dialog
     :param args:
     """
+    fetch_whitelists()
     generate_metafile.generate_file(args.path, args.id, args.name,
                                     args.mandatory_only)
 
 
 def validate(args):
+    if args.whitelist_path is None:
+        fetch_whitelists()
     logical_validation = False if args.skip_logic else True
-    validation_reports = {'errors': {'count': 0, 'report': []},
-                          'warnings': {'count': 0, 'report': []}}
+    validation_reports = {'all_files': 1,
+                          'corrupt_files': {'count': 0, 'report':[]},
+                          'error_count': 0, 'warning_count': 0}
     if os.path.isdir(args.path):
-        metafiles, validation_reports = file_reading.iterate_dir_metafiles([args.path], mode=args.mode, logical_validation=logical_validation, yaml=args.yaml)
+        metafiles, validation_reports = file_reading.iterate_dir_metafiles([args.path], mode=args.mode, logical_validation=logical_validation, yaml=args.yaml, whitelist_path=args.whitelist_path)
     else:
         metafile = utils.read_in_yaml(args.path)
+        file_reports = {'file': metafile, 'error': None, 'warning': None}
         valid, missing_mandatory_keys, invalid_keys, \
-        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, args.mode, logical_validation=logical_validation, yaml=args.yaml)
+        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, args.mode, logical_validation=logical_validation, yaml=args.yaml, whitelist_path=args.whitelist_path)
         metafile['path'] = args.path
         if not valid:
-            validation_reports['errors']['count'] += 1
-            validation_reports['errors']['report'].append((metafile, missing_mandatory_keys, invalid_keys, invalid_entries, invalid_values))
+            validation_reports['corrupt_files']['count'] = 1
+            validation_reports['error_count'] += (len(missing_mandatory_keys) + len(invalid_keys) + len(invalid_entries) + len(invalid_values))
+            file_reports['error'] = (missing_mandatory_keys, invalid_keys, invalid_entries, invalid_values)
         if len(logical_warn) > 0:
-            validation_reports['warnings']['count'] += 1
-            validation_reports['warnings']['report'].append((metafile, logical_warn))
+            validation_reports['warning_count'] += len(logical_warn)
+            file_reports['warning'] = logical_warn
+        validation_reports['corrupt_files']['report'].append(file_reports)
 
-    print(f'Found {validation_reports["errors"]["count"]} errors and {validation_reports["warnings"]["count"]} warnings.')
-    res = []
-    if validation_reports['errors']['count'] > 0 or validation_reports['warnings']['count'] > 0:
+    print(f'{validation_reports["all_files"]} files were validated.')
+    print(f'Found {validation_reports["error_count"]} errors and {validation_reports["warning_count"]} warnings in {validation_reports["corrupt_files"]["count"]} of those files.')
+
+    if validation_reports['corrupt_files']['count'] > 0:
         options = ['print report', 'save report to file']
         print(f'Do you want to see a report? Choose from the following options (1,...,{len(options)} or n)')
         generate_metafile.print_option_list(options, '')
         res = generate_metafile.parse_input_list(options, True)
-    if 'save report to file' in res:
-        timestamp = time.time()
-        filename = f'validation_report_{str(timestamp).split(".")[0]}.txt'
-        f = open(filename, 'w')
+        if res:
+            if 'save report to file' in res:
+                timestamp = time.time()
+                filename = f'validation_report_{str(timestamp).split(".")[0]}.txt'
+                f = open(filename, 'w')
 
-    if validation_reports['errors']['count'] > 0:
-        for rep in validation_reports['errors']['report']:
-            report = validate_yaml.print_validation_report(rep[0], rep[1], rep[2], rep[3], rep[4])
-            if 'save report to file' in res:
-                f.write(report)
+            rep = ''
+            for report in validation_reports['corrupt_files']['report']:
+                rep += f'{"".center(80, "_")}\n\n'
+                rep += validate_yaml.print_full_report(report['file'], report['error'], report['warning'])
+            rep += f'{"".center(80, "_")}\n\n'
+
             if 'print report' in res:
-                print(report)
-    if validation_reports['warnings']['count'] > 0:
-        for rep in validation_reports['warnings']['report']:
-            report = validate_yaml.print_warning(rep[0], rep[1])
+                print(rep)
             if 'save report to file' in res:
-                f.write(report)
-            if 'print report' in res:
-                print(report)
-    if 'save report to file' in res:
-        print(f'The report was saved to the file \'{filename}\'.')
-        f.close()
+                f.write(rep)
+                print(f'The report was saved to the file \'{filename}\'.')
+                f.close()
+
+
+def fetch_whitelists():
+    print('Fetching whitelists...\n')
+    if not os.path.exists('metadata_whitelists'):
+        repo = git.Repo.clone_from(
+            'https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/',
+            'metadata_whitelists')
+    else:
+        repo = git.Repo('metadata_whitelists')
+        o = repo.remotes.origin
+        o.pull()
 
 
 def main():
@@ -135,6 +152,7 @@ def main():
                                    action='store_true')
     validate_function.add_argument('-y', '--yaml', type=pathlib.Path, default='keys.yaml')
     validate_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
+    validate_function.add_argument('-wp', '--whitelist_path', default=None)
     validate_function.set_defaults(func=validate)
 
     args = parser.parse_args()
@@ -146,13 +164,5 @@ def main():
 
 
 if __name__ == "__main__":
-
-    print('Fetching whitelists...\n')
-    if not os.path.exists('metadata_whitelists'):
-        repo = git.Repo.clone_from('https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/', 'metadata_whitelists')
-    else:
-        repo = git.Repo('metadata_whitelists')
-        o = repo.remotes.origin
-        o.pull()
 
     main()

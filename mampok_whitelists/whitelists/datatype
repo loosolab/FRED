@@ -1,0 +1,5 @@
+whitelist_type: plain
+whitelist:
+    - scrna
+    - scatac
+    - RNA

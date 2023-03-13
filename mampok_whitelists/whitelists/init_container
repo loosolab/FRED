@@ -1,0 +1,4 @@
+whitelist_type: plain
+whitelist:
+    - s3download
+    - s3downloadfolder
