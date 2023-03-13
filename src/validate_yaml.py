@@ -399,6 +399,8 @@ def validate_value(input_value, value_type, key, mode='metadata'):
             valid = False
             message = 'The value contains an invalid character ' \
                       '(\", {, } or |).'
+        else:
+            print(key)
     return valid, message
 
 
@@ -430,7 +432,7 @@ def validate_logic(metafile, mode='metadata'):
                     if warning:
                         logical_warn.append((f'Run from {run["date"]}', warn_message))
     elif mode == 'mamplan':
-        if 'tags' in metafile and 'organization' in metafile['tags']:
+        if 'tags' in metafile and 'organization' in metafile['tags'] and metafile['tags']['organization'] is not None:
             if 'public' in metafile['tags']['organization']:
                 if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:
                     logical_warn.append(('tags:pubmedid', 'The pubmed ID is missing for this public project'))
