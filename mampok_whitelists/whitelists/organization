@@ -1,6 +1,7 @@
 whitelist_type: plain
 whitelist:
     - public
+    - external
     - Abt-A
     - AG-nerds
     - VL-AG-Looso

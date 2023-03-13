@@ -2,3 +2,5 @@ whitelist_type: plain
 whitelist:
     - GI
     - BN
+    - GWDG
+    - GWDGmanagt
