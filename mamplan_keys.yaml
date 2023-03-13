@@ -43,6 +43,12 @@ deployment:
       value: null
       whitelist: False
       input_type: bool
+    autoscaling:
+      mandatory: False
+      list: False
+      value: null
+      whitelist: False
+      input_type: bool
     bucket: 
       mandatory: True
       list:  False
@@ -128,7 +134,13 @@ tags:
       input_type: short_text
     owner:
       mandatory: False
-      list:  True
+      list:  False
+      value: null
+      whitelist: True
+      input_type: short_text
+    user:
+      mandatory: False
+      list: True
       value: null
       whitelist: True
       input_type: short_text
