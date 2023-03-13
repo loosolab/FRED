@@ -386,7 +386,7 @@ def validate_value(input_value, value_type, key, mode='metadata'):
                     input_date = input_value.split('/')
                     date_message = f'Input must be of type \'DD/MM/YYYY\'.'
                 if len(input_date) != 3 or len(input_date[0]) != 2 or len(
-                        input_date[1]) != 2 or len(input_date[2]) != 4:
+                        input_date[1]) != 2 or not ((mode == 'mamplan' and len(input_date[2]) == 2) or len(input_date[2]) == 4):
                     raise SyntaxError
                 input_value = datetime.date(int(input_date[2]),
                                             int(input_date[1]),
