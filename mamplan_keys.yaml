@@ -1,0 +1,191 @@
+project:
+  mandatory: True
+  list:  False
+  value:
+    files: 
+      mandatory: True
+      list:  True
+      value: null
+      whitelist: False
+      input_type: short_text
+    id: 
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: short_text
+    tool:
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: short_text
+    init_container: 
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: short_text
+    supress_s3:
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: bool
+
+deployment:
+  mandatory: True
+  list:  False
+  value:
+    active:
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: bool
+    bucket: 
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: short_text
+    cluster:
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: True
+      input_type: short_text
+    mampok_url:
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: bool
+    icinga:
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: bool
+    lifetime:
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: date
+    random:
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: bool
+    replicas:
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: number
+    url: 
+      mandatory: True
+      list:  False
+      value: null
+      whitelist: False
+      input_type: short_text
+
+tags:
+  mandatory: False
+  list:  False
+  value:
+    analyst:
+      mandatory: False
+      list:  True
+      value: null
+      whitelist: True
+      input_type: short_text
+    citation:
+      mandatory: False
+      list:  True
+      value: null
+      whitelist: False
+      input_type: short_text
+    creationdate:
+      mandatory: False
+      list:  False
+      value: null
+      whitelist: False
+      input_type: date
+    datatype:
+      mandatory: False
+      list:  False
+      value: null
+      whitelist: False
+      input_type: short_text
+    organization:
+      mandatory: False
+      list:  True
+      value: null
+      whitelist: True
+      input_type: short_text
+    owner:
+      mandatory: False
+      list:  True
+      value: null
+      whitelist: True
+      input_type: short_text
+    pubmedid:
+      mandatory: False
+      list:  False
+      value: null
+      whitelist: False
+      input_type: number
+
+container:
+  mandatory: False
+  list:  False
+  value:
+    main:
+      mandatory: False
+      list:  False
+      value:
+        resources:
+          mandatory: False
+          list:  False
+          value:  
+            limits:
+              mandatory: False
+              list:  False
+              value:
+                cpu: 
+                  mandatory: False
+                  list:  False
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+                memory:
+                  mandatory: False
+                  list:  False
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+            requests:
+              mandatory: False
+              list:  False
+              value:
+                cpu:
+                  mandatory: False
+                  list:  False
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+                memory:
+                  mandatory: False
+                  list:  False
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+        extra_args:
+          mandatory: False
+          list:  True
+          value: null
+          whitelist: False
+          input_type: short_text
