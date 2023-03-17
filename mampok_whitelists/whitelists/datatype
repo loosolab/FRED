@@ -6,3 +6,6 @@ whitelist:
     - bulk RNA-seq
     - bulk ATAC-seq
     - bulk ChIP-seq
+    - scrna&cite
+    - Cut&Run
+    - atac
