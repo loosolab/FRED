@@ -3,7 +3,7 @@ project:
   list:  False
   value:
     files: 
-      mandatory: True
+      mandatory: False
       list:  True
       value: null
       whitelist: False
@@ -21,7 +21,7 @@ project:
       whitelist: False
       input_type: short_text
     init_container: 
-      mandatory: True
+      mandatory: False
       list:  False
       value: null
       whitelist: False
@@ -62,7 +62,7 @@ deployment:
       whitelist: True
       input_type: short_text
     mampok_url:
-      mandatory: True
+      mandatory: False
       list:  False
       value: null
       whitelist: False
@@ -74,7 +74,7 @@ deployment:
       whitelist: False
       input_type: bool
     lifetime:
-      mandatory: True
+      mandatory: False
       list:  False
       value: null
       whitelist: False
@@ -102,6 +102,12 @@ tags:
   mandatory: False
   list:  False
   value:
+    metadata:
+      mandatory: False
+      list: False
+      value: null
+      whitelist: False
+      input_type: bool
     analyst:
       mandatory: False
       list:  True
@@ -120,6 +126,12 @@ tags:
       value: null
       whitelist: False
       input_type: date
+    gse:
+      mandatory: False
+      list: False
+      value: null
+      whitelist: False
+      input_type: short_text
     datatype:
       mandatory: False
       list:  False
@@ -133,7 +145,7 @@ tags:
       whitelist: True
       input_type: short_text
     owner:
-      mandatory: False
+      mandatory: True
       list:  False
       value: null
       whitelist: True
@@ -159,6 +171,64 @@ container:
       mandatory: False
       list:  False
       value:
+        flexVolume:
+          mandatory: False
+          list: False
+          value: 
+            name:
+              mandatory: False
+              list: False
+              value: null
+              whitelist: False
+              input_type: short_text
+            flexVolume:
+              mandatory: False
+              list: False
+              value:
+                driver:
+                  mandatory: False
+                  list: False
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+                fsType:
+                  mandatory: False
+                  list: False
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+                secretRef:
+                  mandatory: False
+                  list: False
+                  value:
+                    name: 
+                      mandatory: False
+                      list: False
+                      value: null
+                      whitelist: False
+                      input_type: short_text
+                options:
+                  mandatory: False
+                  list: False
+                  value:
+                    mountOptions:
+                      mandatory: False
+                      list: False
+                      value: null
+                      whitelist: False
+                      input_type: short_text
+                    networkPath:
+                      mandatory: False
+                      list: False
+                      value: null
+                      whitelist: False
+                      input_type: short_text
+        image:
+          mandatory: False
+          list: False
+          value: null
+          whitelist: False
+          input_type: short_text
         resources:
           mandatory: False
           list:  False
