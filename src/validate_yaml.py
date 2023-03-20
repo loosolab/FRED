@@ -431,10 +431,14 @@ def validate_logic(metafile, mode='metadata'):
                     if warning:
                         logical_warn.append((f'Run from {run["date"]}', warn_message))
     elif mode == 'mamplan':
-        if 'tags' in metafile and 'owner' in metafile['tags'] and metafile['tags']['owner'] is not None:
-            if metafile['tags']['owner'] == 'public':
-                if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:
-                    logical_warn.append(('tags:pubmedid', 'The pubmed ID is missing for this public project'))
+        if 'tags' in metafile:
+            if 'owner' in metafile['tags'] and metafile['tags']['owner'] is not None:
+                if metafile['tags']['owner'] == 'public':
+                    if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:
+                        logical_warn.append(('tags:pubmedid', 'The pubmed ID is missing for this public project'))
+            if 'analyst' not in metafile['tags'] or ('analyst' in metafile['tags'] and metafile['tags']['analyst'] is None):
+                logical_warn.append(('tags:analyst', 'There are no analysts set for this project'))
+        
     return logical_warn
 
 
