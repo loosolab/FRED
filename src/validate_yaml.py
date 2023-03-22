@@ -242,6 +242,8 @@ def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None
                       value
     :return: True if the entry does not match the whitelist else False
     """
+    if entry_value is None:
+      entry_value = 'None'
     whitelist = utils.read_whitelist(entry_key, whitelist_path=whitelist_path)
     if whitelist and whitelist['whitelist_type'] == 'plain':
         whitelist = whitelist['whitelist']
