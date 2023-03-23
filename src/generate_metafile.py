@@ -18,6 +18,7 @@ id = ''
 exp_fac = {}
 list_def = []
 
+
 class WhitelistCompleter:
     def __init__(self, whitelist):
         self.whitelist = whitelist
@@ -74,130 +75,298 @@ def generate_file(path, input_id, name, mandatory_mode):
             result_dict[item] = get_redo_value(key_yaml[item], item, False,
                                                mandatory_mode, result_dict,
                                                True, False, True)
-        print(f'{"".center(size.columns, "-")}\n'
-              f'{"SUMMARY".center(size.columns, " ")}\n'
-              f'{"".center(size.columns, "-")}\n')
-        sum = print_summary(result_dict[item], 1, False)
-        print(sum)
-        print(f'\n\n')
-        print(f'{"".center(size.columns, "-")}\n')
 
-        correct = parse_list_choose_one(['True ', 'False '],
-                                        f'\nIs the input correct? You can redo it by selecting \'False\'')
-        while not correct:
-            result_dict[item] = edit_item(item, result_dict[item], key_yaml[item], result_dict, mandatory_mode)
+        while True:
+            print(get_summary(result_dict))
+            correct = parse_list_choose_one(
+                ['True ', 'False '], f'\nIs the input correct? You can redo '
+                                     f'it by selecting \'False\'')
+            if correct:
+                break
+            else:
+                result_dict[item] = edit_item(item, result_dict[item],
+                                              key_yaml[item], result_dict,
+                                              mandatory_mode)
 
-            print(f'{"".center(size.columns, "-")}\n'
-                  f'{"SUMMARY".center(size.columns, " ")}\n'
-                  f'{"".center(size.columns, "-")}\n')
-            sum = print_summary(result_dict[item], 1, False)
-            print(sum)
-            print(f'\n\n')
-            print(f'{"".center(size.columns, "-")}\n')
-
-            correct = parse_list_choose_one(['True ', 'False '],
-                                            f'\nIs the input correct? You can redo it by selecting \'False\'')
-
-
-    # TODO: extra function for summary
     # print summary
-    print(f'{"".center(size.columns, "-")}\n'
-          f'{"SUMMARY".center(size.columns, " ")}\n'
-          f'{"".center(size.columns, "-")}\n')
-    sum = print_summary(result_dict, 1, False)
-    print(sum)
-    print(f'\n\n')
-    print(f'{"".center(size.columns, "-")}\n')
-
-    print(f'{"".center(size.columns, "-")}\n'
-          f'{"FILE VALIDATION".center(size.columns, " ")}\n'
-          f'{"".center(size.columns, "-")}\n')
-    valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
-        invalid_values, pool_warn, ref_genome_warn = validate_yaml.\
-        validate_file(result_dict)
-    if not valid:
-        validate_yaml.print_validation_report(
-            result_dict, missing_mandatory_keys, invalid_keys,
-            invalid_entries, invalid_values)
-    elif len(pool_warn) > 0 or len(ref_genome_warn) > 0:
-        validate_yaml.print_warning(result_dict, pool_warn, ref_genome_warn)
-    else:
-        print(f'Validation complete. No errors found.\n')
+    print(get_summary(result_dict))
+    print(get_validation(result_dict))
 
     utils.save_as_yaml(result_dict,
                            os.path.join(path, f'{input_id}_metadata.yaml'))
     print_sample_names(result_dict, input_id, path)
 
 
+def get_summary(result):
+    summary = ''
+    summary += f'{"".center(size.columns, "-")}\n' \
+               f'{"SUMMARY".center(size.columns, " ")}\n' \
+               f'{"".center(size.columns, "-")}\n'
+    summary += print_summary(result, 1, False)
+    summary += f'\n\n'
+    summary += f'{"".center(size.columns, "-")}\n'
+    return summary
+
+
+def get_validation(result):
+    report = ''
+    report += f'{"FILE VALIDATION".center(size.columns, " ")}\n' \
+              f'{"".center(size.columns, "-")}\n'
+    valid, missing_mandatory_keys, invalid_keys, \
+    invalid_entries, invalid_values, logical_warn = \
+        validate_yaml.validate_file(result, mode='metadata')
+    if not valid or len(logical_warn) > 0:
+        if not valid:
+            report += validate_yaml.print_validation_report(
+                result, missing_mandatory_keys, invalid_keys, invalid_entries,
+                invalid_values)
+        if len(logical_warn) > 0:
+            report += validate_yaml.print_warning(result, logical_warn)
+    else:
+        report += f'Validation complete. No errors found.\n'
+    return report
+
+
 def edit_item(key_name, item, key_yaml, result_dict, mandatory_mode):
-    # TODO: add + remove list elements
-    
+
+    #TODO: use key_yaml for attributes and not item
+
+    # test if item to edit is a list
     if isinstance(item, list):
+
+        # test that no element in the list is a dictionary
         if all(not isinstance(x, dict) for x in item):
-            item = get_redo_value(key_yaml, key_name, False, mandatory_mode, result_dict, True, False, True)
+
+            # call 'get_redo_value' function to repeat the input
+            item = get_redo_value(key_yaml, key_name, False, mandatory_mode,
+                                  result_dict, True, False, True)
+
+        # list elements contain dictionary
         else:
-            all_options = []
+
+            # initialize a list to hold list elements as options for the user
+            # to choose to edit
+            all_options = ['add element to list', 'remove element from list']
+
+            # iterate over the list
             for i in range(len(item)):
+
+                # if the item is a dictionary, convert it to a string
+                # add the item to the option list
                 if isinstance(item[i], dict):
-                    all_options.append('\n'.join(f'{x}: {item[i][x]}' for x in item[i]))
+                    str_dict = '\n'.join(f'{x}: {item[i][x]}' for x in item[i])
+                    all_options.append(f'edit: {str_dict}')
                 else:
-                    all_options.append(item[i])
+                    all_options.append(f'edit: {item[i]}')
+
+            # test if there are multiple elements in the list
             if len(all_options) > 1:
-                print(f'Please choose the list elements you want to edit (1-{len(item)}) divided by comma.')
+
+                # request user input
+                print(f'Please choose the list elements you want to edit '
+                      f'(1-{len(item)}) divided by comma.')
+
+                # print the list elements as options and parse the user input
                 print_option_list(all_options, False)
                 chosen_options = parse_input_list(all_options, False)
-                options = []
+
+                all_options.remove('remove element from list')
+                all_options.remove('add element to list')
+
+                remove_options = []
+                if 'remove element from list' in chosen_options:
+
+                    print(f'Please choose the list elements you want to remove'
+                          f' (1-{len(item)}) divided by comma.')
+
+                    print_option_list(all_options, False)
+                    remove_options = parse_input_list(all_options, False)
+
+                # initialize a list for the indices of chosen options
+                edit_index = []
+
+                # iterate over all options/list elements
                 for i in range(len(all_options)):
-                    if all_options[i] in chosen_options:
-                        options.append(i)
-                for i in options:
-                    item[i] = edit_item(key_name, item[i], key_yaml, result_dict, mandatory_mode)
+
+                    # test if the option/list element was chosen by the user
+                    if all_options[i] in chosen_options and all_options[i] \
+                            not in remove_options:
+
+                        # add the index of the option to the list
+                        edit_index.append(i)
+
+                # iterate over the indices of chosen options
+                for i in edit_index:
+
+                    # call this function for every chosen list element to edit
+                    # it
+                    item[i] = edit_item(key_name, item[i], key_yaml,
+                                        result_dict, mandatory_mode)
+
+                # TODO ohne index mit Werten
+                for elem in remove_options:
+                    for i in range(len(all_options)):
+                        if all_options[i] in remove_options:
+                            remove_index = i
+                            break
+
+                    del all_options[remove_index]
+                    del item[remove_index]
+
+                if 'add element to list' in chosen_options:
+
+                    item += get_redo_value(key_yaml, key_name, False,
+                                           mandatory_mode, result_dict, True,
+                                           False, True)
+                    pass
+
+
+            # only one element in the list
             else:
-                item = edit_item(key_name, item[0], key_yaml, result_dict, mandatory_mode)
+
+                # call this function to edit the only list element
+                item = edit_item(key_name, item[0], key_yaml, result_dict,
+                                 mandatory_mode)
+
+    # item to edit is a dictionary
     elif isinstance(item, dict):
-        print(f'Please choose the keys (1-{len(item.keys())}) you want to edit divided by comma.')
-        options = [key for key in key_yaml['value'] if key not in not_editable]
-        options.insert(0, 'all')
-        print_option_list(options, False)
-        options = parse_input_list(options, False)
-        if 'all' in options:
+
+        # request input from the user
+        print(f'Please choose the keys (1-{len(item.keys())}) you want to edit'
+              f' divided by comma.')
+
+        # create a list of options from the dictionary keys (only add them if
+        # they are supposed to be edited)
+        edit_index = [key for key in key_yaml['value'] if key not in
+                      not_editable]
+
+        # add option 'all' to redo the complete dictionary
+        edit_index.insert(0, 'all')
+
+        # print options for the user and parse the given input
+        print_option_list(edit_index, False)
+        edit_index = parse_input_list(edit_index, False)
+
+        # test if 'all' was selected
+        if 'all' in edit_index:
+
+            # redo input for the whole dictionary
             new_item = get_redo_value(key_yaml, key_name, False,
                     mandatory_mode, result_dict, True, False, False)
+
+            # input value is a list
             if isinstance(new_item, list):
+
+                # overwrite the old value with the new one
                 item = new_item
+
+            # input value is a dictionary
             else:
+
+                # combine and update the old value with the new one
                 item = {**result_dict[key_name],
                         **new_item}
+
+        # keys were selected but not 'all'
         else:
-            for key in options:
+
+            # iterate over keys
+            for key in edit_index:
+
+                # the key 'organism' was selected (part experimental_setting)
                 if key == 'organism':
-                    item = get_redo_value(key_yaml, 'experimental_setting', False, mandatory_mode, result_dict, True, False, False)
-                elif key == 'experimental_factors' and 'organism' not in options:
-                    new_yaml = copy.deepcopy(key_yaml)
-                    new_yaml['value'].pop('organism')
-                    item = get_redo_value(new_yaml, 'experimental_setting',
-                                          False, mandatory_mode, copy.deepcopy(item),
+
+                    # redo the whole dictionary because the latter parts depend
+                    # on the organism
+                    item = get_redo_value(key_yaml, 'experimental_setting',
+                                          False, mandatory_mode, result_dict,
                                           True, False, False)
-                elif key == 'conditions' and 'experimental_factors' not in options and 'organism' not in options:
-                    for i in range(len(item['experimental_factors'])):
-                        for fac in list_def:
-                            if item['experimental_factors'][i]['factor'] == fac['factor']:
-                                item['experimental_factors'][i] = fac
-                                break
+
+                # the key 'experimental_factors was selected and not the key
+                # 'organism' (part experimental_setting)
+                elif key == 'experimental_factors' and 'organism' not in \
+                        edit_index:
+
+                    # copy the underlying structure (new_yaml) and remove the
+                    # key 'organism'
                     new_yaml = copy.deepcopy(key_yaml)
                     new_yaml['value'].pop('organism')
-                    new_yaml['value'].pop('experimental_factors')
+
+                    # redo all except 'organism' since all keys below the key
+                    # 'experimental_factors' depend on its values
                     item = get_redo_value(new_yaml, 'experimental_setting',
                                           False, mandatory_mode,
                                           copy.deepcopy(item),
                                           True, False, False)
+
+                # the key 'conditions was selected and not the keys 'organism'
+                # or 'experimental_factors'
+                elif key == 'conditions' and 'experimental_factors' not in \
+                        edit_index and 'organism' not in edit_index:
+
+                    # The following loop is needed so get the experimental
+                    # factors into the structure they were directly after input
+                    # before parsing into the yaml structure. This is needed
+                    # for the conditions (combinations of all selected factors
+                    # and values) to be created again.
+
+                    # iterate over the experimental factors
+                    for i in range(len(item['experimental_factors'])):
+
+                        # iterate over elements in 'list_def' (a list of
+                        # dictionaries containing all factors, their values
+                        # and weather they are a list)
+                        for fac in list_def:
+
+                            # test if the factor in 'list_def' matches the
+                            # experimental factor
+                            if item['experimental_factors'][i]['factor'] == \
+                                    fac['factor']:
+
+                                # set the experimental factor to the dictionary
+                                # from 'list_def' and break the loop
+                                item['experimental_factors'][i] = fac
+                                break
+
+                    # copy the underlying structure (new_yaml) and remove the
+                    # keys 'organism' and 'experimental_factors'
+                    new_yaml = copy.deepcopy(key_yaml)
+                    new_yaml['value'].pop('organism')
+                    new_yaml['value'].pop('experimental_factors')
+
+                    # redo the conditions
+                    item = get_redo_value(new_yaml, 'experimental_setting',
+                                          False, mandatory_mode,
+                                          copy.deepcopy(item),
+                                          True, False, False)
+
+                # no special case -> used for all other keys
                 else:
+
+                    # key was already filled out
                     if key in item:
-                        item[key] = edit_item(key, item[key], key_yaml['value'][key], result_dict, mandatory_mode)
+
+                        # call this function to edit the value of the key
+                        item[key] = edit_item(
+                            key, item[key], key_yaml['value'][key],
+                            result_dict, mandatory_mode)
+
+                    # key was not filled out yet
                     else:
-                        item[key] = get_redo_value(key_yaml['value'][key], key, False, mandatory_mode, result_dict, True, False, True)
+
+                        # call function to input information
+                        item[key] = get_redo_value(
+                            key_yaml['value'][key], key, False, mandatory_mode,
+                            result_dict, True, False, True)
+
+    # item is a single value
     else:
-        item = parse_input_value(key_name, key_yaml['desc'], key_yaml['whitelist'], key_yaml['input_type'], item)
+
+        # call function to input value
+        item = parse_input_value(
+            key_name, key_yaml['desc'], key_yaml['whitelist'],
+            key_yaml['input_type'], item)
+
     return item
 
 
@@ -214,31 +383,44 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
     :param first_node: a bool that states how a header should be printed
     :param is_factor: a bool that states if the current value is an
                       experimental factor
+    :param do_redo: a bool that states if an input loop should be started for
+                    list input (set to False if an existing list element is
+                    edited)
     :return: value: the value that was entered for the key
     """
     # test if the input value is of type list
     if node['list']:
+
         # test if one list element contains a dictionary
-        if isinstance(node['value'], dict) and not \
-                set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
-                <= set(node['value'].keys()):
+        if isinstance(node['value'], dict):
+
             # test if the input value is an experimental factor
             if is_factor:
 
+                # call function to input metadata for factor
                 value = fill_metadata_structure(node['value'], item, {},
                                                 optional,
                                                 mandatory_mode, result_dict,
                                                 first_node, is_factor)
             else:
+
+                # set redo to True to initiate while loop
+                redo = True
+
+                # empty list to add filled out list elements to
+                value = []
+
                 # repeat the input prompt for the keys of the list element
                 # until the user specifies it is complete
-                redo = True
-                value = []
                 while redo:
-                    value.append(
-                        fill_metadata_structure(node['value'], item, {}, optional,
-                                                mandatory_mode, result_dict,
-                                                first_node, is_factor))
+
+                    # call function to fill in metadata
+                    value.append(fill_metadata_structure(
+                        node['value'], item, {}, optional, mandatory_mode,
+                        result_dict, first_node, is_factor))
+
+                    # ask the user if another item should be added to the list
+                    # if do_redo is set to True
                     if do_redo:
                         redo = parse_list_choose_one(['True ', 'False '],
                                                  f'\nDo you want to add '
@@ -255,20 +437,16 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
         # a dictionary or a dictionary that contains the key 'merge' as special
         # case (means that the input is treated like a single value and then
         # split into a dictionary, e.g. gene -> gene_name, ensembl_id)
-        if is_factor and \
-                (not isinstance(node['value'], dict) or
-                    (isinstance(node['value'], dict) and
-                        set(
-                            ['mandatory', 'list', 'desc', 'display_name',
-                             'value']) <= set(node['value'].keys()) or
-                        ('special_case' in node and 'merge' in
-                            node['special_case']))):
+        if is_factor and (not isinstance(node['value'], dict) or
+                          ('special_case' in node and 'merge' in
+                           node['special_case'])):
 
             # ask the user to put in a list of experimental factors
             value = get_input_list(node, item, result_dict)
 
         else:
-            # call function to fill in value
+
+            # call function to fill in metadata
             value = fill_metadata_structure(node, item, {}, optional,
                                             mandatory_mode, result_dict,
                                             first_node, is_factor)
@@ -293,18 +471,18 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
     """
 
     # test if the given part of the metadata structure is a dictionary
-    if isinstance(node, dict) and not \
-            set(['mandatory', 'list', 'desc', 'display_name', 'value']) <= \
-            set(node.keys()):
+    if isinstance(node, dict) and \
+            not set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
+            <= set(node.keys()):
 
         # test if the input is of type value_unit
         if len(node.keys()) == 2 and 'value' in node.keys() and 'unit' in \
                 node.keys():
-            print("TOO")
+
+            # test if the input value is an experimental factor
             if is_factor:
 
-                # call function to get a list of value_units if the input value
-                # is an experimental factor
+                # call function to get a list of value_units
                 return get_list_value_unit(result_dict, key)
 
             else:
@@ -680,9 +858,7 @@ def get_experimental_factors(node, result_dict):
         # to the values as ident_key
         # TODO: what is ident key for?
         if isinstance(
-                fac_node['value'], dict) and not \
-                set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
-                <= set(fac_node['value'].keys()) and 'special_case' in \
+                fac_node['value'], dict) and 'special_case' in \
                 fac_node:
             if 'group' in fac_node['special_case']:
                 used_values['ident_key'] = fac_node['special_case']['group']
@@ -1227,9 +1403,7 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
     :return: the filled key
     """
     # test if the key contains a dictionary
-    if isinstance(node['value'], dict) and \
-            not set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
-            <= set(node['value'].keys()):
+    if isinstance(node['value'], dict):
         display_name = node['display_name']
         if first_node:
 
@@ -1628,23 +1802,61 @@ def merge_dicts(a, b):
     :param b: the second dictionary
     :return: res: the merged dictionary
     """
+
+    # test if dictionary 'a' is a list
     if isinstance(a, list):
+
+        # initialize a list to save combined content of dict 'a' and 'b'
         res = []
+
+        # iterate over dict 'a'
         for i in range(len(a)):
+
+            # call this function for every index of the list and add it to the
+            # list
             res.append(merge_dicts(a[i], b[i]))
+
+    # if dict 'a' is a dictionary
     elif isinstance(a, dict):
+
+        # get a list of all keys of dict 'b'
         b_keys = list(b.keys())
+
+        # initialize a dictionary to save the combined information to
         res = {}
+
+        # iterate over the keys of dict 'a'
         for key in a.keys():
+
+            # test if the key is in dict 'b'
             if key in b_keys:
+
+                # call this function to merge the values of the key of dict 'a'
+                # and 'b'
                 res[key] = merge_dicts(a[key], b[key])
+
+                # remove the key from the list of keys for dict 'b'
                 b_keys.remove(key)
+
             else:
+
+                # add the key and value from dict 'a' to the result
                 res[key] = a[key]
+
+        # iterate over all keys left in the list of keys for dict 'b'
         for key in b_keys:
+
+            # add the key and value from dict 'b' to the result
             res[key] = b[key]
+
+    # single value
     else:
+
+        #TODO: different lists?
+
+        # set the value of a as the result
         res = a
+
     return res
 
 
@@ -1791,75 +2003,233 @@ def get_input_list(node, item, filled_object):
     :param filled_object: a dictionary containing filled information
     :return: used_values: the filled in list of values
     """
+
+    # test if a whitelist exists for the item or if the special case 'merge'
+    # was defined (means that the input is treated like a single value and then
+    # split into a dictionary, e.g. gene -> gene_name, ensembl_id)
     if 'whitelist' in node and node['whitelist'] or 'special_case' in node \
             and 'merge' in node['special_case']:
+
+        # read in whitelist
         whitelist = utils.get_whitelist(item, filled_object)
-        if whitelist:
+
+        # test if the whitelist is not None
+        if whitelist is not None:
+
+            # test if autocompletion is needed (for whitelists longer than 30)
             if len(whitelist['whitelist']) > 30:
+
+                # define an empty list to store the input values
                 used_values = []
+
+                # set parameter redo to True to initiate an input loop
                 redo = True
+
+                # request user input
+                #TODO: explain autocomplete
                 print(f'\nPlease enter the values for experimental factor '
                       f'{item}.')
+
                 while redo:
+
+                    # prompt user input via autocompletion
                     input_value = complete_input(whitelist['whitelist'],
                                                  item)
+
+                    # test if the input matches the whitelist
                     if input_value in whitelist['whitelist']:
+
+                        # add input to list
                         used_values.append(input_value)
+
+                        # ask the user if he wants to input another item
                         redo = parse_list_choose_one(
                             ['True ', 'False '],
                             f'\nDo you want to add another {item}?')
+
                     else:
+
+                        # print message for invalid value, loop is repeated
                         print(f'The value you entered does not match the '
                               f'whitelist. Try tab for autocomplete.')
+
             else:
-                print('\nPlease enter the list')
-                if whitelist['whitelist_type'] == 'plain' or whitelist['whitelist_type'] == 'plain_group':
+
+                # request user input
+                print(f'\nPlease enter possible values for factor '
+                      f'\'{node["display_name"]}\' '
+                      f'(1-{len(whitelist["whitelist"])}) divided by comma.')
+
+                # test for different whitelist types
+                if whitelist['whitelist_type'] == 'plain' or \
+                        whitelist['whitelist_type'] == 'plain_group':
+
+                    # for plain whitelists print the whitelist with indices and
+                    # parse the user input
                     print_option_list(whitelist['whitelist'], '')
                     used_values = parse_input_list(whitelist['whitelist'],
                                                    False)
+
                 elif whitelist['whitelist_type'] == 'group':
+
+                    # rewrite the grouped whitelist of type dictionary into a
+                    # plain list
                     w = [x for xs in list(whitelist['whitelist'].values()) for
                          x in xs]
+
+                    # set an index i and start with 1
                     i = 1
+
+                    # iterate over the grouped whitelist (dictionary)
                     for w_key in whitelist['whitelist']:
+
+                        # print the key/group of the whitelist
                         print(f'\033[1m{w_key}\033[0m')
+
+                        # iterate over the values within a group
                         for value in whitelist['whitelist'][w_key]:
+
+                            # print the value with the current index
                             print(f'{i}: {value}')
+
+                            # increase the index by 1
                             i += 1
+
+                    # parse the user input (indices) and match them to the
+                    # whitelist values using the plain list
                     used_values = parse_input_list(w, False)
 
+            # HANDLE PLAIN GROUPED WHITELISTS:
+            # a plain grouped whitelist is a grouped whitelist that contains
+            # more than 30 values and is therefor to long to be displayed.
+            # In order to use autocompletion on such a whitelist, it is
+            # rewritten into a plain whitelist. In order to not loose the
+            # groups, they are added in round braces to the end of the
+            # whitelist values (e.g. value 'GFP' in group 'other' in the
+            # enrichment whitelist turns into 'GFP (other)'). The following
+            # code removes those groups from the values again and saves them
+            # into a list so that they can still be accessed to handle headers
+            # in the part below.
+
+            # set an empty list to save keys of plain grouped whitelists
             w_keys = []
+
+            # remove group keys from values if the whitelist is of type
+            # 'plain_group'
             if whitelist['whitelist_type'] == 'plain_group':
+
+                # iterate over the input values
                 for i in range(len(used_values)):
+
+                    # iterate over the keys of the plain group whitelist
                     for k in whitelist['whitelist_keys']:
+
+                        # test if the input value contains the key in braces
+                        # at the end
                         if used_values[i].endswith(f' ({k})'):
-                            used_values[i] = used_values[i].replace(f' ({k})', '')
+
+                            # remove the key from the end of the value
+                            used_values[i] = used_values[i].replace(
+                                f' ({k})', '')
+
+                            # add the key to the list of whitelist keys
                             w_keys.append(k)
 
+            # HANDLE HEADERS:
+            # Some whitelists contain headers. Those headers represent keys,
+            # the input values should be split into. An example can be found in
+            # the gene whitelist where the header is set to
+            # 'gene_name ensemble_ID' leading to the value
+            # 'TSPAN6 ENSG00000000003' being saved as {'gene_name': 'TSPAN6',
+            # 'ensemble_ID': 'ENSG00000000003'}. Headers can also occur in
+            # grouped whitelists where they are defined for every group
+            # separately. In order to know how to split a value in a grouped
+            # whitelists one needs to know which group the value belongs to.
+            # For grouped whitelists that were rewritten to plain whitelists
+            # (see part above) this information is saved in the list w_keys
+            # that was filled above. The following splits values into a
+            # dictionary according to their headers.
+
+            # test if headers were defined in the whitelist
             if 'headers' in whitelist:
-                if whitelist['whitelist_type'] == 'group' or whitelist['whitelist_type'] == 'plain_group' and len(w_keys)>0:
+
+                # test if whitelist is of type group or plain group and if
+                # w_keys were defined
+                #TODO: works for group?
+                if whitelist['whitelist_type'] == 'group' or \
+                        whitelist['whitelist_type'] == 'plain_group' \
+                        and len(w_keys) > 0:
+
+                    # iterate over input values
                     for i in range(len(used_values)):
+
+                        # look at index of value in w_keys and see if a header
+                        # was defined for that w_key
                         if w_keys[i] in whitelist['headers']:
-                            headers = whitelist['headers'][w_keys[i]].split(' ')
+
+                            #TODO: own function for header?
+
+                            # split the header at the whitespace to get a list
+                            # of keys
+                            headers = whitelist['headers'][w_keys[i]].split(
+                                ' ')
+
+                            # split the value at whitespace to get the
+                            # according values
                             vals = used_values[i].split(' ')
+
+                            # initialize an empty dictionary to save the
+                            # key-value-pairs to
                             used_values[i] = {}
+
+                            # iterate over the keys in the header
                             for j in range(len(headers)):
+
+                                # save the key and value at the same index into
+                                # the dictionary
                                 used_values[i][headers[j]] = vals[j]
+
                 else:
+
+                    # split the header of a non-group whitelist at whitespace
+                    # to get a list of keys
                     headers = whitelist['headers'].split(' ')
+
+                    # iterate over the input values
                     for i in range(len(used_values)):
+
+                        # split the value at whitespace to get the
+                        # according values
                         vals = used_values[i].split(' ')
+
+                        # initialize an empty dictionary to save the
+                        # key-value-pairs to
                         used_values[i] = {}
+
+                        # iterate over the keys in the header
                         for j in range(len(headers)):
+                            # save the key and value at the same index into
+                            # the dictionary
                             used_values[i][headers[j]] = vals[j]
+
         else:
+            # TODO: kann weg?
             print('No whitelist')
             used_values = [0]
+
+    # no whitelist
     else:
+
+        # get the value_type for the input from the underlying structure
         value_type = node['input_type']
+
+        # request user input
         print(f'\nPlease enter a list of {value_type} values for experimental'
               f' factor {item} divided by comma:\n')
+
+        # parse user input
         used_values = parse_input_list(value_type, False)
+
     return used_values
 
 
@@ -1869,15 +2239,28 @@ def print_option_list(options, desc):
     :param options: the whitelist values
     :param desc: a description to be printed
     """
+
+    # test if a description was given
     if desc:
+
+        # create a nested list with every sublist containing an index, option
+        # and description
         data = [[f'{i + 1}:', f'{options[i]}', desc[i]] for i in
                 range(len(options))]
+
+        # print the nested list as a table
         print(tabulate(data, tablefmt='plain',
                        maxcolwidths=[size.columns * 1 / 8,
                                      size.columns * 3 / 8,
                                      size.columns * 4 / 8]))
+
     else:
+
+        # create a nested list with every sublist containing only index and
+        # option
         data = [[f'{i + 1}:', f'{options[i]}'] for i in range(len(options))]
+
+        # print the nested list as a table
         print(tabulate(data, tablefmt='plain',
                        maxcolwidths=[size.columns * 1 / 8,
                                      size.columns * 7 / 8]))
@@ -1886,31 +2269,57 @@ def print_option_list(options, desc):
 def parse_input_list(options, terminable):
     """
     This function parses the user input for a list.
-    :param options: possible input options
-    :param terminable: a bool to state in nothing can be input
+    :param options: possible input options as a list or 'number' for
+                    number input
+    :param terminable: a bool to state if nothing can be input
     :return: input_list: a list containing the input values
     """
+
+    # promt user input for a comma divided list
     input_list = input()
+
+    # if terminable is set to True and the user inputs 'n', nothing is returned
     if terminable and input_list.lower() == 'n':
         return None
+
     else:
+
+        # test if a list was submitted as options
         if isinstance(options, list):
+
+            # split the input list of indices and try to match it with the
+            # option list
             try:
                 input_list = [options[int(i.strip()) - 1] for i in
                               input_list.split(',')]
-            except (IndexError, ValueError) as e:
+
+            except (IndexError, ValueError):
+
+                # Call this function to redo the input if it does not match the
+                # option list
                 print(f'Invalid entry, try again:')
                 input_list = parse_input_list(options, terminable)
+
         else:
+
             try:
+                # split the input list at ','
                 input_list = [x.strip() for x in input_list.split(',')]
+
+                # convert the input list to integers if they are of type
+                # 'number'
                 if options == 'number':
                     for i in range(len(input_list)):
                         input_list[i] = int(input_list[i])
-            except (ValueError, IndexError) as e:
-                print(f'Invalid entry. Please enter {options} numbers divided '
+
+            except (ValueError, IndexError):
+
+                # Call this function to redo the input if the split or
+                # conversion does not work
+                print(f'Invalid entry. Please enter integers divided '
                       f'by comma.')
                 input_list = parse_input_list(options, terminable)
+
     return input_list
 
 
@@ -1920,8 +2329,10 @@ def complete_input(whitelist, key):
     values.
     :param whitelist: a whitelist with possible values
     :param key: the key that should be filled
-    :return: inpu_value: the value that was input by the user
+    :return: input_value: the value that was input by the user
     """
+
+    #TODO: Doku
     print(f'\nPress tab once for autofill if'
           f' possible or to get a list of up to'
           f' 30 possible input values.')
@@ -1942,24 +2353,45 @@ def get_value_unit(result_dict):
     :param result_dict: a dictionary containing filled information
     :return: val_un: a dictionary containing the unit and value
     """
-    val_un = {'unit': parse_input_value('unit', '', True, 'select', result_dict),
-              'value': parse_input_value('value', '', False, 'number', result_dict)}
+
+    # create a dictionary containing 'unit' and 'value' and call the
+    # 'parse_input_value' function to request those information from the user
+    val_un = {'unit': parse_input_value('unit', '', True, 'select',
+                                        result_dict),
+              'value': parse_input_value('value', '', False, 'number',
+                                         result_dict)}
+
     return val_un
 
 
 def get_list_value_unit(result_dict, ex_factor):
     """
-    This function prompts the user to enter a list of value_units.
+    This function prompts the user to enter a list of value_units for
+    experimental factors.
     :param result_dict: a dictionary containing filled information
-    :param factor: the experimental factor that contains the value_unit
+    :param ex_factor: the experimental factor that contains the value_unit
     :return: a dictionary containing a unit and a list of values
     """
+
+    # print request for unit input
     print(f'\nPlease enter the unit for factor {ex_factor}:')
+
+    # call function to input unit
     unit = parse_input_value('unit', '', True, 'select', result_dict)
+
+    # initialize empty list to store the values with units
     val_un = []
+
+    # print request for value input
     print(f'\nPlease enter int values for factor {ex_factor} (in {unit}) '
           f'divided by comma:')
+
+    # call function to input values
     value = parse_input_list('number', False)
+
+    # iterate through the input values and add a dictionary containing a value
+    # and its unit to the 'val_un' list
     for val in value:
         val_un.append({'unit': unit, 'value': val})
+
     return val_un
