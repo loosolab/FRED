@@ -405,9 +405,10 @@ def validate_value(input_value, value_type, key, mode='metadata'):
                 message = date_message
         elif type(input_value) == str and ('\"' in input_value or '{' in input_value or '}' in
                  input_value or '|' in input_value) and key not in generated:
-            valid = False
-            message = 'The value contains an invalid character ' \
-                      '(\", {, } or |).'
+            if mode != 'mamplan':
+                valid = False
+                message = 'The value contains an invalid character ' \
+                          '(\", {, } or |).'
     return valid, message
 
 
