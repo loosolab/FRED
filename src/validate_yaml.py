@@ -219,23 +219,22 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             invalid_keys = res_keys
             sub_lists = sub_lists[:-1]
     else:
-        #TODO: Value unit
-        has_whitelist = list(utils.find_keys(utils.read_in_yaml(key_yaml_path), key_name.split(':')[-1]))
-        if len(has_whitelist) > 0 and 'whitelist' in has_whitelist[0]:
-            has_whitelist = True
-        else:
-            has_whitelist = False
-        if has_whitelist:
-            invalid = new_test_for_whitelist(key_name.split(':')[-1], metafile,
+        #TODO: Value unitb + check for whitelist but fast
+        #has_whitelist = list(utils.find_keys(utils.read_in_yaml(key_yaml_path), key_name.split(':')[-1]))
+        #if len(has_whitelist) > 0 and 'whitelist' in has_whitelist[0]:
+            #has_whitelist = True
+        #else:
+            #has_whitelist = False
+        invalid = new_test_for_whitelist(key_name.split(':')[-1], metafile,
                                          sub_lists, whitelist_path=whitelist_path)
-            if invalid:
-                invalid_entry.append(f'{key_name}:{metafile}')
-        else:
-            inv_value, message = validate_value(metafile, input_type,
+        if invalid:
+            invalid_entry.append(f'{key_name}:{metafile}')
+
+        inv_value, message = validate_value(metafile, input_type,
                                             key_name.split(':')[-1], mode=mode)
 
-            if not inv_value:
-                invalid_value.append((key_name, metafile, message))
+        if not inv_value:
+            invalid_value.append((key_name, metafile, message))
 
     return invalid_keys, invalid_entry, invalid_value
 
