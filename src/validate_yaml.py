@@ -219,16 +219,23 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             invalid_keys = res_keys
             sub_lists = sub_lists[:-1]
     else:
-        invalid = new_test_for_whitelist(key_name.split(':')[-1], metafile,
+        #TODO: Value unit
+        has_whitelist = list(utils.find_keys(utils.read_in_yaml(key_yaml_path), key_name.split(':')[-1]))
+        if len(has_whitelist) > 0 and 'whitelist' in has_whitelist[0]:
+            has_whitelist = True
+        else:
+            has_whitelist = False
+        if has_whitelist:
+            invalid = new_test_for_whitelist(key_name.split(':')[-1], metafile,
                                          sub_lists, whitelist_path=whitelist_path)
-        if invalid:
-            invalid_entry.append(f'{key_name}:{metafile}')
-
-        inv_value, message = validate_value(metafile, input_type,
+            if invalid:
+                invalid_entry.append(f'{key_name}:{metafile}')
+        else:
+            inv_value, message = validate_value(metafile, input_type,
                                             key_name.split(':')[-1], mode=mode)
 
-        if not inv_value:
-            invalid_value.append((key_name, metafile, message))
+            if not inv_value:
+                invalid_value.append((key_name, metafile, message))
 
     return invalid_keys, invalid_entry, invalid_value
 
@@ -242,8 +249,6 @@ def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None
                       value
     :return: True if the entry does not match the whitelist else False
     """
-    if entry_value is None:
-      entry_value = 'None'
     whitelist = utils.read_whitelist(entry_key, whitelist_path=whitelist_path)
     if whitelist and whitelist['whitelist_type'] == 'plain':
         whitelist = whitelist['whitelist']
@@ -398,10 +403,9 @@ def validate_value(input_value, value_type, key, mode='metadata'):
                 message = date_message
         elif type(input_value) == str and ('\"' in input_value or '{' in input_value or '}' in
                  input_value or '|' in input_value) and key not in generated:
-            if mode != 'mamplan':
-              valid = False
-              message = 'The value contains an invalid character ' \
-                        '(\", {, } or |).'
+            valid = False
+            message = 'The value contains an invalid character ' \
+                      '(\", {, } or |).'
     return valid, message
 
 
@@ -433,14 +437,10 @@ def validate_logic(metafile, mode='metadata'):
                     if warning:
                         logical_warn.append((f'Run from {run["date"]}', warn_message))
     elif mode == 'mamplan':
-        if 'tags' in metafile:
-            if 'owner' in metafile['tags'] and metafile['tags']['owner'] is not None:
-                if metafile['tags']['owner'] == 'public':
-                    if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:
-                        logical_warn.append(('tags:pubmedid', 'The pubmed ID is missing for this public project'))
-            if 'analyst' not in metafile['tags'] or ('analyst' in metafile['tags'] and metafile['tags']['analyst'] is None):
-                logical_warn.append(('tags:analyst', 'There are no analysts set for this project'))
-        
+        if 'tags' in metafile and 'organization' in metafile['tags'] and metafile['tags']['organization'] is not None:
+            if 'public' in metafile['tags']['organization']:
+                if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:
+                    logical_warn.append(('tags:pubmedid', 'The pubmed ID is missing for this public project'))
     return logical_warn
 
 
@@ -461,7 +461,7 @@ def validate_reference_genome(organisms, reference_genome):
                 organism in organisms]):
         invalid = True
         organisms = [f'\'{organism}\'' for organism in organisms]
-        message = (f'  The reference genome \'{reference_genome}\' does not '
+        message = (f'The reference genome \'{reference_genome}\' does not '
                    f'match the input organism ({", ".join(organisms)}).')
     return invalid, message
 
