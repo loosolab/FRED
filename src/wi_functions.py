@@ -42,6 +42,20 @@ def get_empty_wi_object():
     return wi_object
 
 
+def get_single_whitelist(ob):
+    if 'organism' in ob:
+        infos = {'organism': ob['organism']}
+        all_plain = False
+    else:
+        infos = {}
+        all_plain = True
+    whitelist = utils.get_whitelist(ob['key_name'], infos, all_plain)
+    if whitelist and 'whitelist' in whitelist:
+        return whitelist['whitelist']
+    else:
+        return None
+
+
 def parse_empty(node, pos, key_yaml, get_whitelists):
     """
     This function parses a part of the key.yaml into an object readable by the
@@ -92,11 +106,15 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                         whitelist_type = 'plain_group'
             else:
                 whitelist = None
-            if input_type != 'group_select':
-                if isinstance(whitelist, dict):
-                    input_type = 'dependable'
-            if pos.split(':')[-1] == 'gene':
-                input_type = 'gene'
+            if whitelist and len(whitelist) > 30:
+                if node['list']:
+                    input_type = 'multi_autofill'
+                else:
+                    input_type = 'single_autofill'
+                whitelist = None
+            #if input_type != 'group_select':
+            #    if isinstance(whitelist, dict):
+            #        input_type = 'dependable'
             if pos.split(':')[-1] == 'organism':
                 input_type = 'organism_name'
             part_object = {'position': pos, 'mandatory': node['mandatory'],
@@ -128,7 +146,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                                'list': node['list'],
                                'displayName': node['display_name'],
                                'desc': node['desc'], 'value': None,
-                               'value_unit': None, 'whitelist': unit_whitelist,
+                               'value_unit': node['value']['unit']['value'], 'whitelist': unit_whitelist,
                                'input_type': 'value_unit',
                                'input_disabled': input_disabled}
             else:
@@ -180,8 +198,13 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
             if input_type != 'group_select':
                 if isinstance(whitelist, dict):
                     input_type = 'dependable_select'
-                # elif whitelist and len(whitelist) > 30:
-                #    input_type = 'searchable_select'
+                elif whitelist and len(whitelist) > 30:
+                    if node['list']:
+                        input_type = 'multi_autofill'
+                        whitelist = None
+                    else:
+                        input_type = 'single_autofill'
+                        whitelist = None
         else:
             if node['whitelist']:
                 whitelist = pos.split(':')[-1]
@@ -198,8 +221,11 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
                        'whitelist_type': whitelist_type,
                        'input_type': input_type,
                        'input_disabled': input_disabled}
-        if node['list']:
+        if node['list'] or node['input_type'] == 'single_autofill':
             part_object['list_value'] = []
+        if node['input_type'] == 'single_autofill' or node['input_type'] == 'multi_autofill':
+            part_object['search_info'] = {'organism': None, 'key_name': part_object['position'].split(':')[-1]}
+
     return part_object
 
 
@@ -220,6 +246,8 @@ def get_factors(organism):
             get_whitelist_with_type(factor, key_yaml, organism, None)
         values[factor] = {'whitelist': whitelist, 'input_type': input_type,
                           'whitelist_type': whitelist_type}
+        if input_type == 'single_autofill' or input_type == 'multi_autofill':
+            values[factor]['search_info'] = {'organism': organism, 'key_name': factor}
         if headers is not None:
             values[factor]['headers'] = headers
         if w_keys is not None:
@@ -334,21 +362,21 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     if isinstance(whitelist, dict) and 'whitelist' in whitelist:
         whitelist = whitelist['whitelist']
 
-    # if whitelist and len(whitelist) > 30:
-    #    input_type = 'searchable_select'
-    if key == 'gene':
-        input_type = 'gene'
-    elif key == 'enrichment':
-        input_type = 'enrichment'
+    if whitelist and len(whitelist) > 30:
+        input_type = 'multi_autofill'
+        whitelist = None
     if is_list:
         node = list(utils.find_keys(key_yaml, key))[0]
         new_w = [
             {'whitelist': whitelist, 'position': key,
-             'displayName': node['display_name'], 'required': True,
+             'displayName': node['display_name'], 'required': True, 'value': [],
              'input_type': input_type, 'whitelist_type': whitelist_type},
             {'displayName': 'Multi', 'position': 'multi',
              'whitelist': [True, False], 'input_type': 'bool',
              'value': False}]
+        for i in range(len(new_w)):
+            if new_w[i]['input_type'] == 'multi_autofill' or new_w[i]['input_type'] == 'single_autofill':
+                new_w[i]['search_info'] = {'key_name': key, 'organism': organism}
         whitelist = new_w
         whitelist_type = 'list_select'
         input_type = 'nested'
@@ -393,112 +421,66 @@ def get_samples(condition, sample, real_val):
                     if val in real_val:
                         sample[i]['value'] = real_val[val]
                     else:
-                        if 'input_type' in sample[i] and sample[i][
-                                'input_type'] == 'gene':
-                            val = ""
-                            for key in c[1]:
-                                val = f'{val}{" " if val != "" else ""}{c[1][key]}'
-                            sample[i]['value'] = val
+                        if sample[i]['list']:
+                            filled_sample = copy.deepcopy(sample[i]
+                                                          ['input_fields'])
+                            for j in range(len(filled_sample)):
+                                for x in c[1]:
+                                    if filled_sample[
+                                        j]['position'].split(':')[-1] == x:
+                                        if x in ['age', 'time_point',
+                                                 'treatment_duration']:
+                                            unit = c[1][x].lstrip('0123456789')
+                                            value = c[1][x][:len(c[1][x]) -
+                                                             len(unit)]
+                                            filled_sample[j]['value'] = \
+                                                int(value)
+                                            filled_sample[j]['value_unit'] = \
+                                                unit
+                                        else:
+                                            filled_sample[j]['value'] = c[1][x]
+                                        filled_sample[j]['input_disabled'] = \
+                                            True
+                            sample[i]['list_value'].append(filled_sample)
                         else:
-                            if sample[i]['list']:
-                                filled_sample = copy.deepcopy(sample[i]
-                                                              ['input_fields'])
-                                for j in range(len(filled_sample)):
+                            if 'input_fields' in sample[i]:
+                                for j in range(len(sample[i]['input_fields'])):
                                     for x in c[1]:
-                                        if filled_sample[
-                                                j]['position'].split(':')[-1] == x:
+                                        if sample[i]['input_fields'][j][
+                                            'position'].split(':')[-1] == x:
                                             if x in ['age', 'time_point',
                                                      'treatment_duration']:
-                                                unit = c[1][x].lstrip('0123456789')
-                                                value = c[1][x][:len(c[1][x]) -
-                                                                len(unit)]
-                                                filled_sample[j]['value'] = \
-                                                    int(value)
-                                                filled_sample[j]['value_unit'] = \
-                                                    unit
+                                                unit = c[1][x].lstrip(
+                                                    '0123456789')
+                                                value = c[1][x][
+                                                        :len(c[1][x]) - len(
+                                                            unit)]
+                                                sample[i]['input_fields'][j][
+                                                    'value'] = int(value)
+                                                sample[i]['input_fields'][j][
+                                                    'value_unit'] = unit
                                             else:
-                                                filled_sample[j]['value'] = c[1][x]
-                                            filled_sample[j]['input_disabled'] = \
-                                                True
-                                sample[i]['list_value'].append(filled_sample)
+                                                sample[i]['input_fields'][j][
+                                                    'value'] = c[1][x]
                             else:
-                                if 'input_fields' in sample[i]:
-                                    for j in range(len(sample[i]['input_fields'])):
-                                        for x in c[1]:
-                                            if sample[i]['input_fields'][j][
-                                                    'position'].split(':')[-1] == x:
-                                                if x in ['age', 'time_point',
-                                                         'treatment_duration']:
-                                                    unit = c[1][x].lstrip(
-                                                        '0123456789')
-                                                    value = c[1][x][
-                                                            :len(c[1][x]) - len(unit)]
-                                                    sample[i]['input_fields'][j][
-                                                        'value'] = int(value)
-                                                    sample[i]['input_fields'][j][
-                                                        'value_unit'] = unit
-                                                else:
-                                                    sample[i]['input_fields'][j][
-                                                        'value'] = c[1][x]
-                                else:
-                                    val = ""
-                                    for key in c[1]:
-                                        val = f'{val}{" " if val != "" else ""}{c[1][key]}'
-                                    sample[i]['value'] = val
-
+                                val = ""
+                                for key in c[1]:
+                                    val = f'{val}{" " if val != "" else ""}{c[1][key]}'
+                                sample[i]['value'] = val
                 else:
                     if sample[i]['list']:
-                        if len(sample[i]['list_value']) > 0:
-                            new_val = copy.deepcopy(sample[i]['input_fields']
-                                                    [0])
-                            new_val['value'] = c[1]
-                            new_val['input_disabled'] = True
-                            sample[i]['list_value'].append([new_val])
-                        else:
-                            new_samp = copy.deepcopy(sample[i])
-                            new_samp.pop('list_value')
-                            new_samp['list'] = False
-                            new_samp[
-                                'position'] = \
-                                f'{new_samp["position"]}:' \
-                                f'{new_samp["position"].split(":")[-1]}'
-                            sample[i]['input_fields'] = [new_samp]
-                            new_val = copy.deepcopy(new_samp)
-                            new_val['value'] = c[1]
-                            new_val['input_disabled'] = True
-                            sample[i]['list_value'].append([new_val])
-                            sample[i]['title'] = copy.deepcopy(
-                                sample[i]['displayName'])
-                            sample[i].pop('displayName')
-                            sample[i].pop('value')
-                            sample[i].pop('whitelist')
-                            sample[i].pop('whitelist_type')
-                            sample[i].pop('input_type')
+                        sample[i]['list_value'].append(c[1])
+                        sample[i]['input_disabled'] = True
                     else:
                         if c[1] in real_val:
                             sample[i]['value'] = real_val[c[1]]
                         else:
                             sample[i]['value'] = c[1]
+                if 'input_type' in sample[i] and sample[i]['input_type'] == 'single_autofill':
+                    sample[i]['list_value'] = [] if sample[i][
+                                                        'value'] is None else [
+                        sample[i]['value']]
                 sample[i]['input_disabled'] = True
-            elif not any(sample[i]['position'] ==
-                         f'experimental_setting:conditions:'
-                         f'biological_replicates:samples:{x[0]}'
-                         for x in conds):
-                if sample[i]['list'] and 'title' not in sample[i]:
-                    new_samp = copy.deepcopy(sample[i])
-                    new_samp.pop('list_value')
-                    new_samp['list'] = False
-                    new_samp['position'] = \
-                        f'{new_samp["position"]}:' \
-                        f'{new_samp["position"].split(":")[-1]}'
-                    sample[i]['input_fields'] = [new_samp]
-                    sample[i]['title'] = copy.deepcopy(
-                        sample[i]['displayName'])
-                    sample[i].pop('displayName')
-                    sample[i].pop('value')
-                    sample[i].pop('whitelist')
-                    sample[i].pop('whitelist_type')
-                    sample[i].pop('input_type')
     return sample
 
 
@@ -554,7 +536,6 @@ def get_conditions(factors, organism_name):
                     factors[i]['values'] = generate.get_combis(
                         factors[i]['values'][0][factors[i]['factor']],
                         factors[i]['factor'], factors[i]['values'][0]['multi'])
-
         if 'whitelist_keys' in factors[i]:
             for j in range(len(factors[i]['values'])):
                 for k in factors[i]['whitelist_keys']:
@@ -634,7 +615,7 @@ def get_whitelist_object(item, organism_name, whitelists):
     """
     if 'input_type' in item:
         input_type = item['input_type']
-        if input_type == 'select' or input_type == 'gene':
+        if input_type == 'select' or input_type == 'single_autofill' or input_type == 'multi_autofill' or input_type == 'dependable':
             whitelist = utils.get_whitelist(item['position'].split(':')[-1],
                                             {'organism': organism_name})
             if 'headers' in whitelist:
@@ -651,21 +632,26 @@ def get_whitelist_object(item, organism_name, whitelists):
             whitelist = [True, False]
             input_type = 'select'
         elif input_type == 'value_unit':
-            item['value_unit'] = None
+            if 'value_unit' not in item:
+                item['value_unit'] = None
             whitelist = utils.read_whitelist('unit')
             if 'whitelist_type' in whitelist and whitelist[
                     'whitelist_type'] == 'plain':
                 whitelist = whitelist['whitelist']
         else:
             whitelist = None
-        if item['position'].split(':')[-1] == 'gene':
-            if 'whitelist' in whitelist:
-                whitelist = whitelist['whitelist']
-            input_type = 'gene'
-        if item['position'].split(':')[-1] == 'enrichment':
-            if 'whitelist' in whitelist:
-                whitelist = whitelist['whitelist']
-            input_type = 'enrichment'
+
+        item['whitelist'] = item['position'].split(':')[-1] if whitelist is not None else None
+        if whitelist and isinstance(whitelist, list) and len(whitelist) > 30:
+            if item['list']:
+                input_type = 'multi_autofill'
+            else:
+                input_type = 'single_autofill'
+            item['search_info'] = {'organism': organism_name,
+                                   'key_name': item['position'].split(':')[-1]}
+            if not 'list_value' in item:
+                item['list_value'] = []
+            whitelist = None
         item['input_type'] = input_type
         if input_type == 'group_select':
             w = []
@@ -722,7 +708,7 @@ def parse_part(wi_object, factors, organism, id, nom):
         'keys.yaml'))
 
     if isinstance(wi_object, dict):
-        if wi_object['list']:
+        if wi_object['list'] or 'input_type' in wi_object and (wi_object['input_type'] == 'single_autofill' or wi_object['input_type'] == 'multi_autofill'):
             val = []
             for i in range(len(wi_object['list_value'])):
                 if isinstance(wi_object['list_value'][i], dict):
@@ -730,8 +716,7 @@ def parse_part(wi_object, factors, organism, id, nom):
 
                         samples = []
                         for sub_elem in wi_object['list_value'][i]['list_value']:
-
-                            samples.append(get_sample(sub_elem, id, organism))
+                            samples.append(get_sample(sub_elem, id, organism, factors, nom))
 
                         val.append({'condition_name': wi_object['list_value'][i]['correct_value'],
                                     'biological_replicates':
@@ -799,27 +784,38 @@ def parse_part(wi_object, factors, organism, id, nom):
     return val
 
 
-def get_sample(sub_elem, id, organism):
+def get_sample(sub_elem, id, organism, factors, nom):
     short_organism = utils.get_whitelist(os.path.join('abbrev', 'organism_name'),
                                          {'organism_name': organism})['whitelist']
     short_organism = short_organism[organism]
-
     sample = {}
     for elem in sub_elem:
         if elem['list']:
             res = []
             for el in elem['list_value']:
-                r = get_sample(el, id, organism)
-                if isinstance(r, dict) and len(r.keys()) == 1 and list(r.keys())[0] == elem['position'].split(':')[-1]:
-                    r = r[elem['position'].split(':')[-1]]
-                res.append(r)
+                if isinstance(el, list):
+                    part_dict = {}
+                    for d in el:
+                        if isinstance(d, dict):
+                            val_ = parse_part(d, factors, organism, id, nom)
+                            if val_:
+                                part_dict[d['position'].split(':')[-1]] = val_
+                    if len(part_dict)>0:
+                        res.append(part_dict)
+                else:
+                    res.append(el)
             if len(res) > 0:
                 sample[elem['position'].split(':')[-1]] = res
         else:
             if 'correct_value' in elem:
                 sample_count = int(elem['value'].split('_')[-1])
-                sample[elem['position'].split(':')[-1]] = f'{elem["correct_value"]}_b{"{:02d}".format(sample_count)}'
+                sample[elem['position'].split(':')[
+                    -1]] = f'{elem["correct_value"]}_b{"{:02d}".format(sample_count)}'
             elif 'value' in elem:
+                if elem['input_type'] == 'multi_autofill' or elem[
+                    'input_type'] == 'single_autofill' and len(
+                    elem['list_value']) > 0:
+                    elem['value'] = elem['list_value'][0]
                 if elem['value'] is not None:
                     if elem['input_type'] == 'value_unit':
                         unit = elem['value_unit']
@@ -841,11 +837,12 @@ def get_sample(sub_elem, id, organism):
                                         new_val = {}
                                         for l in range(len(
                                                 elem['headers'][k].split(
-                                                        ' '))):
+                                                    ' '))):
                                             new_val[
-                                                elem['headers'][k].split(' ')[
+                                                elem['headers'][k].split(
+                                                    ' ')[
                                                     l]] = \
-                                            elem['value'].split(' ')[l]
+                                                elem['value'].split(' ')[l]
                                         elem['value'] = new_val
                                         break
                         elif 'headers' in elem:
@@ -853,26 +850,32 @@ def get_sample(sub_elem, id, organism):
                             for l in range(
                                     len(elem['headers'].split(' '))):
                                 new_val[elem['headers'].split(' ')[l]] = \
-                                elem['value'].split(' ')[l]
+                                    elem['value'].split(' ')[l]
                             elem['value'] = new_val
                         val = elem['value']
-                    sample[elem['position'].split(':')[-1]] = val
+                    if len('value') > 0:
+                        sample[elem['position'].split(':')[-1]] = val
             else:
-                if elem['position'].split(':')[-1] == 'technical_replicates':
+                if elem['position'].split(':')[
+                    -1] == 'technical_replicates':
                     sample_name = []
-                    count = [x['value'] for x in elem['input_fields'] if x['position'].split(':')[-1] == 'count'][0]
+                    count = [x['value'] for x in elem['input_fields'] if
+                             x['position'].split(':')[-1] == 'count'][0]
                     for c in range(count):
                         for m in range(sample['number_of_measurements']):
                             sample_name.append(f'{id}_{short_organism}_'
-                                           f'{sample["sample_name"]}'
-                                           f'_t{"{:02d}".format(c + 1)}_'
-                                           f'm{"{:02d}".format(m + 1)}')
+                                               f'{sample["sample_name"]}'
+                                               f'_t{"{:02d}".format(c + 1)}_'
+                                               f'm{"{:02d}".format(m + 1)}')
                     sample['technical_replicates'] = {'count': count,
-                                                  'sample_name': sample_name}
+                                                      'sample_name': sample_name}
                 else:
-                    res = get_sample(elem['input_fields'], id, organism)
+                    res = get_sample(elem['input_fields'], id, organism,
+                                     factors, nom)
+                    print(res)
                     if len(res) > 0:
                         sample[elem['position'].split(':')[-1]] = res
+
     return sample
 
 
@@ -892,7 +895,10 @@ def parse_list_part(wi_object, factors, organism, id, nom):
         if wi_object[i]['position'].split(':')[
                 -1] == 'organism':
             organism = wi_object[i]['value'].split(' ')[0]
-        val = parse_part(wi_object[i], factors, organism, id, nom)
+            val = {'organism_name': wi_object[i]['value'].split(' ')[0],
+                               'taxonomy_id': wi_object[i]['value'].split(' ')[1]}
+        else:
+            val = parse_part(wi_object[i], factors, organism, id, nom)
         if wi_object[i]['position'].split(':')[-1] == 'technical_replicates':
             sample_name = []
             for c in range(val['count']):
@@ -903,7 +909,11 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                                        f'm{"{:02d}".format(m+1)}')
             val['sample_name'] = sample_name
         elif wi_object[i]['position'].split(':')[-1] == 'experimental_factors':
+            key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+                     'keys.yaml'))
             for r in range(len(factors)):
+                infos = list(utils.find_keys(key_yaml, factors[r]['factor']))
+
                 if 'whitelist_keys' in factors[r]:
                     w_keys = factors[r]['whitelist_keys']
                     factors[r].pop('whitelist_keys')
@@ -930,6 +940,22 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                         for l in range(len(headers.split(' '))):
                             new_val[headers.split(' ')[l]] = factors[r]['values'][j].split(' ')[l]
                         factors[r]['values'][j] = new_val
+                elif len(infos) > 0 and isinstance(infos[0]['value'], dict) and len(infos[0]['value']) == 2 and 'unit' in infos[0]['value'] and 'value' in infos[0]['value']:
+                    for j in range(len(factors[r]['values'])):
+                        unit = factors[r]['values'][j].lstrip('0123456789')
+                        value = int(factors[r]['values'][j][:len(factors[r]['values'][j]) - len(unit)])
+                        factors[r]['values'][j] = {'unit': unit, 'value': value}
+                elif len(factors[r]['values']) == 1 and isinstance(factors[r]['values'][0], dict):
+                    if all(x in [factors[r]['factor'], 'multi'] for x in list(factors[r]['values'][0].keys())):
+                        factors[r]['values'] = factors[r]['values'][0][factors[r]['factor']]
+                    else: 
+                        factors[r]['values'] = factors[r]['values'][0]
+                        remove = []
+                        for elem in factors[r]['values']:
+                            if factors[r]['values'][elem] == None or elem == 'multi' or ((isinstance(factors[r]['values'][elem], list) or isinstance(factors[r]['values'][elem], dict)) and len(factors[r]['values'][elem]) == 0):
+                                remove.append(elem)
+                        for elem in remove:
+                            factors[r]['values'].pop(elem)
 
             res[wi_object[i]['position'].split(':')[-1]] = factors
 
@@ -1045,19 +1071,19 @@ def object_to_html(yaml_object, depth, margin, is_list):
             if key == list(yaml_object.keys())[0] and is_list:
                 input_text = object_to_html(yaml_object[key],
                                             depth + 1, margin + 1.5, is_list)
-                html_str = f'{html_str}<ul style="list-style-type: circle;">' \
+                html_str = f'{html_str}<ul class="list-style-type-circle">' \
                            f'<li><p><font color={get_color(depth)}>{key}' \
                            f'</font>: {input_text}</p></li></ul>'
             else:
                 input_text = object_to_html(yaml_object[key],
                                             depth + 1, margin + 1.5, is_list)
-                html_str = f'{html_str}<ul style="list-style: none;"><li><p>' \
+                html_str = f'{html_str}<ul class="list-style-none"><li><p>' \
                            f'<font color={get_color(depth)}>{key}</font>: ' \
                            f'{input_text}</p></li></ul>'
     elif isinstance(yaml_object, list):
         for elem in yaml_object:
             if not isinstance(elem, list) and not isinstance(elem, dict):
-                html_str = f'{html_str}<ul style="list-style-type: circle;">' \
+                html_str = f'{html_str}<ul class="list-style-type-circle">' \
                            f'<li><p>{elem}</p></li></ul>'
             else:
                 html_str = f'{html_str}' \
@@ -1074,14 +1100,10 @@ def get_color(depth):
     :param depth: the depth of indentation
     :return: color: the color in which the key should be colored
     """
-    if depth < 1:
+    if depth %2 == 0:
         color = '26a69a'
-    elif depth < 2:
-        color = '#d95965'
-    elif depth < 3:
-        color = '2fccbd'
     else:
-        color = 'fc6875'
+        color = '#d95965'
     return color
 
 
@@ -1181,8 +1203,7 @@ def get_search_mask():
         {'key_name': 'All keys', 'display_name': 'All Fields', 'nested': [],
          'whitelist': False, 'chained_keys': ''}]
     keys += get_search_keys(key_yaml, '')
-    whitelist_object = get_gene_whitelist()
-    return {'keys': keys, 'whitelist_object': whitelist_object}
+    return {'keys': keys}
 
 
 def find_metadata(path, search_string):
@@ -1217,26 +1238,6 @@ def find_metadata(path, search_string):
     return new_files
 
 
-def get_gene_whitelist():
-    """
-    This function reads in the gene whitelist for all organisms.
-    :return: a dictionary containing the gene names and ensembl ids
-    """
-    whitelist = utils.read_whitelist('gene')['whitelist']
-    paths = [whitelist[k] for k in whitelist]
-
-    pool_obj = multiprocessing.Pool()
-    answer = pool_obj.map(wi_utils.read_gene_whitelist, paths)
-    gene_name = []
-    ensembl_id = []
-    for elem in answer:
-        gene_name += list(set(elem[0]))
-        ensembl_id += list(set(elem[1]))
-    gene_name = list(set(gene_name))
-    ensembl_id = list(set(ensembl_id))
-    return {'gene_name': gene_name, 'ensembl_id': ensembl_id}
-
-
 def get_search_keys(key_yaml, chained):
     """
     This function returns all keys of the metadata structure in a nested way.
@@ -1251,7 +1252,7 @@ def get_search_keys(key_yaml, chained):
                  key_yaml, key))[0]['display_name']}
         if isinstance(key_yaml[key]['value'], dict) and not \
                 set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
-                <= set(key_yaml[key]['value'].keys()):
+                <= set(key_yaml[key]['value'].keys()) and not ('special_case' in key_yaml[key] and 'merge' in key_yaml[key]['special_case']):
             d['nested'] = get_search_keys(key_yaml[key]['value'],
                                           f'{chained}{key}:'
                                           if chained != '' else f'{key}:')
@@ -1259,10 +1260,14 @@ def get_search_keys(key_yaml, chained):
             d['chained_keys'] = f'{chained}{key}:' \
                 if chained != '' else f'{key}:'
             d['nested'] = []
-        if key == 'gene_name' or key == 'ensembl_id':
-            d['whitelist'] = True
-        else:
-            d['whitelist'] = False
+
+        if 'whitelist' in key_yaml[key]:
+            d['whitelist'] = key_yaml[key]['whitelist']
+        elif 'special_case' in key_yaml[key] and 'merge' in key_yaml[key]['special_case']:
+            d['whitelist'] = key_yaml[key]['value'][key_yaml[key]['special_case']['merge']]['whitelist']
+
+        if 'whitelist' in d and d['whitelist']:
+            d['search_info'] = {'key_name': key}
         res.append(d)
     return res
 

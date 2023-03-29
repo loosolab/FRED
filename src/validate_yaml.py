@@ -11,7 +11,7 @@ generated = ['condition_name', 'sample_name']
 factor = None
 
 
-def validate_file(metafile):
+def validate_file(metafile, mode, logical_validation=True, yaml=None, whitelist_path=None):
     """
     In this function all functions for the validation of a metadata file are
     called. The validation is based on the data in the file 'keys.yaml'. It is
@@ -24,30 +24,56 @@ def validate_file(metafile):
     invalid_keys: a list containing the invalid keys
     invalid_entries: a list containing the invalid entries -> (key, [values])
     """
-    pool_warn = []
-    ref_genome_warn = []
+    logical_warn = []
     valid = True
-    key_yaml = utils.read_in_yaml(os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml'))
+    if mode == 'metadata':
+        key_yaml_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml')
+        key_yaml = utils.read_in_yaml(key_yaml_path)
+    else:
+        key_yaml_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..', 'mamplan_keys.yaml')
+        key_yaml = utils.read_in_yaml(key_yaml_path)
     invalid_keys, invalid_entries, invalid_value = \
-        new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile)
+        new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
                                                 [x.split(':')[-1] for x in
                                                  invalid_keys])
     if len(missing_mandatory_keys) > 0 or len(invalid_keys) > 0 or len(
             invalid_entries) > 0 or len(invalid_value) > 0:
         valid = False
-    else:
-        pool_warn, ref_genome_warn = validate_logic(metafile)
+    if logical_validation:
+        logical_warn = validate_logic(metafile, mode)
     return valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
-        invalid_value, pool_warn, ref_genome_warn
+        invalid_value, logical_warn
 
 
 # -----------------------------------REPORT-------------------------------------
 
 
-def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
-                            invalid_values, invalid_value):
+def print_full_report(metafile, errors, warnings, size=80):
+    report = ''
+    try:
+        input_id = metafile['project']['id']
+    except KeyError:
+        input_id = 'missing'
+    try:
+        path = metafile['path']
+    except KeyError:
+        path = 'missing'
+    report += f'{"VALIDATION REPORT".center(size, "-")}\n' \
+              f'Project ID: {input_id}\n' \
+              f'Path: {path}\n\n' \
+
+    if errors is not None:
+        report += f'{print_validation_report(errors[0], errors[1], errors[2], errors[3], size)}\n'
+    if warnings is not None:
+        report += f'{print_warning(warnings,size)}\n'
+    return report
+
+
+def print_validation_report(missing_mandatory_keys, invalid_keys,
+                            invalid_values, invalid_value, size=80):
     """
     This function outputs a report on invalid files. The report contains the ID
      of the project, the path to the file, as well as the missing mandatory
@@ -58,14 +84,6 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     :param invalid_keys: a list containing all invalid keys
     :param invalid_values: a list containing all invalid values
     """
-    try:
-        input_id = metafile['project']['id']
-    except KeyError:
-        input_id = 'missing'
-    try:
-        path = metafile['path']
-    except KeyError:
-        path = 'missing'
     invalid_entries = '\n- '.join(invalid_keys)
     missing = '\n- '.join(missing_mandatory_keys)
     whitelist_values = []
@@ -76,58 +94,49 @@ def print_validation_report(metafile, missing_mandatory_keys, invalid_keys,
     value = []
     for v in invalid_value:
         value.append(f'{v[0]}: {v[1]} -> {v[2]}')
-    print(f'{"ERROR".center(80, "-")}\n'
-          f'Project ID: {input_id}\n'
-          f'Path: {path}\n\n'
-          f'Report:\n')
+    report = ''
+    report += f'{"ERROR".center(size, "-")}\n\n'
     if len(invalid_keys) > 0:
-        print(f'The following keys were invalid:\n'
-              f'- {invalid_entries}\n')
+        report += f'The following keys were invalid:\n'\
+                  f'- {invalid_entries}\n'
     if len(missing_mandatory_keys) > 0:
-        print(f'The following mandatory keys were missing:\n'
-              f'- {missing}\n')
+        report += f'The following mandatory keys were missing:\n' \
+                  f'- {missing}\n'
     if len(invalid_values) > 0:
-        print(f'The following values do not match the whitelist:\n'
-              f'- {"- ".join(whitelist_values)}')
+        report += f'The following values do not match the whitelist:\n' \
+                  f'- {"- ".join(whitelist_values)}\n'
     if len(invalid_value) > 0:
-        print(f'The following values are invalid:\n'
-              f'- {"- ".join(value)}')
-    print(f'{"".center(80, "-")}')
+        report += f'The following values are invalid:\n' \
+                  f'- {"- ".join(value)}\n'
+    return report
 
 
-def print_warning(metafile, pool_warn, ref_genome_warn):
+def print_warning(logical_warn, size=80):
     """
     This function prints a warning message.
     :param metafile: the metafile that contains the warning
     :param pool_warn: a list of warnings concerning pooled and donor_count
     :param ref_genome_warn: a list of warnings concerning the reference_genome
     """
-    try:
-        input_id = metafile['project']['id']
-    except KeyError:
-        input_id = 'missing'
-    try:
-        path = metafile['path']
-    except KeyError:
-        path = 'missing'
-    print(f'{"WARNING".center(80, "-")}\n'
-          f'Project ID: {input_id}\n'
-          f'Path: {path}\n\n'
-          f'Report:\n')
-    if len(pool_warn) > 0:
-        for elem in pool_warn:
-            print(f'- Sample \'{elem[0]}\':\n{elem[1]}')
-    if len(ref_genome_warn) > 0:
-        for elem in ref_genome_warn:
-            print(f'- Run from {elem[0]}:\n{elem[1]}')
-    print(f'{"".center(80, "-")}')
 
+    report = ''
+    report += f'{"WARNING".center(size, "-")}\n\n'
+    if len(logical_warn) > 0:
+        for elem in logical_warn:
+            report += f'- {elem[0]}:\n{elem[1]}\n'
+    #if len(pool_warn) > 0:
+    #    for elem in pool_warn:
+    #        print(f'- Sample \'{elem[0]}\':\n{elem[1]}')
+    #if len(ref_genome_warn) > 0:
+    #    for elem in ref_genome_warn:
+    #        print(f'- Run from {elem[0]}:\n{elem[1]}')
+    return report
 
 # --------------------------------UTILITIES------------------------------------
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
              invalid_entry, invalid_value, input_type, is_factor,
-             local_factor, full_metadata):
+             local_factor, full_metadata, key_yaml_path, whitelist_path=None, mode='metadata'):
     """
     This function test if all keys in the metadata file are valid.
     :param metafile: the metadata file
@@ -150,9 +159,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             'value' in metafile and 'unit' in metafile):
         for key in metafile:
             if not key_yaml and key_name.split(':')[-1] in is_factor or (key_name.split(':')[-1] == 'values' and local_factor is not None):
-                new_yaml1 = utils.read_in_yaml(os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)), '..',
-                    'keys.yaml'))
+                new_yaml1 = utils.read_in_yaml(key_yaml_path)
                 if key_name.split(':')[-1] in is_factor:
                     new_yaml = list(utils.find_keys(new_yaml1, key_name.split(':')[-1]))
                 else:
@@ -161,9 +168,9 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     if 'whitelist' in new_yaml[0] and new_yaml[0]['whitelist']:
                         if key_name.split(':')[-1] in is_factor:
                             w = utils.get_whitelist(key_name.split(':')[-1],
-                                                    full_metadata)
+                                                    full_metadata, whitelist_path=whitelist_path)
                         else:
-                            w = utils.get_whitelist(local_factor, full_metadata)
+                            w = utils.get_whitelist(local_factor, full_metadata, whitelist_path=whitelist_path)
                         if w and 'headers' in w:
                             if isinstance(w['headers'], dict):
                                 if 'whitelist_keys' in w:
@@ -180,7 +187,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                         invalid_keys.append(key)
                 else:
                     invalid_keys.append(key)
-            elif key not in key_yaml:
+            elif not key_yaml or (key_yaml and key not in key_yaml):
                 invalid_keys.append(key)
             else:
                 if key == 'factor':
@@ -202,7 +209,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     metafile[key], key_yaml[key]['value'], sub_lists,
                     f'{key_name}:{key}' if key_name != '' else key,
                     invalid_keys, invalid_entry, invalid_value, input_type,
-                    is_factor, local_factor, full_metadata)
+                    is_factor, local_factor, full_metadata, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
                 invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
@@ -210,17 +217,23 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             res_keys, res_entries, res_values = new_test(
                 item, key_yaml, sub_lists, key_name, invalid_keys,
                 invalid_entry, invalid_value, input_type, is_factor,
-                local_factor, full_metadata)
+                local_factor, full_metadata, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
             invalid_keys = res_keys
             sub_lists = sub_lists[:-1]
     else:
+        #TODO: Value unitb + check for whitelist but fast
+        #has_whitelist = list(utils.find_keys(utils.read_in_yaml(key_yaml_path), key_name.split(':')[-1]))
+        #if len(has_whitelist) > 0 and 'whitelist' in has_whitelist[0]:
+            #has_whitelist = True
+        #else:
+            #has_whitelist = False
         invalid = new_test_for_whitelist(key_name.split(':')[-1], metafile,
-                                         sub_lists)
+                                         sub_lists, whitelist_path=whitelist_path)
         if invalid:
             invalid_entry.append(f'{key_name}:{metafile}')
 
         inv_value, message = validate_value(metafile, input_type,
-                                            key_name.split(':')[-1])
+                                            key_name.split(':')[-1], mode=mode)
 
         if not inv_value:
             invalid_value.append((key_name, metafile, message))
@@ -228,7 +241,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
     return invalid_keys, invalid_entry, invalid_value
 
 
-def new_test_for_whitelist(entry_key, entry_value, sublists):
+def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None):
     """
     This function tests if the value of a key matches the whitelist.
     :param entry_key: the key that is tested
@@ -237,7 +250,14 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
                       value
     :return: True if the entry does not match the whitelist else False
     """
-    whitelist = utils.read_whitelist(entry_key)
+    if entry_value == None:
+        entry_value = 'None'
+    if whitelist_path == None:
+        whitelist_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..',
+            'metadata_whitelists')
+
+    whitelist = utils.read_whitelist(entry_key, whitelist_path=whitelist_path)
     if whitelist and whitelist['whitelist_type'] == 'plain':
         whitelist = whitelist['whitelist']
     if isinstance(whitelist, dict):
@@ -258,20 +278,20 @@ def new_test_for_whitelist(entry_key, entry_value, sublists):
             if value[0] in whitelist:
                 whitelist = whitelist[value[0]]
             else:
-                whitelist = utils.read_whitelist(value[0])
+                whitelist = utils.read_whitelist(value[0], whitelist_path=whitelist_path)
                 if whitelist and whitelist['whitelist_type'] == 'plain':
                     whitelist = whitelist['whitelist']
         if isinstance(whitelist, dict) and whitelist[
                 'whitelist_type'] == 'group':
+            #TODO: linked whitelists
             whitelist = utils.read_grouped_whitelist(whitelist, {})
             whitelist = [x for xs in list(whitelist['whitelist'].values())
                          if xs is not None for x in xs]
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \
             and os.path.isfile(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..',
-            'metadata_whitelists', 'whitelists', whitelist)):
-        whitelist = utils.read_whitelist(whitelist)
+            whitelist_path, 'whitelists', whitelist)):
+        whitelist = utils.read_whitelist(whitelist, whitelist_path=whitelist_path)
         if whitelist:
             whitelist = whitelist['whitelist']
     if whitelist and entry_value not in whitelist:
@@ -349,7 +369,7 @@ def find_key(metafile, key):
     return new_metafile
 
 
-def validate_value(input_value, value_type, key):
+def validate_value(input_value, value_type, key, mode='metadata'):
     """
     This function tests if an entered value matches its type and contains
     invalid characters.
@@ -374,25 +394,31 @@ def validate_value(input_value, value_type, key):
                 message = 'The value has to be an integer.'
         elif value_type == 'date':
             try:
-                input_date = input_value.split('.')
+                if mode == 'metadata':
+                    input_date = input_value.split('.')
+                    date_message = f'Input must be of type \'DD.MM.YYYY\'.'
+                elif mode == 'mamplan':
+                    input_date = input_value.split('/')
+                    date_message = f'Input must be of type \'DD/MM/YYYY\'.'
                 if len(input_date) != 3 or len(input_date[0]) != 2 or len(
-                        input_date[1]) != 2 or len(input_date[2]) != 4:
+                        input_date[1]) != 2 or not ((mode == 'mamplan' and len(input_date[2]) == 2) or len(input_date[2]) == 4):
                     raise SyntaxError
                 input_value = datetime.date(int(input_date[2]),
                                             int(input_date[1]),
                                             int(input_date[0]))
             except (IndexError, ValueError, SyntaxError) as e:
                 valid = False
-                message = f'Input must be of type \'DD.MM.YYYY\'.'
+                message = date_message
         elif type(input_value) == str and ('\"' in input_value or '{' in input_value or '}' in
                  input_value or '|' in input_value) and key not in generated:
-            valid = False
-            message = 'The value contains an invalid character ' \
-                      '(\", {, } or |).'
+            if mode != 'mamplan':
+                valid = False
+                message = 'The value contains an invalid character ' \
+                          '(\", {, } or |).'
     return valid, message
 
 
-def validate_logic(metafile):
+def validate_logic(metafile, mode='metadata'):
     """
     This functions tests the logic of the input data.
     :param metafile: the metafile to be validated
@@ -400,25 +426,31 @@ def validate_logic(metafile):
     pool_warn: a list containing warnings about the donor_count and pooled
     ref_genome_warn: a list containing warnings about the reference genome
     """
-    pool_warn = []
-    ref_genome_warn = []
-    samples = list(utils.find_keys(metafile, 'samples'))
-    for cond in samples:
-        for sample in cond:
-            warning, warn_message = validate_donor_count(sample['pooled'],
-                                                         sample['donor_count'])
-            if warning:
-                pool_warn.append((sample['sample_name'], warn_message))
-    organisms = list(utils.find_keys(metafile, 'organism_name'))
-    runs = list(utils.find_keys(metafile, 'runs'))
-    if len(runs) > 0:
-        for run in runs[0]:
-            if 'reference_genome' in run:
-                warning, warn_message = validate_reference_genome(
-                    organisms, run['reference_genome'])
+    logical_warn = []
+
+    if mode == 'metadata':
+        samples = list(utils.find_keys(metafile, 'samples'))
+        for cond in samples:
+            for sample in cond:
+                warning, warn_message = validate_donor_count(sample['pooled'],
+                                                             sample['donor_count'])
                 if warning:
-                    ref_genome_warn.append((run['date'], warn_message))
-    return pool_warn, ref_genome_warn
+                    logical_warn.append((f'Sample \'{sample["sample_name"]}\'', warn_message))
+        organisms = list(utils.find_keys(metafile, 'organism_name'))
+        runs = list(utils.find_keys(metafile, 'runs'))
+        if len(runs) > 0:
+            for run in runs[0]:
+                if 'reference_genome' in run:
+                    warning, warn_message = validate_reference_genome(
+                        organisms, run['reference_genome'])
+                    if warning:
+                        logical_warn.append((f'Run from {run["date"]}', warn_message))
+    elif mode == 'mamplan':
+        if 'tags' in metafile and 'organization' in metafile['tags'] and metafile['tags']['organization'] is not None:
+            if 'public' in metafile['tags']['organization']:
+                if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:
+                    logical_warn.append(('tags:pubmedid', 'The pubmed ID is missing for this public project'))
+    return logical_warn
 
 
 def validate_reference_genome(organisms, reference_genome):
@@ -456,10 +488,10 @@ def validate_donor_count(pooled, donor_count):
     message = None
     if pooled and donor_count <= 1:
         invalid = True
-        message = (f'Found donor count {donor_count} for pooled sample. '
+        message = (f'  Found donor count {donor_count} for pooled sample. '
                    f'The donor count should be greater than 1.')
     elif not pooled and donor_count > 1:
         invalid = True
-        message = (f'Found donor count {donor_count} for sample that is not '
+        message = (f'  Found donor count {donor_count} for sample that is not '
                    f'pooled. The donor count should be 1.')
     return invalid, message

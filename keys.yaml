@@ -427,7 +427,7 @@ experimental_setting:
                   display_name: 'Treatment'
                   desc: ''
                   special_case:
-                    group: treatment_type
+                    group: 'treatment_type'
                   value:
                     treatment_type:
                       mandatory: False
@@ -450,8 +450,6 @@ experimental_setting:
                       list: False
                       display_name: 'Duration'
                       desc: ''
-                      special_case:
-                        group: 'treatment_type'
                       value:
                         value:
                           mandatory: True
@@ -496,9 +494,23 @@ experimental_setting:
                   list: False
                   display_name: 'Body-Mass-Index'
                   desc: ''
-                  value: null
-                  whitelist: False
-                  input_type: number
+                  value:
+                    value:
+                      mandatory: False
+                      list: False
+                      display_name: 'Value'
+                      desc: ''
+                      value: null
+                      whitelist: False
+                      input_type: number
+                    unit:
+                      mandatory: False
+                      list: False
+                      display_name: 'Unit'
+                      desc: ''
+                      value: 'kg/m2'
+                      whitelist: True
+                      input_type: select
                 flow:
                   mandatory: False
                   list: False
@@ -593,7 +605,7 @@ technical_details:
         runs:
           mandatory: False
           list: True
-          display_name:  'Runs'
+          display_name: 'Runs'
           desc:  ''
           value:
             date:
