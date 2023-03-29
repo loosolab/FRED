@@ -26,12 +26,14 @@ def validate_file(metafile, mode, logical_validation=True, yaml=None, whitelist_
     """
     logical_warn = []
     valid = True
-    if yaml is not None:
-        key_yaml_path = yaml
-    else:
+    if mode == 'metadata':
         key_yaml_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml')
-    key_yaml = utils.read_in_yaml(key_yaml_path)
+        key_yaml = utils.read_in_yaml(key_yaml_path)
+    else:
+        key_yaml_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..', 'mamplan_keys.yaml')
+        key_yaml = utils.read_in_yaml(key_yaml_path)
     invalid_keys, invalid_entries, invalid_value = \
         new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
@@ -49,7 +51,7 @@ def validate_file(metafile, mode, logical_validation=True, yaml=None, whitelist_
 # -----------------------------------REPORT-------------------------------------
 
 
-def print_full_report(metafile, errors, warnings):
+def print_full_report(metafile, errors, warnings, size=80):
     report = ''
     try:
         input_id = metafile['project']['id']
@@ -59,19 +61,19 @@ def print_full_report(metafile, errors, warnings):
         path = metafile['path']
     except KeyError:
         path = 'missing'
-    report += f'{"VALIDATION REPORT".center(80, "-")}\n' \
+    report += f'{"VALIDATION REPORT".center(size, "-")}\n' \
               f'Project ID: {input_id}\n' \
               f'Path: {path}\n\n' \
 
     if errors is not None:
-        report += f'{print_validation_report(errors[0], errors[1], errors[2], errors[3])}\n'
+        report += f'{print_validation_report(errors[0], errors[1], errors[2], errors[3], size)}\n'
     if warnings is not None:
-        report += f'{print_warning(warnings)}\n'
+        report += f'{print_warning(warnings,size)}\n'
     return report
 
 
 def print_validation_report(missing_mandatory_keys, invalid_keys,
-                            invalid_values, invalid_value):
+                            invalid_values, invalid_value, size=80):
     """
     This function outputs a report on invalid files. The report contains the ID
      of the project, the path to the file, as well as the missing mandatory
@@ -93,7 +95,7 @@ def print_validation_report(missing_mandatory_keys, invalid_keys,
     for v in invalid_value:
         value.append(f'{v[0]}: {v[1]} -> {v[2]}')
     report = ''
-    report += f'{"ERROR".center(80, "-")}\n\n'
+    report += f'{"ERROR".center(size, "-")}\n\n'
     if len(invalid_keys) > 0:
         report += f'The following keys were invalid:\n'\
                   f'- {invalid_entries}\n'
@@ -109,7 +111,7 @@ def print_validation_report(missing_mandatory_keys, invalid_keys,
     return report
 
 
-def print_warning(logical_warn):
+def print_warning(logical_warn, size=80):
     """
     This function prints a warning message.
     :param metafile: the metafile that contains the warning
@@ -118,7 +120,7 @@ def print_warning(logical_warn):
     """
 
     report = ''
-    report += f'{"WARNING".center(80, "-")}\n\n'
+    report += f'{"WARNING".center(size, "-")}\n\n'
     if len(logical_warn) > 0:
         for elem in logical_warn:
             report += f'- {elem[0]}:\n{elem[1]}\n'
@@ -250,6 +252,10 @@ def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None
     """
     if entry_value == None:
         entry_value = 'None'
+    if whitelist_path == None:
+        whitelist_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..',
+            'metadata_whitelists')
 
     whitelist = utils.read_whitelist(entry_key, whitelist_path=whitelist_path)
     if whitelist and whitelist['whitelist_type'] == 'plain':
