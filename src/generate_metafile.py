@@ -430,7 +430,7 @@ def edit_item(key_name, item, key_yaml, result_dict, mandatory_mode, mode):
 
                         # call function to input information
                         item[key] = get_redo_value(
-                            key_yaml['value'][key], key, not key_yaml['mandatory'], mandatory_mode,
+                            key_yaml['value'][key], key, True, mandatory_mode,
                             result_dict, True, False, True, mode)
 
     # item is a single value
@@ -892,6 +892,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                           mandatory_mode, result_dict,
                                           first_node, is_factor, mode)
             return value
+
     return return_dict
 
 

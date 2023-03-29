@@ -109,12 +109,16 @@ def edit(args):
             os.path.join(os.path.dirname(os.path.abspath(__file__)),
                      'mamplan_keys.yaml'))
     file = utils.read_in_yaml(args.path)
-    options = [key for key in file]
+    options = [key for key in key_yaml]
     print(f'Choose the parts you want to edit (1,...,{len(options)}) divided by comma.\n')
     generate_metafile.print_option_list(options, False)
     edit_keys = generate_metafile.parse_input_list(options, True)
     for key in edit_keys:
-        file[key] = generate_metafile.edit_item(key, file[key], key_yaml[key], file, args.mandatory_only, args.mode)
+        if key in file:
+            file[key] = generate_metafile.edit_item(key, file[key], key_yaml[key], file, args.mandatory_only, args.mode)
+        else:
+            file[key] = generate_metafile.get_redo_value(key_yaml[key], key, True, args.mandatory_only, file, True, False, True, args.mode)
+
         while True:
             print(generate_metafile.get_summary(file[key]))
             correct = generate_metafile.parse_list_choose_one(
@@ -125,7 +129,7 @@ def edit(args):
             else:
                 file[key] = generate_metafile.edit_item(key, file[key],
                                               key_yaml[key], file,
-                                              args.mandatory_only)
+                                              args.mandatory_only, args.mode)
     utils.save_as_yaml(file, args.path)
     print(f'Changes were saved to {args.path}')
 
