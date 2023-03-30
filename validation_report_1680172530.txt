@@ -1,0 +1,883 @@
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext184-ruth-haberman-aec2
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext184-ruth/Haberman_aec2_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext184-ruth-haberman
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext184-ruth/Haberman_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext184-ruth-morse
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext184-ruth/Morse_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext184-ruth-reyfman-aec2
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext184-ruth/Reyfman_aec2_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext184-ruth-reyfman
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext184-ruth/Reyfman_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext188-scanpy-mdc
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext188_mdc_zebrafish_heart/ext188_scanpy_mdc_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext203-michel
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext203_Michel/ext203_michel_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext204-vera
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext204_Vera/ext204_vera_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext205
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext205/ext205_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext209-knoepp-ukhalle
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext209_Knoepp_UKHalle_RNAseq/ext209_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext247
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext247-zf-fin-regeneration/ext247_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext301-saverio-10x-nox-hox-06-21
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext301_Saverio_10x_Nox_Hox_06_21/1_Saverio_noBatchCor_MamPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext318
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext318_TOBIAS_dashboard_reischauer/ext318_i2dash_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext361-ext289
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext361_ext289_combined_wilson/ext361_ext289_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext370-scatacseq-230228
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext370_scATAC_reischauer/ext370_230228_MamPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext370-scatacseq-recluster
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext370_scATAC_reischauer/ext370_MamPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext411-rna-cristian-fr
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext411_cristian_rna_wilson/ext411_RNAcristianFR_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext430-biblis
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext430_biblis_CPI_A1/ext430_biblisMix_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext85-kavi-roxy
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/ext85/ext85_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: takis-axolotl
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/extProteomics_Takis_axolotl/extProteomics_Takis_axolotl_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: linnarson
+Path: /mnt/agnerds/BCU_REPOSITORY/extern/linnarson/linnarson_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dst93-immunecells-joao-subcluster1
+Path: /mnt/agnerds/BCU_REPOSITORY/intern_dep_stainer/dst93_scRNA_joao/dst93_subcluster_1_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dst93-immunecells-joao-subcluster-2
+Path: /mnt/agnerds/BCU_REPOSITORY/intern_dep_stainer/dst93_scRNA_joao/dst93_subcluster_2_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dst93-immunecells-joao-subcluster-5
+Path: /mnt/agnerds/BCU_REPOSITORY/intern_dep_stainer/dst93_scRNA_joao/dst93_subcluster_5_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ext140
+Path: /mnt/agnerds/BCU_REPOSITORY/paper/ext140_kavi/ext140_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following values do not match the whitelist:
+- external in tags:organization
+
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dst138-20hpf-npas4l-scrnaseq
+Path: /mnt/agnerds/BCU_REPOSITORY/paper/kenny_2022/kenny_2022_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: use-case-1
+Path: /mnt/agnerds/BCU_REPOSITORY/paper/use_case_1/i2dash_uc1_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following keys were invalid:
+- cluster
+The following mandatory keys were missing:
+- deployment:cluster
+- deployment:random
+- deployment:icinga
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: use-case-2
+Path: /mnt/agnerds/BCU_REPOSITORY/paper/use_case_2/i2dash_uc2_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following keys were invalid:
+- cluster
+The following mandatory keys were missing:
+- deployment:cluster
+- deployment:random
+- deployment:icinga
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: use-case-3
+Path: /mnt/agnerds/BCU_REPOSITORY/paper/use_case_3/i2dash_uc3_MaMPlan.yml
+
+-------------------------------------ERROR--------------------------------------
+
+The following keys were invalid:
+- cluster
+The following mandatory keys were missing:
+- deployment:cluster
+- deployment:random
+- deployment:icinga
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: emtab-133-human-lung-cell-atlas-10x
+Path: /mnt/agnerds/BCU_REPOSITORY/public/E-MTAB-133-cell atlas of the human lung/emtab-133-Mamplan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: mtab7376-mouse-mi-injury
+Path: /mnt/agnerds/BCU_REPOSITORY/public/E-MTAB-7376/E-MTAB-7376-annotated_cellxgene_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: hlca
+Path: /mnt/agnerds/BCU_REPOSITORY/public/HLCA/HLCA_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: droplet-normal-lung-blood
+Path: /mnt/agnerds/BCU_REPOSITORY/public/human_lung_atlas_travaglini2020_T/droplet_normal_lung_blood_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: mouse-endothelial-cells
+Path: /mnt/agnerds/BCU_REPOSITORY/public/Mouse_Transcriptomic_Signatures_of_Organ_Specific_Endothelial_Cells/Mouse_Transcriptomic_Endothelial_Cells_MaMPlan.yml
+
+------------------------------------WARNING-------------------------------------
+
+- tags:pubmedid:
+The pubmed ID is missing for this public project
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: ckuenne-igv-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/ckuenne/ckuenne-igv-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dspothe-igv-1-0-2
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/dspothe/dspothe-igv-1-0-2_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dspothe-igv-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/dspothe/dspothe-igv-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dspothe-igv-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/dspothe/dspothe-igv-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dspothe-rstudio-snap-ss-1-1
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/dspothe/dspothe-rstudio-snap-ss-1-1_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dspothe-rstudio-snap-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/dspothe/dspothe-rstudio-snap-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dspothe-rstudio-snap-ss-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/dspothe/dspothe-rstudio-snap-ss-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: dspothe-rstudio-splicing-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/dspothe/dspothe-rstudio-splicing-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: eavci-igv-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/eavci/eavci-igv-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: hlotfik-rstudio-snap-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/hlotfik/hlotfik-rstudio-snap-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: lmetzge-rstudio-snap-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/lmetzge/lmetzge-rstudio-snap-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: mbentse-rstudio-snap-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/mbentse/mbentse-rstudio-snap-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: mlooso-rstudio-snap-ss-1-2
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/mlooso/mlooso-rstudio-snap-ss-1-2_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: mlooso-rstudio-snap-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/mlooso/mlooso-rstudio-snap-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: mlooso-rstudio-splicing-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/mlooso/mlooso-rstudio-splicing-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: mlooso-rstudio-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/mlooso/mlooso-rstudio-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: mstaps-rstudio-splicing-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/mstaps/mstaps-rstudio-splicing-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: mstaps-rstudio-splicing-ss-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/mstaps/mstaps-rstudio-splicing-ss-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-igv-1-0-2
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-igv-1-0-2_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-igv-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-igv-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-jupyter-scatac-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-jupyter-scatac-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-rstudio-snap-ss-1-0
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-rstudio-snap-ss-1-0_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-rstudio-snap-ss-1-1
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-rstudio-snap-ss-1-1_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-rstudio-snap-ss-1-2
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-rstudio-snap-ss-1-2_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-rstudio-snap-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-rstudio-snap-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-rstudio-snap-ss-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-rstudio-snap-ss-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-rstudio-splicing-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-rstudio-splicing-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nknoppi-rstudio-splicing-ss-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nknoppi/nknoppi-rstudio-splicing-ss-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nmeixne-igv-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nmeixne/nmeixne-igv-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: nmeixne-rstudio-snap-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/nmeixne/nmeixne-rstudio-snap-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: pgoyman-rstudio-splicing-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/pgoyman/pgoyman-rstudio-splicing-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: pgoyman-rstudio-splicing-ss-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/pgoyman/pgoyman-rstudio-splicing-ss-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: qyin-rstudio-snap-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/qyin/qyin-rstudio-snap-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: qyin-rstudio-splicing-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/qyin/qyin-rstudio-splicing-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: rwiegan-igv-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/rwiegan/rwiegan-igv-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: rwiegan-rstudio-splicing-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/rwiegan/rwiegan-rstudio-splicing-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: swatana-igv-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/swatana/swatana-igv-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: swatana-rstudio-snap-ss-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/swatana/swatana-rstudio-snap-ss-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: swatana-rstudio-snap-ss-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/swatana/swatana-rstudio-snap-ss-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: swatana-rstudio-splicing-ss-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/swatana/swatana-rstudio-splicing-ss-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: tjuan-igv-df
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/tjuan/tjuan-igv-df_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+
+-------------------------------VALIDATION REPORT--------------------------------
+Project ID: tjuan-igv-latest
+Path: /mnt/agnerds/BCU_REPOSITORY/self_services_deployments/tjuan/tjuan-igv-latest_MaMPlan.yaml
+
+-------------------------------------ERROR--------------------------------------
+
+The following mandatory keys were missing:
+- tags
+
+________________________________________________________________________________
+

@@ -1,0 +1,105 @@
+project:
+  id: gse130699-mouse-cardiomyocytes
+  project_name: Single nucleus RNA-seq of cardiomyocytes from neonatal mouse hearts
+    after injury
+  date: 18.03.2020
+  owner:
+    name: public
+    ldap_name: '---'
+    department: alleAbt
+    email: '---'
+  description: " \tThe adult mammalian heart is incapable of regeneration following\
+    \ injury. In contrast, the neonatal mouse heart can efficiently regenerate during\
+    \ the first week of life. The molecular mechanisms that mediate the regenerative\
+    \ response and its blockade in later life are not understood. Here, by single-nucleus\
+    \ RNA sequencing, we map the dynamic transcriptional landscape of five distinct\
+    \ cardiomyocyte populations in healthy, injured and regenerating mouse hearts.\
+    \ We identify immature cardiomyocytes that enter the cell-cycle following injury\
+    \ and disappear as the heart loses the ability to regenerate. These proliferative\
+    \ neonatal cardiomyocytes display a unique transcriptional program dependent on\
+    \ NFYa and NFE2L1 transcription factors, which exert proliferative and protective\
+    \ functions, respectively. Cardiac overexpression of these two factors conferred\
+    \ protection against ischemic injury in mature mouse hearts that were otherwise\
+    \ non-regenerative. These findings advance our understanding of the cellular basis\
+    \ of neonatal heart regeneration and reveal a transcriptional landscape for heart\
+    \ repair following injury. "
+  nerd:
+  - name: Philipp Goymann
+    ldap_name: pgoyman
+    department: AG-nerds
+    email: philipp.goymann@mpi-bn.mpg.de
+  - name: '2'
+    ldap_name: '---'
+    department: alleAbt
+    email: '---'
+experimental_setting:
+- organism:
+    organism_name: mouse
+    taxonomy_id: '10090'
+  experimental_factors:
+  - factor: time_point
+    values:
+    - unit: days
+      value: 1
+    - unit: days
+      value: 8
+  conditions:
+  - condition_name: time_point:"1days"
+    biological_replicates:
+      count: 3
+      samples:
+      - sample_name: tmp.1days_b01
+        pooled: false
+        donor_count: 1
+        time_point:
+          unit: days
+          value: 1
+        disease:
+        - disease_status: healthy
+          disease_type: Heart failure
+        - disease_status: healthy
+          disease_type: Heart failure
+        number_of_measurements: 1
+        technical_replicates:
+          count: 1
+          sample_name:
+          - gse130699-mouse-cardiomyocytes_mouse_tmp.1days_b01_t01_m01
+      - sample_name: tmp.1days_b02
+        pooled: false
+        donor_count: 1
+        time_point:
+          unit: days
+          value: 1
+        number_of_measurements: 1
+        technical_replicates:
+          count: 1
+          sample_name:
+          - gse130699-mouse-cardiomyocytes_mouse_tmp.1days_b02_t01_m01
+      - sample_name: tmp.1days_b03
+        pooled: false
+        donor_count: 1
+        time_point:
+          unit: days
+          value: 1
+        number_of_measurements: 1
+        technical_replicates:
+          count: 1
+          sample_name:
+          - gse130699-mouse-cardiomyocytes_mouse_tmp.1days_b03_t01_m01
+  - condition_name: time_point:"8days"
+    biological_replicates:
+      count: 1
+      samples:
+      - sample_name: tmp.8days_b01
+        pooled: false
+        donor_count: 1
+        time_point:
+          unit: days
+          value: 8
+        number_of_measurements: 1
+        technical_replicates:
+          count: 1
+          sample_name:
+          - gse130699-mouse-cardiomyocytes_mouse_tmp.8days_b01_t01_m01
+technical_details:
+  technique: sc RNAseq
