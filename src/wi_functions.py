@@ -724,32 +724,33 @@ def parse_part(wi_object, factors, organism, id, nom):
         'keys.yaml'))
 
     if isinstance(wi_object, dict):
-        if wi_object['list'] or 'input_type' in wi_object and (wi_object['input_type'] == 'single_autofill' or wi_object['input_type'] == 'multi_autofill'):
+        if wi_object['list'] or ('input_type' in wi_object and (wi_object['input_type'] == 'single_autofill' or wi_object['input_type'] == 'multi_autofill')):
             val = []
-            for i in range(len(wi_object['list_value'])):
-                if isinstance(wi_object['list_value'][i], dict):
-                    if wi_object['list_value'][i]['position'].split(':')[-1] == 'condition':
+            if 'list_value' in wi_object:
+                for i in range(len(wi_object['list_value'])):
+                    if isinstance(wi_object['list_value'][i], dict):
+                        if wi_object['list_value'][i]['position'].split(':')[-1] == 'condition':
 
-                        samples = []
-                        for sub_elem in wi_object['list_value'][i]['list_value']:
-                            samples.append(get_sample(sub_elem, id, organism, factors, nom))
+                            samples = []
+                            for sub_elem in wi_object['list_value'][i]['list_value']:
+                                samples.append(get_sample(sub_elem, id, organism, factors, nom))
 
-                        val.append({'condition_name': wi_object['list_value'][i]['correct_value'],
-                                    'biological_replicates':
-                                        {'count': len(samples),
-                                         'samples': samples}})
+                            val.append({'condition_name': wi_object['list_value'][i]['correct_value'],
+                                        'biological_replicates':
+                                            {'count': len(samples),
+                                             'samples': samples}})
 
-                    #else:
-                    #    print(elem['position'])
-                elif isinstance(wi_object['list_value'][i], list):
-                    if wi_object['position'].split(':')[-1] == 'experimental_setting':
-                        val.append(parse_list_part(wi_object['list_value'][i], factors[i], organism, id,
-                                               nom))
+                        #else:
+                        #    print(elem['position'])
+                    elif isinstance(wi_object['list_value'][i], list):
+                        if wi_object['position'].split(':')[-1] == 'experimental_setting':
+                            val.append(parse_list_part(wi_object['list_value'][i], factors[i], organism, id,
+                                                   nom))
+                        else:
+                            val.append(parse_list_part(wi_object['list_value'][i], factors, organism, id,
+                                                   nom))
                     else:
-                        val.append(parse_list_part(wi_object['list_value'][i], factors, organism, id,
-                                               nom))
-                else:
-                    val.append(wi_object['list_value'][i])
+                        val.append(wi_object['list_value'][i])
         else:
             if 'whitelist_keys' in wi_object:
                 for k in wi_object['whitelist_keys']:
