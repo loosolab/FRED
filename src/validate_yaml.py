@@ -432,7 +432,7 @@ def validate_logic(metafile, mode='metadata'):
         samples = list(utils.find_keys(metafile, 'samples'))
         for cond in samples:
             for sample in cond:
-                if 'pooled' in sample and 'donor_count' in sample:
+                if isinstance(sample, dict) and 'pooled' in sample and 'donor_count' in sample:
                     warning, warn_message = validate_donor_count(sample['pooled'],
                                                                  sample['donor_count'])
                     if warning:
