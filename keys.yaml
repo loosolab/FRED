@@ -613,7 +613,7 @@ technical_details:
         runs:
           mandatory: False
           list: True
-          display_name:  'Runs'
+          display_name: 'Runs'
           desc:  ''
           value:
             date:

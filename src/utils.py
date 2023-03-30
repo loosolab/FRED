@@ -93,25 +93,26 @@ def find_values(node, kv):
                         yield val
 
 
-def read_whitelist(key):
+def read_whitelist(key, whitelist_path=None):
     """
     This function reads in a whitelist and returns it.
     :param key: the key that contains a whitelist
     :return: whitelist: the read in whitelist
     """
+    if whitelist_path is None:
+        whitelist_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists')
     try:
-        whitelist = read_in_json(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists', 'misc', 'json', key))
+        whitelist = read_in_json(os.path.join(whitelist_path, 'misc', 'json', key))
     except (AttributeError, FileNotFoundError):
         try:
             whitelist = read_in_yaml(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
-                         'metadata_whitelists', 'whitelists', key))
+                os.path.join(whitelist_path, 'whitelists', key))
         except (AttributeError, FileNotFoundError):
             whitelist = None
     return whitelist
 
 
-def read_grouped_whitelist(whitelist, filled_object, all_plain = False):
+def read_grouped_whitelist(whitelist, filled_object, all_plain=False, whitelist_path=None):
     """
     This function parses a whitelist of type 'group'. If there are more than 30
     values it is formed into a plain whitelist.
@@ -119,15 +120,18 @@ def read_grouped_whitelist(whitelist, filled_object, all_plain = False):
     :param filled_object: a dictionary containing filled information
     :return: whitelist: the read in whitelist
     """
+    if whitelist_path is None:
+        whitelist_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..',
+            'metadata_whitelists')
     headers = {}
     for key in whitelist['whitelist']:
         if not isinstance(whitelist['whitelist'][key], list) and \
                 os.path.isfile(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                             '..', 'metadata_whitelists', 'whitelists',
+                os.path.join(whitelist_path, 'whitelists',
                              whitelist['whitelist'][key])):
             whitelist['whitelist'][key] = \
-                get_whitelist(whitelist['whitelist'][key], filled_object, all_plain)
+                get_whitelist(whitelist['whitelist'][key], filled_object, all_plain=all_plain, whitelist_path=whitelist_path)
             if isinstance(whitelist['whitelist'][key], dict):
                 if whitelist['whitelist'][key]['whitelist_type'] == 'depend':
                     if whitelist['whitelist'] and 'whitelist' in \
@@ -164,7 +168,7 @@ def read_grouped_whitelist(whitelist, filled_object, all_plain = False):
     return whitelist
 
 
-def read_depend_whitelist(whitelist, depend):
+def read_depend_whitelist(whitelist, depend, whitelist_path=None):
     """
     This function parses a whitelist of type 'depend' in order to get the
     values fitting the dependency.
@@ -172,22 +176,24 @@ def read_depend_whitelist(whitelist, depend):
     :param depend: the key whose values the whitelist depends on
     :return: whitelist: the read in whitelist
     """
+    if whitelist_path is None:
+        whitelist_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..',
+            'metadata_whitelists')
     if depend in whitelist:
         whitelist = whitelist[depend]
-    elif os.path.isfile(os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), '..', 'metadata_whitelists',
+    elif os.path.isfile(os.path.join(whitelist_path,
             'whitelists', depend)):
-        whitelist = read_whitelist(depend)
+        whitelist = read_whitelist(depend, whitelist_path=whitelist_path)
     if not isinstance(whitelist, list) and not isinstance(whitelist, dict) \
             and os.path.isfile(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..',
-            'metadata_whitelists', 'whitelists',
+            whitelist_path, 'whitelists',
             whitelist)):
-        whitelist = read_whitelist(whitelist)
+        whitelist = read_whitelist(whitelist, whitelist_path=whitelist_path)
     return whitelist
 
 
-def get_whitelist(key, filled_object, all_plain = False):
+def get_whitelist(key, filled_object, all_plain=False, whitelist_path=None):
     """
     This function reads in a whitelist and parses it depending on its type.
     :param key: the key that contains a whitelist
@@ -198,13 +204,17 @@ def get_whitelist(key, filled_object, all_plain = False):
     stay_depend = False
     plain = False
     abbrev = False
-    whitelist = read_whitelist(key)
+    whitelist = read_whitelist(key, whitelist_path=whitelist_path)
+    if whitelist_path is None:
+        whitelist_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..',
+            'metadata_whitelists')
 
     while isinstance(whitelist,
                      dict) and not group and not stay_depend and not \
             plain and not abbrev:
         if whitelist['whitelist_type'] == 'group':
-            whitelist = read_grouped_whitelist(whitelist, filled_object, all_plain)
+            whitelist = read_grouped_whitelist(whitelist, filled_object, all_plain=all_plain, whitelist_path=whitelist_path)
             group = True
         elif whitelist['whitelist_type'] == 'plain':
             plain = True
@@ -217,13 +227,13 @@ def get_whitelist(key, filled_object, all_plain = False):
                     depend = list(find_keys(filled_object, 'organism'))
             if len(depend) > 0:
                 whitelist = read_depend_whitelist(whitelist['whitelist'],
-                                                  depend[0].split(' ')[0])
+                                                  depend[0].split(' ')[0], whitelist_path=whitelist_path)
             else:
                 if all_plain:
                     new_whitelist = []
                     paths = []
                     for key in whitelist['whitelist']:
-                        if not isinstance(whitelist['whitelist'][key], list) and os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists', 'whitelists',whitelist['whitelist'][key])):
+                        if not isinstance(whitelist['whitelist'][key], list) and os.path.isfile(os.path.join(whitelist_path, 'whitelists', whitelist['whitelist'][key])):
                             paths.append(whitelist['whitelist'][key])
                         else:
                             new_whitelist += whitelist['whitelist'][key]

@@ -8,7 +8,7 @@ from src import validate_yaml
 # file_reading.py
 
 
-def iterate_dir_metafiles(path_metafiles):
+def iterate_dir_metafiles(path_metafiles, mode='metadata', logical_validation=True, yaml=None, whitelist_path=None):
     """
     iterate through a list of paths to find all _metadata.yaml(yml) files
     :param path_metafiles: list of paths containing yaml files
@@ -22,31 +22,43 @@ def iterate_dir_metafiles(path_metafiles):
 
     # iterate through paths, through directories, through files
     metafile_list = []
+    file_reports = []
+    error_count = 0
+    warning_count = 0
+    corrupt_count = 0
+    all_files = 0
     for path_metafile in path_metafiles:
         for subdir, dirs, files in os.walk(path_metafile):
             for file in files:
+                error_reports = None
+                warning_reports = None
+                corrupted = False
+                report = {}
                 # add files with suffix '_metadata.y(a)ml'
                 if file.lower().endswith(
-                        "_metadata.yaml") or file.lower().endswith(
-                        '_metadata.yml'):
+                        f'{mode}.yaml') or file.lower().endswith(
+                        f'{mode}.yml'):
                     ypath = os.path.join(subdir, file)
                     # read these yaml as dict and append to metafile-list:
                     print('reading file ' + ypath)
+                    all_files += 1
                     metafile = read_in_yaml(ypath)
                     # test if metafile is valid
                     valid, missing_mandatory_keys, invalid_keys, \
-                        invalid_entries, invalid_values, pool_warn, ref_genome_warn = validate_yaml.validate_file(metafile)
+                        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, mode, logical_validation=logical_validation, yaml=yaml, whitelist_path=whitelist_path)
                     # add path to dic
                     metafile['path'] = ypath
                     if not valid:
-                        validate_yaml.print_validation_report(
-                            metafile, missing_mandatory_keys, invalid_keys,
-                            invalid_entries, invalid_values)
-                        if len(pool_warn) > 0 or len(ref_genome_warn) > 0:
-                            validate_yaml.print_warning(metafile, pool_warn, ref_genome_warn)
+                        error_reports = (missing_mandatory_keys, invalid_keys, invalid_entries, invalid_values)
+                        corrupted = True
+                        error_count += (len(missing_mandatory_keys) + len(invalid_keys) + len(invalid_entries) + len(invalid_values))
                     else:
-                        if len(pool_warn) > 0 or len(ref_genome_warn) > 0:
-                            validate_yaml.print_warning(metafile, pool_warn, ref_genome_warn)
-                        if metafile:
-                            metafile_list.append(metafile)
-    return metafile_list
+                        metafile_list.append(metafile)
+                    if len(logical_warn) > 0:
+                        corrupted = True
+                        warning_count += len(logical_warn)
+                        warning_reports = logical_warn
+                    if corrupted:
+                        corrupt_count += 1
+                        file_reports.append({'file': metafile, 'error': error_reports, 'warning': warning_reports})
+    return metafile_list, {'all_files': all_files, 'corrupt_files': {'count': corrupt_count, 'report': file_reports}, 'error_count': error_count, 'warning_count': warning_count}

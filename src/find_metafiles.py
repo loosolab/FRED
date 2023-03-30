@@ -37,7 +37,7 @@ def find_projects(dir_path, search, return_dict):
     # split parameters linked via or into list
 
     # read in all *_metadata.yaml(yml) within the path
-    metafiles = file_reading.iterate_dir_metafiles([dir_path])
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles([dir_path])
 
     # put round brackets around the search string
     search = '(' + search + ')'
