@@ -432,10 +432,11 @@ def validate_logic(metafile, mode='metadata'):
         samples = list(utils.find_keys(metafile, 'samples'))
         for cond in samples:
             for sample in cond:
-                warning, warn_message = validate_donor_count(sample['pooled'],
-                                                             sample['donor_count'])
-                if warning:
-                    logical_warn.append((f'Sample \'{sample["sample_name"]}\'', warn_message))
+                if 'pooled' in sample and 'donor_count' in sample:
+                    warning, warn_message = validate_donor_count(sample['pooled'],
+                                                                 sample['donor_count'])
+                    if warning:
+                        logical_warn.append((f'Sample \'{sample["sample_name"]}\'', warn_message))
         organisms = list(utils.find_keys(metafile, 'organism_name'))
         runs = list(utils.find_keys(metafile, 'runs'))
         if len(runs) > 0:
