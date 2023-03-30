@@ -467,8 +467,8 @@ def validate_reference_genome(organisms, reference_genome):
     message = None
     ref_genome_whitelist = utils.get_whitelist('reference_genome', None)
     if ref_genome_whitelist:
-        if not any([reference_genome in ref_genome_whitelist['whitelist'][organism] for
-                    organism in organisms]):
+        if not(any(organism in ref_genome_whitelist['whitelist'] for organism in organisms)) or not any([reference_genome in ref_genome_whitelist['whitelist'][organism] for
+                    organism in organisms if organism in ref_genome_whitelist['whitelist']]):
             invalid = True
             organisms = [f'\'{organism}\'' for organism in organisms]
             message = (f'The reference genome \'{reference_genome}\' does not '
