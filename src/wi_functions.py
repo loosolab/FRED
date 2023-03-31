@@ -209,7 +209,8 @@ def parse_empty(node, pos, key_yaml, get_whitelists):
             if input_type != 'group_select':
                 if isinstance(whitelist, dict):
                     input_type = 'dependable_select'
-                elif whitelist and len(whitelist) > 30:
+                # TODO: better solution for department
+                elif whitelist and len(whitelist) > 30 and pos.split(':')[-1] != 'department':
                     if node['list']:
                         input_type = 'multi_autofill'
                         whitelist = None
