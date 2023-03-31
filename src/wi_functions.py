@@ -444,7 +444,7 @@ def get_samples(condition, sample, real_val):
                                 for x in c[1]:
                                     if filled_sample[
                                         j]['position'].split(':')[-1] == x:
-                                        sub_info = utils.find_keys(key_yaml, x)
+                                        sub_info = list(utils.find_keys(key_yaml, x))
                                         if len(sub_info)>0 and 'special_case' in sub_info[0] and 'value_unit' in sub_info[0]['special_case']:
                                             unit = c[1][x].lstrip('0123456789')
                                             value = c[1][x][:len(c[1][x]) -
