@@ -38,6 +38,12 @@ def read_in_json(json_file):
     return low_output
 
 
+def save_as_json(dictionary, json_file):
+
+    with open(json_file, 'w') as f:
+        json.dump(dictionary, f)
+
+
 # The following function was found on Stackoverflow
 # https://stackoverflow.com/questions/9807634/find-all-occurrences-of-a-key-in-
 # nested-dictionaries-and-lists
