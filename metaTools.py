@@ -94,6 +94,11 @@ def validate(args):
 
         output_report = {'report': copy.deepcopy(validation_reports)['corrupt_files']['report']}
         for elem in output_report['report']:
+            id = list(utils.find_keys(elem['file'], 'id'))
+            if len(id) > 0:
+                elem['id'] = id[0]
+            else:
+                elem['id'] = 'missing'
             elem['path'] = elem['file']['path']
             errors = list(elem['error']) if 'error' in elem is not None else []
             elem['error'] = {}
