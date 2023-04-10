@@ -1,6 +1,6 @@
 stages:
   - deploy
-  - test_keys
+  - test
 test_keys:
   image: python:3.8-buster
 
