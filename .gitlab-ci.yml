@@ -7,6 +7,8 @@ variables:
   GIT_SUBMODULE_STRATEGY: normal
 
 test_keys:
+  only:
+  - main
   image: python:3.8-buster
   before_script:
     - pip install -r requirements.txt
@@ -17,7 +19,8 @@ test_keys:
 pages:
   stage: deploy
   image: python:3.8-buster
-
+  only:
+    - main
   before_script:
     - pip install -r requirements.txt
   script:
