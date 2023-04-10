@@ -10,12 +10,17 @@ test_keys:
 
 pages:
   stage: deploy
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  
   script:
     - mkdir .public
     - cp -r ./* .public
     - rm -rf public
     - mv .public public
     - mkdocs build --strict --verbose
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:latest" .
+    - docker push "$CI_REGISTRY_IMAGE:latest"
   artifacts:
     paths:
       - public
