@@ -1,17 +1,20 @@
 stages:
   - deploy
+  - test_keys
+test_keys:
+  image: python:3.8-buster
 
+  before_script:
+    - pip install -r requirements.txt
+  stage: test
+  script:
+    - test/test_key_yaml.py
 pages:
   stage: deploy
   image: python:3.8-buster
 
   before_script:
     - pip install -r requirements.txt
-
-  test_keys:
-    stage: test
-    script:
-      - test/test_key_yaml.py
   script:
     - mkdir .public
     - cp -r ./* .public
