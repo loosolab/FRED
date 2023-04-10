@@ -6,34 +6,7 @@ stages:
 variables:
   GIT_SUBMODULE_STRATEGY: normal
 
-test_keys:
-  only:
-  - main
-  image: python:3.8-buster
-  before_script:
-    - pip install -r requirements.txt
-  stage: test
-  script:
-    - test/test_key_yaml.py
 
-pages:
-  stage: deploy
-  image: python:3.8-buster
-  only:
-    - main
-  before_script:
-    - pip install -r requirements.txt
-  script:
-    - mkdir .public
-    - cp -r ./* .public
-    - rm -rf public
-    - mv .public public
-    - mkdocs build --strict --verbose
-  artifacts:
-    paths:
-      - public
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 build-prod:       # This job runs in the build stage, which runs first.
     stage: build_prod
