@@ -108,7 +108,7 @@ def validate(args):
             else:
                 elem['id'] = 'missing'
             elem['path'] = elem['file']['path']
-            errors = list(elem['error']) if 'error' in elem is not None else []
+            errors = list(elem['error']) if 'error' in elem and elem['error'] is not None else []
             elem['error'] = {}
             elem.pop('file')
             for i in range(len(errors)):
