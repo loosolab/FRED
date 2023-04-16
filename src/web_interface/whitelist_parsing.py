@@ -108,7 +108,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     if options[0]['list']:
         new_w = [
             {'whitelist': whitelist, 'position': key,
-             'displayName': options['display_name'], 'required': True, 'value': [],
+             'displayName': options[0]['display_name'], 'required': True, 'value': [],
              'input_type': input_type, 'whitelist_type': whitelist_type},
             {'displayName': 'Multi', 'position': 'multi',
              'whitelist': [True, False], 'input_type': 'bool',
