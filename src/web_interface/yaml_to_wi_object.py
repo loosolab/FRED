@@ -1,5 +1,5 @@
 import src.utils as utils
-import os
+import src.web_interface.whitelist_parsing as whitelist_parsing
 
 # TODO: example of format in wi_object (Keys)
 
@@ -53,67 +53,30 @@ def parse_empty(node, pos, key_yaml, get_whitelists=True):
 
         # test for special case 'merge' -> it is used when two keys share a
         # whitelist (e.g. gene -> gene_name, ensemble_id)
-        if 'special_case' in node and 'merge' in node['special_case']:
-
-            # set the input type to select
-            input_type = 'select'
+        if 'special_case' in node and any(
+                ['merge', 'value_unit'] in node['special_case']):
 
             # test if whitelist should be included in the object
             if get_whitelists:
 
-                # TODO: own function
-                # read in whitelist
-                whitelist = utils.get_whitelist(pos.split(':')[-1], {})
-
-                # test if the right keys are present in the whitelist
-                # -> format check
-                if 'whitelist_type' in whitelist and 'whitelist' in whitelist:
-
-                    # set whitelist type and whitelist
-                    whitelist_type = whitelist['whitelist_type']
-                    whitelist = whitelist['whitelist']
-
-                    if whitelist_type == 'depend':
-                        whitelist = None
-                        input_type = 'dependable'
-
-                    # TODO: test if plain_group is already there
-                    elif whitelist_type == 'group':
-                        if isinstance(whitelist, dict):
-                            new_w = []
-                            for key in whitelist:
-                                new_w.append(
-                                    {'title': key,
-                                     'whitelist': whitelist['whitelist'][key]})
-                            input_type = 'group_select'
-                            whitelist = new_w
-                        else:
-                            input_type = 'select'
-                            whitelist_type = 'plain_group'
+                # read and parse whitelist
+                whitelist, whitelist_type, input_type, headers, \
+                    whitelist_keys = whitelist_parsing.parse_whitelist(
+                        node, {})
 
             else:
 
                 # set whitelist to None if it should not be included
                 whitelist = None
 
-            # test if whitelist is longer than 30
-            if whitelist and len(whitelist) > 30:
+                if 'merge' in node['special_case']:
 
-                # set whitelist type to multi_autofill if it is a list
-                if node['list']:
-                    input_type = 'multi_autofill'
+                    # set the input type to select
+                    input_type = 'select'
 
-                # set whitelist type to single_autofill if it is a string
-                else:
-                    input_type = 'single_autofill'
+                elif 'value_unit' in node['special_case']:
 
-                # set whitelist to None
-                # -> whitelists on the website will be called with
-                # get_single_whitelist function (from whitelist_parsing) and
-                # used with an autocompletion
-                # -> whitelist only gets send to website if the field is
-                # actually entered which saves space and time
-                whitelist = None
+                    input_type = 'value_unit'
 
             # set input type of field organism to 'organism' -> special case
             if pos.split(':')[-1] == 'organism':
@@ -129,6 +92,10 @@ def parse_empty(node, pos, key_yaml, get_whitelists=True):
                            'whitelist_type': whitelist_type,
                            'input_type': input_type,
                            'input_disabled': input_disabled}
+
+            if input_type == 'value_unit':
+
+                part_object['value_unit'] = node['value']['unit']['value']
 
         # no special case -> the value takes a dictionary and should be
         # displayed via an expandable
@@ -148,40 +115,13 @@ def parse_empty(node, pos, key_yaml, get_whitelists=True):
                                                 pos + ':' + key,
                                                 key_yaml, get_whitelists))
 
-            # test if the input fields are value_units
-            if 'special_case' in node and 'value_unit' in node['special_case']:
 
-                # initialize a whitelist for units
-                unit_whitelist = []
-
-                # iterate over the input fields to find the unit and save its
-                # values to the unit_whitelist
-                for i in range(len(input_fields)):
-                    if input_fields[i]['position'].split(':')[-1] == 'unit':
-                        unit_whitelist = input_fields[i]['whitelist']
-
-                # creation and filling of dictionary containing all necessary
-                # information for one input field of type value_unit
-                part_object = {'position': pos, 'mandatory': node['mandatory'],
-                               'list': node['list'],
-                               'displayName': node['display_name'],
-                               'desc': node['desc'], 'value': None,
-                               'value_unit': node['value']['unit']['value'],
-                               'whitelist': unit_whitelist,
-                               'input_type': 'value_unit',
-                               'input_disabled': input_disabled}
-
-            # no special case -> display as expandable
-            else:
-
-                # creation and filling of dictionary containing all necessary
-                # information for one expandable with its input fields
-                part_object = {'position': pos, 'mandatory': node['mandatory'],
-                               'list': node['list'],
-                               'title': node['display_name'],
-                               'desc': node['desc'],
-                               'input_fields': input_fields,
-                               'input_disabled': input_disabled}
+            # creation and filling of dictionary containing all necessary
+            # information for one expandable with its input fields
+            part_object = {'position': pos, 'mandatory': node['mandatory'],
+                           'list': node['list'], 'title': node['display_name'],
+                           'desc': node['desc'], 'input_fields': input_fields,
+                           'input_disabled': input_disabled}
 
         # test if the key takes multiple values and add the property
         # 'list_value' as a place to save those values to via the website
@@ -191,81 +131,19 @@ def parse_empty(node, pos, key_yaml, get_whitelists=True):
     # the key does not contain a dictionary as value
     else:
 
-        # set the input type as defined in the general structure
-        input_type = node['input_type']
-
         # test if whitelists should be included in the object
         if get_whitelists:
 
-            # test if a whitelist is defined for the current key
-            if node['whitelist']:
-
-                # read in whitelist
-                whitelist = utils.get_whitelist(pos.split(':')[-1], {})
-
-                # test if the right keys are present in the whitelist
-                # -> format check
-                if 'whitelist_type' in whitelist and 'whitelist' in whitelist:
-
-                    # set whitelist type and whitelist
-                    whitelist_type = whitelist['whitelist_type']
-                    whitelist = whitelist['whitelist']
-
-                    if whitelist_type == 'depend':
-                        whitelist = None
-                        input_type = 'dependable'
-
-                    # TODO: test if plain_group is already there
-                    elif whitelist_type == 'group':
-                        if isinstance(whitelist, dict):
-                            new_w = []
-                            for key in whitelist:
-                                new_w.append(
-                                    {'title': key,
-                                     'whitelist': whitelist['whitelist'][key]})
-                            input_type = 'group_select'
-                            whitelist = new_w
-                        else:
-                            input_type = 'select'
-                            whitelist_type = 'plain_group'
-
-            # set whitelist to ['True', 'False'] and input type to 'select' if
-            # a value of type boolean is requested
-            elif input_type == 'bool':
-                whitelist = [True, False]
-                input_type = 'select'
-
-            # set whitelist to None if none is defined
-            else:
-                whitelist = None
-
-            # TODO: better solution for department
-            # test if whitelist is longer than 30
-            if whitelist and len(whitelist) > 30 and \
-                    pos.split(':')[-1] != 'department':
-
-                # set whitelist type to multi_autofill if it is a list
-                if node['list']:
-                    input_type = 'multi_autofill'
-
-                # set whitelist type to single_autofill if it is a string
-                else:
-                    input_type = 'single_autofill'
-
-                # set whitelist to None
-                # -> whitelists on the website will be called with
-                # get_single_whitelist function (from whitelist_parsing) and
-                # used with an autocompletion
-                # -> whitelist only gets send to website if the field is
-                # actually entered which saves space and time
-                whitelist = None
+            whitelist, whitelist_type, input_type, headers, \
+            whitelist_keys = whitelist_parsing.parse_whitelist(
+                node, {})
 
         # whitelist should not be included
         else:
 
             # set the whitelist to the name of the key if a whitelist was
             # defined
-            if node['whitelist'] or input_type == 'bool':
+            if node['whitelist'] or node['input_type'] == 'bool':
                 whitelist = pos.split(':')[-1]
 
             # set the whitelist to None if no whitelist was defined

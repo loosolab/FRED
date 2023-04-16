@@ -4,25 +4,45 @@ import copy
 
 def get_single_whitelist(ob):
     """
-    This functions returns a sigle whitelist of type 'plain' for a key that is
+    This functions returns a single whitelist of type 'plain' for a key that is
     specified within a given dictionary. If the organism is specified as well,
     dependent whitelists only contain the values for said organism.
     (-> used for metadata generation and editing) If no organism is given, the
     whitelists of multiple organisms are merged together. (-> used for
     searching)
     :param ob: a dictionary containing the key 'key_name' and optionally the
-    key 'organism'
+               key 'organism'
     :return: either a whitelist or None if no whitelist exists
     """
+
+    # test if an organism was specified
     if 'organism' in ob:
+
+        # save the organism in a dictionary to work like a result dict
         infos = {'organism': ob['organism']}
+
+        # set all_plain to False since dependencies from the organism can be
+        # taken into account
         all_plain = False
+
     else:
+
+        # set an empty dictionary to work like a result dict -> no info was
+        # given
         infos = {}
+
+        # set all_plain to True since dependencies cannot be considered
         all_plain = True
+
+    # read in the whitelist
     whitelist = utils.get_whitelist(ob['key_name'], infos, all_plain)
+
+    # test if the whitelist was found and read in correctly and return the list
+    # of whitelist values
     if whitelist and 'whitelist' in whitelist:
         return whitelist['whitelist']
+
+    # return None if no whitelist was found
     else:
         return None
 
@@ -41,27 +61,23 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     headers: the headers that might occur in the whitelist
     """
     whitelist_type = None
-    is_list = False
     whitelist_keys = None
+
     filled_object = {'organism': copy.deepcopy(organism)}
     organism = organism.split(' ')[0]
-    input_type = list(utils.find_keys(key_yaml, key))
-    if len(input_type) > 0:
-        if input_type[0]['list']:
-            is_list = True
-        if isinstance(input_type[0]['value'], dict) and not \
-                set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
-                <= set(input_type[0]['value'].keys()):
-            if len(input_type[0]['value'].keys()) == 2 and 'value' in \
-                    input_type[0]['value'] and 'unit' in \
-                    input_type[0]['value']:
-                input_type = 'value_unit'
-            elif 'special_case' in input_type[0] and 'merge' in \
-                    input_type[0]['special_case']:
-                input_type = 'select'
+
+    options = list(utils.find_keys(key_yaml, key))
+
+    if len(options) > 0:
+
+        if isinstance(options[0]['value'], dict):
+            if 'special_case' in options[0] and any(['value_unit','merge'] in \
+                    options[0]['special_case']):
+                whitelist, whitelist_type, input_type, headers, \
+                    whitelist_keys = parse_whitelist(options, filled_object)
             else:
                 val = []
-                for k in input_type[0]['value']:
+                for k in options[0]['value']:
                     k_val = {}
                     k_val['whitelist'], k_val['whitelist_type'], \
                         k_val['input_type'], \
@@ -85,62 +101,15 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                 input_type = 'nested'
                 return val, whitelist_type, input_type, headers, whitelist_keys
         else:
-            if input_type[0]['input_type'] == 'bool':
-                input_type = 'bool'
-            else:
-                input_type = input_type[0]['input_type']
+            whitelist, whitelist_type, input_type, headers, whitelist_keys = \
+                parse_whitelist(options, filled_object)
     else:
         input_type = 'short_text'
 
-    if input_type == 'value_unit':
-        whitelist = utils.read_whitelist('unit')
-    elif input_type == 'select':
-        whitelist = utils.read_whitelist(key)
-    elif input_type == 'bool':
-        whitelist = [True, False]
-        input_type = 'select'
-    else:
-        whitelist = None
-
-    if isinstance(whitelist, dict):
-        if 'headers' in whitelist:
-            headers = whitelist['headers']
-        if whitelist['whitelist_type'] == 'group':
-            whitelist = utils.read_grouped_whitelist(whitelist, filled_object)
-            input_type = 'group_select'
-            if 'headers' in whitelist:
-                headers = whitelist['headers']
-            if 'whitelist_keys' in whitelist:
-                whitelist_keys = whitelist['whitelist_keys']
-            if isinstance(whitelist['whitelist'], dict):
-                new_w = []
-                for value in whitelist['whitelist']:
-                    if value not in ['headers', 'whitelist_keys']:
-                        new_w.append({'title': value,
-                                      'whitelist':
-                                          whitelist['whitelist'][value]})
-                whitelist = new_w
-                whitelist_type = 'group'
-            else:
-                whitelist_type = 'plain_group'
-                input_type = 'select'
-        elif whitelist['whitelist_type'] == 'depend':
-            whitelist = utils.read_depend_whitelist(whitelist['whitelist'],
-                                                    organism)
-            whitelist_type = 'depend'
-            if 'headers' in whitelist:
-                headers = whitelist['headers']
-    if isinstance(whitelist, dict) and 'whitelist' in whitelist:
-        whitelist = whitelist['whitelist']
-
-    if whitelist and len(whitelist) > 30:
-        input_type = 'multi_autofill'
-        whitelist = None
-    if is_list:
-        node = list(utils.find_keys(key_yaml, key))[0]
+    if options['list']:
         new_w = [
             {'whitelist': whitelist, 'position': key,
-             'displayName': node['display_name'], 'required': True, 'value': [],
+             'displayName': options['display_name'], 'required': True, 'value': [],
              'input_type': input_type, 'whitelist_type': whitelist_type},
             {'displayName': 'Multi', 'position': 'multi',
              'whitelist': [True, False], 'input_type': 'bool',
@@ -151,6 +120,85 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
         whitelist = new_w
         whitelist_type = 'list_select'
         input_type = 'nested'
+    return whitelist, whitelist_type, input_type, headers, whitelist_keys
+
+
+def parse_whitelist(node, filled_object):
+
+    whitelist = None
+    whitelist_type = None
+    input_type = 'short_text'
+    headers = None
+    whitelist_keys = None
+
+    if ('whitelist' in node and node['whitelist']) or (
+            'special_case' in node and 'merge' in node['special_case']):
+
+        # read in whitelist
+        whitelist = utils.get_whitelist(node['position'].split(':')[-1],
+                                        filled_object)
+
+        # test if the right keys are present in the whitelist
+        # -> format check
+        if 'whitelist_type' in whitelist and 'whitelist' in whitelist:
+
+            # set whitelist type and whitelist
+            whitelist_type = whitelist['whitelist_type']
+            headers = whitelist['headers'] if 'headers' in whitelist else None
+            whitelist_keys = whitelist['whitelist_keys'] if 'whitelist_keys' in \
+                                                            whitelist else None
+            whitelist = whitelist['whitelist']
+
+            # TODO: raus?
+            if whitelist_type == 'depend':
+                whitelist = None
+                input_type = 'dependable'
+
+            # TODO: test if plain_group is already there
+            elif whitelist_type == 'group':
+                if isinstance(whitelist, dict):
+                    new_w = []
+                    for key in whitelist:
+                        new_w.append(
+                            {'title': key,
+                             'whitelist': whitelist['whitelist'][key]})
+                    input_type = 'group_select'
+                    whitelist = new_w
+                else:
+                    input_type = 'select'
+                    whitelist_type = 'plain_group'
+
+            # TODO: better solution for department
+            # test if whitelist is longer than 30
+            if whitelist and len(whitelist) > 30 and \
+                    node['position'].split(':')[-1] != 'department':
+
+                # set whitelist type to multi_autofill if it is a list
+                if node['list']:
+                    input_type = 'multi_autofill'
+
+                # set whitelist type to single_autofill if it is a string
+                else:
+                    input_type = 'single_autofill'
+
+                # set whitelist to None
+                # -> whitelists on the website will be called with
+                # get_single_whitelist function (from whitelist_parsing) and
+                # used with an autocompletion
+                # -> whitelist only gets send to website if the field is
+                # actually entered which saves space and time
+                whitelist = None
+
+    elif 'special_case' in node and 'value_unit' in node['special_case']:
+
+        whitelist = utils.get_whitelist('unit', filled_object)
+        input_type = 'value_unit'
+
+    elif node['input_type'] == 'bool':
+
+        whitelist = ['True', False]
+        input_type = 'select'
+
     return whitelist, whitelist_type, input_type, headers, whitelist_keys
 
 
