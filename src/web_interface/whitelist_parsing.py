@@ -139,7 +139,7 @@ def parse_whitelist(key_name, node, filled_object):
 
         # test if the right keys are present in the whitelist
         # -> format check
-        if 'whitelist_type' in whitelist and 'whitelist' in whitelist:
+        if whitelist is not None and 'whitelist_type' in whitelist and 'whitelist' in whitelist:
 
             # set whitelist type and whitelist
             whitelist_type = whitelist['whitelist_type']
