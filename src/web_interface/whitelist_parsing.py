@@ -73,7 +73,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
         if isinstance(options[0]['value'], dict):
             if 'special_case' in options[0] and ('merge' in options[0]['special_case'] or 'value_unit' in options[0]['special_case']):
                 whitelist, whitelist_type, input_type, headers, \
-                    whitelist_keys = parse_whitelist(key, options, filled_object)
+                    whitelist_keys = parse_whitelist(key, options[0], filled_object)
             else:
                 val = []
                 for k in options[0]['value']:
@@ -101,11 +101,11 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                 return val, whitelist_type, input_type, headers, whitelist_keys
         else:
             whitelist, whitelist_type, input_type, headers, whitelist_keys = \
-                parse_whitelist(key, options, filled_object)
+                parse_whitelist(key, options[0], filled_object)
     else:
         input_type = 'short_text'
 
-    if options['list']:
+    if options[0]['list']:
         new_w = [
             {'whitelist': whitelist, 'position': key,
              'displayName': options['display_name'], 'required': True, 'value': [],
