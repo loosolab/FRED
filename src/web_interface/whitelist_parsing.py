@@ -71,8 +71,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     if len(options) > 0:
 
         if isinstance(options[0]['value'], dict):
-            if 'special_case' in options[0] and any(['value_unit','merge'] in \
-                    options[0]['special_case']):
+            if 'special_case' in options[0] and ('merge' in options[0]['special_case'] or 'value_unit' in options[0]['special_case']):
                 whitelist, whitelist_type, input_type, headers, \
                     whitelist_keys = parse_whitelist(key, options, filled_object)
             else:

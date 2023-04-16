@@ -53,8 +53,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists=True):
 
         # test for special case 'merge' -> it is used when two keys share a
         # whitelist (e.g. gene -> gene_name, ensemble_id)
-        if 'special_case' in node and any(
-                ['merge', 'value_unit'] in node['special_case']):
+        if 'special_case' in node and ('merge' in node['special_case'] or 'value_unit' in node['special_case']):
 
             # test if whitelist should be included in the object
             if get_whitelists:
