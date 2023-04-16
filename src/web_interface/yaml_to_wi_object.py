@@ -77,6 +77,10 @@ def parse_empty(node, pos, key_yaml, get_whitelists=True):
 
                     input_type = 'value_unit'
 
+                else:
+
+                    input_type = 'short_text'
+
             # set input type of field organism to 'organism' -> special case
             if pos.split(':')[-1] == 'organism':
                 input_type = 'organism_name'
@@ -139,6 +143,8 @@ def parse_empty(node, pos, key_yaml, get_whitelists=True):
 
         # whitelist should not be included
         else:
+
+            input_type = node['input_type']
 
             # set the whitelist to the name of the key if a whitelist was
             # defined
