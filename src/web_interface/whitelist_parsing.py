@@ -197,6 +197,9 @@ def parse_whitelist(key_name, node, filled_object):
         whitelist = ['True', False]
         input_type = 'select'
 
+    else:
+        input_type = node['input_type']
+
     return whitelist, whitelist_type, input_type, headers, whitelist_keys
 
 
