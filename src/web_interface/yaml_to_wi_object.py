@@ -61,7 +61,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists=True):
 
                 # read and parse whitelist
                 whitelist, whitelist_type, input_type, headers, \
-                    whitelist_keys = whitelist_parsing.parse_whitelist(
+                    whitelist_keys = whitelist_parsing.parse_whitelist(pos.split(':')[-1],
                         node, {})
 
             else:
@@ -135,7 +135,7 @@ def parse_empty(node, pos, key_yaml, get_whitelists=True):
         if get_whitelists:
 
             whitelist, whitelist_type, input_type, headers, \
-            whitelist_keys = whitelist_parsing.parse_whitelist(
+            whitelist_keys = whitelist_parsing.parse_whitelist(pos.split(':')[-1],
                 node, {})
 
         # whitelist should not be included

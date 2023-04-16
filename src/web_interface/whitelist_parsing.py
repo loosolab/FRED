@@ -74,7 +74,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
             if 'special_case' in options[0] and any(['value_unit','merge'] in \
                     options[0]['special_case']):
                 whitelist, whitelist_type, input_type, headers, \
-                    whitelist_keys = parse_whitelist(options, filled_object)
+                    whitelist_keys = parse_whitelist(key, options, filled_object)
             else:
                 val = []
                 for k in options[0]['value']:
@@ -102,7 +102,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
                 return val, whitelist_type, input_type, headers, whitelist_keys
         else:
             whitelist, whitelist_type, input_type, headers, whitelist_keys = \
-                parse_whitelist(options, filled_object)
+                parse_whitelist(key, options, filled_object)
     else:
         input_type = 'short_text'
 
@@ -123,7 +123,7 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     return whitelist, whitelist_type, input_type, headers, whitelist_keys
 
 
-def parse_whitelist(node, filled_object):
+def parse_whitelist(key_name, node, filled_object):
 
     whitelist = None
     whitelist_type = None
@@ -135,8 +135,7 @@ def parse_whitelist(node, filled_object):
             'special_case' in node and 'merge' in node['special_case']):
 
         # read in whitelist
-        whitelist = utils.get_whitelist(node['position'].split(':')[-1],
-                                        filled_object)
+        whitelist = utils.get_whitelist(key_name, filled_object)
 
         # test if the right keys are present in the whitelist
         # -> format check
@@ -171,7 +170,7 @@ def parse_whitelist(node, filled_object):
             # TODO: better solution for department
             # test if whitelist is longer than 30
             if whitelist and len(whitelist) > 30 and \
-                    node['position'].split(':')[-1] != 'department':
+                    key_name != 'department':
 
                 # set whitelist type to multi_autofill if it is a list
                 if node['list']:
