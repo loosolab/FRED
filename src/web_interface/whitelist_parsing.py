@@ -159,7 +159,7 @@ def parse_whitelist(key_name, node, filled_object):
                     for key in whitelist:
                         new_w.append(
                             {'title': key,
-                             'whitelist': whitelist['whitelist'][key]})
+                             'whitelist': whitelist[key]})
                     input_type = 'group_select'
                     whitelist = new_w
                 else:
