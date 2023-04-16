@@ -56,7 +56,7 @@ def validate_object(wi_object):
     return validation.validate_object(wi_object)
 
 
-def get_summary(wi_object)
+def get_summary(wi_object):
 
     return html_output.get_summary(wi_object)
 
@@ -89,4 +89,3 @@ def find_metadata(path, search_string):
 def edit_wi_object(path, project_id):
 
     return editing.edit_wi_object(path, project_id)
-    
