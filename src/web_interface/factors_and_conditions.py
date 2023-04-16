@@ -17,7 +17,7 @@ def get_factors(organism):
     :return: factor_value: a dictionary containing factors and whitelists
     """
     key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..',
                      'keys.yaml'))
     factor_value = {'factor': utils.read_whitelist('factor')['whitelist']}
     values = {}
@@ -46,7 +46,7 @@ def get_samples(condition, sample, real_val):
     """
     conds = generate.split_cond(condition)
     key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..',
                      'keys.yaml'))
     for i in range(len(sample)):
         if sample[i][
@@ -155,7 +155,7 @@ def get_conditions(factors, organism_name):
     """
     organism = organism_name.split(' ')[0]
     key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..',
                      'keys.yaml'))
     real_val = {}
     for i in range(len(factors)):
@@ -230,7 +230,7 @@ def get_conditions(factors, organism_name):
     condition_object = []
 
     key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..',
                      'keys.yaml'))
     sample = yto.parse_empty(key_yaml['experimental_setting']['value']
                          ['conditions']['value']['biological_replicates']

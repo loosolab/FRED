@@ -18,7 +18,7 @@ def edit_wi_object(path, project_id):
     :return: wi_object: the filled wi object
     """
     meta_yaml = find_metafiles.find_projects(path, project_id, True)
-    keys_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), '..', '..', 'keys.yaml'))
     if len(meta_yaml) > 0:
         for elem in meta_yaml:
@@ -27,7 +27,7 @@ def edit_wi_object(path, project_id):
                     meta_yaml = elem[key]
         if 'path' in meta_yaml:
             meta_yaml.pop('path')
-        empty_object = yto.get_empty_wi_object(keys_yaml)
+        empty_object = yto.get_empty_wi_object(key_yaml)
         wi_object = {}
         for part in empty_object:
             if part == 'all_factors':
@@ -36,11 +36,8 @@ def edit_wi_object(path, project_id):
                 wi_object[part] = fill_wi_object(empty_object[part],
                                                  meta_yaml[part])
     else:
-        wi_object = yto.get_empty_wi_object(keys_yaml)
+        wi_object = yto.get_empty_wi_object(key_yaml)
 
-    key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
-                     'keys.yaml'))
     sample = yto.parse_empty(
         key_yaml['experimental_setting']['value']['conditions']['value']
         ['biological_replicates']['value']['samples'],

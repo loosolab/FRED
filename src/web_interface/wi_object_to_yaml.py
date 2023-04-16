@@ -41,7 +41,7 @@ def parse_part(wi_object, factors, organism, id, nom):
     gn = None
     embl = None
     key_yaml = utils.read_in_yaml(os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), '..',
+        os.path.dirname(os.path.abspath(__file__)), '..', '..',
         'keys.yaml'))
 
     if isinstance(wi_object, dict):
@@ -151,7 +151,7 @@ def parse_list_part(wi_object, factors, organism, id, nom):
                                        f'm{"{:02d}".format(m+1)}')
             val['sample_name'] = sample_name
         elif wi_object[i]['position'].split(':')[-1] == 'experimental_factors':
-            key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+            key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..',
                      'keys.yaml'))
             for r in range(len(factors)):
                 infos = list(utils.find_keys(key_yaml, factors[r]['factor']))
