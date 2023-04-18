@@ -1,38 +1,42 @@
 import src.utils as utils
 import src.web_interface.wi_object_to_yaml as oty
-import copy
-
-#TODO: inline comments
 
 
-def get_summary(wi_object):
+def get_summary(wi_object, key_yaml):
     """
     This function parses the wi object into a yaml structure and then parses
     the yaml to HTML to be output in the web interface. It also returns a list
     of filenames
+    :param key_yaml: the read in general structure
     :param wi_object: the filled wi object
     :return: a dictionary containing the yaml structure as a dictionary and as
              HTML as well as the filenames as a string and in HTML
     """
-    factors = copy.deepcopy(wi_object['all_factors'])
-    new_object = {}
-    for part in ['project', 'experimental_setting', 'technical_details']:
-        new_object[part] = wi_object[part]
-    new_object['all_factors'] = factors
-    yaml_object = oty.parse_object(new_object)
+
+    # parse wi_object to yaml
+    yaml_object = oty.parse_object(wi_object, key_yaml)
+
+    # save the project_id from the yaml file
     if 'project' in yaml_object and 'id' in yaml_object['project']:
         project_id = yaml_object['project']['id']
     else:
         project_id = None
-    filename_nested = list(
-        utils.find_list_key(yaml_object, 'technical_replicates:sample_name'))
+
+    # fetch all filenames from the yaml via a generator -> nested lists
+    filename_nested = list(utils.find_list_key(
+        yaml_object, 'technical_replicates:sample_name'))
+
+    # save filenames in html and string format
     html_filenames, filenames = get_html_filenames(filename_nested)
+
+    # rewrite yaml to html
     html_str = ''
     for elem in yaml_object:
         end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
         html_str = f'{html_str}<h3>{elem}</h3>' \
-                   f'{object_to_html(yaml_object[elem], 0, 0, False)}' \
+                   f'{object_to_html(yaml_object[elem], 0, False)}' \
                    f'<br>{end}'
+
     return {'yaml': yaml_object, 'summary': html_str,
             'file_names': html_filenames, 'file_string': (
                 project_id,
@@ -45,57 +49,111 @@ def get_html_filenames(filename_nest):
     :param filename_nest: a nested list of filenames
     :return:
     html_filenames: the file names in HTML format
-    filenames: the filenames as a string
+    filenames: the filenames as a list of strings
     """
+
+    # define empty list to store filenames in string format
     filenames = []
+
+    # initialize html string
     html_filenames = ''
+
+    # iterate over nested filenames
     for file_list in filename_nest:
+
+        # initialize partial html string
         part_html = ''
+
+        # iterate over single filenames
         for filename in file_list:
+
+            # add the filename to the html and to the list
             part_html = f'{part_html}- {filename}<br>'
             filenames.append(filename)
+
+        # add a break between the filenames and a horizontal line after the
+        # last filename of the list
         end = f'{"<br><hr><br>" if file_list != filename_nest[-1] else "<br>"}'
+
+        # add the converted file list to the html string
         html_filenames = f'{html_filenames}{part_html}{end}'
+
     return html_filenames, filenames
 
 
-def object_to_html(yaml_object, depth, margin, is_list):
+def object_to_html(yaml_object, depth, is_list):
     """
     This function parses the yaml structure into HTML
     :param yaml_object: a dictionary containing the yaml format
     :param depth: the depth of the indentation
-    :param margin: the margin for the indentation
     :param is_list: a boolean to state if a key contains a list
     :return: html_str: the yaml structure in HTML
     """
+
+    # initialize html string
     html_str = ''
+
+    # yaml is a dictionary
     if isinstance(yaml_object, dict):
+
+        # iterate over keys in dictionary
         for key in yaml_object:
+
+            # first key in a list -> bullet point
             if key == list(yaml_object.keys())[0] and is_list:
-                input_text = object_to_html(yaml_object[key],
-                                            depth + 1, margin + 1.5, is_list)
+
+                # convert value of key to html
+                input_text = object_to_html(yaml_object[key], depth + 1,
+                                            is_list)
+
+                # call function get_color to select the color of the key and
+                # add key and html value to html string with a bullet point
                 html_str = f'{html_str}<ul class="list-style-type-circle">' \
                            f'<li><p><font color={get_color(depth)}>{key}' \
                            f'</font>: {input_text}</p></li></ul>'
+
+            # key without bullet point
             else:
-                input_text = object_to_html(yaml_object[key],
-                                            depth + 1, margin + 1.5, is_list)
+
+                # convert value of key to html
+                input_text = object_to_html(yaml_object[key], depth + 1,
+                                            is_list)
+
+                # call function get_color to select the color of the key and
+                # add key and html value to html string
                 html_str = f'{html_str}<ul class="list-style-none"><li><p>' \
                            f'<font color={get_color(depth)}>{key}</font>: ' \
                            f'{input_text}</p></li></ul>'
+
+    # yaml is a list
     elif isinstance(yaml_object, list):
+
+        # iterate over list elements
         for elem in yaml_object:
+
+            # list element is single value
             if not isinstance(elem, list) and not isinstance(elem, dict):
+
+                # add value to html string with a bullet point
                 html_str = f'{html_str}<ul class="list-style-type-circle">' \
                            f'<li><p>{elem}</p></li></ul>'
+
+            # list element is dict or list
             else:
-                html_str = f'{html_str}' \
-                           f'{object_to_html(elem, depth, margin, True)}'
+
+                # call this function on list element and add it to html string
+                html_str = f'{html_str}{object_to_html(elem, depth, True)}'
+
+    # yaml is a single value
     else:
+
+        # add value to html string
         html_str = f'{html_str}{yaml_object}'
+
     return html_str
 
 
+# TODO: new color scheme -> 2 colors as parameter
 def get_color(depth):
     """
     This function returns a color for the key in the HTML format depending on
@@ -103,8 +161,13 @@ def get_color(depth):
     :param depth: the depth of indentation
     :return: color: the color in which the key should be colored
     """
+
+    # color 1 if number of indentations is even
     if depth % 2 == 0:
         color = '26a69a'
+
+    # color 2 if number of indentations is uneven
     else:
         color = '#d95965'
+
     return color

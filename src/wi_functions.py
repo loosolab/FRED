@@ -6,7 +6,6 @@ import src.web_interface.yaml_to_wi_object as yto
 import src.web_interface.git_whitelists as git_whitelists
 import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.factors_and_conditions as fac_cond
-import src.web_interface.wi_object_to_yaml as oty
 import src.web_interface.validation as validation
 import src.web_interface.html_output as html_output
 import src.web_interface.file_io as file_io
@@ -17,8 +16,6 @@ import os
 
 # This script contains all functions for generation of objects for the web
 # interface
-disabled_fields = []
-
 
 def get_empty_wi_object():
 
@@ -46,11 +43,6 @@ def get_conditions(factors, organism_name):
     return fac_cond.get_conditions(factors, organism_name)
 
 
-def parse_object(wi_object):
-
-    return oty.parse_object(wi_object)
-
-
 def validate_object(wi_object):
 
     return validation.validate_object(wi_object)
@@ -58,7 +50,11 @@ def validate_object(wi_object):
 
 def get_summary(wi_object):
 
-    return html_output.get_summary(wi_object)
+    # read in general structure
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), '..', 'keys.yaml'))
+
+    return html_output.get_summary(wi_object, key_yaml)
 
 
 def save_object(dictionary, path, filename):

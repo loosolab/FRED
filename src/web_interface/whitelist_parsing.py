@@ -47,6 +47,7 @@ def get_single_whitelist(ob):
         return None
 
 
+# TODO: redundant?
 def get_whitelist_with_type(key, key_yaml, organism, headers):
     """
     This function reads in a whitelist and returns it together with its type.
@@ -60,44 +61,90 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
     input_type: the type of the expected value
     headers: the headers that might occur in the whitelist
     """
+
+    # initialize whitelist_type and whitelist_keys with None
     whitelist_type = None
     whitelist_keys = None
 
-    filled_object = {'organism': copy.deepcopy(organism)}
+    # define an object containing the organism to be able to parse whitelists
+    # of type 'depend'
+    filled_object = {'organism': organism}
+
+    # TODO: direkt gesplitted übergeben
     organism = organism.split(' ')[0]
 
+    # extract the properties of the key from the general structure
     options = list(utils.find_keys(key_yaml, key))
 
+    # key was found in general structure
     if len(options) > 0:
 
+        # value of key is a dictionary
         if isinstance(options[0]['value'], dict):
-            if 'special_case' in options[0] and ('merge' in options[0]['special_case'] or 'value_unit' in options[0]['special_case']):
+
+            # special case: merge or value unit
+            if 'special_case' in options[0] and (
+                    'merge' in options[0]['special_case'] or 'value_unit' in
+                    options[0]['special_case']):
+
+                # read in and parse whitelist
                 whitelist, whitelist_type, input_type, headers, \
-                    whitelist_keys = parse_whitelist(key, options[0], filled_object)
+                    whitelist_keys = parse_whitelist(key, options[0],
+                                                     filled_object)
+
             else:
+
+                # initialize an empty list to store the dictionaries of the
+                # keys
                 val = []
+
+                # iterate over the keys of the value
                 for k in options[0]['value']:
+
+                    # initialize an empty dictionary to store the properties of
+                    # the key for the wi_object
                     k_val = {}
+
+                    # read in and parse
                     k_val['whitelist'], k_val['whitelist_type'], \
                         k_val['input_type'], \
-                        header, whitelist_keys = get_whitelist_with_type(
+                        header, whitelist_keys = parse_whitelist(
                         k, key_yaml, organism, headers)
+
+                    # set header
                     if header is not None:
                         k_val['headers'] = header
+
+                    # set whitelist keys
                     if whitelist_keys is not None:
                         k_val['whitelist_keys'] = whitelist_keys
+
+                    # extract properties of the key from general structure
                     node = list(utils.find_keys(key_yaml, k))[0]
+
+                    # set key 'unit' for special case value_unit
                     if k_val['input_type'] == 'value_unit':
                         k_val['unit'] = None
+
+                    # set properties
                     k_val['displayName'] = node['display_name']
                     k_val['required'] = node['mandatory']
                     k_val['position'] = k
                     k_val['value'] = []
+
+                    # add dictionary with properties of the key to the list
                     val.append(k_val)
+
+                # add the key 'Multi'
+                # -> used for experimental factors of type list
+                # -> one factor can occur multiple times in one condition
                 val.append({'displayName': 'Multi', 'position': 'multi',
                             'whitelist': [True, False], 'input_type': 'bool',
                             'value': False})
+
+                # set input type to nested
                 input_type = 'nested'
+
                 return val, whitelist_type, input_type, headers, whitelist_keys
         else:
             whitelist, whitelist_type, input_type, headers, whitelist_keys = \
@@ -124,12 +171,14 @@ def get_whitelist_with_type(key, key_yaml, organism, headers):
 
 def parse_whitelist(key_name, node, filled_object):
 
+    # initialize return values
     whitelist = None
     whitelist_type = None
     input_type = 'short_text'
     headers = None
     whitelist_keys = None
 
+    # whitelist is defined or special case merge
     if ('whitelist' in node and node['whitelist']) or (
             'special_case' in node and 'merge' in node['special_case']):
 
@@ -138,9 +187,11 @@ def parse_whitelist(key_name, node, filled_object):
 
         # test if the right keys are present in the whitelist
         # -> format check
-        if whitelist is not None and 'whitelist_type' in whitelist and 'whitelist' in whitelist:
+        if whitelist is not None and 'whitelist_type' in whitelist and \
+                'whitelist' in whitelist:
 
-            # set whitelist type and whitelist
+            # set whitelist type , headers, whitelist_keys, whitelist and
+            # input_type
             whitelist_type = whitelist['whitelist_type']
             headers = whitelist['headers'] if 'headers' in whitelist else None
             whitelist_keys = whitelist['whitelist_keys'] if 'whitelist_keys' in \
@@ -188,19 +239,28 @@ def parse_whitelist(key_name, node, filled_object):
                 # actually entered which saves space and time
                 whitelist = None
 
+    # special case: value unit
     elif 'special_case' in node and 'value_unit' in node['special_case']:
 
+        # read in unit whitelist and set input type to value_unit
         whitelist = utils.get_whitelist('unit', filled_object)
         input_type = 'value_unit'
 
+    # boolean value
     elif node['input_type'] == 'bool':
 
-        whitelist = ['True', False]
+        # set whitelist to True and False and set input type to select
+        whitelist = [True, False]
         input_type = 'select'
 
+    # no whitelist or special case
     else:
+
+        # set input type as defines in general structure
         input_type = node['input_type']
 
+    # TODO: one tier higher / raus
+    # set headers and whitelist keys
     if headers is not None:
         whitelist = {'whitelist': whitelist,
                      'whitelist_type': whitelist_type,
