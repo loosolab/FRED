@@ -140,10 +140,14 @@ def validate(args):
                     elem.pop('warning')
 
         if res:
-            timestamp = time.time()
+            if args.filename is not None:
+                filename = args.filename
+            else:
+                timestamp = time.time()
+                filename = f'validation_report_{str(timestamp).split(".")[0]}'
 
             if 'save report to txt file' in res:
-                txt_filename = f'validation_report_{str(timestamp).split(".")[0]}.txt'
+                txt_filename = f'{filename}.txt'
                 txt_f = open(txt_filename, 'w')
 
             rep = ''
@@ -158,12 +162,12 @@ def validate(args):
                 txt_f.close()
 
             if 'save report to json file' in res:
-                json_filename = f'validation_report_{str(timestamp).split(".")[0]}.json'
+                json_filename = f'{filename}.json'
                 utils.save_as_json(output_report, json_filename)
                 print(f'The report was saved to the file \'{json_filename}\'.')
 
             if 'save report to yaml file' in res:
-                yaml_filename = f'validation_report_{str(timestamp).split(".")[0]}.yaml'
+                yaml_filename = f'{filename}.yaml'
                 utils.save_as_yaml(output_report, yaml_filename)
                 print(f'The report was saved to the file \'{yaml_filename}\'.')
 
@@ -233,6 +237,7 @@ def main():
                                    action='store_true')
     validate_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
     validate_function.add_argument('-o', '--output', default=None, choices=['json', 'txt', 'print', 'yaml'])
+    validate_function.add_argument('-f', '--filename', default=None)
     validate_function.set_defaults(func=validate)
 
     edit_function = subparsers.add_parser('edit', help='')
