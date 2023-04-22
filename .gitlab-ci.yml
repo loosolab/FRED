@@ -4,7 +4,8 @@ variables:
 stages:          # List of stages for jobs, and their order of execution
   - build-page
   - build-container
-  #- test
+  - run-test
+
 docker:
     stage: build-container
     image: docker:latest
@@ -20,15 +21,17 @@ docker:
       - docker build --pull -t "$CI_REGISTRY_IMAGE:latest" .
       - docker push "$CI_REGISTRY_IMAGE:latest"
 
-page:       # This job runs in the build stage, which runs first.
+test:       # Test run
+  stage: run-test
   image: python:3.8-buster
-  stage: build-page
+  before_script:
+  - pip install -r requirements.txt
   script:
-    - mkdir .public
-    - cp -r ./* .public
-    - rm -rf public
-    - mv .public public
-    - mkdocs build --strict --verbose
+    - test/test_key_yaml.py
+
+page:       # This job runs in the build stage, which runs first.
+  stage: build-page
+  image: python:3.8-buster
   before_script:
   - pip install -r requirements.txt
   artifacts:
@@ -36,6 +39,12 @@ page:       # This job runs in the build stage, which runs first.
       - public
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+  - mkdir .public
+  - cp -r ./* .public
+  - rm -rf public
+  - mv .public public
+  - mkdocs build --strict --verbose
 
 
 
