@@ -1,22 +1,29 @@
-stages:
-  - deploy
-  - test
-  - build_prod
-
 variables:
   GIT_SUBMODULE_STRATEGY: normal
 
+stages:          # List of stages for jobs, and their order of execution
+  - build-page
+  #- build-container
+  #- test
 
-pages:
-  stage: deploy
+
+build-page:       # This job runs in the build stage, which runs first.
+  image: python:3.8-buster
+  stage: build-page
   script:
     - mkdir .public
     - cp -r ./* .public
     - rm -rf public
     - mv .public public
     - mkdocs build --strict --verbose
+  before_script:
+  - pip install -r requirements.txt
   artifacts:
     paths:
       - public
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+
+
+
