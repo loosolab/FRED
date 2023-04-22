@@ -432,10 +432,11 @@ def validate_logic(metafile, mode='metadata'):
         samples = list(utils.find_keys(metafile, 'samples'))
         for cond in samples:
             for sample in cond:
-                warning, warn_message = validate_donor_count(sample['pooled'],
-                                                             sample['donor_count'])
-                if warning:
-                    logical_warn.append((f'Sample \'{sample["sample_name"]}\'', warn_message))
+                if isinstance(sample, dict) and 'pooled' in sample and 'donor_count' in sample:
+                    warning, warn_message = validate_donor_count(sample['pooled'],
+                                                                 sample['donor_count'])
+                    if warning:
+                        logical_warn.append((f'Sample \'{sample["sample_name"]}\'', warn_message))
         organisms = list(utils.find_keys(metafile, 'organism_name'))
         runs = list(utils.find_keys(metafile, 'runs'))
         if len(runs) > 0:
@@ -464,14 +465,14 @@ def validate_reference_genome(organisms, reference_genome):
     """
     invalid = False
     message = None
-    ref_genome_whitelist = utils.get_whitelist(
-        'reference_genome', None)['whitelist']
-    if not any([reference_genome in ref_genome_whitelist[organism] for
-                organism in organisms]):
-        invalid = True
-        organisms = [f'\'{organism}\'' for organism in organisms]
-        message = (f'The reference genome \'{reference_genome}\' does not '
-                   f'match the input organism ({", ".join(organisms)}).')
+    ref_genome_whitelist = utils.get_whitelist('reference_genome', None)
+    if ref_genome_whitelist:
+        if not(any(organism in ref_genome_whitelist['whitelist'] for organism in organisms)) or not any([reference_genome in ref_genome_whitelist['whitelist'][organism] for
+                    organism in organisms if organism in ref_genome_whitelist['whitelist']]):
+            invalid = True
+            organisms = [f'\'{organism}\'' for organism in organisms]
+            message = (f'The reference genome \'{reference_genome}\' does not '
+                       f'match the input organism ({", ".join(organisms)}).')
     return invalid, message
 
 
