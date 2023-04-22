@@ -1,0 +1,22 @@
+stages:
+  - deploy
+  - test
+  - build_prod
+
+variables:
+  GIT_SUBMODULE_STRATEGY: normal
+
+
+pages:
+  stage: deploy
+  script:
+    - mkdir .public
+    - cp -r ./* .public
+    - rm -rf public
+    - mv .public public
+    - mkdocs build --strict --verbose
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
