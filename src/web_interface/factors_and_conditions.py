@@ -212,7 +212,9 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 multi = False
 
-                val = {k: v for k, v in val.items() if v is not None}
+                val = {k: v for k, v in val.items() if
+                       not (type(v) in [list, dict] and len(v) == 0)
+                       and v is not None}
 
                 val['ident_key'] = factor_infos[0]['special_case']['group'] if\
                     'special_case' in factor_infos[0] and 'group' in \
@@ -229,6 +231,7 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 factors[i]['values'] = generate.get_combis(
                     val, factors[i]['factor'], multi)
+                print(factors[i]['values'])
 
         for j in range(len(factors[i]['values'])):
             if 'whitelist_keys' in factors[i]:

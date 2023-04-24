@@ -53,7 +53,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
     if isinstance(node['value'], dict):
 
         input_type = None
-        
+
         # special case: merge or value_unit
         if 'special_case' in node and ('merge' in node['special_case'] or
                                        'value_unit' in node['special_case']):
