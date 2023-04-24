@@ -72,8 +72,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
                 input_type = 'short_text'
 
             # set input type of field organism to 'organism' -> special case
-            if pos.split(':')[-1] == 'organism':
-                input_type = 'organism_name'
+            #if pos.split(':')[-1] == 'organism':
+            #    input_type = 'organism_name'
 
             if get_whitelist_object:
 
