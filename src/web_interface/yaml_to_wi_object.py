@@ -61,6 +61,16 @@ def parse_empty(node, pos, key_yaml, filled_object,
                 whitelist_parsing.parse_whitelist(pos.split(':')[-1], node,
                                                   filled_object)
 
+            # set input type depending on case
+            if 'merge' in node['special_case']:
+                input_type = 'select'
+
+            elif 'value_unit' in node['special_case']:
+                input_type = 'value_unit'
+
+            else:
+                input_type = 'short_text'
+
             # set input type of field organism to 'organism' -> special case
             # (used to display button to confirm organism on the website)
             if pos.split(':')[-1] == 'organism':
@@ -95,6 +105,13 @@ def parse_empty(node, pos, key_yaml, filled_object,
                 part_object['headers'] = headers
             if whitelist_keys is not None:
                 part_object['whitelist_keys'] = whitelist_keys
+
+            if input_type == 'single_autofill' or input_type == \
+                    'multi_autofill':
+                part_object['search_info'] = {
+                    'organism': filled_object['organism']
+                    if 'organism' in filled_object else None,
+                    'key_name': part_object['position'].split(':')[-1]}
 
         # no special case -> the value takes a dictionary and should be
         # displayed via an expandable
@@ -170,7 +187,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
         # the correct whitelist via the website
         if input_type == 'single_autofill' or input_type == 'multi_autofill':
             part_object['search_info'] = {
-                'organism': None,
+                'organism': filled_object['organism']
+                if 'organism' in filled_object else None,
                 'key_name': part_object['position'].split(':')[-1]}
 
     return part_object, whitelist_object
