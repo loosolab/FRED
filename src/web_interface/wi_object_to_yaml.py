@@ -318,7 +318,7 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
             organism = short[organism]
 
         # special case: experimental factors
-        elif wi_object[i]['position'].split(':')[-1] == 'experimental_factors':
+        if wi_object[i]['position'].split(':')[-1] == 'experimental_factors':
 
             # iterate over experimental factors
             for r in range(len(factors)):
@@ -402,7 +402,7 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
                 sample_name, nom)
 
         # test if the value is not empty
-        if val is not None or (type(val) in [str, dict] and len(val) > 0):
+        if val is not None or (type(val) in [str, list, dict] and len(val) > 0):
 
             # overwrite the old value with the converted one
             res[wi_object[i]['position'].split(':')[-1]] = val
