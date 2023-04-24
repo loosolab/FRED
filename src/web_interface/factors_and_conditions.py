@@ -262,7 +262,7 @@ def get_conditions(factors, organism_name, key_yaml):
 
     if len(sample) > 0:
         sample, whitelist_object = yto.parse_empty(
-            sample[0], 'samples', key_yaml, {'organism': organism_name},
+            sample[0], 'experimental_setting:conditions:biological_replicates:samples', key_yaml, {'organism': organism_name},
             get_whitelist_object=True)
         sample = sample['input_fields']
 
@@ -298,7 +298,7 @@ def get_samples(condition, sample, real_val, key_yaml):
     conds = generate.split_cond(condition)
 
     for i in range(len(sample)):
-        if sample[i]['position'] == 'samples:sample_name':
+        if sample[i]['position'] == 'experimental_setting:conditions:biological_replicates:samples:sample_name':
             sample_name = generate.get_short_name(condition, {})
             sample[i]['value'] = sample_name \
                 .replace(':', ': ') \
@@ -308,7 +308,7 @@ def get_samples(condition, sample, real_val, key_yaml):
                 .replace('+', ' + ')
             sample[i]['correct_value'] = sample_name
         for c in conds:
-            if sample[i]['position'] == f'samples:{c[0]}':
+            if sample[i]['position'] == f'experimental_setting:conditions:biological_replicates:samples:{c[0]}':
                 info = list(utils.find_keys(key_yaml, c[0]))
                 if len(info)>0 and 'special_case' in info[0] and 'value_unit' in info[0]['special_case']:
                     unit = c[1].lstrip('0123456789')
