@@ -141,16 +141,6 @@ def parse_whitelist(key_name, node, filled_object):
         # set input type as defines in general structure
         input_type = node['input_type']
 
-    # TODO: one tier higher / raus
-    # set headers and whitelist keys
-    #if headers is not None:
-    #    whitelist = {'whitelist': whitelist,
-    #                 'whitelist_type': whitelist_type,
-    #                 'headers': headers}
-    #    whitelist_type = None
-    #    if whitelist_keys is not None:
-    #        whitelist['whitelist_keys'] = whitelist_keys
-
     return whitelist, whitelist_type, input_type, headers, whitelist_keys
 
 

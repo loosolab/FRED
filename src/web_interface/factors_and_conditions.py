@@ -264,6 +264,7 @@ def get_conditions(factors, organism_name, key_yaml):
         sample, whitelist_object = yto.parse_empty(
             sample[0], 'experimental_setting:conditions:biological_replicates:samples', key_yaml, {'organism': organism_name},
             get_whitelist_object=True)
+
         sample = sample['input_fields']
 
         #for item in sample:
