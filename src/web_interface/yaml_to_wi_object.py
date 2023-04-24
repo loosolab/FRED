@@ -61,16 +61,6 @@ def parse_empty(node, pos, key_yaml, filled_object,
                 whitelist_parsing.parse_whitelist(pos.split(':')[-1], node,
                                                   filled_object)
 
-            # set input type depending on case
-            if 'merge' in node['special_case']:
-                input_type = 'select'
-
-            elif 'value_unit' in node['special_case']:
-                input_type = 'value_unit'
-
-            else:
-                input_type = 'short_text'
-
             # set input type of field organism to 'organism' -> special case
             # (used to display button to confirm organism on the website)
             if pos.split(':')[-1] == 'organism':
