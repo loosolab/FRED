@@ -133,7 +133,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
 
         # test if the key takes multiple values and add the property
         # 'list_value' as a place to save those values to via the website
-        if node['list']:
+        if node['list'] or input_type == 'single_autofill':
             part_object['list_value'] = []
 
     # the key does not contain a dictionary as value
