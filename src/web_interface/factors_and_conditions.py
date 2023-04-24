@@ -34,14 +34,14 @@ def get_factors(organism, key_yaml):
             whitelist, whitelist_type, input_type, headers, w_keys = \
                 get_factor_values(factor, node[0], {'organism': organism})
 
+            if input_type == 'single_autofill':
+                input_type = 'multi_autofill'
+
             # save whitelist, input_type and whitelist_type for the values of
             # one factor
             values[factor] = {'whitelist': whitelist,
                               'input_type': input_type,
                               'whitelist_type': whitelist_type}
-
-            if input_type == 'single_autofill':
-                input_type = 'multi_autofill'
 
             # add search_info if input is of type single- or multi-autofill
             if input_type == 'multi_autofill':
@@ -151,14 +151,14 @@ def get_factor_values(key, node, filled_object):
         # values are single values (no dictionaries)
         if not isinstance(node['value'], dict):
 
+            if input_type == 'single_autofill':
+                input_type = 'multi_autofill'
+
             # create a dictionary that contains all properties of the factor
             new_w = {'whitelist': whitelist, 'position': key,
                      'displayName': node['display_name'], 'required': True,
                      'value': [], 'input_type': input_type,
                      'whitelist_type': whitelist_type}
-
-            if input_type == 'single_autofill':
-                input_type = 'multi_autofill'
 
             # add search info if factor is of type single- or multi-autofill
             if input_type == 'multi_autofill':
