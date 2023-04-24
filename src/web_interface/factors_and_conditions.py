@@ -40,8 +40,11 @@ def get_factors(organism, key_yaml):
                               'input_type': input_type,
                               'whitelist_type': whitelist_type}
 
+            if input_type == 'single_autofill':
+                input_type = 'multi_autofill'
+
             # add search_info if input is of type single- or multi-autofill
-            if input_type in ['single_autofill', 'multi_autofill']:
+            if input_type == 'multi_autofill':
                 values[factor]['search_info'] = {'organism': organism,
                                                  'key_name': factor}
 
@@ -119,8 +122,11 @@ def get_factor_values(key, node, filled_object):
             k_val['position'] = k
             k_val['value'] = []
 
+            if k_val['input_type'] == 'single_autofill':
+                k_val['input_type'] = 'multi_autofill'
+
             # add search info if the input is of type single- or multi-autofill
-            if k_val['input_type'] in ['single_autofill', 'multi_autofill']:
+            if k_val['input_type'] == 'multi_autofill':
                 k_val['whitelist'] = None
                 k_val['search_info'] = {'organism': filled_object['organism'],
                                         'key_name': k}
@@ -151,8 +157,11 @@ def get_factor_values(key, node, filled_object):
                      'value': [], 'input_type': input_type,
                      'whitelist_type': whitelist_type}
 
+            if input_type == 'single_autofill':
+                input_type = 'multi_autofill'
+
             # add search info if factor is of type single- or multi-autofill
-            if input_type in ['single_autofill', 'multi_autofill']:
+            if input_type == 'multi_autofill':
                 new_w['whitelist'] = None
                 new_w['search_info'] = {'organism': filled_object['organism'],
                                         'key_name': key}
