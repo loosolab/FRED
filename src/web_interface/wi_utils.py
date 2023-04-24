@@ -72,7 +72,7 @@ def parse_whitelist_keys(whitelist_keys, value, headers, mode='dict'):
 
             # replace the original value with the one split according to the
             # header
-            value = parse_headers(headers, value, mode=mode)
+            value = parse_headers(headers[k], value, mode=mode)
 
             # break since the whitelist key was found in the header
             # -> all other whitelist keys cannot be there too
