@@ -2,40 +2,283 @@ import src.utils as utils
 import src.generate_metafile as generate
 import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.yaml_to_wi_object as yto
-import os
+import src.web_interface.wi_utils as wi_utils
 import copy
-import pytz
-from dateutil import parser
 
 
-def get_factors(organism):
+def get_factors(organism, key_yaml):
     """
-    This function returns all experimental factor with a whitelist of their
+    This function returns all experimental factors with a whitelist of their
     values.
+    :param key_yaml: the read in general structure
     :param organism: the organism that was selected by the user
     :return: factor_value: a dictionary containing factors and whitelists
     """
-    key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..',
-                     'keys.yaml'))
+
+    # initialize dictionary with all factors
     factor_value = {'factor': utils.read_whitelist('factor')['whitelist']}
+
+    # initialize empty dictionary to store values of each factor
     values = {}
+
+    # iterate over factors
     for factor in factor_value['factor']:
-        whitelist, whitelist_type, input_type, headers, w_keys = \
-            whitelist_parsing.get_whitelist_with_type(factor, key_yaml, organism, None)
-        values[factor] = {'whitelist': whitelist, 'input_type': input_type,
-                          'whitelist_type': whitelist_type}
-        if input_type == 'single_autofill' or input_type == 'multi_autofill':
-            values[factor]['search_info'] = {'organism': organism, 'key_name': factor}
-        if headers is not None:
-            values[factor]['headers'] = headers
-        if w_keys is not None:
-            values[factor]['whitelist_keys'] = w_keys
+
+        # get attributes of factor from general structure
+        node = list(utils.find_keys(key_yaml, factor))
+
+        # factor was found in general structure
+        if len(node) > 0:
+
+            # call function 'get_factor_values' to get whitelist information
+            whitelist, whitelist_type, input_type, headers, w_keys = \
+                get_factor_values(factor, node[0], {'organism': organism})
+
+            # save whitelist, input_type and whitelist_type for the values of
+            # one factor
+            values[factor] = {'whitelist': whitelist,
+                              'input_type': input_type,
+                              'whitelist_type': whitelist_type}
+
+            # add search_info if input is of type single- or multi-autofill
+            if input_type in ['single_autofill', 'multi_autofill']:
+                values[factor]['search_info'] = {'organism': organism,
+                                                 'key_name': factor}
+
+            # add header and whitelist keys if they are defined
+            if headers is not None:
+                values[factor]['headers'] = headers
+            if w_keys is not None:
+                values[factor]['whitelist_keys'] = w_keys
+
+    # add the values to the dictionary
     factor_value['values'] = values
+
     return factor_value
 
 
-def get_samples(condition, sample, real_val):
+def get_factor_values(key, node, filled_object):
+    """
+    This function is used to get the whitelists of experimental factors
+    including the whitelist type, input type, headers and whitelist keys
+    :param key: the name of the experimental factor
+    :param node: the part of the general structure containing information of
+                 the factor
+    :param filled_object: a dictionary storing the used organism and used for
+                          parsing of whitelists of type 'depend' (dependent
+                          on organism)
+    :return:
+    whitelist: a list or dictionary of available values for input (type depends
+               on whitelist_type)
+    whitelist_type: the type of the whitelist (e.g. plain, group, ...)
+    input_type: the input type for the input field in the web interface (e.g.
+                short_text, select, single_autofill, ...)
+    headers: the headers of the whitelist (None if no headers are defined)
+    w_keys: the keys of a whitelist of type group that was rewritten to type
+            plain (None if the whitelist is not plain group)
+    """
+
+    # initialize headers, whitelist keys and whitelist type with None
+    headers = None
+    w_keys = None
+    whitelist_type = None
+
+    # value is a dictionary and no special case
+    if isinstance(node['value'], dict) and not (
+            'special_case' in node and ('merge' in node['special_case'] or
+                                        'value_unit' in node['special_case'])):
+
+        # initialize whitelist as empty list
+        whitelist = []
+
+        # iterate over the keys of the value
+        for k in node['value']:
+
+            # initialize an empty dictionary to store the properties of
+            # the key
+            k_val = {}
+
+            # call this function to get the whitelist information for the keys
+            k_val['whitelist'], k_val['whitelist_type'], k_val['input_type'], \
+                header, whitelist_keys = get_factor_values(k, node['value'][k],
+                                                           filled_object)
+
+            # add header and whitelist keys to dictionary if they are defined
+            if header is not None:
+                k_val['headers'] = header
+            if whitelist_keys is not None:
+                k_val['whitelist_keys'] = whitelist_keys
+
+            # add key 'unit' if key is of special case value_unit
+            if k_val['input_type'] == 'value_unit':
+                k_val['unit'] = None
+
+            # add properties from the general structure
+            k_val['displayName'] = node['value'][k]['display_name']
+            k_val['required'] = node['value'][k]['mandatory']
+            k_val['position'] = k
+            k_val['value'] = []
+
+            # add search info if the input is of type single- or multi-autofill
+            if k_val['input_type'] in ['single_autofill', 'multi_autofill']:
+                k_val['whitelist'] = None
+                k_val['search_info'] = {'organism': filled_object['organism'],
+                                        'key_name': k}
+
+            # add dictionary with properties of the key to the whitelist
+            whitelist.append(k_val)
+
+        # set input type to nested
+        input_type = 'nested'
+
+    # value is not a dictionary or special_case: merge or value_unit
+    else:
+
+        # read and parse whitelist
+        whitelist, whitelist_type, input_type, headers, w_keys = \
+            whitelist_parsing.parse_whitelist(key, node,
+                                              filled_object)
+
+    # factor takes a list as value -> can occur multiple times in one condition
+    if node['list']:
+
+        # values are single values (no dictionaries)
+        if not isinstance(node['value'], dict):
+
+            # create a dictionary that contains all properties of the factor
+            new_w = {'whitelist': whitelist, 'position': key,
+                     'displayName': node['display_name'], 'required': True,
+                     'value': [], 'input_type': input_type,
+                     'whitelist_type': whitelist_type}
+
+            # add search info if factor is of type single- or multi-autofill
+            if input_type in ['single_autofill', 'multi_autofill']:
+                new_w['whitelist'] = None
+                new_w['search_info'] = {'organism': filled_object['organism'],
+                                        'key_name': key}
+
+            # set the dictionary with the properties of the factor as one value
+            # of the whitelist
+            # -> moved factor down one level
+            # -> needed in order to add second key 'Multi' (see below)
+            whitelist = [new_w]
+            whitelist_type = 'list_select'
+
+            # set input type to nested
+            input_type = 'nested'
+
+        # add the key 'Multi'
+        # -> used for experimental factors of type list
+        # -> True if one factor can occur multiple times in one condition
+        whitelist.append({'displayName': 'Multi', 'position': 'multi',
+                          'whitelist': [True, False], 'input_type': 'bool',
+                          'value': False})
+
+    return whitelist, whitelist_type, input_type, headers, w_keys
+
+
+def get_conditions(factors, organism_name, key_yaml):
+    """
+    This function creates all combinations of selected experimental factors and
+    their values.
+    :param organism_name: the selected organism
+    :param factors: multiple dictionaries containing the keys 'factor' and
+    'values' with their respective values grouped in a list
+    e.g. [{'factor': 'gender', 'values': ['male', 'female']},
+          {'factor: 'life_stage', 'values': ['child', 'adult']}]
+    :return: a list containing all combinations of conditions
+    """
+
+    real_val = {}
+
+    for i in range(len(factors)):
+
+        factor_infos = list(utils.find_keys(key_yaml, factors[i]['factor']))
+
+        if len(factor_infos) > 0:
+
+            val = factors[i]['values'][0]
+
+            if isinstance(val, dict):
+
+                multi = False
+
+                val = {k: v for k, v in val.items() if v is not None}
+
+                val['ident_key'] = factor_infos[0]['special_case']['group'] if\
+                    'special_case' in factor_infos[0] and 'group' in \
+                    factor_infos[0]['special_case'] else None
+
+                if 'multi' in val:
+
+                    multi = False if val['ident_key'] is None else \
+                            val['multi']
+
+                if all(k in ['multi', factors[i]['factor'], 'ident_key'] for k
+                       in list(val.keys())):
+                    val = val[factors[i]['factor']]
+
+                factors[i]['values'] = generate.get_combis(
+                    val, factors[i]['factor'], multi)
+
+        for j in range(len(factors[i]['values'])):
+            if 'whitelist_keys' in factors[i]:
+
+                full_value = copy.deepcopy(factors[i]['values'][j])
+                headers = factors[i]['headers'] if 'headers' in factors[i] \
+                    else None
+                factors[i]['values'][j] = wi_utils.parse_whitelist_keys(
+                    factors[i]['whitelist_keys'], factors[i]['values'][j],
+                    headers, mode='str')
+
+                if headers is not None:
+                    factors[i]['values'][j] = f'{factors[i]["factor"]}:{"{"}' \
+                                              f'{factors[i]["values"][j]}{"}"}'
+
+                real_val[factors[i]['values'][j]] = full_value
+
+            # TODO: real_val?
+            elif 'headers' in factors[i]:
+
+                str_value = wi_utils.parse_headers(
+                    factors[i]['headers'], factors[i]['values'][j], mode='str')
+                factors[i]['values'][j] = f'{factors[i]["factor"]}:{"{"}' \
+                                          f'{str_value}{"}"}'
+
+    conditions = generate.get_condition_combinations(factors)
+
+    sample = list(utils.find_keys(key_yaml, 'samples'))
+    whitelists = {}
+    condition_object = []
+
+    if len(sample) > 0:
+        sample, whitelist_object = yto.parse_empty(
+            sample[0], 'samples', key_yaml, {'organism': organism_name},
+            get_whitelist_object=True)
+        sample = sample['input_fields']
+
+        #for item in sample:
+        #    item, whitelists = whitelist_parsing.get_whitelist_object(
+        #        item, organism, whitelists)
+
+        for cond in conditions:
+            cond_sample = copy.deepcopy(sample)
+            cond_sample = get_samples(cond, cond_sample, real_val, key_yaml)
+            d = {'correct_value': cond,
+                 'title': cond.replace(':', ': ').replace('|',
+                                                          '| ').replace(
+                     '#', '# ').replace('-', ' - '),
+                 'position': 'experimental_setting:condition',
+                 'list': True, 'mandatory': True, 'list_value': [],
+                 'input_disabled': False, 'desc': '',
+                 'input_fields': copy.deepcopy(cond_sample)}
+            condition_object.append(d)
+
+    return {'conditions': condition_object,
+            'whitelist_object': whitelist_object, 'organism': organism_name}
+
+
+def get_samples(condition, sample, real_val, key_yaml):
     """
     This function created a pre-filled object with the structure of the samples
     to be displayed in the web interface.
@@ -44,9 +287,7 @@ def get_samples(condition, sample, real_val):
     :return: sample: the pre-filled sample
     """
     conds = generate.split_cond(condition)
-    key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..',
-                     'keys.yaml'))
+
     for i in range(len(sample)):
         if sample[i][
             'position'] == 'experimental_setting:conditions:biological_' \
@@ -139,121 +380,3 @@ def get_samples(condition, sample, real_val):
                         sample[i]['value']]
                 sample[i]['input_disabled'] = True
     return sample
-
-
-def get_conditions(factors, organism_name):
-    """
-    This function creates all combinations of selected experimental factors and
-    their values.
-    :param organism_name: the selected organism
-    :param factors: multiple dictionaries containing the keys 'factor' and
-    'values' with their respective values grouped in a list
-    e.g. [{'factor': 'gender', 'values': ['male', 'female']},
-          {'factor: 'life_stage', 'values': ['child', 'adult']}]
-    :return: a list containing all combinations of conditions
-    """
-    organism = organism_name.split(' ')[0]
-    key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..',
-                     'keys.yaml'))
-    real_val = {}
-    for i in range(len(factors)):
-        if len(factors[i]['values']) == 1 and isinstance(
-                factors[i]['values'][0], dict) and not (
-                'value' in factors[i]['values'][0] and 'unit' in
-                factors[i]['values'][0]):
-            empty_key = []
-            for k in factors[i]['values'][0]:
-                if (isinstance(factors[i]['values'][0][k], list) and len(
-                        factors[i]['values'][0][k]) == 0) or \
-                        factors[i]['values'][0][k] is None:
-                    empty_key.append(k)
-            for key in empty_key:
-                factors[i]['values'][0].pop(key)
-            node = list(utils.find_keys(key_yaml, factors[i]['factor']))
-            if len(node) > 0 and 'special_case' in node[0] and 'group' in \
-                    node[0]['special_case']:
-                ident_key = node[0]['special_case']['group']
-            else:
-                ident_key = None
-            factors[i]['values'][0]['ident_key'] = ident_key
-            if 'multi' in factors[i]['values'][0]:
-                factor_info = list(utils.find_keys(
-                    key_yaml, factors[i]['factor']))[0]
-                if factor_info['list'] and isinstance(
-                        factor_info['value'], dict) and not \
-                        set(['mandatory', 'list', 'desc', 'display_name',
-                             'value']) <= set(factor_info['value'].keys()):
-                    if factors[i]['values'][0]['multi'] and ident_key is None:
-                        factors[i]['values'][0]['multi'] = False
-                    factors[i]['values'] = generate.get_combis(
-                        factors[i]['values'][0], factors[i]['factor'],
-                        factors[i]['values'][0]['multi'])
-                else:
-                    factors[i]['values'] = generate.get_combis(
-                        factors[i]['values'][0][factors[i]['factor']],
-                        factors[i]['factor'], factors[i]['values'][0]['multi'])
-        if 'whitelist_keys' in factors[i]:
-            for j in range(len(factors[i]['values'])):
-                for k in factors[i]['whitelist_keys']:
-                    if factors[i]['values'][j].endswith(f' ({k})'):
-                        factors[i]['values'][j] = factors[i]['values'][j].replace(f' ({k})', '')
-                        w_key = k
-                        if 'headers' in factors[i] and w_key in factors[i]['headers']:
-                            headers = factors[i]['headers'][w_key].split(' ')
-                            vals = factors[i]['values'][j].split(' ')
-
-                            # iterate through the headers and save the header and value of the
-                            # same index into a dictionary with header as key
-                            v = f'{factors[i]["factor"]}:{"{"}'
-                            for l in range(len(headers)):
-                                v = f'{v}{"|" if l > 0 else ""}{headers[l]}:"{vals[l]}"'
-                            v = f'{v}{"}"}'
-
-                            # overwrite the input value with the dictionary
-                            real_val[v] = f'{factors[i]["values"][j]} ({w_key})'
-                            factors[i]['values'][j] = v
-                        else:
-                            real_val[factors[i]['values'][j]] = f'{factors[i]["values"][j]} ({w_key})'
-        else:
-            if 'headers' in factors[i]:
-                headers = factors[i]['headers'].split(' ')
-                for j in range(len(factors[i]['values'])):
-                    val = factors[i]['values'][j].split(' ')
-                    v = f'{factors[i]["factor"]}:{"{"}'
-                    for k in range(len(headers)):
-                        v = f'{v}{"|" if k > 0 else ""}{headers[k]}:"{val[k]}"'
-                    v = f'{v}{"}"}'
-                    factors[i]['values'][j] = v
-    conditions = generate.get_condition_combinations(factors)
-    condition_object = []
-
-    key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..',
-                     'keys.yaml'))
-    sample = yto.parse_empty(key_yaml['experimental_setting']['value']
-                         ['conditions']['value']['biological_replicates']
-                         ['value']['samples'],
-                         'experimental_setting:conditions:biological_'
-                         'replicates:samples', key_yaml, False)[
-        'input_fields']
-    whitelists = {}
-    for item in sample:
-        item, whitelists = whitelist_parsing.get_whitelist_object(item, organism,
-                                                whitelists)
-
-    for cond in conditions:
-        cond_sample = copy.deepcopy(sample)
-        cond_sample = get_samples(cond, cond_sample, real_val)
-        d = {'correct_value': cond,
-             'title': cond.replace(':', ': ').replace('|',
-                                                      '| ').replace(
-                 '#', '# ').replace('-', ' - '),
-             'position': 'experimental_setting:condition',
-             'list': True, 'mandatory': True, 'list_value': [],
-             'input_disabled': False, 'desc': '',
-             'input_fields': copy.deepcopy(cond_sample)}
-        condition_object.append(d)
-
-    return {'conditions': condition_object, 'whitelist_object': whitelists,
-            'organism': organism_name}

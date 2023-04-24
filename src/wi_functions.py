@@ -35,12 +35,20 @@ def get_single_whitelist(ob):
 
 def get_factors(organism):
 
-    return fac_cond.get_factors(organism)
+    # read in general structure
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), '..', 'keys.yaml'))
+
+    return fac_cond.get_factors(organism, key_yaml)
 
 
 def get_conditions(factors, organism_name):
 
-    return fac_cond.get_conditions(factors, organism_name)
+    # read in general structure
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), '..', 'keys.yaml'))
+
+    return fac_cond.get_conditions(factors, organism_name, key_yaml)
 
 
 def validate_object(wi_object):

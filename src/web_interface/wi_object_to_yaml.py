@@ -1,4 +1,5 @@
 import src.utils as utils
+import src.web_interface.wi_utils as wi_utils
 import os
 import pytz
 from dateutil import parser
@@ -207,7 +208,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     if 'whitelist_keys' in wi_object:
 
                         # replace value with converted one
-                        convert_value = parse_whitelist_keys(
+                        convert_value = wi_utils.parse_whitelist_keys(
                             wi_object['whitelist_keys'], convert_value,
                             wi_object['headers']
                             if 'headers' in wi_object else None)
@@ -217,7 +218,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
 
                         # replace the original value with the one split
                         # according to the header
-                        convert_value = parse_headers(
+                        convert_value = wi_utils.parse_headers(
                             wi_object['headers'], convert_value)
 
                     # value is of type value_unit
@@ -308,15 +309,11 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
     # iterate over list
     for i in range(len(wi_object)):
 
-        # TODO: change to header
         # special case: organism
         if wi_object[i]['position'].split(':')[-1] == 'organism':
             organism = wi_object[i]['value'].split(' ')[0]
-            val = {'organism_name': wi_object[i]['value'].split(' ')[0],
-                   'taxonomy_id': wi_object[i]['value'].split(' ')[1]}
-
             short = utils.get_whitelist(
-                os.path.join('abbrev', 'organism_name'), val)['whitelist']
+                os.path.join('abbrev', 'organism_name'), organism)['whitelist']
 
             organism = short[organism]
 
@@ -365,7 +362,8 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
                         if 'whitelist_keys' in factors[r]:
 
                             # replace value with converted one
-                            factors[r]['values'][j] = parse_whitelist_keys(
+                            factors[r]['values'][j] = \
+                                wi_utils.parse_whitelist_keys(
                                 factors[r]['whitelist_keys'],
                                 factors[r]['values'][j], factors[r]['headers']
                                 if 'headers' in factors[r] else None)
@@ -375,15 +373,16 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
 
                             # replace the original value with the one split
                             # according to the header
-                            factors[r]['values'][j] = parse_headers(
+                            factors[r]['values'][j] = wi_utils.parse_headers(
                                 factors[r]['headers'], factors[r]['values'][j])
 
                         # factor of type value_unit
                         elif len(infos) > 0 and 'special_case' in infos[0]\
                                 and 'value_unit' in infos[0]['special_case']:
 
-                            factors[r]['values'][j] = split_value_unit(
-                                factors[r]['values'][j])
+                            factors[r]['values'][j] = \
+                                wi_utils.split_value_unit(
+                                    factors[r]['values'][j])
 
                     # remove the keys 'header' and 'whitelist_keys'
                     if 'whitelist_keys' in factors[r]:
@@ -403,82 +402,9 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
                 sample_name, nom)
 
         # test if the value is not empty
-        # noinspection PyTypeChecker
         if val is not None or (type(val) in [str, dict] and len(val) > 0):
 
             # overwrite the old value with the converted one
             res[wi_object[i]['position'].split(':')[-1]] = val
 
     return res if len(res) > 0 else None, organism, sample_name, nom
-
-
-# TODO: move below functions to new script
-def split_value_unit(value_unit):
-    """
-    This function splits a value_unit (e.g. 2weeks) into a value and unit and
-    returns them in a dictionary
-    :param value_unit: a string containing a number and a unit
-    :return: a dictionary containing value and unit
-    """
-
-    # split value and unit
-    unit = value_unit.lstrip('0123456789')
-    value = int(value_unit[:len(value_unit) - len(unit)])
-
-    return {'value': value, 'unit': unit}
-
-
-def parse_headers(headers, value):
-    """
-    This function splits a value into a dictionary depending on the header
-    :param headers: a string containing the header keys divided by space
-    :param value: a string value to be split at space
-    :return: new_val: the dictionary containing header keys and their values
-    """
-
-    # define a dictionary to save the new value to
-    new_val = {}
-
-    # iterate over the keys in the header
-    for key_index in range(len(headers.split(' '))):
-
-        # save the header key at index 'key_index' with the part of the value
-        # at the same index (split at ' ')
-        new_val[headers.split(' ')[key_index]] = value.split(' ')[key_index]
-
-    return new_val
-
-
-def parse_whitelist_keys(whitelist_keys, value, headers):
-    """
-    This function removes the group-key from the end of the value of a plain
-    grouped whitelist and splits the value into a dictionary depending on a
-    given header
-    :param whitelist_keys: a list of keys the whitelist was grouped by
-    :param value: the value that should be converted
-    :param headers: a string of keys the value should be split into
-                    (might be None if no header is specified)
-    :return: value: the converted value (dictionary or string depending on
-                    weather a header was given)
-    """
-
-    # iterate over whitelist keys
-    for k in whitelist_keys:
-
-        # remove the '(<whitelist_key>)' from the end of the value
-        if value.endswith(f' ({k})'):
-            value = value.replace(f' ({k})', '')
-
-        # test if wi object contains headers
-        if headers is not None and k in headers:
-
-            # replace the original value with the one split according to the
-            # header
-            value = parse_headers(headers, value)
-
-            # break since the whitelist key was found in the header
-            # -> all other whitelist keys cannot be there too
-            # -> better performance
-            break
-
-    return value
