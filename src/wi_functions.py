@@ -3,6 +3,7 @@ import sys
 sys.path.append('metadata-organizer')
 import src.utils as utils
 import src.web_interface.yaml_to_wi_object as yto
+import src.web_interface.wi_object_to_yaml as oty
 import src.web_interface.git_whitelists as git_whitelists
 import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.factors_and_conditions as fac_cond
@@ -93,3 +94,13 @@ def find_metadata(path, search_string):
 def edit_wi_object(path, project_id):
 
     return editing.edit_wi_object(path, project_id)
+
+
+# TODO: not needed -> in summary
+def parse_object(wi_object):
+
+    # read in general structure
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), '..', 'keys.yaml'))
+
+    return oty.parse_object(wi_object, key_yaml)
