@@ -67,12 +67,12 @@ def parse_whitelist_keys(whitelist_keys, value, headers, mode='dict'):
         if value.endswith(f' ({k})'):
             value = value.replace(f' ({k})', '')
 
-        # test if wi object contains headers
-        if headers is not None and k in headers:
+            # test if wi object contains headers
+            if headers is not None and k in headers:
 
-            # replace the original value with the one split according to the
-            # header
-            value = parse_headers(headers[k], value, mode=mode)
+                # replace the original value with the one split according to
+                # the header
+                value = parse_headers(headers[k], value, mode=mode)
 
             # break since the whitelist key was found in the header
             # -> all other whitelist keys cannot be there too
