@@ -16,6 +16,11 @@ def split_value_unit(value_unit):
 def parse_headers(headers, value, mode='dict'):
     """
     This function splits a value into a dictionary depending on the header
+    :param mode: a string defining the type the split value should be returned
+                 as, default is 'dict'
+                 -> dict: returns the split value in a dictionary
+                 -> str: returns the split value as a string
+                         ('<key1>:<value1>|<keys2>:<value2>')
     :param headers: a string containing the header keys divided by space
     :param value: a string value to be split at space
     :return: new_val: the dictionary containing header keys and their values
@@ -52,6 +57,11 @@ def parse_whitelist_keys(whitelist_keys, value, headers, mode='dict'):
     This function removes the group-key from the end of the value of a plain
     grouped whitelist and splits the value into a dictionary depending on a
     given header
+    :param mode: a string defining the type the value split according to the
+                 headers should be returned as, default is 'dict'
+                 -> dict: returns the split value in a dictionary
+                 -> str: returns the split value as a string
+                         ('<key1>:<value1>|<keys2>:<value2>')
     :param whitelist_keys: a list of keys the whitelist was grouped by
     :param value: the value that should be converted
     :param headers: a string of keys the value should be split into

@@ -34,6 +34,8 @@ def get_factors(organism, key_yaml):
             whitelist, whitelist_type, input_type, headers, w_keys = \
                 get_factor_values(factor, node[0], {'organism': organism})
 
+            # change single_autofill to multi_autofill because all factors can
+            # have multiple values
             if input_type == 'single_autofill':
                 input_type = 'multi_autofill'
 
@@ -122,6 +124,8 @@ def get_factor_values(key, node, filled_object):
             k_val['position'] = k
             k_val['value'] = []
 
+            # change single_autofill to multi_autofill because all factors can
+            # have multiple values
             if k_val['input_type'] == 'single_autofill':
                 k_val['input_type'] = 'multi_autofill'
 
@@ -151,6 +155,8 @@ def get_factor_values(key, node, filled_object):
         # values are single values (no dictionaries)
         if not isinstance(node['value'], dict):
 
+            # change single_autofill to multi_autofill because all factors can
+            # have multiple values
             if input_type == 'single_autofill':
                 input_type = 'multi_autofill'
 
@@ -265,14 +271,11 @@ def get_conditions(factors, organism_name, key_yaml):
 
     if len(sample) > 0:
         sample, whitelist_object = yto.parse_empty(
-            sample[0], 'experimental_setting:conditions:biological_replicates:samples', key_yaml, {'organism': organism_name},
-            get_whitelist_object=True)
+            sample[0],
+            'experimental_setting:conditions:biological_replicates:samples',
+            key_yaml, {'organism': organism_name}, get_whitelist_object=True)
 
         sample = sample['input_fields']
-
-        #for item in sample:
-        #    item, whitelists = whitelist_parsing.get_whitelist_object(
-        #        item, organism, whitelists)
 
         for cond in conditions:
             cond_sample = copy.deepcopy(sample)
@@ -302,23 +305,38 @@ def get_samples(condition, sample, real_val, key_yaml):
     conds = generate.split_cond(condition)
 
     for i in range(len(sample)):
-        if sample[i]['position'] == 'experimental_setting:conditions:biological_replicates:samples:sample_name':
+        if sample[i]['position'] == 'experimental_setting:conditions:' \
+                                    'biological_replicates:samples:' \
+                                    'sample_name':
+
             sample_name = generate.get_short_name(condition, {})
+
+            # TODO: improve display
+            # add whitespaces to sample name to enable line breaks on the
+            # website
             sample[i]['value'] = sample_name \
                 .replace(':', ': ') \
                 .replace('|', '| ') \
                 .replace('#', '# ') \
                 .replace('-', ' - ') \
                 .replace('+', ' + ')
+
+            # save the unchanged sample name as 'correct_value'
             sample[i]['correct_value'] = sample_name
+
         for c in conds:
-            if sample[i]['position'] == f'experimental_setting:conditions:biological_replicates:samples:{c[0]}':
+            if sample[i]['position'] == f'experimental_setting:conditions:' \
+                                        f'biological_replicates:samples:' \
+                                        f'{c[0]}':
+
                 info = list(utils.find_keys(key_yaml, c[0]))
-                if len(info)>0 and 'special_case' in info[0] and 'value_unit' in info[0]['special_case']:
-                    unit = c[1].lstrip('0123456789')
-                    value = c[1][:len(c[1]) - len(unit)]
-                    sample[i]['value'] = int(value)
-                    sample[i]['value_unit'] = unit
+                if len(info) > 0 and 'special_case' in info[0] and \
+                        'value_unit' in info[0]['special_case']:
+
+                    value_unit = wi_utils.split_value_unit(c[1])
+                    sample[i]['value'] = value_unit['value']
+                    sample[i]['value_unit'] = value_unit['unit']
+
                 elif isinstance(c[1], dict):
                     val = f'{c[0]}:{"{"}'
                     for l in range(len(list(c[1].keys()))):

@@ -144,6 +144,7 @@ def parse_whitelist(key_name, node, filled_object):
     return whitelist, whitelist_type, input_type, headers, whitelist_keys
 
 
+# TODO: raus
 def get_whitelist_object(item, organism_name, whitelists):
     """
     This function creates a whitelist object containing the whitelists of all
