@@ -239,19 +239,18 @@ def get_conditions(factors, organism_name, key_yaml):
                     val, factors[i]['factor'], multi)
 
         for j in range(len(factors[i]['values'])):
+            print(factors[i]['values'][j])
             if 'whitelist_keys' in factors[i]:
-
                 full_value = copy.deepcopy(factors[i]['values'][j])
                 headers = factors[i]['headers'] if 'headers' in factors[i] \
                     else None
                 factors[i]['values'][j] = wi_utils.parse_whitelist_keys(
                     factors[i]['whitelist_keys'], factors[i]['values'][j],
                     headers, mode='str')
-
-                if headers is not None:
+                if headers is not None and full_value.split('(')[-1].replace(
+                        ')', '') in headers:
                     factors[i]['values'][j] = f'{factors[i]["factor"]}:{"{"}' \
                                               f'{factors[i]["values"][j]}{"}"}'
-
                 real_val[factors[i]['values'][j]] = full_value
 
             # TODO: real_val?
@@ -262,7 +261,6 @@ def get_conditions(factors, organism_name, key_yaml):
                     factors[i]['headers'], factors[i]['values'][j], mode='str')
                 factors[i]['values'][j] = f'{factors[i]["factor"]}:{"{"}' \
                                           f'{str_value}{"}"}'
-                print(factors[i]['values'][j])
                 real_val[factors[i]['values'][j]] = full_value
 
     conditions = generate.get_condition_combinations(factors)
@@ -355,10 +353,9 @@ def fill_sample(conds, sample, real_val, key_yaml, sample_name):
                             val = "|".join(
                                 [f'{key}:"{c[1][key]}"' for key in c[1]])
                             val = f'{c[0]}:{"{"}{val}{"}"}'
-
+                            print(real_val)
                             # headers and whitelist_keys
                             if val in real_val:
-
                                 filled_sample = real_val[val]
 
                             # disease
@@ -371,7 +368,7 @@ def fill_sample(conds, sample, real_val, key_yaml, sample_name):
                                         info, key_yaml, sample_name)
 
                                 else:
-                                    print(c[1])
+                                    print('HIER')
                                     val = ""
                                     for key in c[1]:
                                         val = f'{val}{" " if val != "" else ""}{c[1][key]}'
@@ -403,4 +400,4 @@ def fill_sample(conds, sample, real_val, key_yaml, sample_name):
                                 else [sample[i]['value']]
 
                         sample[i]['input_disabled'] = True
-                        return sample
+    return sample
