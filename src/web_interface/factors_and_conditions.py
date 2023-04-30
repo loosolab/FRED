@@ -237,7 +237,6 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 factors[i]['values'] = generate.get_combis(
                     val, factors[i]['factor'], multi)
-                print(factors[i]['values'])
 
         for j in range(len(factors[i]['values'])):
             if 'whitelist_keys' in factors[i]:
@@ -258,16 +257,19 @@ def get_conditions(factors, organism_name, key_yaml):
             # TODO: real_val?
             elif 'headers' in factors[i]:
 
+                full_value = copy.deepcopy(factors[i]['values'][j])
                 str_value = wi_utils.parse_headers(
                     factors[i]['headers'], factors[i]['values'][j], mode='str')
                 factors[i]['values'][j] = f'{factors[i]["factor"]}:{"{"}' \
                                           f'{str_value}{"}"}'
+                print(factors[i]['values'][j])
+                real_val[factors[i]['values'][j]] = full_value
 
     conditions = generate.get_condition_combinations(factors)
 
     sample = list(utils.find_keys(key_yaml, 'samples'))
-    whitelists = {}
     condition_object = []
+    whitelist_object = {}
 
     if len(sample) > 0:
         sample, whitelist_object = yto.parse_empty(
@@ -302,14 +304,21 @@ def get_samples(condition, sample, real_val, key_yaml):
     :param sample: the empty structure of the sample
     :return: sample: the pre-filled sample
     """
+    sample_name = generate.get_short_name(condition, {})
     conds = generate.split_cond(condition)
+    sample = fill_sample(conds, sample, real_val, key_yaml, sample_name)
 
+    return sample
+
+
+def fill_sample(conds, sample, real_val, key_yaml, sample_name):
+
+    factors = [cond[0] for cond in conds]
+
+    # iterate over samples
     for i in range(len(sample)):
-        if sample[i]['position'] == 'experimental_setting:conditions:' \
-                                    'biological_replicates:samples:' \
-                                    'sample_name':
 
-            sample_name = generate.get_short_name(condition, {})
+        if sample[i]['position'].endswith('samples:sample_name'):
 
             # TODO: improve display
             # add whitespaces to sample name to enable line breaks on the
@@ -324,86 +333,67 @@ def get_samples(condition, sample, real_val, key_yaml):
             # save the unchanged sample name as 'correct_value'
             sample[i]['correct_value'] = sample_name
 
-        for c in conds:
-            if sample[i]['position'] == f'experimental_setting:conditions:' \
-                                        f'biological_replicates:samples:' \
-                                        f'{c[0]}':
+        elif sample[i]['position'].split(':')[-1] in factors:
 
-                info = list(utils.find_keys(key_yaml, c[0]))
-                if len(info) > 0 and 'special_case' in info[0] and \
-                        'value_unit' in info[0]['special_case']:
+            for c in conds:
 
-                    value_unit = wi_utils.split_value_unit(c[1])
-                    sample[i]['value'] = value_unit['value']
-                    sample[i]['value_unit'] = value_unit['unit']
+                if sample[i]['position'].split(':')[-1] == c[0]:
 
-                elif isinstance(c[1], dict):
-                    val = f'{c[0]}:{"{"}'
-                    for l in range(len(list(c[1].keys()))):
-                        val = f'{val}{"|" if l > 0 else ""}{list(c[1].keys())[l]}:"{c[1][list(c[1].keys())[l]]}"'
-                    val = f'{val}{"}"}'
-                    if val in real_val:
-                        sample[i]['value'] = real_val[val]
-                    else:
-                        if sample[i]['list']:
-                            filled_sample = copy.deepcopy(sample[i]
-                                                          ['input_fields'])
-                            for j in range(len(filled_sample)):
-                                for x in c[1]:
-                                    if filled_sample[
-                                        j]['position'].split(':')[-1] == x:
-                                        sub_info = list(utils.find_keys(key_yaml, x))
-                                        if len(sub_info)>0 and 'special_case' in sub_info[0] and 'value_unit' in sub_info[0]['special_case']:
-                                            unit = c[1][x].lstrip('0123456789')
-                                            value = c[1][x][:len(c[1][x]) -
-                                                             len(unit)]
-                                            filled_sample[j]['value'] = \
-                                                int(value)
-                                            filled_sample[j]['value_unit'] = \
-                                                unit
-                                        else:
-                                            filled_sample[j]['value'] = c[1][x]
-                                        filled_sample[j]['input_disabled'] = \
-                                            True
-                            sample[i]['list_value'].append(filled_sample)
-                        else:
-                            if 'input_fields' in sample[i]:
-                                for j in range(len(sample[i]['input_fields'])):
-                                    for x in c[1]:
-                                        if sample[i]['input_fields'][j][
-                                            'position'].split(':')[-1] == x:
-                                            sub_info = utils.find_keys(
-                                                key_yaml, x)
-                                            if len(sub_info) > 0 and 'special_case' in sub_info[0] and 'value_unit' in sub_info[0]['special_case']:
-                                                unit = c[1][x].lstrip(
-                                                    '0123456789')
-                                                value = c[1][x][
-                                                        :len(c[1][x]) - len(
-                                                            unit)]
-                                                sample[i]['input_fields'][j][
-                                                    'value'] = int(value)
-                                                sample[i]['input_fields'][j][
-                                                    'value_unit'] = unit
-                                            else:
-                                                sample[i]['input_fields'][j][
-                                                    'value'] = c[1][x]
+                    info = list(utils.find_keys(key_yaml, c[0]))
+
+                    if len(info) > 0:
+
+                        if 'special_case' in info[0] and 'value_unit' \
+                                in info[0]['special_case']:
+
+                            value_unit = wi_utils.split_value_unit(c[1])
+                            sample[i]['value'] = value_unit['value']
+                            sample[i]['value_unit'] = value_unit['unit']
+
+                        elif isinstance(c[1], dict):
+
+                            val = "|".join(
+                                [f'{key}:"{c[1][key]}"' for key in c[1]])
+                            val = f'{c[0]}:{"{"}{val}{"}"}'
+
+                            # headers and whitelist_keys
+                            if val in real_val:
+
+                                filled_sample = real_val[val]
+
+                            # disease
                             else:
-                                val = ""
-                                for key in c[1]:
-                                    val = f'{val}{" " if val != "" else ""}{c[1][key]}'
-                                sample[i]['value'] = val
-                else:
-                    if sample[i]['list']:
-                        sample[i]['list_value'].append(c[1])
-                        sample[i]['input_disabled'] = True
-                    else:
-                        if c[1] in real_val:
-                            sample[i]['value'] = real_val[c[1]]
+
+                                filled_sample = fill_sample(
+                                    [(x, c[1][x]) for x in c[1]],
+                                    copy.deepcopy(sample[i]['input_fields']),
+                                    info, key_yaml, sample_name)
+
+                            if sample[i]['list']:
+                                sample[i]['list_value'].append(filled_sample)
+
+                            else:
+                                sample[i]['input_fields'] = filled_sample
+
                         else:
-                            sample[i]['value'] = c[1]
-                if 'input_type' in sample[i] and sample[i]['input_type'] == 'single_autofill':
-                    sample[i]['list_value'] = [] if sample[i][
-                                                        'value'] is None else [
-                        sample[i]['value']]
-                sample[i]['input_disabled'] = True
+                            if c[1] in real_val:
+                                filled_sample = real_val[c[1]]
+                            else:
+                                filled_sample = c[1]
+
+                            if sample[i]['list']:
+                                sample[i]['list_value'].append(filled_sample)
+
+                            else:
+                                sample[i]['value'] = filled_sample
+
+                        if 'input_type' in sample[i] and \
+                                sample[i]['input_type'] == 'single_autofill':
+
+                            sample[i]['list_value'] = [] if \
+                                sample[i]['value'] is None \
+                                else [sample[i]['value']]
+
+                        sample[i]['input_disabled'] = True
+
     return sample
