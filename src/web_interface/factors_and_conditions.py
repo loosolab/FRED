@@ -363,11 +363,19 @@ def fill_sample(conds, sample, real_val, key_yaml, sample_name):
 
                             # disease
                             else:
+                                if 'input_fields' in sample[i]:
+                                    filled_sample = fill_sample(
+                                        [(x, c[1][x]) for x in c[1]],
+                                        copy.deepcopy(
+                                            sample[i]['input_fields']),
+                                        info, key_yaml, sample_name)
 
-                                filled_sample = fill_sample(
-                                    [(x, c[1][x]) for x in c[1]],
-                                    copy.deepcopy(sample[i]['input_fields']),
-                                    info, key_yaml, sample_name)
+                                else:
+                                    print(c[1])
+                                    val = ""
+                                    for key in c[1]:
+                                        val = f'{val}{" " if val != "" else ""}{c[1][key]}'
+                                    filled_sample = val
 
                             if sample[i]['list']:
                                 sample[i]['list_value'].append(filled_sample)
@@ -395,5 +403,4 @@ def fill_sample(conds, sample, real_val, key_yaml, sample_name):
                                 else [sample[i]['value']]
 
                         sample[i]['input_disabled'] = True
-
-    return sample
+                        return sample
