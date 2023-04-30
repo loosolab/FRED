@@ -353,7 +353,7 @@ def fill_sample(conds, sample, real_val, key_yaml, sample_name):
                             val = "|".join(
                                 [f'{key}:"{c[1][key]}"' for key in c[1]])
                             val = f'{c[0]}:{"{"}{val}{"}"}'
-                            print(real_val)
+
                             # headers and whitelist_keys
                             if val in real_val:
                                 filled_sample = real_val[val]
