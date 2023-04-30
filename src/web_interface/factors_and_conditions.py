@@ -239,7 +239,7 @@ def get_conditions(factors, organism_name, key_yaml):
                     val, factors[i]['factor'], multi)
 
         for j in range(len(factors[i]['values'])):
-            print(factors[i]['values'][j])
+
             if 'whitelist_keys' in factors[i]:
                 full_value = copy.deepcopy(factors[i]['values'][j])
                 headers = factors[i]['headers'] if 'headers' in factors[i] \
@@ -253,7 +253,6 @@ def get_conditions(factors, organism_name, key_yaml):
                                               f'{factors[i]["values"][j]}{"}"}'
                 real_val[factors[i]['values'][j]] = full_value
 
-            # TODO: real_val?
             elif 'headers' in factors[i]:
 
                 full_value = copy.deepcopy(factors[i]['values'][j])
@@ -360,25 +359,20 @@ def fill_sample(conds, sample, real_val, key_yaml, sample_name):
 
                             # disease
                             else:
-                                if 'input_fields' in sample[i]:
-                                    filled_sample = fill_sample(
-                                        [(x, c[1][x]) for x in c[1]],
-                                        copy.deepcopy(
-                                            sample[i]['input_fields']),
-                                        info, key_yaml, sample_name)
 
-                                else:
-                                    print('HIER')
-                                    val = ""
-                                    for key in c[1]:
-                                        val = f'{val}{" " if val != "" else ""}{c[1][key]}'
-                                    filled_sample = val
+                                filled_sample = fill_sample(
+                                    [(x, c[1][x]) for x in c[1]],
+                                    copy.deepcopy(sample[i]['input_fields']),
+                                    info, key_yaml, sample_name)
 
                             if sample[i]['list']:
                                 sample[i]['list_value'].append(filled_sample)
 
-                            else:
+                            elif 'input_fields' in sample[i]:
                                 sample[i]['input_fields'] = filled_sample
+
+                            else:
+                                sample[i]['value'] = filled_sample
 
                         else:
                             if c[1] in real_val:
