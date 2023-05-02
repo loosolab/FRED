@@ -8,6 +8,8 @@ stages:          # List of stages for jobs, and their order of execution
 
 docker:
     stage: build-container
+    only:
+      - main
     image: docker:latest
     services:
         - name: docker:dind
