@@ -1,5 +1,4 @@
 import src.utils as utils
-import copy
 
 
 def get_single_whitelist(ob):

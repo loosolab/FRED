@@ -9,17 +9,16 @@ import pytz
 from dateutil import parser
 
 
-def edit_wi_object(path, project_id):
+def edit_wi_object(path, project_id, key_yaml):
     """
     This function fills an empty wi object with the information of a metadata
     file.
     :param path: the path containing the metadata file
-    :param project_id: the id of the project
+    :param project_id: the id of the  project
     :return: wi_object: the filled wi object
     """
     meta_yaml = find_metafiles.find_projects(path, project_id, True)
-    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
-        os.path.abspath(__file__)), '..', '..', 'keys.yaml'))
+
     if len(meta_yaml) > 0:
         for elem in meta_yaml:
             for key in elem:
@@ -38,7 +37,7 @@ def edit_wi_object(path, project_id):
     else:
         wi_object = yto.get_empty_wi_object(key_yaml)
 
-    sample = yto.parse_empty(
+    sample, whitelist_object = yto.parse_empty(
         key_yaml['experimental_setting']['value']['conditions']['value']
         ['biological_replicates']['value']['samples'],
         'experimental_setting:conditions:biological_'
