@@ -451,6 +451,8 @@ def validate_logic(metafile, mode='metadata'):
             if 'public' in metafile['tags']['organization']:
                 if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:
                     logical_warn.append(('tags:pubmedid', 'The pubmed ID is missing for this public project'))
+        if 'project' in metafile and 'id' in metafile['project'] and metafile['project']['id'] is not None and metafile['project']['id'] != metafile['project']['id'].lower():
+            logical_warn.append(('project:id', 'The ID should be lowercase'))
     return logical_warn
 
 
