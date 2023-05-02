@@ -343,6 +343,14 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
+                cellular_compartment:
+                  mandatory: False
+                  list: True
+                  display_name: 'Fraction'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 gene:
                   mandatory: False
                   list: False
