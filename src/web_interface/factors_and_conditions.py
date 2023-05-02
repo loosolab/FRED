@@ -224,7 +224,7 @@ def get_conditions(factors, organism_name, key_yaml):
 
         # sanity check -> factor was found in general structure and
         # list of values contains only one element
-        if len(factor_infos) > 0 and len(factors[i]['values'] == 1):
+        if len(factor_infos) > 0 and len(factors[i]['values']) == 1:
 
             # set val to the values specified for the factor
             val = factors[i]['values'][0]
