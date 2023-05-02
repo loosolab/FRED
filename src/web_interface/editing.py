@@ -8,6 +8,8 @@ import copy
 import pytz
 from dateutil import parser
 
+disabled_fields = []
+
 
 def edit_wi_object(path, project_id, key_yaml):
     """
@@ -41,8 +43,8 @@ def edit_wi_object(path, project_id, key_yaml):
         key_yaml['experimental_setting']['value']['conditions']['value']
         ['biological_replicates']['value']['samples'],
         'experimental_setting:conditions:biological_'
-        'replicates:samples', key_yaml, False)[
-        'input_fields']
+        'replicates:samples', key_yaml, {})
+    sample = sample['input_fields']
     whitelist_object = {}
     for experimental_setting in wi_object['experimental_setting'][
             'list_value']:
