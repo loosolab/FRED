@@ -357,7 +357,8 @@ def get_conditions(factors, organism_name, key_yaml):
             # call functions to fill the samples with the values from the
             # condition
             filled_sample = get_samples(split_condition, copy.deepcopy(sample),
-                                        real_val, key_yaml, sample_name)
+                                        real_val, key_yaml, sample_name,
+                                        organism_name)
 
             # TODO: improve display
             # save the condition as a dictionary with the filled sample as
@@ -378,7 +379,8 @@ def get_conditions(factors, organism_name, key_yaml):
             'whitelist_object': whitelist_object, 'organism': organism_name}
 
 
-def get_samples(split_condition, sample, real_val, key_yaml, sample_name):
+def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
+                organism_name, is_factor=True):
     """
     This function created a pre-filled object with the structure of the samples
     to be displayed in the web interface
@@ -411,7 +413,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name):
                 .replace('+', ' + ')
 
             # save the unchanged sample name as 'correct_value'
-            sample[i]['correct_value'] = sample_name
+            sample[i]['correct_value'] = sample_name.split('_')[0]
 
         # input field is a factor
         elif sample[i]['position'].split(':')[-1] in factors:
@@ -456,12 +458,42 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name):
                             # value is not in real_val
                             else:
 
-                                # call this function on the keys of the value
-                                # in order to fill them
-                                filled_value = get_samples(
-                                    [(x, c[1][x]) for x in c[1]],
-                                    copy.deepcopy(sample[i]['input_fields']),
-                                    info, key_yaml, sample_name)
+                                if 'input_fields' in sample[i]:
+                                    # call this function on the keys of the
+                                    # value in order to fill them
+                                    filled_value = get_samples(
+                                        [(x, c[1][x]) for x in c[1] if not (c[1] == 'technical_replicates' and x == 'sample_name')],
+                                        copy.deepcopy(
+                                            sample[i]['input_fields']),
+                                        info, key_yaml, sample_name,
+                                        organism_name, is_factor=is_factor)
+                                # TODO: als real_val?
+                                elif 'headers' in sample[i]:
+                                    headers = [x for x in c[1]]
+                                    w_key = None
+                                    if isinstance(sample[i]['headers'], dict):
+                                        for k in sample[i]['headers']:
+                                            if sorted(sample[i]['headers'][k].split(' ')) == sorted(headers):
+                                                w_key = k
+                                                break
+                                    else:
+                                        if sorted(headers) != sorted(sample[i]['headers'].split(' ')):
+                                            headers = None
+
+                                    if headers is not None:
+                                        filled_value = ''
+                                        for header in headers:
+                                            filled_value = filled_value + ' ' + \
+                                                           c[1][header]
+                                        filled_value = filled_value.lstrip(
+                                            ' ').rstrip(' ')
+                                    else:
+                                        filled_value = None
+
+                                    if filled_value is not None and w_key is not None and sample[i]['input_type'] == 'plain_group':
+                                        filled_value = f'{filled_value} ({w_key})'
+                                else:
+                                    filled_value = None
 
                             # save the filled value in 'list_value' if the
                             # input field takes a list
@@ -470,7 +502,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name):
 
                             # save the filled value in 'input_fields' if the
                             # input field takes a dictionary
-                            elif 'input_fields' in sample[i]:
+                            elif 'input_fields' in sample:
                                 sample[i]['input_fields'] = filled_value
 
                             # save the filled value in 'value'
@@ -501,7 +533,6 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name):
                         # input field is of type single_autofill
                         if 'input_type' in sample[i] and \
                                 sample[i]['input_type'] == 'single_autofill':
-
                             # initialize the key 'list_value' and move the
                             # value under the key 'value' to the key
                             # 'list_value'
@@ -509,7 +540,9 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name):
                                 sample[i]['value'] is None \
                                 else [sample[i]['value']]
 
-                        # disable the input for the filled input field
-                        sample[i]['input_disabled'] = True
+            if is_factor:
+                # disable the input for the filled input field
+                sample[i]['input_disabled'] = True
 
     return sample
+
