@@ -361,11 +361,12 @@ def get_conditions(factors, organism_name, key_yaml):
                                         real_val, key_yaml, sample_name,
                                         organism_name)
 
-            # TODO: improve display
+            title, readd = get_condition_title(split_condition)
             # save the condition as a dictionary with the filled sample as
             # input fields
             d = {'correct_value': cond,
-                 'title': get_condition_title(split_condition),
+                 'title': title,
+                 'readd': readd,
                  'position': 'experimental_setting:condition',
                  'list': True, 'mandatory': True, 'list_value': [],
                  'input_disabled': False, 'desc': '',
@@ -380,11 +381,13 @@ def get_conditions(factors, organism_name, key_yaml):
 
 def get_condition_title(split_condition):
     html = '<table class="table_style_condition_title"><tbody>'
+    readd = ''
     for i in range(len(split_condition)):
-        if len(split_condition) > 1 and i < len(split_condition) -1:
+        if len(split_condition) > 1 and i < len(split_condition) - 1:
             html += '<tr class="tr_style_condition_title">'
         else:
             html += '<tr>'
+        readd += f'{split_condition[i][0]}:\n'
         html += f'<td class="td_style_condition_title_value">{split_condition[i][0]}:</td>'
         if isinstance(split_condition[i][1], dict):
             vals = ''
@@ -394,12 +397,16 @@ def get_condition_title(split_condition):
                     vals += f'"{value}"<br>'
                 else:
                     vals += f'"{value}"'
+                readd += f'{value}\n'
             html += f'<td class="td_style_condition_title_value">{vals}</td></tr>'
         else:
             value = re.sub('0000(0)*', '...', split_condition[i][1])
             html += f'<td class="td_style_condition_title_value">"{value}"</td></tr>'
+            readd += f'{value}\n'
+        if len(split_condition) > 1 and i < len(split_condition) - 1:
+            readd += '---\n'
     html += f'</tbody></table>'
-    return html
+    return html, readd
 
 
 def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
