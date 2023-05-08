@@ -4,6 +4,7 @@ import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.yaml_to_wi_object as yto
 import src.web_interface.wi_utils as wi_utils
 import copy
+import re
 
 
 def get_factors(organism, key_yaml):
@@ -364,7 +365,7 @@ def get_conditions(factors, organism_name, key_yaml):
             # save the condition as a dictionary with the filled sample as
             # input fields
             d = {'correct_value': cond,
-                 'title': cond.replace(':', ': ').replace('|', '<br>  ').replace('-', '<br>'). replace('{', '').replace('}', ''),
+                 'title': get_condition_title(split_condition),
                  'position': 'experimental_setting:condition',
                  'list': True, 'mandatory': True, 'list_value': [],
                  'input_disabled': False, 'desc': '',
@@ -375,6 +376,18 @@ def get_conditions(factors, organism_name, key_yaml):
 
     return {'conditions': condition_object,
             'whitelist_object': whitelist_object, 'organism': organism_name}
+
+
+def get_condition_title(split_condition):
+    html = '<table><tbody>'
+    for elem in split_condition:
+        html += f'<tr><td>{elem[0]}</td>'
+        if isinstance(elem[1], dict):
+            html += f'<td>{"<br>".join(re.sub("0000(0)*", "...", elem[1][key]) for key in elem[1])}</td></tr>'
+        else:
+            html += f'<td>{elem[1]}</td></tr>'
+    html += f'</tbody></table>'
+    return html
 
 
 def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
