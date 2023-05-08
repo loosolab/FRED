@@ -364,9 +364,7 @@ def get_conditions(factors, organism_name, key_yaml):
             # save the condition as a dictionary with the filled sample as
             # input fields
             d = {'correct_value': cond,
-                 'title': cond.replace(':', ': ').replace('|',
-                                                          '| ').replace(
-                     '#', '# ').replace('-', ' - '),
+                 'title': cond.replace(':', ': ').replace('|', '\n  ').replace('-', '\n'). replace('{', '').replace('}', ''),
                  'position': 'experimental_setting:condition',
                  'list': True, 'mandatory': True, 'list_value': [],
                  'input_disabled': False, 'desc': '',
@@ -409,10 +407,10 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
             # website
             sample[i]['value'] = sample_name \
                 .replace(':', ': ') \
-                .replace('|', '\n') \
-                .replace('#', '\n') \
-                .replace('-', '\n') \
-                .replace('+', '\n')
+                .replace('|', '| ') \
+                .replace('#', '# ') \
+                .replace('-', ' - ') \
+                .replace('+', ' + ')
 
             # save the unchanged sample name as 'correct_value'
             sample[i]['correct_value'] = sample_name.split('_')[0]
