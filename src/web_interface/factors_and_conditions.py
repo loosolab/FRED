@@ -364,7 +364,7 @@ def get_conditions(factors, organism_name, key_yaml):
             # save the condition as a dictionary with the filled sample as
             # input fields
             d = {'correct_value': cond,
-                 'title': cond.replace(':', ': ').replace('|', '\n  ').replace('-', '\n'). replace('{', '').replace('}', ''),
+                 'title': cond.replace(':', ': ').replace('|', '<br>  ').replace('-', '<br>'). replace('{', '').replace('}', ''),
                  'position': 'experimental_setting:condition',
                  'list': True, 'mandatory': True, 'list_value': [],
                  'input_disabled': False, 'desc': '',
