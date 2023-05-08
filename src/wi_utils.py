@@ -50,6 +50,8 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
     if isinstance(wi_object, dict):
         if 'desc' in wi_object and 'backup_desc' not in wi_object:
             wi_object['backup_desc'] = wi_object['desc']
+        if not 'list' in wi_object:
+            print(wi_object)
         if wi_object['list']:
             if not any([isinstance(x, dict) or isinstance(x, list) for x in
                         wi_object['list_value']]):

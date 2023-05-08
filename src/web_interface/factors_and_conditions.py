@@ -399,6 +399,8 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
     # iterate over samples
     for i in range(len(sample)):
 
+        filled_value = None
+
         # input field: sample_name
         if sample[i]['position'].endswith('samples:sample_name'):
 
@@ -407,10 +409,10 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
             # website
             sample[i]['value'] = sample_name \
                 .replace(':', ': ') \
-                .replace('|', '| ') \
-                .replace('#', '# ') \
-                .replace('-', ' - ') \
-                .replace('+', ' + ')
+                .replace('|', '\n') \
+                .replace('#', '\n') \
+                .replace('-', '\n') \
+                .replace('+', '\n')
 
             # save the unchanged sample name as 'correct_value'
             sample[i]['correct_value'] = sample_name.split('_')[0]
@@ -452,6 +454,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                             # save the value from the dictionary real_val if
                             # real_val contains the current value as key
+
                             if val in real_val:
                                 filled_value = real_val[val]
 
@@ -472,6 +475,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                     headers = [x for x in c[1]]
                                     w_key = None
                                     if isinstance(sample[i]['headers'], dict):
+
                                         for k in sample[i]['headers']:
                                             if sorted(sample[i]['headers'][k].split(' ')) == sorted(headers):
                                                 w_key = k
@@ -487,13 +491,9 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                                            c[1][header]
                                         filled_value = filled_value.lstrip(
                                             ' ').rstrip(' ')
-                                    else:
-                                        filled_value = None
 
-                                    if filled_value is not None and w_key is not None and sample[i]['input_type'] == 'plain_group':
+                                    if filled_value is not None and w_key is not None and sample[i]['whitelist_type'] == 'plain_group':
                                         filled_value = f'{filled_value} ({w_key})'
-                                else:
-                                    filled_value = None
 
                             # save the filled value in 'list_value' if the
                             # input field takes a list
@@ -519,7 +519,16 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                             # save the current value
                             else:
-                                filled_value = c[1]
+
+                                if sample[i]['whitelist_type'] == 'plain_group' and 'whitelist_keys' in sample[i]:
+                                    w = utils.get_whitelist(sample[i]['position'].split(':')[-1], {'organism': organism_name})
+
+                                    for key in sample[i]['whitelist_keys']:
+                                        if f'{c[1]} ({key})' in w['whitelist']:
+                                            filled_value = f'{c[1]} ({key})'
+                                            break
+                                else:
+                                    filled_value = c[1]
 
                             # save the filled value in 'list_value' if the
                             # input field takes a list

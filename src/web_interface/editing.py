@@ -32,13 +32,13 @@ def edit_wi_object(path, project_id, key_yaml):
             meta_yaml.pop('path')
         empty_object = yto.get_empty_wi_object(key_yaml)
         wi_object = {}
+        wi_object['all_factors'], real_val = get_all_factors(meta_yaml,
+                                                             key_yaml)
         for part in empty_object:
-            if part == 'all_factors':
-                wi_object['all_factors'] = get_all_factors(meta_yaml)
-            else:
+            if part != 'all_factors':
                 wi_object[part], whitelist_object = new_fill(
                     meta_yaml[part], empty_object[part], key_yaml,
-                    whitelist_object)
+                    whitelist_object, real_val)
 
     else:
         wi_object = yto.get_empty_wi_object(key_yaml)
@@ -47,7 +47,7 @@ def edit_wi_object(path, project_id, key_yaml):
     return wi_object
 
 
-def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object):
+def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
 
     if isinstance(meta_yaml, dict):
 
@@ -61,7 +61,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object):
             if wi_object['position'].split(':')[-1] == 'experimental_setting':
                 fill_key = 'input_fields'
                 filled_value, whitelist_object = fill_experimental_setting(
-                    wi_object, meta_yaml, key_yaml, whitelist_object)
+                    wi_object, meta_yaml, key_yaml, whitelist_object, real_val)
                 print(len(filled_value))
             else:
                 fill_key = 'input_fields'
@@ -71,14 +71,19 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object):
                         filled_value[i], whitelist_object = new_fill(
                             meta_yaml[filled_value[i]['position'].split(
                                 ':')[-1]],
-                            filled_value[i], key_yaml, whitelist_object)
+                            filled_value[i], key_yaml, whitelist_object, real_val)
 
     elif isinstance(meta_yaml, list):
         fill_key = 'list_value'
         filled_value = []
         for i in range(len(meta_yaml)):
             f_val, whitelist_object = new_fill(meta_yaml[i], copy.deepcopy(wi_object),
-                                               key_yaml, whitelist_object)
+                                               key_yaml, whitelist_object, real_val)
+            # TODO: WTF?
+            if 'input_fields' in f_val:
+                f_val = f_val['input_fields']
+            else:
+                f_val = f_val['value']
             filled_value.append(f_val)
 
     else:
@@ -93,7 +98,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object):
     return wi_object, whitelist_object
 
 
-def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object):
+def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, real_val):
     organism = ''
     filled_object = []
     for j in range(len(wi_object['input_fields'])):
@@ -124,28 +129,30 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object):
                             sample_name = generate.get_short_name(
                                 cond['condition_name'], {})
                             input_fields = fac_cond.get_samples(
-                                split_cond, copy.deepcopy(sample), {},
+                                split_cond, copy.deepcopy(sample), real_val,
                                 key_yaml, sample_name, organism)
 
                             for s in cond['biological_replicates']['samples']:
                                 filled_keys = []
                                 for k in s:
                                     if s[k] is not None:
+                                        # TODO: dict (disease usw.)
+                                        # TODO: real_val
                                         if isinstance(s[k], list):
                                             for elem in s[k]:
-                                                if (s, elem) not in filled_keys:
+                                                if (s, elem) not in filled_keys and (s, elem) not in split_cond:
                                                     filled_keys.append((s, elem))
                                         elif (s, s[k]) not in split_cond:
                                             filled_keys.append((s, s[k]))
 
-                                sample_name = f'{sample_name}_{int(s["sample_name"].split("_")[-1].replace("b",""))}'
+                                cond_sample_name = f'{sample_name}_{int(s["sample_name"].split("_")[-1].replace("b",""))}'
                                 filled_sample = copy.deepcopy(input_fields)
                                 filled_sample = fac_cond.get_samples(
                                         filled_keys,
-                                        filled_sample, {},
-                                        key_yaml, sample_name, organism,
+                                        filled_sample, real_val,
+                                        key_yaml, cond_sample_name, organism,
                                         is_factor=False)
-                                samples.append(filled_sample)
+                                samples.append(copy.deepcopy(filled_sample))
                             d = {'correct_value': cond['condition_name'],
                                  'title': cond['condition_name'].replace(':',
                                                                          ': ').replace(
@@ -163,16 +170,17 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object):
 
                 else:
 
-                    if 'headers' in f:
-                        new_val = ''
-                        for header in f['headers'].split(' '):
-                            new_val = new_val + ' ' + meta_yaml[key][header]
-                        new_val = new_val.lstrip(' ').rstrip(' ')
+                    if 'headers' in f and isinstance(meta_yaml[key], dict):
+                        new_val = parse_headers(meta_yaml[key], f['headers'])
                     else:
                         new_val = meta_yaml[key]
 
                     if key == 'organism':
                         organism = new_val
+
+                    if 'whitelist_keys' in f:
+                        new_val = parse_whitelist_keys(meta_yaml[key], f['whitelist_keys'], utils.get_whitelist(key, {'organism': organism}))
+
                     if 'list' in f and f['list']:
                         f['list_value'] = new_val
                     else:
@@ -181,8 +189,38 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object):
     return filled_object, whitelist_object
 
 
+def parse_headers(value, headers):
 
-def get_all_factors(meta_yaml):
+    if isinstance(headers, dict):
+        header = None
+        for k in headers:
+            if sorted(headers[k].split(' ')) == sorted(list(value.keys())):
+                header = headers[k].split(' ')
+                break
+    else:
+        header = headers.split(' ')
+
+    if header is not None:
+        val = ''
+        for h in header:
+            val = f'{val}{" " if val != "" else ""}{value[h]}'
+        value = val
+
+    return value
+
+
+def parse_whitelist_keys(value, whitelist_keys, whitelist):
+
+    for key in whitelist_keys:
+        if f'{value} ({key})' in whitelist:
+            value = f'{value} ({key})'
+            break
+
+    return value
+
+
+# TODO: value unit?
+def get_all_factors(meta_yaml, real_val):
     """
     This function creates an object containing all experimental factors from a
     metadata yaml to be stored in a wi object.
@@ -190,23 +228,38 @@ def get_all_factors(meta_yaml):
     :return: all_factors: an object containing all experimental factors
     """
     all_factors = []
+    real_val = {}
     for setting in meta_yaml['experimental_setting']:
         setting_factors = []
         for factors in setting['experimental_factors']:
             setting_fac = {'factor': factors['factor']}
-            if factors['factor'] == 'gene':
-                header = ''
-                value = []
-                for elem in factors['values']:
-                    val = ''
-                    for key in elem:
-                        header = f'{header}{" " if header != "" else ""}{key}'
-                        val = f'{val}{" " if val != "" else ""}{elem[key]}'
-                    value.append(val)
-                setting_fac['headers'] = header
-            else:
-                value = factors['values']
-            setting_fac['values'] = value
+            w = utils.get_whitelist(factors['factor'], setting)
+            setting_fac['values'] = []
+            for elem in factors['values']:
+
+                value = elem
+                if 'headers' in w:
+                    if 'headers' not in setting_fac:
+                        setting_fac['headers'] = w['headers']
+                    if isinstance(elem, dict):
+                        value = parse_headers(value, w['headers'])
+
+                if 'whitelist_keys' in w:
+                    if 'whitelist_keys' not in setting_fac:
+                        setting_fac['whitelist_keys'] = w['whitelist_keys']
+                    if 'whitelist_type' in w and w['whitelist_type'] == 'plain_group':
+                        value = parse_whitelist_keys(value, w['whitelist_keys'], w['whitelist'])
+
+                if value != elem:
+                    if isinstance(elem, dict):
+                        # rewrite the value into a string
+                        val = "|".join(
+                            [f'{key}:"{elem[key]}"' for key in elem])
+                        val = f'{factors["factor"]}:{"{"}{val}{"}"}'
+                        real_val[val] = value
+                    else:
+                        real_val[elem] = value
+                setting_fac['values'].append(value)
             setting_factors.append(setting_fac)
         all_factors.append(setting_factors)
-    return all_factors
+    return all_factors, real_val
