@@ -393,7 +393,7 @@ def get_condition_title(split_condition):
                 if key != list(split_condition[i][1].keys())[-1]:
                     vals += f'"{value}"<br>'
                 else:
-                    vals += f'{value}'
+                    vals += f'"{value}"'
             html += f'<td class="td_style_condition_title_value">{vals}</td></tr>'
         else:
             value = re.sub('0000(0)*', '...', split_condition[i][1])
