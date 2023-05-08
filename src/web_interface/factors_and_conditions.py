@@ -379,11 +379,11 @@ def get_conditions(factors, organism_name, key_yaml):
 
 
 def get_condition_title(split_condition):
-    html = '<table><tbody>'
+    html = '<table class="table_style_condition_title"><tbody>'
     for elem in split_condition:
-        html += f'<tr><td>{elem[0]}</td>'
+        html += f'<tr class="tr_style_condition_title"><td class="td_style_condition_title_factor">{elem[0]}</td>'
         if isinstance(elem[1], dict):
-            html += f'<td>{"<br>".join(re.sub("0000(0)*", "...", elem[1][key]) for key in elem[1])}</td></tr>'
+            html += f'<td class="td_style_condition_title_value>{"<br>".join(re.sub("0000(0)*", "...", elem[1][key]) for key in elem[1])}</td></tr>'
         else:
             html += f'<td>{elem[1]}</td></tr>'
     html += f'</tbody></table>'
