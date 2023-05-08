@@ -380,12 +380,24 @@ def get_conditions(factors, organism_name, key_yaml):
 
 def get_condition_title(split_condition):
     html = '<table class="table_style_condition_title"><tbody>'
-    for elem in split_condition:
-        html += f'<tr class="tr_style_condition_title"><td class="td_style_condition_title_factor">{elem[0]}</td>'
-        if isinstance(elem[1], dict):
-            html += f'<td class="td_style_condition_title_value>{"<br>".join(re.sub("0000(0)*", "...", elem[1][key]) for key in elem[1])}</td></tr>'
+    for i in range(len(split_condition)):
+        if len(split_condition > 1) and i < len(split_condition)[-1]:
+            html += '<tr class="tr_style_condition_title">'
         else:
-            html += f'<td>{elem[1]}</td></tr>'
+            html += '<tr>'
+        html += f'<td class="td_style_condition_title_factor">{split_condition[0]}</td>'
+        if isinstance(split_condition[1], dict):
+            vals = ''
+            for key in split_condition[1]:
+                value = re.sub('0000(0)*', '...', split_condition[1][key])
+                if key != list(split_condition[1].keys())[-1]:
+                    vals += f'{value}<br>'
+                else:
+                    vals += f'{value}'
+            html += f'<td class="td_style_condition_title_value">{val}</td></tr>'
+        else:
+            value = re.sub('0000(0)*', '...', split_condition[1])
+            html += f'<td class="td_style_condition_title_value">{value}</td></tr>'
     html += f'</tbody></table>'
     return html
 
