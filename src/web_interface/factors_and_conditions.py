@@ -381,7 +381,7 @@ def get_conditions(factors, organism_name, key_yaml):
 def get_condition_title(split_condition):
     html = '<table class="table_style_condition_title"><tbody>'
     for i in range(len(split_condition)):
-        if len(split_condition > 1) and i < len(split_condition) -1:
+        if len(split_condition) > 1 and i < len(split_condition) -1:
             html += '<tr class="tr_style_condition_title">'
         else:
             html += '<tr>'
@@ -394,7 +394,7 @@ def get_condition_title(split_condition):
                     vals += f'{value}<br>'
                 else:
                     vals += f'{value}'
-            html += f'<td class="td_style_condition_title_value">{val}</td></tr>'
+            html += f'<td class="td_style_condition_title_value">{vals}</td></tr>'
         else:
             value = re.sub('0000(0)*', '...', split_condition[1])
             html += f'<td class="td_style_condition_title_value">{value}</td></tr>'
