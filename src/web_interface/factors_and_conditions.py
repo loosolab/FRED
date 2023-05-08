@@ -385,18 +385,18 @@ def get_condition_title(split_condition):
             html += '<tr class="tr_style_condition_title">'
         else:
             html += '<tr>'
-        html += f'<td class="td_style_condition_title_factor">{split_condition[0]}</td>'
-        if isinstance(split_condition[1], dict):
+        html += f'<td class="td_style_condition_title_factor">{split_condition[i][0]}</td>'
+        if isinstance(split_condition[i][1], dict):
             vals = ''
-            for key in split_condition[1]:
-                value = re.sub('0000(0)*', '...', split_condition[1][key])
-                if key != list(split_condition[1].keys())[-1]:
+            for key in split_condition[i][1]:
+                value = re.sub('0000(0)*', '...', split_condition[i][1][key])
+                if key != list(split_condition[i][1].keys())[-1]:
                     vals += f'{value}<br>'
                 else:
                     vals += f'{value}'
             html += f'<td class="td_style_condition_title_value">{vals}</td></tr>'
         else:
-            value = re.sub('0000(0)*', '...', split_condition[1])
+            value = re.sub('0000(0)*', '...', split_condition[i][1])
             html += f'<td class="td_style_condition_title_value">{value}</td></tr>'
     html += f'</tbody></table>'
     return html
