@@ -12,6 +12,7 @@ import copy
 # TODO: size global -> metaTools.py
 # TODO: remove not_editable
 
+
 factor = []
 not_editable = ['id', 'sample_name', 'pooled', 'donor_count',
                 'technical_replicates']
@@ -84,7 +85,7 @@ def get_validation(result, mode, size=80):
 
 
 def get_redo_value(node, item, optional, mandatory_mode, result_dict,
-                   first_node, is_factor, do_redo, mode):
+                   first_node, is_factor, do_redo, mode, size=80):
     """
     This function tests whether a list must be specified for a value and,
     depending on this, calls a function to enter the value.
@@ -115,7 +116,7 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                 value = fill_metadata_structure(node['value'], item, {},
                                                 optional,
                                                 mandatory_mode, result_dict,
-                                                first_node, is_factor, mode)
+                                                first_node, is_factor, mode, size=size)
             else:
 
                 # set redo to True to initiate while loop
@@ -131,7 +132,7 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                     # call function to fill in metadata
                     value.append(fill_metadata_structure(
                         node['value'], item, {}, optional, mandatory_mode,
-                        result_dict, first_node, is_factor, mode))
+                        result_dict, first_node, is_factor, mode, size=size))
 
                     # ask the user if another item should be added to the list
                     # if do_redo is set to True
@@ -169,7 +170,7 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
 
 
 def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
-                            result_dict, first_node, is_factor, mode):
+                            result_dict, first_node, is_factor, mode, size=80):
     """
     This function calls other functions to fill in metadata information for a
     key depending on its type.
@@ -272,7 +273,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                     f' (1,...,{len(optionals)} or n)')
 
                 # print a list of all optional keys
-                print_option_list(optionals, desc)
+                print_option_list(optionals, desc, size=size)
 
                 # parse the user input
                 options = parse_input_list(optionals, True)
@@ -368,7 +369,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                         f'{option}. Please select the elements'
                                         f' for which you want to add '
                                         f'information.\n')
-                                    print_option_list(elems, desc)
+                                    print_option_list(elems, desc, size=size)
                                     list_elems = parse_input_list(
                                         range(len(return_dict[option]) + 1),
                                         False)
@@ -388,8 +389,8 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                             caption = elems[
                                                 int(indc) - 1].replace("\n",
                                                                        ", ").\
-                                                center(size.columns, ' ')
-                                            line = ''.center(size.columns, '_')
+                                                center(size, ' ')
+                                            line = ''.center(size, '_')
                                             print(f'\n'
                                                   f'{line}\n\n'
                                                   f'List element: {caption}\n'
@@ -481,10 +482,10 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                             # caption for the new element and
                                             # set new_element to True
 
-                                            h_line = ''.center(size.columns,
+                                            h_line = ''.center(size,
                                                                '_')
                                             caption = f'New {option}'.center(
-                                                size.columns, ' ')
+                                                size, ' ')
                                             print(f'\n'
                                                   f'{h_line}\n\n'
                                                   f'{caption}\n'
@@ -539,7 +540,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
 # --------------------------EXPERIMENTAL SETTING-------------------------------
 
 
-def get_experimental_factors(node, result_dict, mode):
+def get_experimental_factors(node, result_dict, mode, size=80):
     """
     This function prompts the user to specify the examined experimental
     factors, as well as the analyzed values for each selected factor.
@@ -557,7 +558,7 @@ def get_experimental_factors(node, result_dict, mode):
     print(
         f'\nPlease select the analyzed experimental factors '
         f'(1-{len(factor_list)}) divided by comma:\n')
-    print_option_list(factor_list, False)
+    print_option_list(factor_list, False, size=size)
     used_factors = parse_input_list(factor_list, False)
 
     # create a list to store experimental factors with their selected values
@@ -601,7 +602,7 @@ def get_experimental_factors(node, result_dict, mode):
     return experimental_factors
 
 
-def get_conditions(factors, node, mandatory_mode, result_dict, mode):
+def get_conditions(factors, node, mandatory_mode, result_dict, mode, size=80):
     """
     This function generates all combinations of the specified experimental
     factors and their values and lets the user choose which of those he likes
@@ -720,7 +721,7 @@ def get_conditions(factors, node, mandatory_mode, result_dict, mode):
         print(
             f'\nPlease select the analyzed combinations of experimental '
             f'factors (1-{len(combinations)}) divided by comma:\n')
-        print_option_list(combinations, False)
+        print_option_list(combinations, False, size=size)
         used_combinations = parse_input_list(combinations, False)
 
     # call get_replicate_count to fill in information for every condition
@@ -731,7 +732,7 @@ def get_conditions(factors, node, mandatory_mode, result_dict, mode):
     return conditions
 
 
-def get_replicate_count(conditions, node, mandatory_mode, result_dict, mode):
+def get_replicate_count(conditions, node, mandatory_mode, result_dict, mode, size=80):
     """
     This function is used to ask the user for the number of biological
     replicates for every condition. Per replicate, it calls a function to fill
@@ -756,9 +757,9 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict, mode):
 
         # print a caption for the condition, ask the user to enter the
         # number of biological replicated and parse the user input
-        print(f'{"".center(size.columns, "_")}\n\n'
-              f'{f"Condition: {condition}".center(size.columns, " ")}\n'
-              f'{"".center(size.columns, "_")}\n\n'
+        print(f'{"".center(size, "_")}\n\n'
+              f'{f"Condition: {condition}".center(size, " ")}\n'
+              f'{"".center(size, "_")}\n\n'
               f'Please enter the number of biological replicates:')
         bio = parse_input_value('count', '', False, 'number',
                                 result_dict)
@@ -771,8 +772,8 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict, mode):
                                                  f'\nAre the samples pooled?')
 
             # print a caption for the biological replicate
-            print(f'{"".center(size.columns, "_")}\n\n'
-                  f'\033[1m{"Biological Replicates".center(size.columns, " ")}'
+            print(f'{"".center(size, "_")}\n\n'
+                  f'\033[1m{"Biological Replicates".center(size, " ")}'
                   f'\033[0m\n')
 
             # call fill_replicates to enter information for the replicate and
@@ -790,7 +791,7 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict, mode):
 
 
 def fill_replicates(condition, bio, input_pooled, node,
-                    mandatory_mode, result_dict, mode):
+                    mandatory_mode, result_dict, mode, size=80):
     """
     This function is used to enter information for biological replicates.
     :param condition: the condition for which the biological replicated are
@@ -841,7 +842,7 @@ def fill_replicates(condition, bio, input_pooled, node,
         samples['sample_name'] = short_name
 
         # print a caption for the sample
-        print(f'{f"Sample: {sample_name}".center(size.columns, "-")}\n')
+        print(f'{f"Sample: {sample_name}".center(size, "-")}\n')
 
         # save if the sample is pooled in the sample dictionary
         samples['pooled'] = input_pooled
@@ -1105,7 +1106,7 @@ def print_sample_names(result, input_id, path, size=80):
 
 
 def enter_information(node, key, return_dict, optional, mandatory_mode,
-                      result_dict, first_node, is_factor, mode):
+                      result_dict, first_node, is_factor, mode, size=80):
     """
     This function is used to create prompts for the user to enter information
     and parses the input.
@@ -1125,16 +1126,16 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
         if first_node:
 
             # if the key is on top level, print a bigger caption
-            print(f'{"".center(size.columns, "_")}\n\n'
-                  f'{f"{display_name}".center(size.columns, " ")}\n'
-                  f'{"".center(size.columns, "_")}\n')
+            print(f'{"".center(size, "_")}\n\n'
+                  f'{f"{display_name}".center(size, " ")}\n'
+                  f'{"".center(size, "_")}\n')
         else:
 
             # if the key is on a lower level, print a smaller caption
             print(f'\n'
-                  f'{"".center(size.columns, "-")}\n'
-                  f'{f"{display_name}".center(size.columns, " ")}\n'
-                  f'{"".center(size.columns, "-")}\n')
+                  f'{"".center(size, "-")}\n'
+                  f'{f"{display_name}".center(size, " ")}\n'
+                  f'{"".center(size, "-")}\n')
 
         # print a description if one is stated in the metadata structure
         if node['desc'] != '':
@@ -1152,7 +1153,7 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
                                  node['input_type'], result_dict)
 
 
-def parse_list_choose_one(whitelist, header):
+def parse_list_choose_one(whitelist, header, size=80):
     """
     This function prints an indexed whitelist and prompts the user to choose a
     value by specifying the index.
@@ -1164,7 +1165,7 @@ def parse_list_choose_one(whitelist, header):
     # print the given header and indexed whitelist and parse the user input
     try:
         print(f'{header}')
-        print_option_list(whitelist, False)
+        print_option_list(whitelist, False, size=size)
         value = whitelist[int(input()) - 1]
 
     # redo the input prompt if the user input is not an integer
@@ -1577,7 +1578,7 @@ def merge_dicts(a, b):
     return res
 
 
-def get_combinations(values, key):
+def get_combinations(values, key, size=80):
     """
     This function creates combinations for experimental factors that can occur
     multiple times in one condition and lets the user choose those that were
@@ -1607,7 +1608,7 @@ def get_combinations(values, key):
         print(
             f'\nPlease select the analyzed combinations for {key} '
             f'(1-{len(merge_values)}) divided by comma:\n')
-        print_option_list(merge_values, False)
+        print_option_list(merge_values, False, size=size)
         used_values = parse_input_list(merge_values, False)
     else:
         used_values = values
@@ -1711,7 +1712,7 @@ def get_combis(values, key, multi):
         return disease_values
 
 
-def get_input_list(node, item, filled_object):
+def get_input_list(node, item, filled_object, size=80):
     """
     This function asks the user to enter a list of values divided by comma and
     parses the input.
@@ -1783,7 +1784,7 @@ def get_input_list(node, item, filled_object):
 
                     # for plain whitelists print the whitelist with indices and
                     # parse the user input
-                    print_option_list(whitelist['whitelist'], '')
+                    print_option_list(whitelist['whitelist'], '', size=size)
                     used_values = parse_input_list(whitelist['whitelist'],
                                                    False)
 
@@ -1950,7 +1951,7 @@ def get_input_list(node, item, filled_object):
     return used_values
 
 
-def print_option_list(options, desc):
+def print_option_list(options, desc, size=80):
     """
     This function prints an indexed whitelist.
     :param options: the whitelist values
@@ -1967,9 +1968,9 @@ def print_option_list(options, desc):
 
         # print the nested list as a table
         print(tabulate(data, tablefmt='plain',
-                       maxcolwidths=[size.columns * 1 / 8,
-                                     size.columns * 3 / 8,
-                                     size.columns * 4 / 8]))
+                       maxcolwidths=[size * 1 / 8,
+                                     size * 3 / 8,
+                                     size * 4 / 8]))
 
     else:
 
@@ -1979,8 +1980,8 @@ def print_option_list(options, desc):
 
         # print the nested list as a table
         print(tabulate(data, tablefmt='plain',
-                       maxcolwidths=[size.columns * 1 / 8,
-                                     size.columns * 7 / 8]))
+                       maxcolwidths=[size * 1 / 8,
+                                     size * 7 / 8]))
 
 
 def parse_input_list(options, terminable):

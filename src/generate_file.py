@@ -21,7 +21,6 @@ def generate_file(path, input_id, mandatory_mode, mode, size=80):
     """
 
     # TODO: search for id
-
     filename = [f'{input_id}_{mode}.yaml', f'{input_id}_{mode}.yml']
 
     # test if metadata for given id already exists
@@ -54,6 +53,8 @@ def generate_file(path, input_id, mandatory_mode, mode, size=80):
         # overwrite metafile
         else:
             generate(path, input_id, mandatory_mode, mode, size=size)
+    else:
+        generate(path, input_id, mandatory_mode, mode, size=size)
 
 
 def generate(path, input_id, mandatory_mode, mode, size=80):
