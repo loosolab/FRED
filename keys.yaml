@@ -346,7 +346,7 @@ experimental_setting:
                 cellular_compartment:
                   mandatory: False
                   list: True
-                  display_name: 'Fraction'
+                  display_name: 'Cellular Component'
                   desc: ''
                   value: null
                   whitelist: True

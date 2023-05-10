@@ -6,9 +6,11 @@ import time
 import git
 import os
 from src import generate_metafile
+from src import generate_file
 from src import find_metafiles
 from src import validate_yaml
 from src import file_reading
+from src import edit_file
 from src import utils
 
 
@@ -42,9 +44,15 @@ def generate(args):
     calls script generate_metafile to start dialog
     :param args:
     """
+    try:
+        size = os.get_terminal_size()
+        size = size.columns
+    except OSError:
+        size = 80
+
     fetch_whitelists()
-    generate_metafile.generate_file(args.path, args.id,
-                                    args.mandatory_only, args.mode)
+    generate_file.generate_file(args.path, args.id,
+                                    args.mandatory_only, args.mode, size=size)
 
 
 def validate(args):
@@ -167,38 +175,13 @@ def validate(args):
                 print(rep)
 
 def edit(args):
-    if args.mode == 'metadata':
-        key_yaml = utils.read_in_yaml(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                     'keys.yaml'))
-    else:
-        key_yaml = utils.read_in_yaml(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                     'mamplan_keys.yaml'))
-    file = utils.read_in_yaml(args.path)
-    options = [key for key in key_yaml]
-    print(f'Choose the parts you want to edit (1,...,{len(options)}) divided by comma.\n')
-    generate_metafile.print_option_list(options, False)
-    edit_keys = generate_metafile.parse_input_list(options, True)
-    for key in edit_keys:
-        if key in file:
-            file[key] = generate_metafile.edit_item(key, file[key], key_yaml[key], file, args.mandatory_only, args.mode)
-        else:
-            file[key] = generate_metafile.get_redo_value(key_yaml[key], key, True, args.mandatory_only, file, True, False, True, args.mode)
+    try:
+        size = os.get_terminal_size()
+        size = size.columns
+    except OSError:
+        size = 80
 
-        while True:
-            print(generate_metafile.get_summary(file[key]))
-            correct = generate_metafile.parse_list_choose_one(
-                ['True ', 'False '], f'\nIs the input correct? You can redo '
-                                     f'it by selecting \'False\'')
-            if correct:
-                break
-            else:
-                file[key] = generate_metafile.edit_item(key, file[key],
-                                              key_yaml[key], file,
-                                              args.mandatory_only, args.mode)
-    utils.save_as_yaml(file, args.path)
-    print(f'Changes were saved to {args.path}')
+    edit_file.edit_file(args.path, args.mode, args.mandatory_only, size)
 
 
 def fetch_whitelists():
