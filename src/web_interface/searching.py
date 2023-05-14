@@ -82,7 +82,7 @@ def get_meta_info(path, project_id):
     else:
         html_str = 'No metadata found.'
 
-    return html_str
+    return html_str, correct_file
 
 
 # TODO: test if value is in condition -> replace

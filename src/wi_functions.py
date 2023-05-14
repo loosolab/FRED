@@ -95,8 +95,8 @@ def edit_wi_object(path, project_id):
     # read in general structure
     key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), '..', 'keys.yaml'))
-
-    return editing.edit_wi_object(path, project_id, key_yaml)
+    html_str, metafile = editing.edit_wi_object(path, project_id, key_yaml)
+    return html_str
 
 
 # TODO: not needed -> in summary

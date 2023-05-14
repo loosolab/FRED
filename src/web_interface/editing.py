@@ -3,7 +3,7 @@ import src.utils as utils
 import src.generate_metafile as generate
 import src.web_interface.yaml_to_wi_object as yto
 import src.web_interface.factors_and_conditions as fac_cond
-import src.web_interface.whitelist_parsing as whitelist_parsing
+import src.web_interface.searching as searching
 import os
 import copy
 import pytz
@@ -21,7 +21,7 @@ def edit_wi_object(path, project_id, key_yaml):
     :return: wi_object: the filled wi object
     """
     # TODO: als Übergabe bei get_info
-    meta_yaml = find_metafiles.find_projects(path, project_id, True)
+    html_str, meta_yaml = searching.get_meta_info(path, project_id)
     whitelist_object = {}
     if len(meta_yaml) > 0:
         for elem in meta_yaml:
