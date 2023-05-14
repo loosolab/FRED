@@ -2,6 +2,7 @@ import src.find_metafiles as find_metafiles
 import src.utils as utils
 import src.web_interface.html_output as html_output
 import src.web_interface.git_whitelists as git_whitelists
+import src.file_reading as file_reading
 import os
 
 
@@ -13,29 +14,93 @@ def get_meta_info(path, project_id):
     :return: html_str: the summary in HTML
     """
     # If file must be searched
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles([path], return_false=True)
+    correct_file = None
+    for metafile in metafiles:
+        if 'project' in metafile and 'id' in metafile['project'] and metafile['project']['id'] == project_id:
+            correct_file = metafile
+            break
 
-    yaml = find_metafiles.find_projects(path, f'id:{project_id}', True)
-    if len(yaml) == 0:
-        return f'No metadata found.'
+    if correct_file is not None:
+
+        html_str = ''
+        if validation_reports['error_count'] > 0 or validation_reports['warning_count'] > 0:
+            error = None
+            warning = None
+
+            for report in validation_reports['corrupt_files']['report']:
+                print(report['file']['path'], correct_file['path'])
+                if report['file']['path'] == correct_file['path']:
+                    error = report['error']
+                    warning = report['warning']
+                    break
+
+            # TODO: error Handling + Ausgabe
+            if error is not None:
+                html_str += f'<font color="red"><h3>ERROR:</h3>'
+                if len(error[0]) > 0:
+                    html_str += f'<b>Missing mandatory keys:</b><br>'
+                    for elem in error[0]:
+                        html_str += f'- {elem}<br>'
+                if len(error[1]) > 0:
+                    html_str += f'<b>Invalid keys:</b><br>'
+                    for elem in error[1]:
+                        value = correct_file
+                        for key in elem.split(':'):
+                            value = value[key]
+                        html_str += f'- {elem}: {value}<br>'
+                        correct_file = pop_key(correct_file, elem.split(':'), value)
+
+                if len(error[2]) > 0:
+                    html_str += f'<b>Invalid entries:</b><br>'
+                    for elem in error[2]:
+                        html_str += f'- {elem.split(":")[-1]} in {":".join(elem.split(":")[:-1])}<br>'
+                        correct_file = pop_key(correct_file, elem.split(":")[:-1], elem.split(":")[-1])
+
+                if len(error[3]) > 0:
+                    html_str += f'<b>Invalid values:</b><br>'
+                    for elem in error[3]:
+                        html_str += f'- {elem[0]}: {elem[1]} -> {elem[2]}<br>'
+
+                html_str += '</font><hr>'
+
+            if warning is not None:
+                html_str += f'<font color="orange"><h3>WARNING:</h3>'
+                for elem in warning:
+                    message = elem[0].replace("\'", "")
+                    html_str += f'- {message}: {elem[1]}<br>'
+                html_str += '</font><hr>'
+
+        if 'path' in correct_file:
+            correct_file.pop('path')
+        for elem in correct_file:
+            end = f'{"<hr><br>" if elem != list(correct_file.keys())[-1] else ""}'
+            html_str = f'{html_str}<h3>{elem}</h3>' \
+                       f'{html_output.object_to_html(correct_file[elem], 0, False)}<br>'\
+                       f'{end}'
+
     else:
-        count = 0
-        for elem in yaml:
-            for key in elem:
-                if key == project_id:
-                    yaml = elem[key]
-                    count += 1
-        if count > 1:
-            return f'Error: Multiple metadata files found.'
+        html_str = 'No metadata found.'
+
+    return html_str
+
+
+# TODO: test if value is in condition -> replace
+# TODO: test for list -> only remove wrong item
+def pop_key(metafile, key_list, value):
+    if isinstance(metafile, list):
+        for i in range(len(metafile)):
+            metafile[i] = pop_key(metafile[i], key_list, value)
+    elif isinstance(metafile, dict):
+        if len(key_list) == 1:
+            if key_list[0] in metafile and metafile[key_list[0]] == value:
+                metafile.pop(key_list[0])
+                return metafile
         else:
-            if 'path' in yaml:
-                yaml.pop('path')
-            html_str = ''
-            for elem in yaml:
-                end = f'{"<hr><br>" if elem != list(yaml.keys())[-1] else ""}'
-                html_str = f'{html_str}<h3>{elem}</h3>' \
-                           f'{html_output.object_to_html(yaml[elem], 0, 0, False)}<br>' \
-                           f'{end}'
-            return html_str
+            metafile[key_list[0]] = pop_key(metafile[key_list[0]], key_list[1:], value)
+    else:
+        print('VALUE', metafile)
+    return metafile
 
 
 def get_search_mask():
