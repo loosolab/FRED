@@ -77,8 +77,8 @@ def save_filenames(file_str, path):
 
 
 def get_meta_info(path, project_id):
-
-    return searching.get_meta_info(path, project_id)
+    html_str, metafile = searching.get_meta_info(path, project_id)
+    return html_str
 
 
 def get_search_mask():
@@ -95,8 +95,7 @@ def edit_wi_object(path, project_id):
     # read in general structure
     key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), '..', 'keys.yaml'))
-    html_str, metafile = editing.edit_wi_object(path, project_id, key_yaml)
-    return html_str
+    return editing.edit_wi_object(path, project_id, key_yaml)
 
 
 # TODO: not needed -> in summary

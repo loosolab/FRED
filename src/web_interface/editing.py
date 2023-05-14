@@ -233,7 +233,6 @@ def get_all_factors(meta_yaml, real_val):
         setting_factors = []
         for factors in setting['experimental_factors']:
             setting_fac = {'factor': factors['factor']}
-            print(factors['factor'])
             w = utils.get_whitelist(factors['factor'], setting)
             setting_fac['values'] = []
             for elem in factors['values']:
