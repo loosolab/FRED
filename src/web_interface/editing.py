@@ -172,7 +172,10 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, 
                         new_val = meta_yaml[key]
 
                     if key == 'organism':
-                        organism = new_val
+                        if 'organism_name' in new_val:
+                            organism = new_val['organism_name']
+                        else:
+                            organism = new_val
 
                     if 'whitelist_keys' in f:
                         new_val = parse_whitelist_keys(meta_yaml[key], f['whitelist_keys'], utils.get_whitelist(key, {'organism': organism}))
