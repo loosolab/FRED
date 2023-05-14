@@ -233,18 +233,19 @@ def get_all_factors(meta_yaml, real_val):
         setting_factors = []
         for factors in setting['experimental_factors']:
             setting_fac = {'factor': factors['factor']}
+            print(factors['factor'])
             w = utils.get_whitelist(factors['factor'], setting)
             setting_fac['values'] = []
             for elem in factors['values']:
 
                 value = elem
-                if 'headers' in w:
+                if w and 'headers' in w:
                     if 'headers' not in setting_fac:
                         setting_fac['headers'] = w['headers']
                     if isinstance(elem, dict):
                         value = parse_headers(value, w['headers'])
 
-                if 'whitelist_keys' in w:
+                if w and 'whitelist_keys' in w:
                     if 'whitelist_keys' not in setting_fac:
                         setting_fac['whitelist_keys'] = w['whitelist_keys']
                     if 'whitelist_type' in w and w['whitelist_type'] == 'plain_group':
