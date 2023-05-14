@@ -1416,7 +1416,7 @@ def get_short_name(condition, result_dict):
     """
     conds = split_cond(condition)
     whitelist = utils.get_whitelist(os.path.join('abbrev', 'factor'),
-                                    result_dict)['whitelist']
+                                    result_dict)
     if whitelist and 'whitelist_type' in whitelist and whitelist[
             'whitelist_type'] == 'plain':
         whitelist = whitelist['whitelist']
