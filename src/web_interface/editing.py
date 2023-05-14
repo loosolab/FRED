@@ -24,10 +24,6 @@ def edit_wi_object(path, project_id, key_yaml):
     html_str, meta_yaml = searching.get_meta_info(path, project_id)
     whitelist_object = {}
     if len(meta_yaml) > 0:
-        for elem in meta_yaml:
-            for key in elem:
-                if key == project_id:
-                    meta_yaml = elem[key]
         if 'path' in meta_yaml:
             meta_yaml.pop('path')
         empty_object = yto.get_empty_wi_object(key_yaml)
