@@ -29,7 +29,6 @@ def get_meta_info(path, project_id):
             warning = None
 
             for report in validation_reports['corrupt_files']['report']:
-                print(report['file']['path'], correct_file['path'])
                 if report['file']['path'] == correct_file['path']:
                     error = report['error']
                     warning = report['warning']
@@ -71,13 +70,15 @@ def get_meta_info(path, project_id):
                     html_str += f'- {message}: {elem[1]}<br>'
                 html_str += '</font><hr>'
 
-        if 'path' in correct_file:
-            correct_file.pop('path')
+
+        file_path = correct_file['path']
+        correct_file.pop('path')
         for elem in correct_file:
             end = f'{"<hr><br>" if elem != list(correct_file.keys())[-1] else ""}'
             html_str = f'{html_str}<h3>{elem}</h3>' \
                        f'{html_output.object_to_html(correct_file[elem], 0, False)}<br>'\
                        f'{end}'
+        correct_file['path'] = file_path
 
     else:
         html_str = 'No metadata found.'
