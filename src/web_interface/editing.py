@@ -1,10 +1,8 @@
-import src.find_metafiles as find_metafiles
 import src.utils as utils
 import src.generate_metafile as generate
 import src.web_interface.yaml_to_wi_object as yto
 import src.web_interface.factors_and_conditions as fac_cond
 import src.web_interface.searching as searching
-import os
 import copy
 import pytz
 from dateutil import parser
@@ -83,8 +81,13 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
 
     else:
         fill_key = 'value'
-        filled_value = meta_yaml
-
+        if wi_object['input_type'] == 'date':
+            local_time = parser.parse(meta_yaml, dayfirst=True)
+            default_time = local_time.astimezone(pytz.utc)
+            filled_value = default_time.strftime("%Y-%m-%dT%X.%fZ")
+        else:
+            filled_value = meta_yaml
+    
     if 'input_type' in wi_object and wi_object['input_type'] == \
             'single_autofill':
         fill_key = 'list_value'
