@@ -73,9 +73,11 @@ def get_meta_info(path, project_id):
 
             if warning is not None:
                 html_str += f'<font color="orange"><h3><b>WARNING:</b></h3>'
+                html_str += '<ul>'
                 for elem in warning:
                     message = elem[0].replace("\'", "")
-                    html_str += f'- {message}: {elem[1]}<br>'
+                    html_str += f'<li>{message}: {elem[1]}</li>'
+                html_str += '</ul>'
                 html_str += '</font><hr>'
 
         if 'path' in correct_file:
