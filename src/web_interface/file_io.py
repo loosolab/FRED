@@ -12,10 +12,11 @@ def save_object(dictionary, path, filename):
     :param filename: the name of the file
     :return: new_filename: the name under which the file was saved
     """
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles([path],
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles([path.split('/')[0]],
                                                                        return_false=True)
     correct_file = None
     for metafile in metafiles:
+        print(metafile['project']['id'], dictionary["project"]["id"])
         if 'project' in metafile and 'id' in metafile['project'] and \
                 metafile['project']['id'] == dictionary["project"]["id"]:
             correct_file = metafile
@@ -23,6 +24,7 @@ def save_object(dictionary, path, filename):
 
     if correct_file is not None:
         path = correct_file['path']
+        print('PATH', path)
         new_filename = path
         utils.save_as_yaml(dictionary, path)
     else:
