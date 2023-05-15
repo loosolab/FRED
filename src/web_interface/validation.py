@@ -16,7 +16,10 @@ def validate_object(wi_object):
     for setting in wi_object['experimental_setting']['list_value']:
         for elem in setting:
             if elem['position'].split(':')[-1] == 'organism':
-                organisms.append(elem['value'].split(' ')[0])
+                if isinstance(elem['value'], dict):
+                    organisms.append(elem['value']['organism_name'].split(' ')[0])
+                else:
+                    organisms.append(elem['value'].split(' ')[0])
     warnings = {}
     errors = {}
     factors = copy.deepcopy(wi_object['all_factors'])
