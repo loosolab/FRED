@@ -83,7 +83,9 @@ def get_meta_info(path, project_id):
 
 def get_search_mask():
     git_whitelists.get_whitelists()
-    return searching.get_search_mask()
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), '..', 'keys.yaml'))
+    return searching.get_search_mask(key_yaml)
 
 
 def find_metadata(path, search_string):

@@ -102,17 +102,12 @@ def pop_key(metafile, key_list, value):
     return metafile
 
 
-def get_search_mask():
+def get_search_mask(key_yaml):
     """
     This functions returns all necessary information for the search mask.
     :return: a dictionary containing all keys of the metadata structure and a
              whitelist object
     """
-    git_whitelists.get_whitelists()
-
-    key_yaml = utils.read_in_yaml(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
-                     'keys.yaml'))
     keys = [
         {'key_name': 'All keys', 'display_name': 'All Fields', 'nested': [],
          'whitelist': False, 'chained_keys': ''}]
