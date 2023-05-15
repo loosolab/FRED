@@ -93,6 +93,9 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
         fill_key = 'list_value'
 
     wi_object[fill_key] = filled_value
+
+    if wi_object['position'].split(':')[-1] == 'id':
+        wi_object['input_disabled'] = True
     return wi_object, whitelist_object
 
 
