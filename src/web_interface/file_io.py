@@ -16,7 +16,6 @@ def save_object(dictionary, path, filename):
                                                                        return_false=True)
     correct_file = None
     for metafile in metafiles:
-        print(metafile['project']['id'], dictionary["project"]["id"])
         if 'project' in metafile and 'id' in metafile['project'] and \
                 metafile['project']['id'] == dictionary["project"]["id"]:
             correct_file = metafile
@@ -24,7 +23,6 @@ def save_object(dictionary, path, filename):
 
     if correct_file is not None:
         path = correct_file['path']
-        print('PATH', path)
         new_filename = path
         utils.save_as_yaml(dictionary, path)
     else:
