@@ -59,7 +59,7 @@ def get_meta_info(path, project_id):
                     html_str += '<ul>'
                     for elem in error[2]:
                         html_str += f'<li>{elem.split(":")[-1]} in {":".join(elem.split(":")[:-1])}</li>'
-                        correct_file = pop_key(correct_file, elem.split(":")[:-1], elem.split(":")[-1])
+                        correct_file = pop_value(correct_file, elem.split(":")[:-1], elem.split(":")[-1])
                     html_str += '</ul>'
 
                 if len(error[3]) > 0:
@@ -107,8 +107,28 @@ def pop_key(metafile, key_list, value):
                 return metafile
         else:
             metafile[key_list[0]] = pop_key(metafile[key_list[0]], key_list[1:], value)
+    return metafile
+
+
+def pop_value(metafile, key_list, value):
+    if len(key_list) == 1:
+        if isinstance(metafile, list):
+            for i in range(len(metafile)):
+                metafile[i] = pop_value(metafile[i], key_list, value)
+        elif key_list[0] in metafile:
+            if isinstance(metafile[key_list[0]], list):
+                metafile[key_list[0]] = [x for x in metafile[key_list[0]] if x != value]
+                if len(metafile[key_list[0]]) == 0:
+                    if key_list[0] in metafile and metafile[key_list[0]] == value:
+                        metafile.pop(key_list[0])
+            else:
+                metafile.pop(key_list[0])
     else:
-        print('VALUE', metafile)
+        if isinstance(metafile, list):
+            for i in range(len(metafile)):
+                metafile[i] = pop_value(metafile[i], key_list, value)
+        elif isinstance(metafile, dict):
+            metafile[key_list[0]] = pop_value(metafile[key_list[0]], key_list[1:], value)
     return metafile
 
 

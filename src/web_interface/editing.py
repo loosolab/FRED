@@ -255,6 +255,10 @@ def get_all_factors(meta_yaml, real_val):
                         real_val[val] = value
                     else:
                         real_val[elem] = value
+                # TODO: nach oben rücken + rekursiv (eigene Funktion)
+                elif isinstance(factors['values'], dict):
+                    value = {value: factors['values'][value]}
+                print(value)
                 setting_fac['values'].append(value)
             setting_factors.append(setting_fac)
         all_factors.append(setting_factors)
