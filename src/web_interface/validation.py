@@ -23,7 +23,7 @@ def validate_object(wi_object):
     wi_object.pop('all_factors')
 
     for elem in wi_object:
-        elem, wi_object[elem], pooled, organisms, warnings, errors = validate_part(elem, wi_object[elem], [], pooled, organisms, [])
+        elem, wi_object[elem], pooled, organisms, warnings[elem], errors[elem] = validate_part(elem, wi_object[elem], [], pooled, organisms, [])
 
     new_object = {}
     for part in ['project', 'experimental_setting', 'technical_details']:
