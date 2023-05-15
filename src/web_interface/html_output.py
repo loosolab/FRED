@@ -14,7 +14,7 @@ def get_summary(wi_object, key_yaml):
     """
 
     # parse wi_object to yaml
-    yaml_object = oty.parse_object(wi_object, key_yaml)
+    yaml_object, file_path = oty.parse_object(wi_object, key_yaml)
 
     # save the project_id from the yaml file
     if 'project' in yaml_object and 'id' in yaml_object['project']:
@@ -37,10 +37,10 @@ def get_summary(wi_object, key_yaml):
                    f'{object_to_html(yaml_object[elem], 0, False)}' \
                    f'<br>{end}'
 
-    return {'yaml': yaml_object, 'summary': html_str,
-            'file_names': html_filenames, 'file_string': (
-                project_id,
-                '\n'.join(filenames)) if project_id is not None else None}
+    return_object = {'summary': html_str, 'file_names': html_filenames,
+                     'file_string': (project_id, '\n'.join(filenames)) if
+                     project_id is not None else None}
+    return return_object
 
 
 def get_html_filenames(filename_nest):

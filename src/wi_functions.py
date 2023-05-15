@@ -104,5 +104,5 @@ def parse_object(wi_object):
     # read in general structure
     key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), '..', 'keys.yaml'))
-
-    return oty.parse_object(wi_object, key_yaml)
+    res, path = oty.parse_object(wi_object, key_yaml)
+    return {'object': res, 'path': path}

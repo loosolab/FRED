@@ -22,17 +22,10 @@ def validate_object(wi_object):
                     organisms.append(elem['value'].split(' ')[0])
     warnings = {}
     errors = {}
-    factors = copy.deepcopy(wi_object['all_factors'])
-    wi_object.pop('all_factors')
 
-    for elem in wi_object:
-        elem, wi_object[elem], pooled, organisms, warnings[elem], errors[elem] = validate_part(elem, wi_object[elem], [], pooled, organisms, [])
-
-    new_object = {}
     for part in ['project', 'experimental_setting', 'technical_details']:
-        new_object[part] = wi_object[part]
-    wi_object = new_object
-    wi_object['all_factors'] = copy.deepcopy(factors)
+        part, wi_object[part], pooled, organisms, warnings[part], errors[part] = validate_part(part, wi_object[part], [], pooled, organisms, [])
+
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings}
     return validation_object

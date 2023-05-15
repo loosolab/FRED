@@ -24,8 +24,8 @@ def edit_wi_object(path, project_id, key_yaml):
     html_str, meta_yaml = searching.get_meta_info(path, project_id)
     whitelist_object = {}
     if meta_yaml is not None:
-        file_path = meta_yaml['path']
-        meta_yaml.pop('path')
+        if 'path' in meta_yaml:
+            meta_yaml.pop('path')
         empty_object = yto.get_empty_wi_object(key_yaml)
         wi_object = {}
         wi_object['all_factors'], real_val = get_all_factors(meta_yaml,
@@ -40,7 +40,6 @@ def edit_wi_object(path, project_id, key_yaml):
         wi_object = yto.get_empty_wi_object(key_yaml)
 
     wi_object['whitelists'] = whitelist_object
-    wi_object['path'] = file_path
     return wi_object
 
 

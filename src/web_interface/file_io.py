@@ -1,4 +1,5 @@
 import src.find_metafiles as find_metafiles
+import src.file_reading as file_reading
 import src.utils as utils
 import os
 
@@ -11,14 +12,17 @@ def save_object(dictionary, path, filename):
     :param filename: the name of the file
     :return: new_filename: the name under which the file was saved
     """
-    metafiles = find_metafiles.find_projects(path,
-                                         f'id:"{dictionary["project"]["id"]}"',
-                                         False)
-    if len(metafiles) > 0:
-        for elem in metafiles:
-            for key in elem:
-                if key == dictionary['project']['id']:
-                    path = elem[key]
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles([path],
+                                                                       return_false=True)
+    correct_file = None
+    for metafile in metafiles:
+        if 'project' in metafile and 'id' in metafile['project'] and \
+                metafile['project']['id'] == dictionary["project"]["id"]:
+            correct_file = metafile
+            break
+
+    if correct_file is not None:
+        path = correct_file['path']
         new_filename = path
         utils.save_as_yaml(dictionary, path)
     else:
