@@ -58,7 +58,6 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
                 fill_key = 'input_fields'
                 filled_value, whitelist_object = fill_experimental_setting(
                     wi_object, meta_yaml, key_yaml, whitelist_object, real_val)
-                print(len(filled_value))
             else:
                 fill_key = 'input_fields'
                 filled_value = copy.deepcopy(wi_object['input_fields'])
@@ -136,11 +135,10 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, 
                                         # TODO: real_val
                                         if isinstance(s[k], list):
                                             for elem in s[k]:
-                                                if (s, elem) not in filled_keys and (s, elem) not in split_cond:
-                                                    filled_keys.append((s, elem))
-                                        elif (s, s[k]) not in split_cond:
-                                            filled_keys.append((s, s[k]))
-
+                                                if (k, elem) not in filled_keys and (k, elem) not in split_cond:
+                                                    filled_keys.append((k, elem))
+                                        elif (k, s[k]) not in split_cond:
+                                            filled_keys.append((k, s[k]))
                                 cond_sample_name = f'{sample_name}_{int(s["sample_name"].split("_")[-1].replace("b",""))}'
                                 filled_sample = copy.deepcopy(input_fields)
                                 filled_sample = fac_cond.get_samples(
@@ -149,12 +147,10 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, 
                                         key_yaml, cond_sample_name, organism,
                                         is_factor=False)
                                 samples.append(copy.deepcopy(filled_sample))
+                            title, readd = fac_cond.get_condition_title(split_cond)
                             d = {'correct_value': cond['condition_name'],
-                                 'title': cond['condition_name'].replace(':',
-                                                                         ': ').replace(
-                                     '|',
-                                     '| ').replace(
-                                     '#', '# ').replace('-', ' - '),
+                                 'title': title,
+                                 'readd': readd,
                                  'position': 'experimental_setting:condition',
                                  'list': True, 'mandatory': True,
                                  'list_value': samples,

@@ -467,8 +467,11 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                         if 'special_case' in info[0] and 'value_unit' \
                                 in info[0]['special_case']:
 
-                            # split the value into value and unit
-                            value_unit = wi_utils.split_value_unit(c[1])
+                            if isinstance(c[1], dict):
+                                value_unit = c[1]
+                            else:
+                                # split the value into value and unit
+                                value_unit = wi_utils.split_value_unit(c[1])
 
                             # save the value and unit in the sample
                             sample[i]['value'] = value_unit['value']
