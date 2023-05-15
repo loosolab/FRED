@@ -227,7 +227,6 @@ def get_all_factors(meta_yaml, real_val):
     :return: all_factors: an object containing all experimental factors
     """
     all_factors = []
-    real_val = {}
     for setting in meta_yaml['experimental_setting']:
         setting_factors = []
         for factors in setting['experimental_factors']:
@@ -235,7 +234,6 @@ def get_all_factors(meta_yaml, real_val):
             w = utils.get_whitelist(factors['factor'], setting)
             setting_fac['values'] = []
             for elem in factors['values']:
-
                 value = elem
                 if w and 'headers' in w:
                     if 'headers' not in setting_fac:
@@ -248,6 +246,9 @@ def get_all_factors(meta_yaml, real_val):
                         setting_fac['whitelist_keys'] = w['whitelist_keys']
                     if 'whitelist_type' in w and w['whitelist_type'] == 'plain_group':
                         value = parse_whitelist_keys(value, w['whitelist_keys'], w['whitelist'])
+
+                if isinstance(elem, dict) and len(list(elem.keys()))==2 and 'unit' in elem and 'value' in elem:
+                    value = f'{elem["value"]}{elem["unit"]}'
 
                 if value != elem:
                     if isinstance(elem, dict):
