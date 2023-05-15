@@ -162,6 +162,7 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, 
 
                 else:
 
+                    print(f)
                     if 'headers' in f and isinstance(meta_yaml[key], dict):
                         new_val = parse_headers(meta_yaml[key], f['headers'])
                     else:
