@@ -87,7 +87,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
             filled_value = default_time.strftime("%Y-%m-%dT%X.%fZ")
         else:
             filled_value = meta_yaml
-    
+
     if 'input_type' in wi_object and wi_object['input_type'] == \
             'single_autofill':
         fill_key = 'list_value'

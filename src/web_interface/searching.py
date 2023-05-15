@@ -36,35 +36,43 @@ def get_meta_info(path, project_id):
 
             # TODO: error Handling + Ausgabe
             if error is not None:
-                html_str += f'<font color="red"><h3>ERROR:</h3>'
+                html_str += f'<font color="red"><h3><b>ERROR:</b></h3>'
                 if len(error[0]) > 0:
                     html_str += f'<b>Missing mandatory keys:</b><br>'
+                    html_str += '<ul>'
                     for elem in error[0]:
-                        html_str += f'- {elem}<br>'
+                        html_str += f'<li>{elem}</li>'
+                    html_str += '</ul>'
                 if len(error[1]) > 0:
                     html_str += f'<b>Invalid keys:</b><br>'
+                    html_str += '<ul>'
                     for elem in error[1]:
                         value = correct_file
                         for key in elem.split(':'):
                             value = value[key]
-                        html_str += f'- {elem}: {value}<br>'
+                        html_str += f'<li>{elem}: {value}</li>'
                         correct_file = pop_key(correct_file, elem.split(':'), value)
+                    html_str += '</ul>'
 
                 if len(error[2]) > 0:
                     html_str += f'<b>Invalid entries:</b><br>'
+                    html_str += '<ul>'
                     for elem in error[2]:
-                        html_str += f'- {elem.split(":")[-1]} in {":".join(elem.split(":")[:-1])}<br>'
+                        html_str += f'<li>{elem.split(":")[-1]} in {":".join(elem.split(":")[:-1])}</li>'
                         correct_file = pop_key(correct_file, elem.split(":")[:-1], elem.split(":")[-1])
+                    html_str += '</ul>'
 
                 if len(error[3]) > 0:
                     html_str += f'<b>Invalid values:</b><br>'
+                    html_str += '<ul>'
                     for elem in error[3]:
-                        html_str += f'- {elem[0]}: {elem[1]} -> {elem[2]}<br>'
+                        html_str += f'<li>{elem[0]}: {elem[1]} -> {elem[2]}</li>'
+                    html_str += '</ul>'
 
                 html_str += '</font><hr>'
 
             if warning is not None:
-                html_str += f'<font color="orange"><h3>WARNING:</h3>'
+                html_str += f'<font color="orange"><h3><b>WARNING:</b></h3>'
                 for elem in warning:
                     message = elem[0].replace("\'", "")
                     html_str += f'- {message}: {elem[1]}<br>'
