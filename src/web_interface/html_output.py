@@ -14,7 +14,7 @@ def get_summary(wi_object, key_yaml):
     """
 
     # parse wi_object to yaml
-    yaml_object, file_path = oty.parse_object(wi_object, key_yaml)
+    yaml_object = oty.parse_object(wi_object, key_yaml)
 
     # save the project_id from the yaml file
     if 'project' in yaml_object and 'id' in yaml_object['project']:
