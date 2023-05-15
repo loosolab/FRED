@@ -311,7 +311,10 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
 
         # special case: organism
         if wi_object[i]['position'].split(':')[-1] == 'organism':
-            organism = wi_object[i]['value'].split(' ')[0]
+            if isinstance(wi_object[i]['value'], dict):
+                organism = wi_object[i]['value']['organism_name'].split(' ')[0]
+            else:
+                organism = wi_object[i]['value'].split(' ')[0]
             short = utils.get_whitelist(
                 os.path.join('abbrev', 'organism_name'), organism)['whitelist']
 
