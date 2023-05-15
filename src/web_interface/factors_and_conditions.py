@@ -350,7 +350,7 @@ def get_conditions(factors, organism_name, key_yaml):
         for cond in conditions:
 
             # generate a sample name from the condition
-            sample_name = generate.get_short_name(cond, {})
+            sample_name = generate.get_short_name(cond, {}, key_yaml)
 
             # split the condition into key-value pairs
             split_condition = generate.split_cond(cond)

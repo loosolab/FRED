@@ -122,7 +122,7 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, 
                             split_cond = generate.split_cond(
                                 cond['condition_name'])
                             sample_name = generate.get_short_name(
-                                cond['condition_name'], {})
+                                cond['condition_name'], {}, key_yaml)
                             input_fields = fac_cond.get_samples(
                                 split_cond, copy.deepcopy(sample), real_val,
                                 key_yaml, sample_name, organism)
