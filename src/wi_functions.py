@@ -82,7 +82,7 @@ def get_meta_info(path, project_id):
 
 
 def get_search_mask():
-
+    git_whitelists.get_whitelists()
     return searching.get_search_mask()
 
 
@@ -92,6 +92,7 @@ def find_metadata(path, search_string):
 
 
 def edit_wi_object(path, project_id):
+    git_whitelists.get_whitelists()
     # read in general structure
     key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), '..', 'keys.yaml'))

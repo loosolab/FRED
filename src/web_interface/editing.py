@@ -162,18 +162,13 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, 
 
                 else:
 
-                    print(f)
                     if 'headers' in f and isinstance(meta_yaml[key], dict):
                         new_val = parse_headers(meta_yaml[key], f['headers'])
                     else:
                         new_val = meta_yaml[key]
-                    print(new_val)
+
                     if key == 'organism':
-                        if 'organism_name' in new_val:
-                            print('HIER!!!!!!!!!!!!!!!!!!!!!!!')
-                            organism = new_val['organism_name']
-                        else:
-                            organism = new_val
+                        organism = new_val
 
                     if 'whitelist_keys' in f:
                         new_val = parse_whitelist_keys(meta_yaml[key], f['whitelist_keys'], utils.get_whitelist(key, {'organism': organism}))
