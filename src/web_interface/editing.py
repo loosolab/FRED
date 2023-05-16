@@ -23,6 +23,7 @@ def edit_wi_object(path, project_id, key_yaml):
     # TODO: as Parameter at get_info
     html_str, meta_yaml = searching.get_meta_info(path, project_id)
     whitelist_object = {}
+
     if meta_yaml is not None:
         if 'path' in meta_yaml:
             meta_yaml.pop('path')
@@ -279,7 +280,6 @@ def get_all_factors(meta_yaml, real_val):
                 # TODO: nach oben rücken + rekursiv (eigene Funktion)
                 elif isinstance(factors['values'], dict):
                     value = {value: factors['values'][value]}
-                print(value)
                 setting_fac['values'].append(value)
             setting_factors.append(setting_fac)
         all_factors.append(setting_factors)

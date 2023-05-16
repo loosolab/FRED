@@ -24,8 +24,8 @@ def pop_key(metafile, key_list, value):
 
             # if the remaining list element is an empty dictionary or list then
             # set it to None
-            if isinstance(metafile[i], dict) or isinstance(metafile[i], list) \
-                    and len(metafile[i]) == 0:
+            if (isinstance(metafile[i], dict) or
+                    isinstance(metafile[i], list)) and len(metafile[i]) == 0:
                 metafile[i] = None
 
         # remove all list elements that are None
@@ -51,11 +51,10 @@ def pop_key(metafile, key_list, value):
             # key of the list
             metafile[key_list[0]] = pop_key(metafile[key_list[0]],
                                             key_list[1:], value)
-
             # test if the remaining part of the metafile is an empty dictionary
             # or list
-            if isinstance(metafile[key_list[0]], dict) or \
-                    isinstance(metafile[key_list[0]], list) and \
+            if (isinstance(metafile[key_list[0]], dict) or
+                    isinstance(metafile[key_list[0]], list)) and \
                     len(metafile[key_list[0]]) == 0:
 
                 # remove the key from the metafile
@@ -87,8 +86,8 @@ def pop_value(metafile, key_list, value):
                 metafile[i] = pop_value(metafile[i], key_list, value)
 
                 # test if the remaining element is an empty dictionary or list
-                if isinstance(metafile[i], dict) or \
-                        isinstance(metafile[i], list) and \
+                if (isinstance(metafile[i], dict) or
+                        isinstance(metafile[i], list)) and \
                         len(metafile[i]) == 0:
 
                     # set the element to None
@@ -136,17 +135,16 @@ def pop_value(metafile, key_list, value):
             metafile = [x for x in metafile if x is not None]
 
         # metafile is a dictionary
-        elif isinstance(metafile, dict):
+        elif isinstance(metafile, dict) and key_list[0] in metafile:
 
             # call this function on the part of the metafile within the first
             # key of the list
             metafile[key_list[0]] = pop_value(metafile[key_list[0]],
                                               key_list[1:], value)
-
             # test if the remaining part of the metafile is an empty dictionary
             # or list
-            if isinstance(metafile[key_list[0]], dict) or \
-                    isinstance(metafile[key_list[0]], list) and \
+            if (isinstance(metafile[key_list[0]], dict) or
+                    isinstance(metafile[key_list[0]], list)) and \
                     len(metafile[key_list[0]]) == 0:
 
                 # remove the key from the metafile
