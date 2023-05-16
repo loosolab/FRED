@@ -88,7 +88,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
     else:
         fill_key = 'value'
         if wi_object['input_type'] == 'date':
-            filled_value = wi_utils.date_to_str(meta_yaml)
+            filled_value = wi_utils.str_to_date(meta_yaml)
         else:
             filled_value = meta_yaml
 
