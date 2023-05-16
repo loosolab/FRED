@@ -37,10 +37,9 @@ def get_summary(wi_object, key_yaml):
                    f'{object_to_html(yaml_object[elem], 0, False)}' \
                    f'<br>{end}'
 
-    return_object = {'summary': html_str, 'file_names': html_filenames,
-                     'file_string': (project_id, '\n'.join(filenames)) if
-                     project_id is not None else None}
-    return return_object
+    return {'summary': html_str, 'file_names': html_filenames,
+            'file_string': (project_id, '\n'.join(filenames)) if
+            project_id is not None else None}
 
 
 def get_html_filenames(filename_nest):

@@ -1,30 +1,36 @@
 import src.find_metafiles as find_metafiles
 import src.utils as utils
 import src.web_interface.html_output as html_output
-import src.web_interface.git_whitelists as git_whitelists
+import src.web_interface.wi_utils as wi_utils
 import src.file_reading as file_reading
-import os
+
+# TODO: refactor and comment
 
 
 def get_meta_info(path, project_id):
     """
-    This file creates an HTML summary for a project containing metadata.
+    This file creates an HTML summary for a project containing metadata
     :param path: the path of a folder to be searched for a project
     :param project_id: the id of the project
     :return: html_str: the summary in HTML
     """
+
+    # TODO: own function
     # If file must be searched
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles([path], return_false=True)
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles(
+        [path], return_false=True)
     correct_file = None
     for metafile in metafiles:
-        if 'project' in metafile and 'id' in metafile['project'] and metafile['project']['id'] == project_id:
+        if 'project' in metafile and 'id' in metafile['project'] and \
+                metafile['project']['id'] == project_id:
             correct_file = metafile
             break
 
     if correct_file is not None:
 
         html_str = ''
-        if validation_reports['error_count'] > 0 or validation_reports['warning_count'] > 0:
+        if validation_reports['error_count'] > 0 or \
+                validation_reports['warning_count'] > 0:
             error = None
             warning = None
 
@@ -51,22 +57,27 @@ def get_meta_info(path, project_id):
                         for key in elem.split(':'):
                             value = value[key]
                         html_str += f'<li>{elem}: {value}</li>'
-                        correct_file = pop_key(correct_file, elem.split(':'), value)
+                        correct_file = wi_utils.pop_key(correct_file,
+                                                        elem.split(':'), value)
                     html_str += '</ul>'
 
                 if len(error[2]) > 0:
                     html_str += f'<b>Invalid entries:</b><br>'
                     html_str += '<ul>'
                     for elem in error[2]:
-                        html_str += f'<li>{elem.split(":")[-1]} in {":".join(elem.split(":")[:-1])}</li>'
-                        correct_file = pop_value(correct_file, elem.split(":")[:-1], elem.split(":")[-1])
+                        html_str += f'<li>{elem.split(":")[-1]} in ' \
+                                    f'{":".join(elem.split(":")[:-1])}</li>'
+                        correct_file = wi_utils.pop_value(
+                            correct_file, elem.split(":")[:-1],
+                            elem.split(":")[-1])
                     html_str += '</ul>'
 
                 if len(error[3]) > 0:
                     html_str += f'<b>Invalid values:</b><br>'
                     html_str += '<ul>'
                     for elem in error[3]:
-                        html_str += f'<li>{elem[0]}: {elem[1]} -> {elem[2]}</li>'
+                        html_str += f'<li>{elem[0]}: {elem[1]} -> ' \
+                                    f'{elem[2]}</li>'
                     html_str += '</ul>'
 
                 html_str += '</font><hr>'
@@ -94,44 +105,6 @@ def get_meta_info(path, project_id):
     return html_str, correct_file
 
 
-# TODO: test if value is in condition -> replace
-# TODO: test for list -> only remove wrong item
-def pop_key(metafile, key_list, value):
-    if isinstance(metafile, list):
-        for i in range(len(metafile)):
-            metafile[i] = pop_key(metafile[i], key_list, value)
-    elif isinstance(metafile, dict):
-        if len(key_list) == 1:
-            if key_list[0] in metafile and metafile[key_list[0]] == value:
-                metafile.pop(key_list[0])
-                return metafile
-        else:
-            metafile[key_list[0]] = pop_key(metafile[key_list[0]], key_list[1:], value)
-    return metafile
-
-
-def pop_value(metafile, key_list, value):
-    if len(key_list) == 1:
-        if isinstance(metafile, list):
-            for i in range(len(metafile)):
-                metafile[i] = pop_value(metafile[i], key_list, value)
-        elif key_list[0] in metafile:
-            if isinstance(metafile[key_list[0]], list):
-                metafile[key_list[0]] = [x for x in metafile[key_list[0]] if x != value]
-                if len(metafile[key_list[0]]) == 0:
-                    if key_list[0] in metafile and metafile[key_list[0]] == value:
-                        metafile.pop(key_list[0])
-            else:
-                metafile.pop(key_list[0])
-    else:
-        if isinstance(metafile, list):
-            for i in range(len(metafile)):
-                metafile[i] = pop_value(metafile[i], key_list, value)
-        elif isinstance(metafile, dict):
-            metafile[key_list[0]] = pop_value(metafile[key_list[0]], key_list[1:], value)
-    return metafile
-
-
 def get_search_mask(key_yaml):
     """
     This functions returns all necessary information for the search mask.
@@ -148,7 +121,7 @@ def get_search_mask(key_yaml):
 def find_metadata(path, search_string):
     """
     This function searches for metadata files that match a search string in a
-    given directory.
+    given directory
     :param path: the path that should be searched
     :param search_string: the search string
     :return: new_files: a list containing all matching files
@@ -179,7 +152,7 @@ def find_metadata(path, search_string):
 
 def get_search_keys(key_yaml, chained):
     """
-    This function returns all keys of the metadata structure in a nested way.
+    This function returns all keys of the metadata structure in a nested way
     :param key_yaml: the read in keys.yaml
     :param chained: the position of the key
     :return: res: a dictionary containing all metadata keys
@@ -191,7 +164,9 @@ def get_search_keys(key_yaml, chained):
                  key_yaml, key))[0]['display_name']}
         if isinstance(key_yaml[key]['value'], dict) and not \
                 set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
-                <= set(key_yaml[key]['value'].keys()) and not ('special_case' in key_yaml[key] and 'merge' in key_yaml[key]['special_case']):
+                <= set(key_yaml[key]['value'].keys()) and not (
+                'special_case' in key_yaml[key] and 'merge' in
+                key_yaml[key]['special_case']):
             d['nested'] = get_search_keys(key_yaml[key]['value'],
                                           f'{chained}{key}:'
                                           if chained != '' else f'{key}:')
@@ -202,8 +177,10 @@ def get_search_keys(key_yaml, chained):
 
         if 'whitelist' in key_yaml[key]:
             d['whitelist'] = key_yaml[key]['whitelist']
-        elif 'special_case' in key_yaml[key] and 'merge' in key_yaml[key]['special_case']:
-            d['whitelist'] = key_yaml[key]['value'][key_yaml[key]['special_case']['merge']]['whitelist']
+        elif 'special_case' in key_yaml[key] and 'merge' in \
+                key_yaml[key]['special_case']:
+            d['whitelist'] = key_yaml[key]['value'][key_yaml[key][
+                'special_case']['merge']]['whitelist']
 
         if 'whitelist' in d and d['whitelist']:
             d['search_info'] = {'key_name': key}

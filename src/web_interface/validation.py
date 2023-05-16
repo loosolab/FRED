@@ -1,12 +1,12 @@
-import copy
 import src.validate_yaml as validate_yaml
-from dateutil import parser
-import pytz
+import src.web_interface.wi_utils as wi_utils
+
+# TODO: rewrite and documentation
 
 
 def validate_object(wi_object):
     """
-    This function performs a validation over the wi object.
+    This function performs a validation over the wi object
     :param wi_object: the filled wi object
     :return: validation_object: the validated wi object with errors and
                                 warnings
@@ -17,14 +17,17 @@ def validate_object(wi_object):
         for elem in setting:
             if elem['position'].split(':')[-1] == 'organism':
                 if isinstance(elem['value'], dict):
-                    organisms.append(elem['value']['organism_name'].split(' ')[0])
+                    organisms.append(elem['value']['organism_name'].split(
+                        ' ')[0])
                 else:
                     organisms.append(elem['value'].split(' ')[0])
     warnings = {}
     errors = {}
 
     for part in ['project', 'experimental_setting', 'technical_details']:
-        part, wi_object[part], pooled, organisms, warnings[part], errors[part] = validate_part(part, wi_object[part], [], pooled, organisms, [])
+        part, wi_object[part], pooled, organisms, warnings[part], \
+            errors[part] = validate_part(part, wi_object[part], [], pooled,
+                                         organisms, [])
 
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings}
@@ -100,10 +103,7 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
             else:
                 if wi_object['value'] is not None and wi_object['value'] != '':
                     if wi_object['input_type'] == 'date':
-                        default_time = parser.parse(wi_object['value'])
-                        timezone = pytz.timezone("Europe/Berlin")
-                        local_time = default_time.astimezone(timezone)
-                        value = local_time.strftime("%d.%m.%Y")
+                        value = wi_utils.date_to_str(wi_object['value'])
                     else:
                         value = wi_object['value']
                     valid, message = validate_yaml.validate_value(

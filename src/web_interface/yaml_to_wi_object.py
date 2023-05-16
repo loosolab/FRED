@@ -33,6 +33,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
     """
     This function parses a part of the key.yaml into an object readable by the
     web-interface
+    :param filled_object: a dictionary containing pre-filled information
     :param node: a part of the key.yaml that should be parsed
     :param pos: the position of the node (chained keys)
     :param key_yaml: the whole key.yaml
@@ -40,6 +41,9 @@ def parse_empty(node, pos, key_yaml, filled_object,
                                  into a separate object, False if not, default
                                  False
     :return: part_object: an object for the web interface parsed from node
+             whitelist_object: a dictionary containing all whitelists, it is
+                               only filled if 'get_whitelist_object' is set to
+                               True
     """
 
     # disable input for the keys condition_name and sample_name because they
@@ -47,11 +51,13 @@ def parse_empty(node, pos, key_yaml, filled_object,
     input_disabled = True if pos.split(':')[-1] \
         in ['condition_name', 'sample_name'] else False
 
+    # initialize a whitelist object to store all whitelists
     whitelist_object = {}
 
     # test if the value of the current node is a dictionary
     if isinstance(node['value'], dict):
 
+        # initialize the input type with None
         input_type = None
 
         # special case: merge or value_unit
@@ -68,13 +74,20 @@ def parse_empty(node, pos, key_yaml, filled_object,
             if pos.split(':')[-1] == 'organism':
                 input_type = 'organism_name'
 
+            # test if the whitelist should be stored in a separate object
             if get_whitelist_object:
 
+                # special case: value_unit
                 if input_type == 'value_unit':
+
+                    # store the whitelist in the object under the key 'unit'
                     whitelist_object['unit'] = whitelist
                     whitelist = 'unit'
 
+                # a whitelist is defined for the key
                 elif whitelist is not None:
+
+                    # save the whitelist to the object under the keyname
                     whitelist_object[pos.split(':')[-1]] = whitelist
                     whitelist = pos.split(':')[-1]
 
@@ -93,13 +106,14 @@ def parse_empty(node, pos, key_yaml, filled_object,
             if input_type == 'value_unit':
                 part_object['value_unit'] = node['value']['unit']['value']
 
+            # save headers and whitelist keys in the object if they are defined
             if headers is not None:
                 part_object['headers'] = headers
             if whitelist_keys is not None:
                 part_object['whitelist_keys'] = whitelist_keys
 
-            if input_type == 'single_autofill' or input_type == \
-                    'multi_autofill':
+            # add a search info for autofill
+            if input_type in ['single_autofill', 'multi_autofill']:
                 part_object['search_info'] = {
                     'organism': filled_object['organism']
                     if 'organism' in filled_object else None,
@@ -123,7 +137,11 @@ def parse_empty(node, pos, key_yaml, filled_object,
                     node['value'][key], pos + ':' + key, key_yaml,
                     filled_object, get_whitelist_object=get_whitelist_object)
 
+                # add the parsed input fields to the list
                 input_fields.append(field_infos)
+
+                # merge the whitelist object with the object from the input
+                # field
                 whitelist_object = {**whitelist_object, **w_object}
 
             # creation and filling of dictionary containing all necessary
@@ -146,6 +164,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
             whitelist_parsing.parse_whitelist(pos.split(':')[-1], node,
                                               filled_object)
 
+        # test if whitelists are defined and should be stored in a separate
+        # object
         if get_whitelist_object and whitelist is not None:
 
             # set the whitelist to the name of the key if a whitelist was
@@ -164,6 +184,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
                        'input_type': input_type,
                        'input_disabled': input_disabled}
 
+        # add headers and whitelist keys to the empty object if they are
+        # defined
         if headers is not None:
             part_object['headers'] = headers
         if whitelist_keys is not None:

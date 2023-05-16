@@ -1,7 +1,8 @@
-import src.find_metafiles as find_metafiles
 import src.file_reading as file_reading
 import src.utils as utils
 import os
+
+# TODO: comment
 
 
 def save_object(dictionary, path, filename):
@@ -12,8 +13,12 @@ def save_object(dictionary, path, filename):
     :param filename: the name of the file
     :return: new_filename: the name under which the file was saved
     """
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles([path.split('/')[0]],
-                                                                       return_false=True)
+
+    # search for all metadata files
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles(
+        [path.split('/')[0]], return_false=True)
+
+    # TODO: own function
     correct_file = None
     for metafile in metafiles:
         if 'project' in metafile and 'id' in metafile['project'] and \
@@ -35,7 +40,7 @@ def save_object(dictionary, path, filename):
 
 def save_filenames(file_str, path):
     """
-    This function saves the generated filenames into a file.
+    This function saves the generated filenames into a file
     :param file_str: the filenames to be saved
     :param path: the path to save the file to
     :return: filename: the name under which the generated filenames are saved

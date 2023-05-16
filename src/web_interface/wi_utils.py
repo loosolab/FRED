@@ -1,3 +1,200 @@
+import pytz
+from dateutil import parser
+
+
+def pop_key(metafile, key_list, value):
+    """
+    This function iterates over a list of keys in order to remove the last key
+    and every key above it if its remaining value is an empty list or
+    dictionary
+    :param metafile: the read in metadata file
+    :param key_list: a list of keys
+    :param value: the value within the last key
+    :return: metafile: the read in metadata file without the popped key
+    """
+
+    # metafile is a list
+    if isinstance(metafile, list):
+
+        # iterate over list
+        for i in range(len(metafile)):
+
+            # call this function on every list element
+            metafile[i] = pop_key(metafile[i], key_list, value)
+
+            # if the remaining list element is an empty dictionary or list then
+            # set it to None
+            if isinstance(metafile[i], dict) or isinstance(metafile[i], list) \
+                    and len(metafile[i]) == 0:
+                metafile[i] = None
+
+        # remove all list elements that are None
+        metafile = [x for x in metafile if x is not None]
+
+    # metafile is a dictionary
+    elif isinstance(metafile, dict):
+
+        # only one list key is left -> must be removed
+        if len(key_list) == 1:
+
+            # test if the key is in the metafile and its value matches the key
+            # to be removed
+            if key_list[0] in metafile and metafile[key_list[0]] == value:
+
+                # remove the key from the metafile
+                metafile.pop(key_list[0])
+
+        # more keys are left in the list
+        else:
+
+            # call this function on the part of the metafile within the first
+            # key of the list
+            metafile[key_list[0]] = pop_key(metafile[key_list[0]],
+                                            key_list[1:], value)
+
+            # test if the remaining part of the metafile is an empty dictionary
+            # or list
+            if isinstance(metafile[key_list[0]], dict) or \
+                    isinstance(metafile[key_list[0]], list) and \
+                    len(metafile[key_list[0]]) == 0:
+
+                # remove the key from the metafile
+                metafile.pop(key_list[0])
+
+    return metafile
+
+
+def pop_value(metafile, key_list, value):
+    """
+    This function removes a value from the metadata object. If the removal
+    leads to an empty key or list then those are removed as well
+    :param metafile: the read in metadata file
+    :param key_list: a list of keys
+    :param value: the value to be removed
+    :return: metafile: the read in metadata file without the removed value
+    """
+
+    # only one key is in the list
+    if len(key_list) == 1:
+
+        # metafile is a list
+        if isinstance(metafile, list):
+
+            # iterate over the elements of the list
+            for i in range(len(metafile)):
+
+                # call this function on every list element
+                metafile[i] = pop_value(metafile[i], key_list, value)
+
+                # test if the remaining element is an empty dictionary or list
+                if isinstance(metafile[i], dict) or \
+                        isinstance(metafile[i], list) and \
+                        len(metafile[i]) == 0:
+
+                    # set the element to None
+                    metafile[i] = None
+
+            # remove all list elements that are None
+            metafile = [x for x in metafile if x is not None]
+
+        # metafile is a dictionary and contains the key
+        elif key_list[0] in metafile:
+
+            # the value of the key is a list
+            if isinstance(metafile[key_list[0]], list):
+
+                # remove the faulty value from the list
+                metafile[key_list[0]] = [x for x in metafile[key_list[0]] if
+                                         x != value]
+
+                # test if the remaining list is empty then remove the key
+                if len(metafile[key_list[0]]) == 0:
+                    metafile.pop(key_list[0])
+
+            # remove the key if it contains the faulty value
+            elif metafile[key_list[0]] == value:
+                metafile.pop(key_list[0])
+
+    # multiple keys in the list
+    else:
+
+        # metafile is a list
+        if isinstance(metafile, list):
+
+            # iterate over the list elements
+            for i in range(len(metafile)):
+
+                # call this function on every list element
+                metafile[i] = pop_value(metafile[i], key_list, value)
+
+                # set the element to None if it contains an empty list or
+                # dictionary
+                if len(metafile[i]) == 0:
+                    metafile[i] = None
+
+            # remove all elements from the list that are None
+            metafile = [x for x in metafile if x is not None]
+
+        # metafile is a dictionary
+        elif isinstance(metafile, dict):
+
+            # call this function on the part of the metafile within the first
+            # key of the list
+            metafile[key_list[0]] = pop_value(metafile[key_list[0]],
+                                              key_list[1:], value)
+
+            # test if the remaining part of the metafile is an empty dictionary
+            # or list
+            if isinstance(metafile[key_list[0]], dict) or \
+                    isinstance(metafile[key_list[0]], list) and \
+                    len(metafile[key_list[0]]) == 0:
+
+                # remove the key from the metafile
+                metafile.pop(key_list[0])
+
+    return metafile
+
+
+def date_to_str(date):
+    """
+    This function converts the date from default time in ISO 8601 format to
+    time zone Berlin and changes the format to 'DD.MM.YYYY'
+    :param date: the date to be converted
+    :return: the converted date
+    """
+
+    # read in the date as default time
+    default_time = parser.parse(date)
+
+    # initialize the time zone for Berlin
+    timezone = pytz.timezone("Europe/Berlin")
+
+    # convert the default time to the timezone Berlin
+    local_time = default_time.astimezone(timezone)
+
+    # return the date in the format 'DD.MM.YYYY'
+    return local_time.strftime("%d.%m.%Y")
+
+
+def str_to_date(value):
+    """
+    This function converts a string containing the date in the format
+    'DD.MM.YYYY' to ISO 8601 format and changes the timezone from Berlin to
+    default time
+    :param value: the string value containing the date
+    :return: the date in ISO 8601 format
+    """
+
+    # read in the string as local time
+    local_time = parser.parse(value, dayfirst=True)
+
+    # convert the local time to default time
+    default_time = local_time.astimezone(pytz.utc)
+
+    # return the date in the format ISO 8601
+    return default_time.strftime("%Y-%m-%dT%X.%fZ")
+
+
 def split_value_unit(value_unit):
     """
     This function splits a value_unit (e.g. 2weeks) into a value and unit and

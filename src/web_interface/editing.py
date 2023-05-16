@@ -3,22 +3,24 @@ import src.generate_metafile as generate
 import src.web_interface.yaml_to_wi_object as yto
 import src.web_interface.factors_and_conditions as fac_cond
 import src.web_interface.searching as searching
+import src.web_interface.wi_utils as wi_utils
 import copy
-import pytz
-from dateutil import parser
 
 disabled_fields = []
+
+# TODO: code refactoring + documentation
 
 
 def edit_wi_object(path, project_id, key_yaml):
     """
     This function fills an empty wi object with the information of a metadata
-    file.
+    file
+    :param key_yaml:
     :param path: the path containing the metadata file
     :param project_id: the id of the  project
     :return: wi_object: the filled wi object
     """
-    # TODO: als Übergabe bei get_info
+    # TODO: as Parameter at get_info
     html_str, meta_yaml = searching.get_meta_info(path, project_id)
     whitelist_object = {}
     if meta_yaml is not None:
@@ -64,14 +66,17 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
                         filled_value[i], whitelist_object = new_fill(
                             meta_yaml[filled_value[i]['position'].split(
                                 ':')[-1]],
-                            filled_value[i], key_yaml, whitelist_object, real_val)
+                            filled_value[i], key_yaml, whitelist_object,
+                            real_val)
 
     elif isinstance(meta_yaml, list):
         fill_key = 'list_value'
         filled_value = []
         for i in range(len(meta_yaml)):
-            f_val, whitelist_object = new_fill(meta_yaml[i], copy.deepcopy(wi_object),
-                                               key_yaml, whitelist_object, real_val)
+            f_val, whitelist_object = new_fill(
+                meta_yaml[i], copy.deepcopy(wi_object), key_yaml,
+                whitelist_object, real_val)
+
             # TODO: WTF?
             if 'input_fields' in f_val:
                 f_val = f_val['input_fields']
@@ -82,9 +87,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
     else:
         fill_key = 'value'
         if wi_object['input_type'] == 'date':
-            local_time = parser.parse(meta_yaml, dayfirst=True)
-            default_time = local_time.astimezone(pytz.utc)
-            filled_value = default_time.strftime("%Y-%m-%dT%X.%fZ")
+            filled_value = wi_utils.date_to_str(meta_yaml)
         else:
             filled_value = meta_yaml
 
@@ -99,7 +102,8 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
     return wi_object, whitelist_object
 
 
-def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, real_val):
+def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
+                              real_val):
     organism = ''
     filled_object = []
     for j in range(len(wi_object['input_fields'])):
@@ -141,11 +145,18 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, 
                                         # TODO: real_val
                                         if isinstance(s[k], list):
                                             for elem in s[k]:
-                                                if (k, elem) not in filled_keys and (k, elem) not in split_cond:
-                                                    filled_keys.append((k, elem))
+                                                if (k, elem) not in \
+                                                        filled_keys and \
+                                                        (k, elem) not in \
+                                                        split_cond:
+                                                    filled_keys.append(
+                                                        (k, elem))
                                         elif (k, s[k]) not in split_cond:
                                             filled_keys.append((k, s[k]))
-                                cond_sample_name = f'{sample_name}_{int(s["sample_name"].split("_")[-1].replace("b",""))}'
+                                sample_index = int(s["sample_name"].split(
+                                    "_")[-1].replace("b", ""))
+                                cond_sample_name = f'{sample_name}_' \
+                                                   f'{sample_index}'
                                 filled_sample = copy.deepcopy(input_fields)
                                 filled_sample = fac_cond.get_samples(
                                         filled_keys,
@@ -153,7 +164,8 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, 
                                         key_yaml, cond_sample_name, organism,
                                         is_factor=False)
                                 samples.append(copy.deepcopy(filled_sample))
-                            title, readd = fac_cond.get_condition_title(split_cond)
+                            title, readd = fac_cond.get_condition_title(
+                                split_cond)
                             d = {'correct_value': cond['condition_name'],
                                  'title': title,
                                  'readd': readd,
@@ -177,7 +189,9 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object, 
                         organism = new_val
 
                     if 'whitelist_keys' in f:
-                        new_val = parse_whitelist_keys(meta_yaml[key], f['whitelist_keys'], utils.get_whitelist(key, {'organism': organism}))
+                        new_val = parse_whitelist_keys(
+                            meta_yaml[key], f['whitelist_keys'],
+                            utils.get_whitelist(key, {'organism': organism}))
 
                     if 'list' in f and f['list']:
                         f['list_value'] = new_val
@@ -221,7 +235,8 @@ def parse_whitelist_keys(value, whitelist_keys, whitelist):
 def get_all_factors(meta_yaml, real_val):
     """
     This function creates an object containing all experimental factors from a
-    metadata yaml to be stored in a wi object.
+    metadata yaml to be stored in a wi object
+    :param real_val:
     :param meta_yaml: the read in metadata file
     :return: all_factors: an object containing all experimental factors
     """
@@ -243,10 +258,13 @@ def get_all_factors(meta_yaml, real_val):
                 if w and 'whitelist_keys' in w:
                     if 'whitelist_keys' not in setting_fac:
                         setting_fac['whitelist_keys'] = w['whitelist_keys']
-                    if 'whitelist_type' in w and w['whitelist_type'] == 'plain_group':
-                        value = parse_whitelist_keys(value, w['whitelist_keys'], w['whitelist'])
+                    if 'whitelist_type' in w and w['whitelist_type'] == \
+                            'plain_group':
+                        value = parse_whitelist_keys(
+                            value, w['whitelist_keys'], w['whitelist'])
 
-                if isinstance(elem, dict) and len(list(elem.keys()))==2 and 'unit' in elem and 'value' in elem:
+                if isinstance(elem, dict) and len(list(elem.keys())) == 2 and \
+                        'unit' in elem and 'value' in elem:
                     value = f'{elem["value"]}{elem["unit"]}'
 
                 if value != elem:
