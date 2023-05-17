@@ -47,6 +47,19 @@ def get_single_whitelist(ob):
 
 
 def parse_whitelist(key_name, node, filled_object):
+    """
+    This function read in a whitelist and parses it according to type, headers
+    and whitelist keys
+    :param key_name: the key for which a whitelist is defined
+    :param node: the part of the read in metadata structure that contains the
+                 key
+    :param filled_object: a partially filled whitelist object
+    :return: whitelist: the read in whitelist
+             whitelist_type: the type of the whitelist
+             input_type: the type of the input field in the web interface
+             headers: a string containing headers
+             whitelist_keys: the headings of a grouped whitelist
+    """
 
     # initialize return values
     whitelist = None
@@ -76,7 +89,7 @@ def parse_whitelist(key_name, node, filled_object):
             whitelist = whitelist['whitelist']
             input_type = 'select'
 
-            # TODO: raus?
+            # TODO: remove?
             if whitelist_type == 'depend':
                 whitelist = None
                 input_type = 'dependable'
@@ -98,7 +111,7 @@ def parse_whitelist(key_name, node, filled_object):
             # TODO: better solution for department
             # test if whitelist is longer than 30
             if whitelist and len(whitelist) > 30 and \
-                    key_name != 'department':
+                    key_name not in ['department', 'factor']:
 
                 # set whitelist type to multi_autofill if it is a list
                 if node['list']:

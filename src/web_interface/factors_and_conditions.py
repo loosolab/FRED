@@ -350,7 +350,7 @@ def get_conditions(factors, organism_name, key_yaml):
         for cond in conditions:
 
             # generate a sample name from the condition
-            sample_name = generate.get_short_name(cond, {})
+            sample_name = generate.get_short_name(cond, {}, key_yaml)
 
             # split the condition into key-value pairs
             split_condition = generate.split_cond(cond)
@@ -361,7 +361,10 @@ def get_conditions(factors, organism_name, key_yaml):
                                         real_val, key_yaml, sample_name,
                                         organism_name)
 
+            # rewrite condition into title and string to readd deleted
+            # conditions
             title, readd = get_condition_title(split_condition)
+
             # save the condition as a dictionary with the filled sample as
             # input fields
             d = {'correct_value': cond,
@@ -380,32 +383,88 @@ def get_conditions(factors, organism_name, key_yaml):
 
 
 def get_condition_title(split_condition):
+    """
+    This function rewrites a condition into a table to be displayed as a title
+    on the website. It also creates a string that is shown when removed
+    conditions have to be re-added
+    :param split_condition: a list containing the factors and values the
+                            condition consists of
+    :return: html: the title as a table in html
+             readd: the string shown when re-adding deleted conditions
+    """
+
+    # initialize the html string with the table header and style
     html = '<table class="table_style_condition_title"><tbody>'
+
+    # initialize readd as an empty string
     readd = ''
+
+    # iterate over the factors and values
     for i in range(len(split_condition)):
+
+        # start the row of the table with the style depending on the index of
+        # the element that is written into the row (the style creates a
+        # horizontal line below the row and includes padding)
         if len(split_condition) > 1 and i < len(split_condition) - 1:
             html += '<tr class="tr_style_condition_title">'
         else:
             html += '<tr>'
+
+        # add the factor to readd
         readd += f'{split_condition[i][0]}:\n'
-        html += f'<td class="td_style_condition_title_value">{split_condition[i][0]}:</td>'
+
+        # add the factor to the table as a data cell with the style of a value
+        # (padding)
+        html += f'<td class="td_style_condition_title_value">' \
+                f'{split_condition[i][0]}:</td>'
+
+        # value is a dictionary
         if isinstance(split_condition[i][1], dict):
+
+            # initialize an empty string to save the values to
             vals = ''
+
+            # iterate over the keys
             for key in split_condition[i][1]:
+
+                # replace more than 3 zeros with 3 dots to shorten the value
                 value = re.sub('0000(0)*', '...', split_condition[i][1][key])
+
+                # add the value to the string with a <br> if it is not in the
+                # last row
                 if key != list(split_condition[i][1].keys())[-1]:
                     vals += f'"{value}"<br>'
                 else:
                     vals += f'"{value}"'
+
+                # add the value to readd
                 readd += f'{value}\n'
-            html += f'<td class="td_style_condition_title_value">{vals}</td></tr>'
+
+            # add the string with the values to the table as a data cell
+            html += f'<td class="td_style_condition_title_value">{vals}' \
+                    f'</td></tr>'
+
+        # value is not a dictionary
         else:
+
+            # replace more than 3 zeros with 3 dots to shorten the value
             value = re.sub('0000(0)*', '...', split_condition[i][1])
-            html += f'<td class="td_style_condition_title_value">"{value}"</td></tr>'
+
+            # add the value to the table as a data cell
+            html += f'<td class="td_style_condition_title_value">"{value}' \
+                    f'"</td></tr>'
+
+            # add the value to readd
             readd += f'{value}\n'
+
+        # if the condition consists of multiple factors than write a '---'
+        # between them in readd
         if len(split_condition) > 1 and i < len(split_condition) - 1:
             readd += '---\n'
+
+    # close the html table
     html += f'</tbody></table>'
+
     return html, readd
 
 
@@ -414,6 +473,9 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
     """
     This function created a pre-filled object with the structure of the samples
     to be displayed in the web interface
+    :param is_factor: a boolean defining if the input field is an experimental
+                      factor
+    :param organism_name: the name of the selected organism
     :param sample_name: the identifier of the sample build from the condition
     :param key_yaml: the read in general structure
     :param real_val: a dictionary containing the values containing headers and
@@ -467,8 +529,11 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                         if 'special_case' in info[0] and 'value_unit' \
                                 in info[0]['special_case']:
 
-                            # split the value into value and unit
-                            value_unit = wi_utils.split_value_unit(c[1])
+                            if isinstance(c[1], dict):
+                                value_unit = c[1]
+                            else:
+                                # split the value into value and unit
+                                value_unit = wi_utils.split_value_unit(c[1])
 
                             # save the value and unit in the sample
                             sample[i]['value'] = value_unit['value']
@@ -491,11 +556,15 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                             # value is not in real_val
                             else:
 
+                                # TODO: rework with real_val
+
                                 if 'input_fields' in sample[i]:
                                     # call this function on the keys of the
                                     # value in order to fill them
                                     filled_value = get_samples(
-                                        [(x, c[1][x]) for x in c[1] if not (c[1] == 'technical_replicates' and x == 'sample_name')],
+                                        [(x, c[1][x]) for x in c[1] if not (
+                                                c[1] == 'technical_replicates'
+                                                and x == 'sample_name')],
                                         copy.deepcopy(
                                             sample[i]['input_fields']),
                                         info, key_yaml, sample_name,
@@ -507,23 +576,32 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                     if isinstance(sample[i]['headers'], dict):
 
                                         for k in sample[i]['headers']:
-                                            if sorted(sample[i]['headers'][k].split(' ')) == sorted(headers):
+                                            if sorted(
+                                                    sample[i]['headers'][
+                                                        k].split(' ')) == \
+                                                    sorted(headers):
                                                 w_key = k
                                                 break
                                     else:
-                                        if sorted(headers) != sorted(sample[i]['headers'].split(' ')):
+                                        if sorted(headers) != sorted(
+                                                sample[i]['headers'].split(
+                                                    ' ')):
                                             headers = None
 
                                     if headers is not None:
                                         filled_value = ''
                                         for header in headers:
-                                            filled_value = filled_value + ' ' + \
-                                                           c[1][header]
+                                            filled_value = filled_value + ' ' \
+                                                           + c[1][header]
                                         filled_value = filled_value.lstrip(
                                             ' ').rstrip(' ')
 
-                                    if filled_value is not None and w_key is not None and sample[i]['whitelist_type'] == 'plain_group':
-                                        filled_value = f'{filled_value} ({w_key})'
+                                    if filled_value is not None and w_key is \
+                                            not None and \
+                                            sample[i]['whitelist_type'] == \
+                                            'plain_group':
+                                        filled_value = f'{filled_value} ' \
+                                                       f'({w_key})'
 
                             # save the filled value in 'list_value' if the
                             # input field takes a list
@@ -550,8 +628,12 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                             # save the current value
                             else:
 
-                                if sample[i]['whitelist_type'] == 'plain_group' and 'whitelist_keys' in sample[i]:
-                                    w = utils.get_whitelist(sample[i]['position'].split(':')[-1], {'organism': organism_name})
+                                if sample[i]['whitelist_type'] == \
+                                        'plain_group' and 'whitelist_keys' \
+                                        in sample[i]:
+                                    w = utils.get_whitelist(
+                                        sample[i]['position'].split(':')[-1],
+                                        {'organism': organism_name})
 
                                     for key in sample[i]['whitelist_keys']:
                                         if f'{c[1]} ({key})' in w['whitelist']:
@@ -584,4 +666,3 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                 sample[i]['input_disabled'] = True
 
     return sample
-

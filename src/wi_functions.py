@@ -77,13 +77,15 @@ def save_filenames(file_str, path):
 
 
 def get_meta_info(path, project_id):
-
-    return searching.get_meta_info(path, project_id)
+    html_str, metafile = searching.get_meta_info(path, project_id)
+    return html_str
 
 
 def get_search_mask():
-
-    return searching.get_search_mask()
+    git_whitelists.get_whitelists()
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), '..', 'keys.yaml'))
+    return searching.get_search_mask(key_yaml)
 
 
 def find_metadata(path, search_string):
@@ -92,10 +94,10 @@ def find_metadata(path, search_string):
 
 
 def edit_wi_object(path, project_id):
+    git_whitelists.get_whitelists()
     # read in general structure
     key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), '..', 'keys.yaml'))
-
     return editing.edit_wi_object(path, project_id, key_yaml)
 
 
@@ -105,5 +107,4 @@ def parse_object(wi_object):
     # read in general structure
     key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), '..', 'keys.yaml'))
-
     return oty.parse_object(wi_object, key_yaml)

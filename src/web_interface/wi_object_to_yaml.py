@@ -1,8 +1,6 @@
 import src.utils as utils
 import src.web_interface.wi_utils as wi_utils
 import os
-import pytz
-from dateutil import parser
 
 
 def parse_object(wi_object, key_yaml):
@@ -138,6 +136,8 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                             parse_list_part(wi_object['list_value'][i],
                                             key_yaml, factors[i], project_id,
                                             organism, sample_name, nom)
+
+                        # add the converted value to the list
                         val.append(c_val)
 
                     # no special case
@@ -148,6 +148,8 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                             parse_list_part(wi_object['list_value'][i],
                                             key_yaml, factors, project_id,
                                             organism, sample_name, nom)
+
+                        # add the converted value to the list
                         val.append(c_val)
 
                 # if list element is str/int/bool
@@ -156,6 +158,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     # add list element to list
                     val.append(wi_object['list_value'][i])
 
+            # set the converted value to None if it is an empty list
             if len(val) == 0:
                 val = None
 
@@ -231,12 +234,8 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     # value is of type date
                     elif wi_object['input_type'] == 'date':
 
-                        # TODO: own function
-                        # convert the default time to local time
-                        default_time = parser.parse(wi_object['value'])
-                        timezone = pytz.timezone("Europe/Berlin")
-                        local_time = default_time.astimezone(timezone)
-                        val = local_time.strftime("%d.%m.%Y")
+                        # convert the date to a string of format 'DD.MM.YYYY'
+                        val = wi_utils.date_to_str(wi_object['value'])
 
                     # value was changed for display -> original value saved at
                     # key 'correct_value'
@@ -311,10 +310,17 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
 
         # special case: organism
         if wi_object[i]['position'].split(':')[-1] == 'organism':
-            organism = wi_object[i]['value'].split(' ')[0]
-            short = utils.get_whitelist(
-                os.path.join('abbrev', 'organism_name'), organism)['whitelist']
 
+            # TODO: headers
+            # save the organism name
+            organism = wi_object[i]['value'].split(' ')[0]
+
+            # read in the abbrev whitelist for organisms
+            short = utils.get_whitelist(os.path.join(
+                'abbrev', 'organism_name'),
+                {'organism': organism})['whitelist']
+
+            # save the shortened version of the organism
             organism = short[organism]
 
         # special case: experimental factors
@@ -402,7 +408,9 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
                 sample_name, nom)
 
         # test if the value is not empty
-        if val is not None or (type(val) in [str, list, dict] and len(val) > 0):
+        if val is not None and (
+                (type(val) in [str, list, dict] and len(val) > 0) or
+                type(val) not in [str, list, dict]):
 
             # overwrite the old value with the converted one
             res[wi_object[i]['position'].split(':')[-1]] = val

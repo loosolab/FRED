@@ -3,7 +3,7 @@ import sys
 from tabulate import tabulate
 import src.utils as utils
 import src.validate_yaml as validate_yaml
-import src.edit_file as edit_file
+import src.web_interface.wi_utils as wi_utils
 import datetime
 import os
 import readline
@@ -835,7 +835,7 @@ def fill_replicates(condition, bio, input_pooled, node,
         sample_name = f'{condition}_b{"{:02d}".format(i)}'
 
         # call get_short_name to create an abbreviated sample name
-        short_name = f'{get_short_name(condition, result_dict)}' \
+        short_name = f'{get_short_name(condition, result_dict, key_yaml)}' \
                      f'_b{"{:02d}".format(i)}'
 
         # save the abbreviated sample name in the sampled dictionary
@@ -1407,7 +1407,7 @@ def parse_group_choose_one(whitelist, w, header):
     return value
 
 
-def get_short_name(condition, result_dict):
+def get_short_name(condition, result_dict, key_yaml):
     """
     This function creates an abbreviated version of a condition.
     :param condition: the condition that should be abbreviated
@@ -1417,12 +1417,9 @@ def get_short_name(condition, result_dict):
     conds = split_cond(condition)
     whitelist = utils.get_whitelist(os.path.join('abbrev', 'factor'),
                                     result_dict)['whitelist']
-    if whitelist and 'whitelist_type' in whitelist and whitelist[
-            'whitelist_type'] == 'plain':
-        whitelist = whitelist['whitelist']
     short_cond = []
     for c in conds:
-        if whitelist and c[0] in whitelist:
+        if c[0] in whitelist:
             k = whitelist[c[0]]
         else:
             k = c[0]
@@ -1450,15 +1447,21 @@ def get_short_name(condition, result_dict):
                             list(new_vals.keys())])
             short_cond.append(f'{k}#{val}')
         else:
-            val_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]),
-                                                result_dict)
-            if val_whitelist and c[1].lower() in val_whitelist['whitelist']:
-                short_cond.append(
-                    f'{k}.{val_whitelist["whitelist"][c[1].lower()]}')
-            elif val_whitelist and c[1] in val_whitelist['whitelist']:
-                short_cond.append(f'{k}.{val_whitelist["whitelist"][c[1]]}')
+            info = list(utils.find_keys(key_yaml, c[0]))
+            if len(info) > 0 and 'special_case' in info[0] and 'value_unit' in info[0]['special_case']:
+                short_units = utils.get_whitelist(os.path.join('abbrev', 'unit'), result_dict)['whitelist']
+                value_unit = wi_utils.split_value_unit(c[1])
+                short_cond.append(f'{k}.{value_unit["value"]}{short_units[value_unit["unit"]] if value_unit["unit"] in short_units else value_unit["unit"]}')
             else:
-                short_cond.append(f'{k}.{c[1]}')
+                val_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]),
+                                                result_dict)
+                if val_whitelist and c[1].lower() in val_whitelist['whitelist']:
+                    short_cond.append(
+                        f'{k}.{val_whitelist["whitelist"][c[1].lower()]}')
+                elif val_whitelist and c[1] in val_whitelist['whitelist']:
+                    short_cond.append(f'{k}.{val_whitelist["whitelist"][c[1]]}')
+                else:
+                    short_cond.append(f'{k}.{c[1]}')
     # TODO: abbrev unit
     short_condition = '-'.join(short_cond).replace('/', '')
     return short_condition
