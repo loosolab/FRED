@@ -22,15 +22,17 @@ def get_whitelists():
     else:
 
         # set repo to the repository
-        #repo = git.Repo(os.path.join(os.path.dirname(
-        #    os.path.abspath(__file__)), '..', '..', 'metadata_whitelists'))
+        repo = git.Repo(os.path.join(os.path.dirname(
+            os.path.abspath(__file__)), '..', '..', 'metadata_whitelists'))
 
         # set o to origin of the repository
         #o = repo.remotes.origin
 
         # git pull
         #o.pull()
+        repo.config_writer().set_value("user", "name", "myusername").release()
+        repo.config_writer().set_value("user", "email", "myemail").release()
 
-        g = git.Git(os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), '..', '..', 'metadata_whitelists'))
+        g = git.Git(repo)
+
         g.pull('origin', 'update_factors')
