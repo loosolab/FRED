@@ -16,14 +16,21 @@ def get_factors(organism, key_yaml):
     :return: factor_value: a dictionary containing factors and whitelists
     """
 
+    f_node = list(utils.find_keys(key_yaml, 'factor'))[0]
     # initialize dictionary with all factors
-    factor_value = {'factor': utils.read_whitelist('factor')['whitelist']}
-
+    factor_list, whitelist_type, input_type, headers, whitelist_keys = \
+        whitelist_parsing.parse_whitelist(
+            'factor', f_node, {'organism': organism})
+    factor_value = {'factor': factor_list}
+    plain_factors = []
+    print(factor_value['factor'])
+    for elem in factor_list:
+        plain_factors += elem['whitelist']
     # initialize empty dictionary to store values of each factor
     values = {}
 
     # iterate over factors
-    for factor in factor_value['factor']:
+    for factor in plain_factors:
 
         # get attributes of factor from general structure
         node = list(utils.find_keys(key_yaml, factor))
