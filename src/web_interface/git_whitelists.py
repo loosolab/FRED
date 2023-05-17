@@ -16,7 +16,8 @@ def get_whitelists():
         git.Repo.clone_from(
             'https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.'
             'git/', os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 '..', '..', 'metadata_whitelists'))
+                                 '..', '..', 'metadata_whitelists'),
+            branch='update_factors')
 
     # repository was already cloned
     else:
@@ -26,13 +27,7 @@ def get_whitelists():
             os.path.abspath(__file__)), '..', '..', 'metadata_whitelists'))
 
         # set o to origin of the repository
-        #o = repo.remotes.origin
+        o = repo.remotes.origin
 
         # git pull
-        #o.pull()
-        repo.config_writer().set_value("user", "name", "myusername").release()
-        repo.config_writer().set_value("user", "email", "myemail").release()
-
-        g = git.Git(repo)
-
-        g.pull('origin', 'update_factors')
+        o.pull()
