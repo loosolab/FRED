@@ -351,7 +351,7 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
-                gene:
+                genomic_background:
                   mandatory: False
                   list: False
                   display_name: 'Gene'
@@ -537,12 +537,42 @@ experimental_setting:
                   input_type: select
                 knockdown:
                   mandatory: False
-                  list: False
+                  list: True
                   display_name: 'Knockdown'
                   desc: ''
-                  value: null
-                  whitelist: True
-                  input_type: select
+                  value:
+                    knockdown_method:
+                      mandatory: True
+                      list: False
+                      display_name: 'Method'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    gene:
+                      mandatory: False
+                      list: False
+                      display_name: 'Gene'
+                      desc: ''
+                      special_case:
+                        merge: gene_name
+                      value:
+                        gene_name:
+                          mandatory: True
+                          list: False
+                          display_name: 'Gene Name'
+                          desc: ''
+                          value: null
+                          whitelist: True
+                          input_type: select
+                        ensembl_id:
+                          mandatory: True
+                          list: False
+                          display_name: 'ENSEMBL-ID'
+                          desc: ''
+                          value: null
+                          whitelist: True
+                          input_type: select
                 enrichment:
                   mandatory: False
                   list: False
