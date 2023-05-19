@@ -540,9 +540,9 @@ experimental_setting:
                   list: True
                   display_name: 'Knockdown'
                   desc: ''
-                  value:
-                    special_case:
+                  special_case:
                       group: 'gene'
+                  value:
                     knockdown_method:
                       mandatory: True
                       list: False
