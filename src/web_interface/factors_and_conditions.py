@@ -161,10 +161,7 @@ def get_factor_values(key, node, filled_object):
     if node['list']:
 
         # values are single values (no dictionaries)
-        if not isinstance(node['value'], dict) or (
-                'special_case' in node and (
-                'merge' in node['special_case'] or
-                'value_unit' in node['special_case'])):
+        if not isinstance(node['value'], dict):
 
             # change single_autofill to multi_autofill because all factors can
             # have multiple values
