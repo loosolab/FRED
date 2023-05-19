@@ -23,7 +23,7 @@ def get_factors(organism, key_yaml):
             'factor', f_node, {'organism': organism})
     factor_value = {'factor': factor_list}
     plain_factors = []
-    print(factor_value['factor'])
+
     for elem in factor_list:
         plain_factors += elem['whitelist']
     # initialize empty dictionary to store values of each factor
@@ -161,7 +161,10 @@ def get_factor_values(key, node, filled_object):
     if node['list']:
 
         # values are single values (no dictionaries)
-        if not isinstance(node['value'], dict):
+        if not isinstance(node['value'], dict) or (
+                'special_case' in node and (
+                'merge' in node['special_case'] or
+                'value_unit' in node['special_case'])):
 
             # change single_autofill to multi_autofill because all factors can
             # have multiple values
