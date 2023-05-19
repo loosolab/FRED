@@ -271,10 +271,10 @@ experimental_setting:
                   value: 1
                   whitelist: False
                   input_type: number
-                genotype:
+                genetic_background:
                   mandatory: False
                   list: False
-                  display_name: 'Genotype'
+                  display_name: 'Genetic background'
                   desc: ''
                   value: null
                   whitelist: True
@@ -431,7 +431,7 @@ experimental_setting:
                       value: null
                       whitelist: True
                       input_type: select
-                treatment:
+                medical_treatment:
                   mandatory: False
                   list: True
                   display_name: 'Treatment'
@@ -527,7 +527,7 @@ experimental_setting:
                       value: 'kg/m2'
                       whitelist: True
                       input_type: select
-                flow:
+                physical_treatment:
                   mandatory: False
                   list: False
                   display_name: 'Flow'
@@ -554,6 +554,66 @@ experimental_setting:
                     gene:
                       mandatory: False
                       list: True
+                      display_name: 'Gene'
+                      desc: ''
+                      special_case:
+                        merge: gene_name
+                      value:
+                        gene_name:
+                          mandatory: True
+                          list: False
+                          display_name: 'Gene Name'
+                          desc: ''
+                          value: null
+                          whitelist: True
+                          input_type: select
+                        ensembl_id:
+                          mandatory: True
+                          list: False
+                          display_name: 'ENSEMBL-ID'
+                          desc: ''
+                          value: null
+                          whitelist: True
+                          input_type: select
+                knockout:
+                  mandatory: False
+                  list: True
+                  display_name: 'Knockout'
+                  desc: ''
+                  value:
+                    gene:
+                      mandatory: False
+                      list: False
+                      display_name: 'Gene'
+                      desc: ''
+                      special_case:
+                        merge: gene_name
+                      value:
+                        gene_name:
+                          mandatory: True
+                          list: False
+                          display_name: 'Gene Name'
+                          desc: ''
+                          value: null
+                          whitelist: True
+                          input_type: select
+                        ensembl_id:
+                          mandatory: True
+                          list: False
+                          display_name: 'ENSEMBL-ID'
+                          desc: ''
+                          value: null
+                          whitelist: True
+                          input_type: select
+                overexpression:
+                  mandatory: False
+                  list: True
+                  display_name: 'Overexpression'
+                    desc: ''
+                    value:
+                    gene:
+                      mandatory: False
+                      list: False
                       display_name: 'Gene'
                       desc: ''
                       special_case:
