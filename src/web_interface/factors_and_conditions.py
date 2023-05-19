@@ -277,6 +277,28 @@ def get_conditions(factors, organism_name, key_yaml):
                     # val
                     val = val[factors[i]['factor']]
 
+                else:
+                    for key in [x for x in list(val.keys()) if x not in ['multi', 'ident_key']]:
+                        if key == 'gene':
+                            for v in range(len(val[key])):
+                                print(val[key][v])
+                                headers = 'gene_name ensembl_id'
+
+                                # save the original value
+                                full_value = copy.deepcopy(val[key][i])
+
+                                # split the value according to the header and save them as a
+                                # string
+                                str_value = wi_utils.parse_headers(
+                                        headers, val[key][v],
+                                        mode='str')
+
+                                # # rewrite the value to '<factor>:{<values>}'
+                                val[key][v] = f'{key}:{"{"}' \
+                                             f'{str_value}{"}"}'
+                                # save the original value in real_val with the new value as key
+                                real_val[val[key][v]] = full_value
+
                 # generate combinations of the values of the dictionary for the
                 # conditions and overwrite the values with them
                 factors[i]['values'] = generate.get_combis(
@@ -331,7 +353,7 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 # save the original value in real_val with the new value as key
                 real_val[factors[i]['values'][j]] = full_value
-
+    print(factors)
     # generate the conditions
     conditions = generate.get_condition_combinations(factors)
 

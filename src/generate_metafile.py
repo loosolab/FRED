@@ -1631,7 +1631,7 @@ def get_combis(values, key, multi):
     """
     if 'multi' in values:
         values.pop('multi')
-
+    print(values)
     if isinstance(values, list):
         if multi:
             possible_values = []
@@ -1664,7 +1664,10 @@ def get_combis(values, key, multi):
             values.pop('ident_key')
             for elem in depend:
                 possible_values[elem] = []
-                value = [f'{ident_key}:"{elem}"']
+                if elem.startswith(f'{ident_key}:{"{"}'):
+                    value = [elem]
+                else:
+                    value = [f'{ident_key}:"{elem}"']
                 for i in range(len(values.keys())):
                     value2 = []
                     for x in value:
