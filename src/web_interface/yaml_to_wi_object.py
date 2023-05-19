@@ -152,8 +152,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
                            'input_disabled': input_disabled}
 
             if 'special_case' in node and 'group' in node['special_case']:
-                part_object['ident_key'] = node['special_case']['group']
-                
+                part_object['ident_key'] = f'{pos}:{node["special_case"]["group"]}'
+
         # test if the key takes multiple values and add the property
         # 'list_value' as a place to save those values to via the website
         if node['list'] or input_type == 'single_autofill':
