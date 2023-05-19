@@ -553,7 +553,7 @@ experimental_setting:
                       input_type: select
                     gene:
                       mandatory: False
-                      list: False
+                      list: True
                       display_name: 'Gene'
                       desc: ''
                       special_case:
