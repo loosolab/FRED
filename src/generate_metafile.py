@@ -1631,16 +1631,13 @@ def get_combis(values, key, multi):
     """
     if 'multi' in values:
         values.pop('multi')
-    if 'ident_key' in values and (
-            values['ident_key'] not in values or values['ident_key'] is None):
-        values.pop('ident_key')
 
     if isinstance(values, list):
         if multi:
             possible_values = []
             for i in range(len(values)):
                 if isinstance(values[i], dict):
-                    v = '|'.join([f'{k}:"{values[i][k]}"' for k in values[i]])
+                    v = '|'.join([f'{k}:"{values[i][k]}"' for k in values[i] if k != 'ident_key'])
                     s = f'{key}:{"{"}{v}{"}"}'
                 else:
                     s = f'{key}:"{values[i]}"'
@@ -1648,7 +1645,7 @@ def get_combis(values, key, multi):
                 for j in range(i + 1, len(values)):
                     if isinstance(values[j], dict):
                         v = '|'.join(
-                            [f'{k}:"{values[j][k]}"' for k in values[j]])
+                            [f'{k}:"{values[j][k]}"' for k in values[j] if k != 'ident_key'])
                         s2 = f'{key}:{"{"}{v}{"}"}'
                     else:
                         s2 = f'{key}:"{values[j]}"'

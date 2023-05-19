@@ -541,6 +541,8 @@ experimental_setting:
                   display_name: 'Knockdown'
                   desc: ''
                   value:
+                    special_case:
+                      group: 'gene'
                     knockdown_method:
                       mandatory: True
                       list: False
