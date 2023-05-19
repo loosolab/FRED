@@ -609,8 +609,8 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Overexpression'
-                    desc: ''
-                    value:
+                  desc: ''
+                  value:
                     gene:
                       mandatory: False
                       list: False
