@@ -580,6 +580,8 @@ experimental_setting:
                   list: True
                   display_name: 'Knockout'
                   desc: ''
+                  special_case:
+                    group: 'gene'
                   value:
                     gene:
                       mandatory: False
@@ -610,6 +612,8 @@ experimental_setting:
                   list: True
                   display_name: 'Overexpression'
                   desc: ''
+                  special_case:
+                    group: 'gene'
                   value:
                     gene:
                       mandatory: False
