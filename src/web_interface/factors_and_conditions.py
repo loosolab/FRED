@@ -51,7 +51,8 @@ def get_factors(organism, key_yaml):
             # one factor
             values[factor] = {'whitelist': whitelist,
                               'input_type': input_type,
-                              'whitelist_type': whitelist_type}
+                              'whitelist_type': whitelist_type,
+                              'displayName': node[0]['display_name']}
 
             # add search_info if input is of type single- or multi-autofill
             if input_type == 'multi_autofill':
