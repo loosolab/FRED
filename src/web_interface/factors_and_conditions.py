@@ -482,15 +482,15 @@ def get_title_value(cond_value, readd):
             # add the value to the string with a <br> if it is not in the
             # last row
             if key != list(cond_value.keys())[-1]:
-                vals += f'"{value}"<br>'
+                vals += f'{value}<br>'
             else:
-                vals += f'"{value}"'
+                vals += f'{value}'
 
     # value is not a dictionary
     else:
 
         # replace more than 3 zeros with 3 dots to shorten the value
-        vals = re.sub('0000(0)*', '...', cond_value)
+        vals = f'"{re.sub("0000(0)*", "...", cond_value)}"'
 
         # add the value to readd
         readd += f'{vals}\n'
