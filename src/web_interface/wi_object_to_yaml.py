@@ -387,8 +387,9 @@ def parse_factor(factors, key_yaml):
                     if key == 'gene':
                         headers = 'gene_name ensembl_id'
 
-                        factors['values'][i][key] = wi_utils.parse_headers(
-                            headers, factors['values'][i][key], mode='dict')
+                        for j in range(len(factors['values'][i][key])):
+                            factors['values'][i][key][j] = wi_utils.parse_headers(
+                                headers, factors['values'][i][key][j], mode='dict')
                     #if isinstance(factors['values'][i][key], dict):
                     #    if not 'factor' in factors['values'][i][key]:
                     #        factors['values'][i][key]['factor'] = key
