@@ -384,11 +384,16 @@ def parse_factor(factors, key_yaml):
         for i in range(len(factors['values'])):
             if isinstance(factors['values'][i], dict):
                 for key in factors['values'][i]:
-                    if isinstance(factors['values'][i][key], dict):
-                        if not 'factor' in factors['values'][i][key]:
-                            factors['values'][i][key]['factor'] = key
-                        factors['values'][i][key] = parse_factor(factors['values'][i][key], key_yaml)
-                        factors['values'][i][key].pop('factor')
+                    if key == 'gene':
+                        headers = 'gene_name ensembl_id'
+
+                        factors['values'][i][key] = wi_utils.parse_headers(
+                            headers, factors['values'][i][key], mode='dict')
+                    #if isinstance(factors['values'][i][key], dict):
+                    #    if not 'factor' in factors['values'][i][key]:
+                    #        factors['values'][i][key]['factor'] = key
+                    #    factors['values'][i][key] = parse_factor(factors['values'][i][key], key_yaml)
+                    #    factors['values'][i][key].pop('factor')
 
     else:
 
