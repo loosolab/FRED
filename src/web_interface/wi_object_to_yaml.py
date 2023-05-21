@@ -78,6 +78,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
             # define an empty list to store the converted list values
             val = []
 
+            # TODO: headers for list element (if gene is a list)
             # iterate over the list elements
             for i in range(len(wi_object['list_value'])):
 

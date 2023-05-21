@@ -1422,48 +1422,48 @@ def get_short_name(condition, result_dict, key_yaml):
             k = whitelist[c[0]]
         else:
             k = c[0]
-        if isinstance(c[1], dict):
-            cond_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]),
-                                                 result_dict)
-            new_vals = {}
-            for v in c[1]:
-                if cond_whitelist and v in cond_whitelist['whitelist']:
-                    val_whitelist = utils.get_whitelist(
-                        os.path.join('abbrev', v), result_dict)
-                    if val_whitelist and c[1][v].lower() in \
-                            val_whitelist['whitelist']:
-                        new_vals[cond_whitelist["whitelist"][v]] = \
-                            val_whitelist["whitelist"][
-                            c[1][v].lower()]
-                    elif val_whitelist and c[1][v] in \
-                            val_whitelist['whitelist']:
-                        new_vals[cond_whitelist["whitelist"][v]] = \
-                            val_whitelist["whitelist"][
-                            c[1][v]]
-                    else:
-                        new_vals[cond_whitelist["whitelist"][v]] = c[1][v]
-            val = '+'.join([f'{x}.{new_vals[x].replace(" ", "")}' for x in
-                            list(new_vals.keys())])
-            short_cond.append(f'{k}#{val}')
-        else:
-            info = list(utils.find_keys(key_yaml, c[0]))
-            if len(info) > 0 and 'special_case' in info[0] and 'value_unit' in info[0]['special_case']:
-                short_units = utils.get_whitelist(os.path.join('abbrev', 'unit'), result_dict)['whitelist']
-                value_unit = wi_utils.split_value_unit(c[1])
-                short_cond.append(f'{k}.{value_unit["value"]}{short_units[value_unit["unit"]] if value_unit["unit"] in short_units else value_unit["unit"]}')
-            else:
-                val_whitelist = utils.get_whitelist(os.path.join('abbrev', c[0]),
-                                                result_dict)
-                if val_whitelist and c[1].lower() in val_whitelist['whitelist']:
-                    short_cond.append(
-                        f'{k}.{val_whitelist["whitelist"][c[1].lower()]}')
-                elif val_whitelist and c[1] in val_whitelist['whitelist']:
-                    short_cond.append(f'{k}.{val_whitelist["whitelist"][c[1]]}')
-                else:
-                    short_cond.append(f'{k}.{c[1]}')
-    # TODO: abbrev unit
+
+        short_cond.append(get_short_value(c[0], k, c[1], key_yaml, '', result_dict))
+
     short_condition = '-'.join(short_cond).replace('/', '')
     return short_condition
+
+
+def get_short_value(factor, short_factor, value, key_yaml, short_cond, result_dict):
+
+    if isinstance(value, dict):
+        cond_whitelist = utils.get_whitelist(os.path.join('abbrev', factor),
+                                             result_dict)
+        new_vals = {}
+        for v in value:
+
+            new_v = cond_whitelist['whitelist'][v] if cond_whitelist and v in cond_whitelist['whitelist'] else v
+            new_vals[new_v] = get_short_value(v, new_v, value[v], key_yaml, short_cond, result_dict)
+
+        val = '+'.join([f'{new_vals[x].replace(" ", "")}' for x in
+                        list(new_vals.keys())])
+        short_cond += f'{short_factor}#{val}'
+    else:
+        info = list(utils.find_keys(key_yaml, value))
+        if len(info) > 0 and 'special_case' in info[0] and 'value_unit' in \
+                info[0]['special_case']:
+            short_units = \
+            utils.get_whitelist(os.path.join('abbrev', 'unit'), result_dict)[
+                'whitelist']
+            value_unit = wi_utils.split_value_unit(value)
+            short_cond += f'{short_factor}.{value_unit["value"]}' \
+                          f'{short_units[value_unit["unit"]] if value_unit["unit"] in short_units else value_unit["unit"]}'
+        else:
+            val_whitelist = utils.get_whitelist(os.path.join('abbrev', value),
+                                                result_dict)
+            if val_whitelist and value.lower() in val_whitelist['whitelist']:
+                short_cond.append(
+                    f'{short_factor}.{val_whitelist["whitelist"][c[1].lower()]}')
+            elif val_whitelist and value in val_whitelist['whitelist']:
+                short_cond += f'{short_factor}.{val_whitelist["whitelist"][value]}'
+            else:
+                short_cond += f'{short_factor}.{value}'
+    return short_cond
 
 
 def split_cond(condition):
