@@ -281,7 +281,7 @@ def get_conditions(factors, organism_name, key_yaml):
                     for key in [x for x in list(val.keys()) if x not in ['multi', 'ident_key']]:
                         if key == 'gene':
                             for v in range(len(val[key])):
-                                print(val[key][v])
+
                                 headers = 'gene_name ensembl_id'
 
                                 # save the original value
@@ -353,7 +353,7 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 # save the original value in real_val with the new value as key
                 real_val[factors[i]['values'][j]] = full_value
-    print(factors)
+
     # generate the conditions
     conditions = generate.get_condition_combinations(factors)
 
@@ -449,44 +449,11 @@ def get_condition_title(split_condition):
         html += f'<td class="td_style_condition_title_value">' \
                 f'{split_condition[i][0]}:</td>'
 
-        # value is a dictionary
-        if isinstance(split_condition[i][1], dict):
+        vals, readd = get_title_value(split_condition[i][1], readd)
 
-            # initialize an empty string to save the values to
-            vals = ''
-
-            # iterate over the keys
-            for key in split_condition[i][1]:
-
-                # replace more than 3 zeros with 3 dots to shorten the value
-                value = re.sub('0000(0)*', '...', split_condition[i][1][key])
-
-                # add the value to the string with a <br> if it is not in the
-                # last row
-                if key != list(split_condition[i][1].keys())[-1]:
-                    vals += f'"{value}"<br>'
-                else:
-                    vals += f'"{value}"'
-
-                # add the value to readd
-                readd += f'{value}\n'
-
-            # add the string with the values to the table as a data cell
-            html += f'<td class="td_style_condition_title_value">{vals}' \
-                    f'</td></tr>'
-
-        # value is not a dictionary
-        else:
-
-            # replace more than 3 zeros with 3 dots to shorten the value
-            value = re.sub('0000(0)*', '...', split_condition[i][1])
-
-            # add the value to the table as a data cell
-            html += f'<td class="td_style_condition_title_value">"{value}' \
-                    f'"</td></tr>'
-
-            # add the value to readd
-            readd += f'{value}\n'
+        # add the string with the values to the table as a data cell
+        html += f'<td class="td_style_condition_title_value">{vals}'\
+                f'</td></tr>'
 
         # if the condition consists of multiple factors than write a '---'
         # between them in readd
@@ -497,6 +464,38 @@ def get_condition_title(split_condition):
     html += f'</tbody></table>'
 
     return html, readd
+
+
+def get_title_value(cond_value, readd):
+
+    # value is a dictionary
+    if isinstance(cond_value, dict):
+
+        # initialize an empty string to save the values to
+        vals = ''
+
+        # iterate over the keys
+        for key in cond_value:
+
+            value, readd = get_title_value(cond_value[key], readd)
+
+            # add the value to the string with a <br> if it is not in the
+            # last row
+            if key != list(cond_value.keys())[-1]:
+                vals += f'"{value}"<br>'
+            else:
+                vals += f'"{value}"'
+
+    # value is not a dictionary
+    else:
+
+        # replace more than 3 zeros with 3 dots to shorten the value
+        vals = re.sub('0000(0)*', '...', cond_value)
+
+        # add the value to readd
+        readd += f'{vals}\n'
+
+    return vals, readd
 
 
 def get_samples(split_condition, sample, real_val, key_yaml, sample_name,

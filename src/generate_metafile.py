@@ -1,5 +1,4 @@
-import sys
-
+import json
 from tabulate import tabulate
 import src.utils as utils
 import src.validate_yaml as validate_yaml
@@ -1468,6 +1467,40 @@ def get_short_name(condition, result_dict, key_yaml):
 
 
 def split_cond(condition):
+
+    conditions = []
+    count = 0
+    cond = '"'
+    for i in range(len(condition)):
+        if condition[i] == '\"':
+            count += 1
+            cond += condition[i]
+        elif condition[i] == '-':
+            if count % 2 == 0:
+                conditions.append(cond)
+                cond = '"'
+        elif condition[i] == ':':
+            cond += f'"{condition[i]}'
+        elif condition[i] == '{':
+            cond += f'{condition[i]}"'
+        elif condition[i] == '|':
+            cond += f',"'
+        else:
+            cond += condition[i]
+    conditions.append(cond)
+
+    for j in range(len(conditions)):
+        d = json.loads(f'{"{"}{conditions[j]}{"}"}')
+
+        key = list(d.keys())[0]
+        conditions[j] = (key, d[key])
+
+    return conditions
+
+
+
+
+def split_cond2(condition):
     """
     This function splits the conditions into keys and value.
     :param condition: a list of conditions that should be split
@@ -1512,6 +1545,7 @@ def split_cond(condition):
             start = i + 1
     if not sub:
         conditions.append((key, value))
+    print(conditions)
     return conditions
 
 
@@ -1631,7 +1665,7 @@ def get_combis(values, key, multi):
     """
     if 'multi' in values:
         values.pop('multi')
-    print(values)
+
     if isinstance(values, list):
         if multi:
             possible_values = []
