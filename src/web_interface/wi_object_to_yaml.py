@@ -330,73 +330,8 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
             # iterate over experimental factors
             for r in range(len(factors)):
 
-                # nested factor
-                if len(factors[r]['values']) == 1 and isinstance(
-                        factors[r]['values'][0], dict):
-
-                    # remove key 'multi'
-                    if 'multi' in factors[r]['values'][0]:
-                        factors[r]['values'][0].pop('multi')
-
-                    # remove keys with None as value
-                    factors[r]['values'][0] = {
-                        k: v for k, v in factors[r]['values'][0].items()
-                        if v is not None}
-
-                    # test if the key in the 'values' dictionary matches the
-                    # factor and overwrite the dictionary with its list values
-                    # -> this is the case if a factor can be a list and can
-                    #    therefor occur multiple times in a condition
-                    # -> key multi has to be added -> change 'values' from list
-                    #    to dict
-                    # -> e.g. factor tissue -> values {tissue: [...], multi: }
-                    if list(factors[r]['values'][0].keys()) == \
-                            [factors[r]['factor']]:
-                        factors[r]['values'] = \
-                            factors[r]['values'][0][factors[r]['factor']]
-
-                else:
-
-                    # fetch the properties of the experimental factor from the
-                    # general structure
-                    infos = list(utils.find_keys(
-                        key_yaml, factors[r]['factor']))
-
-                    # iterate over values of experimental factor
-                    for j in range(len(factors[r]['values'])):
-
-                        # factor contains whitelist keys
-                        if 'whitelist_keys' in factors[r]:
-
-                            # replace value with converted one
-                            factors[r]['values'][j] = \
-                                wi_utils.parse_whitelist_keys(
-                                factors[r]['whitelist_keys'],
-                                factors[r]['values'][j], factors[r]['headers']
-                                if 'headers' in factors[r] else None)
-
-                        # factor contains headers but no whitelist keys
-                        elif 'headers' in factors[r]:
-
-                            # replace the original value with the one split
-                            # according to the header
-                            factors[r]['values'][j] = wi_utils.parse_headers(
-                                factors[r]['headers'], factors[r]['values'][j])
-
-                        # factor of type value_unit
-                        elif len(infos) > 0 and 'special_case' in infos[0]\
-                                and 'value_unit' in infos[0]['special_case']:
-
-                            factors[r]['values'][j] = \
-                                wi_utils.split_value_unit(
-                                    factors[r]['values'][j])
-
-                    # remove the keys 'header' and 'whitelist_keys'
-                    if 'whitelist_keys' in factors[r]:
-                        factors[r].pop('whitelist_keys')
-                    if 'headers' in factors[r]:
-                        factors[r].pop('headers')
-
+                factors[r] = parse_factor(factors[r], key_yaml)
+                
             # set val to factors
             val = factors
 
@@ -417,3 +352,81 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
             res[wi_object[i]['position'].split(':')[-1]] = val
 
     return res if len(res) > 0 else None, organism, sample_name, nom
+
+
+def parse_factor(factors, key_yaml):
+
+    # nested factor
+    if len(factors['values']) == 1 and isinstance(
+            factors['values'][0], dict):
+
+        # remove key 'multi'
+        if 'multi' in factors['values'][0]:
+            factors['values'][0].pop('multi')
+
+        # remove keys with None as value
+        factors['values'][0] = {
+            k: v for k, v in factors['values'][0].items()
+            if v is not None}
+
+        # test if the key in the 'values' dictionary matches the
+        # factor and overwrite the dictionary with its list values
+        # -> this is the case if a factor can be a list and can
+        #    therefor occur multiple times in a condition
+        # -> key multi has to be added -> change 'values' from list
+        #    to dict
+        # -> e.g. factor tissue -> values {tissue: [...], multi: }
+        if list(factors['values'][0].keys()) == \
+                [factors['factor']]:
+            factors['values'] = \
+                factors['values'][0][factors['factor']]
+
+        for key in factors['values']:
+            if isinstance(factors[key]['values'], dict):
+                if not 'factor' in factors['values'][key]:
+                    factors['values'][key]['factor'] = key
+                factors['values'][key] = parse_factor(factors['values'][key], key_yaml)
+                factors['values'][key].pop('factor')
+
+    else:
+
+        # fetch the properties of the experimental factor from the
+        # general structure
+        infos = list(utils.find_keys(
+            key_yaml, factors['factor']))
+
+        # iterate over values of experimental factor
+        for j in range(len(factors['values'])):
+
+            # factor contains whitelist keys
+            if 'whitelist_keys' in factors:
+
+                # replace value with converted one
+                factors['values'][j] = \
+                    wi_utils.parse_whitelist_keys(
+                        factors['whitelist_keys'],
+                        factors['values'][j], factors['headers']
+                        if 'headers' in factors else None)
+
+            # factor contains headers but no whitelist keys
+            elif 'headers' in factors:
+
+                # replace the original value with the one split
+                # according to the header
+                factors['values'][j] = wi_utils.parse_headers(
+                    factors['headers'], factors['values'][j])
+
+            # factor of type value_unit
+            elif len(infos) > 0 and 'special_case' in infos[0] \
+                    and 'value_unit' in infos[0]['special_case']:
+
+                factors['values'][j] = \
+                    wi_utils.split_value_unit(
+                        factors['values'][j])
+
+        # remove the keys 'header' and 'whitelist_keys'
+        if 'whitelist_keys' in factors:
+            factors.pop('whitelist_keys')
+        if 'headers' in factors:
+            factors.pop('headers')
+    return factors
