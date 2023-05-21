@@ -285,7 +285,7 @@ def get_conditions(factors, organism_name, key_yaml):
                                 headers = 'gene_name ensembl_id'
 
                                 # save the original value
-                                full_value = copy.deepcopy(val[key][i])
+                                full_value = copy.deepcopy(val[key][v])
 
                                 # split the value according to the header and save them as a
                                 # string
