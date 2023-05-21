@@ -381,12 +381,14 @@ def parse_factor(factors, key_yaml):
             factors['values'] = \
                 factors['values'][0][factors['factor']]
 
-        for key in factors['values']:
-            if isinstance(factors['values'][key], dict):
-                if not 'factor' in factors['values'][key]:
-                    factors['values'][key]['factor'] = key
-                factors['values'][key] = parse_factor(factors['values'][key], key_yaml)
-                factors['values'][key].pop('factor')
+        for i in range(len(factors['values'])):
+            if isinstance(factors['values'][i], dict):
+                for key in factors['values'][i]:
+                    if isinstance(factors['values'][i][key], dict):
+                        if not 'factor' in factors['values'][i][key]:
+                            factors['values'][i][key]['factor'] = key
+                        factors['values'][i][key] = parse_factor(factors['values'][i][key], key_yaml)
+                        factors['values'][i][key].pop('factor')
 
     else:
 
