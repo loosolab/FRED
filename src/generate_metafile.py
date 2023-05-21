@@ -1730,7 +1730,10 @@ def get_combis(values, key, multi):
             else:
                 start = list(values.keys())[0]
             for elem in values[start]:
-                v = [f'{start}:\"{elem}\"']
+                if elem.startswith(f'{start}:'):
+                    v = [elem]
+                else:
+                    v = [f'{start}:\"{elem}\"']
                 for k in values:
                     if k != start:
                         v2 = []
@@ -1745,7 +1748,10 @@ def get_combis(values, key, multi):
                         v = v2
                 possible_values = v
                 for z in possible_values:
-                    disease_values.append(f'{key}:{"{"}{z}{"}"}')
+                    if z.startswith(f'{key}:{"{"}'):
+                        disease_values.append(f'{"{"}{z}{"}"}')
+                    else:
+                        disease_values.append(f'{key}:{"{"}{z}{"}"}')
         return disease_values
 
 
