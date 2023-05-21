@@ -331,7 +331,7 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
             for r in range(len(factors)):
 
                 factors[r] = parse_factor(factors[r], key_yaml)
-                
+
             # set val to factors
             val = factors
 
@@ -382,7 +382,7 @@ def parse_factor(factors, key_yaml):
                 factors['values'][0][factors['factor']]
 
         for key in factors['values']:
-            if isinstance(factors[key]['values'], dict):
+            if isinstance(factors['values'][key], dict):
                 if not 'factor' in factors['values'][key]:
                     factors['values'][key]['factor'] = key
                 factors['values'][key] = parse_factor(factors['values'][key], key_yaml)
