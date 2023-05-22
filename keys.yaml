@@ -525,7 +525,7 @@ experimental_setting:
                   special_case:
                       group: 'gene'
                       control:
-                        knockdown_method: WT
+                        knockdown_method: 'WT'
                   value:
                     knockdown_method:
                       mandatory: True

@@ -257,6 +257,10 @@ def get_conditions(factors, organism_name, key_yaml):
                     'special_case' in factor_infos[0] and 'group' in \
                     factor_infos[0]['special_case'] else None
 
+                val['control'] = factor_infos[0]['special_case']['control'] if\
+                    'special_case' in factor_infos[0] and 'control' in \
+                    factor_infos[0]['special_case'] else None
+
                 # multi was defined in the value (user input)
                 if 'multi' in val:
 
