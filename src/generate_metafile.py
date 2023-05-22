@@ -1725,9 +1725,11 @@ def get_combis(values, key, multi):
                             if control and val_key in control and control[val_key] == v:
                                 control_value = f'{val_key}:\"{v}\"'
                             elif v.startswith(f'{val_key}:{"{"}'):
-                                value2.append(f'{val}|{v}')
+                                if v not in val:
+                                    value2.append(f'{val}|{v}')
                             else:
-                                value2.append(f'{val}|{val_key}:\"{v}\"')
+                                if f'{val_key}:\"{v}\"' not in val:
+                                    value2.append(f'{val}|{val_key}:\"{v}\"')
                     value = value2
                 possible_values[elem] = value
 
