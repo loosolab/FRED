@@ -1665,7 +1665,9 @@ def get_combis(values, key, multi):
     """
     if 'multi' in values:
         values.pop('multi')
-
+    values = {k: v for k, v in values.items() if
+           not (type(v) in [list, dict] and len(v) == 0)
+           and v is not None}
     if isinstance(values, list):
         if multi:
             possible_values = []
@@ -1742,8 +1744,9 @@ def get_combis(values, key, multi):
                             for y in possible_values[z]:
                                 if y != control_value and y != x:
                                     disease_values.append(f'{key}:{"{"}{y}{"}"}')
-                                    disease_values.append(
-                                        f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
+                                    if f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}' not in disease_values and f'{key}:{"{"}{y}{"}"}-{key}:{"{"}{x}{"}"}' not in disease_values:
+                                        disease_values.append(
+                                            f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
             disease_values.append(f'{key}:{"{"}{control_value}{"}"}')
 
         else:
