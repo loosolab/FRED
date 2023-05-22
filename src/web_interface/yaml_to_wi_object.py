@@ -1,4 +1,6 @@
 import src.web_interface.whitelist_parsing as whitelist_parsing
+import src.web_interface.wi_utils as wi_utils
+import datetime
 
 # TODO: example of format in wi_object (Keys)
 
@@ -210,5 +212,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
                 'organism': filled_object['organism']
                 if 'organism' in filled_object else None,
                 'key_name': part_object['position'].split(':')[-1]}
+
+        if input_type == 'date':
+            part_object['value'] = wi_utils.str_to_date(datetime.datetime.now().strftime('%d.%m.%Y'))
 
     return part_object, whitelist_object
