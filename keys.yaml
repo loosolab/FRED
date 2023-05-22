@@ -343,6 +343,14 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
+                cell_line:
+                  mandatory: False
+                  list: False
+                  display_name: 'Cell line'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 cellular_compartment:
                   mandatory: False
                   list: True

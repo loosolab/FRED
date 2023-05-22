@@ -1454,11 +1454,11 @@ def get_short_value(factor, short_factor, value, key_yaml, short_cond, result_di
             short_cond += f'{short_factor}.{value_unit["value"]}' \
                           f'{short_units[value_unit["unit"]] if value_unit["unit"] in short_units else value_unit["unit"]}'
         else:
-            val_whitelist = utils.get_whitelist(os.path.join('abbrev', value),
+            val_whitelist = utils.get_whitelist(os.path.join('abbrev', factor),
                                                 result_dict)
             if val_whitelist and value.lower() in val_whitelist['whitelist']:
-                short_cond.append(
-                    f'{short_factor}.{val_whitelist["whitelist"][value.lower()]}')
+                short_cond += f'{short_factor}.' \
+                              f'{val_whitelist["whitelist"][value.lower()]}'
             elif val_whitelist and value in val_whitelist['whitelist']:
                 short_cond += f'{short_factor}.{val_whitelist["whitelist"][value]}'
             else:
