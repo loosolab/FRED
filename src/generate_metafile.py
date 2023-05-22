@@ -631,7 +631,7 @@ def get_conditions(factors, node, mandatory_mode, result_dict, mode, size=80):
 
             # overwrite the values with the combinations
             factors[i]['values'] = get_combinations(factors[i]['values'],
-                                                    factors[i]['factor'])
+                                                    factors[i]['factor'], result_dict)
             is_dict.append(f'{factors[i]["values"]}')
 
             # remove ident_key from result dictionary
@@ -1458,7 +1458,7 @@ def get_short_value(factor, short_factor, value, key_yaml, short_cond, result_di
                                                 result_dict)
             if val_whitelist and value.lower() in val_whitelist['whitelist']:
                 short_cond.append(
-                    f'{short_factor}.{val_whitelist["whitelist"][c[1].lower()]}')
+                    f'{short_factor}.{val_whitelist["whitelist"][value.lower()]}')
             elif val_whitelist and value in val_whitelist['whitelist']:
                 short_cond += f'{short_factor}.{val_whitelist["whitelist"][value]}'
             else:
@@ -1490,7 +1490,6 @@ def split_cond(condition):
     conditions.append(cond)
 
     for j in range(len(conditions)):
-        print(conditions[j])
         d = json.loads(f'{"{"}{conditions[j]}{"}"}')
 
         key = list(d.keys())[0]
@@ -1614,7 +1613,7 @@ def merge_dicts(a, b):
     return res
 
 
-def get_combinations(values, key, size=80):
+def get_combinations(values, key, result_dict, size=80):
     """
     This function creates combinations for experimental factors that can occur
     multiple times in one condition and lets the user choose those that were
@@ -1640,7 +1639,7 @@ def get_combinations(values, key, size=80):
             ['True ', 'False '], f'\nCan one sample contain multiple {key}s?')
 
     if multi or is_dict:
-        merge_values = get_combis(values, key, multi)
+        merge_values = get_combis(values, key, multi, result_dict)
         print(
             f'\nPlease select the analyzed combinations for {key} '
             f'(1-{len(merge_values)}) divided by comma:\n')
@@ -1651,7 +1650,7 @@ def get_combinations(values, key, size=80):
     return used_values
 
 
-def get_combis(values, key, multi):
+def get_combis(values, key, multi, result_dict):
     """
     This function creates all combinations for one experimental factor that can
     occur multiple tims in one conditions.
@@ -1662,6 +1661,16 @@ def get_combis(values, key, multi):
     :return: disease_values: a list of all possible combinations of the
                              experimental factor
     """
+
+    if key == 'gene_editing':
+        whitelist_key = 'editing_method'
+        depend_key = 'editing_type'
+        whitelist = utils.get_whitelist(whitelist_key, result_dict)
+    else:
+        whitelist_key = None
+        depend_key = None
+        whitelist = None
+
     control_value = None
     if 'ident_key' in values and values['ident_key'] is not None:
         if not values['ident_key'] in values:
@@ -1690,7 +1699,6 @@ def get_combis(values, key, multi):
         else:
             return values
     else:
-        # TODO: without ident_key
         if multi:
             if 'ident_key' in values and values['ident_key'] is not None:
                 ident_key = values['ident_key']
@@ -1726,9 +1734,24 @@ def get_combis(values, key, multi):
                             for v in values[val_key]:
                                 if isinstance(v, dict) and 'value' in v and 'unit' in v:
                                     v = f'{v["value"]}{v["unit"]}'
-
                                 if control and val_key in control and control[val_key] == v:
                                     control_value = f'{val_key}:\"{v}\"'
+                                elif whitelist and val_key == whitelist_key:
+                                    g_key = None
+                                    for group_key in whitelist['whitelist']:
+                                        if v in whitelist['whitelist'][group_key]:
+                                            g_key = group_key
+                                            break
+                                    if g_key == 'all' or f'{depend_key}:"{g_key}"' in val:
+                                        if v.startswith(f'{val_key}:{"{"}'):
+                                            if v not in val:
+                                                value2.append(f'{val}|{v}')
+                                        else:
+                                            if f'{val_key}:\"{v}\"' not in val:
+                                                value2.append(
+                                                        f'{val}|{val_key}:\"{v}\"')
+                                    else:
+                                        value2.append(val)
                                 elif v.startswith(f'{val_key}:{"{"}'):
                                     if v not in val:
                                         value2.append(f'{val}|{v}')
@@ -1755,6 +1778,7 @@ def get_combis(values, key, multi):
         else:
             disease_values = []
             possible_values = []
+
             if 'control' in values:
                 control = values['control']
                 values.pop('control')
@@ -1784,7 +1808,21 @@ def get_combis(values, key, multi):
                                             control[k] == x:
                                         control_value = f'{k}:\"{x}\"'
                                     else:
-                                        if x.startswith(f'{k}:'):
+                                        if whitelist and k == whitelist_key:
+                                            g_key = None
+                                            for group_key in whitelist['whitelist']:
+                                                if x in whitelist['whitelist'][group_key]:
+                                                    g_key = group_key
+                                                    break
+                                            if g_key == 'all' or f'{depend_key}:"{g_key}"' in i:
+                                                if x.startswith(f'{k}:'):
+                                                    v2.append(f'{i}|{x}')
+                                                else:
+                                                    v2.append(
+                                                        f'{i}|{k}:\"{x}\"')
+                                            else:
+                                                v2.append(i)
+                                        elif x.startswith(f'{k}:'):
                                             v2.append(f'{i}|{x}')
                                         else:
                                             v2.append(f'{i}|{k}:\"{x}\"')

@@ -307,7 +307,7 @@ def get_conditions(factors, organism_name, key_yaml):
                 # generate combinations of the values of the dictionary for the
                 # conditions and overwrite the values with them
                 factors[i]['values'] = generate.get_combis(
-                    val, factors[i]['factor'], multi)
+                    val, factors[i]['factor'], multi, {'organism': organism_name.split(' ')[0]})
 
         # iterate over all values
         for j in range(len(factors[i]['values'])):
