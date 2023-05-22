@@ -197,7 +197,9 @@ def get_factor_values(key, node, filled_object):
         if whitelist:
             whitelist.append({'displayName': 'Multi', 'position': 'multi',
                               'whitelist': [True, False], 'input_type': 'bool',
-                              'value': False})
+                              'value': False,
+                              'desc': f'Can the factor {key} occur multiple '
+                                      f'times in one condition?'})
 
     return whitelist, whitelist_type, input_type, headers, w_keys
 
