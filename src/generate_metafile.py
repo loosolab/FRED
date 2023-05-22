@@ -1696,7 +1696,6 @@ def get_combis(values, key, multi):
             if 'ident_key' in values and values['ident_key'] is not None:
                 ident_key = values['ident_key']
                 start = ident_key
-                values.pop(ident_key)
                 values.pop('ident_key')
             else:
                 ident_key = None
