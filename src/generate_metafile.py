@@ -1685,53 +1685,64 @@ def get_combis(values, key, multi):
             return values
     else:
         # TODO: without ident_key
-        if multi and 'ident_key' in values:
+        if multi:
+            if 'ident_key' in values and values['ident_key'] is not None:
+                ident_key = values['ident_key']
+                start = ident_key
+                values.pop(ident_key)
+                values.pop('ident_key')
+            else:
+                ident_key = None
+                if 'ident_key' in values:
+                    values.pop('ident_key')
+                start = list(values.keys())[0]
+
             possible_values = {}
             control_value = None
             disease_values = []
-            ident_key = values['ident_key']
-            depend = values[ident_key]
-            values.pop(ident_key)
-            values.pop('ident_key')
             control = values['control'] if 'control' in values else None
             if 'control' in values:
                 values.pop('control')
-            for elem in depend:
+            depend = []
+            for elem in values[start]:
+
                 possible_values[elem] = []
-                if elem.startswith(f'{ident_key}:{"{"}'):
+                if elem.startswith(f'{start}:{"{"}'):
                     value = [elem]
                 else:
-                    value = [f'{ident_key}:"{elem}"']
-                for val_key in values:
-                    value2 = []
-                    for x in value:
-                        val = x
-                        for v in values[val_key]:
-                            if isinstance(
-                                    v, dict) and 'value' in v and 'unit' in v:
-                                v = f'{v["value"]}{v["unit"]}'
+                    value = [f'{start}:"{elem}"']
+                if start == ident_key:
+                    depend += value
 
-                            if control and val_key in control and control[val_key] == v:
-                                control_value = f'{val_key}:\"{v}\"'
-                                value2.append(control_value)
-                            else:
-                                value2.append(f'{val}|{val_key}:\"{v}\"')
-                    value = value2
+                for val_key in values:
+                    if val_key != start:
+                        value2 = []
+                        for x in value:
+                            val = x
+                            for v in values[val_key]:
+                                if isinstance(v, dict) and 'value' in v and 'unit' in v:
+                                    v = f'{v["value"]}{v["unit"]}'
+
+                                if control and val_key in control and control[val_key] == v:
+                                    control_value = f'{val_key}:\"{v}\"'
+                                elif v.startswith(f'{val_key}:{"{"}'):
+                                    value2.append(f'{val}|{v}')
+                                else:
+                                    value2.append(f'{val}|{val_key}:\"{v}\"')
+                        value = value2
                 possible_values[elem] = value
 
                 #TODO: more than two diseases
                 for z in possible_values:
                     if z != elem:
                         for x in possible_values[elem]:
-                            if x == control_value and control_value not in disease_values:
-                                disease_values.append(f'{key}:{"{"}{x}{"}"}')
-                            else:
-                                disease_values.append(f'{key}:{"{"}{x}{"}"}')
-                                for y in possible_values[z]:
-                                    if y != control_value:
-                                        disease_values.append(f'{key}:{"{"}{y}{"}"}')
-                                        disease_values.append(
-                                            f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
+                            disease_values.append(f'{key}:{"{"}{x}{"}"}')
+                            for y in possible_values[z]:
+                                if y != control_value:
+                                    disease_values.append(f'{key}:{"{"}{y}{"}"}')
+                                    disease_values.append(
+                                        f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
+            disease_values.append(f'{key}:{"{"}{control_value}{"}"}')
 
         else:
             disease_values = []

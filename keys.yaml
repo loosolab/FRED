@@ -523,7 +523,6 @@ experimental_setting:
                   display_name: 'Gene editing'
                   desc: ''
                   special_case:
-                      group: 'gene'
                       control:
                         editing_method: 'WT'
                   value:
