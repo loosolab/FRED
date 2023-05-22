@@ -262,8 +262,7 @@ def get_conditions(factors, organism_name, key_yaml):
 
                     # set multi to the value defined by the user if an ident
                     # key is defined else False
-                    multi = False if val['ident_key'] is None else \
-                            val['multi']
+                    multi = val['multi']
 
                 # test if the value of the factor contains just the 'factor',
                 # 'multi' and 'ident_key' as keys

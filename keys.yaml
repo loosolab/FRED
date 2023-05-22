@@ -351,30 +351,6 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
-                gene:
-                  mandatory: False
-                  list: False
-                  display_name: 'Gene'
-                  desc: ''
-                  special_case:
-                    merge: gene_name
-                  value:
-                    gene_name:
-                      mandatory: True
-                      list: False
-                      display_name: 'Gene Name'
-                      desc: ''
-                      value: null
-                      whitelist: True
-                      input_type: select
-                    ensembl_id:
-                      mandatory: True
-                      list: False
-                      display_name: 'ENSEMBL-ID'
-                      desc: ''
-                      value: null
-                      whitelist: True
-                      input_type: select
                 disease:
                   mandatory: False
                   list: True
@@ -382,6 +358,8 @@ experimental_setting:
                   desc: ''
                   special_case:
                     group: 'disease_type'
+                    control:
+                      disease_status: 'healthy'
                   value:
                     disease_type:
                       mandatory: False
@@ -413,7 +391,9 @@ experimental_setting:
                   display_name: 'Injury'
                   desc: ''
                   special_case:
-                    group: injury_type
+                    group: 'injury_type'
+                    control:
+                      injury_status: 'non-injured'
                   value:
                     injury_status:
                       mandatory: True
@@ -438,6 +418,8 @@ experimental_setting:
                   desc: ''
                   special_case:
                     group: 'treatment_type'
+                    control:
+                      treatment_status: 'not treated'
                   value:
                     treatment_type:
                       mandatory: False
@@ -542,6 +524,8 @@ experimental_setting:
                   desc: ''
                   special_case:
                       group: 'gene'
+                      control:
+                        knockdown_method: WT
                   value:
                     knockdown_method:
                       mandatory: True

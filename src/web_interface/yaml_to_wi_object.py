@@ -151,8 +151,11 @@ def parse_empty(node, pos, key_yaml, filled_object,
                            'desc': node['desc'], 'input_fields': input_fields,
                            'input_disabled': input_disabled}
 
-            if 'special_case' in node and 'group' in node['special_case']:
-                part_object['ident_key'] = f'{pos}:{node["special_case"]["group"]}'
+            if 'special_case' in node:
+                if 'group' in node['special_case']:
+                    part_object['ident_key'] = f'{pos}:{node["special_case"]["group"]}'
+                if 'control' in node['special_case']:
+                    part_object['control'] = node['special_case']['control']
 
         # test if the key takes multiple values and add the property
         # 'list_value' as a place to save those values to via the website
