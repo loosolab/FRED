@@ -1663,6 +1663,11 @@ def get_combis(values, key, multi):
     :return: disease_values: a list of all possible combinations of the
                              experimental factor
     """
+
+    if 'ident_key' in values and values['ident_key'] is not None:
+        if not values['ident_key'] in values:
+            multi = False
+
     if 'multi' in values:
         values.pop('multi')
     values = {k: v for k, v in values.items() if
@@ -1747,7 +1752,8 @@ def get_combis(values, key, multi):
                                     if f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}' not in disease_values and f'{key}:{"{"}{y}{"}"}-{key}:{"{"}{x}{"}"}' not in disease_values:
                                         disease_values.append(
                                             f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
-            disease_values.append(f'{key}:{"{"}{control_value}{"}"}')
+            if control_value is not None:
+                disease_values.append(f'{key}:{"{"}{control_value}{"}"}')
 
         else:
             disease_values = []
