@@ -1490,14 +1490,13 @@ def split_cond(condition):
     conditions.append(cond)
 
     for j in range(len(conditions)):
+        print(conditions[j])
         d = json.loads(f'{"{"}{conditions[j]}{"}"}')
 
         key = list(d.keys())[0]
         conditions[j] = (key, d[key])
 
     return conditions
-
-
 
 
 def split_cond2(condition):
@@ -1663,7 +1662,7 @@ def get_combis(values, key, multi):
     :return: disease_values: a list of all possible combinations of the
                              experimental factor
     """
-
+    control_value = None
     if 'ident_key' in values and values['ident_key'] is not None:
         if not values['ident_key'] in values:
             multi = False
@@ -1704,7 +1703,6 @@ def get_combis(values, key, multi):
                 start = list(values.keys())[0]
 
             possible_values = {}
-            control_value = None
             disease_values = []
             control = values['control'] if 'control' in values else None
             if 'control' in values:
@@ -1785,9 +1783,11 @@ def get_combis(values, key, multi):
                                     if control and k in control and \
                                             control[k] == x:
                                         control_value = f'{k}:\"{x}\"'
-                                        v2.append(control_value)
                                     else:
-                                        v2.append(f'{i}|{k}:\"{x}\"')
+                                        if x.startswith(f'{k}:'):
+                                            v2.append(f'{i}|{x}')
+                                        else:
+                                            v2.append(f'{i}|{k}:\"{x}\"')
                         v = v2
                 possible_values = v
                 for z in possible_values:
@@ -1795,6 +1795,8 @@ def get_combis(values, key, multi):
                         disease_values.append(f'{"{"}{z}{"}"}')
                     else:
                         disease_values.append(f'{key}:{"{"}{z}{"}"}')
+            if control_value is not None:
+                disease_values.append(f'{key}:{"{"}{control_value}{"}"}')
         return list(set(disease_values))
 
 
