@@ -1715,21 +1715,20 @@ def get_combis(values, key, multi):
                     depend += value
 
                 for val_key in values:
-                    if val_key != start:
-                        value2 = []
-                        for x in value:
-                            val = x
-                            for v in values[val_key]:
-                                if isinstance(v, dict) and 'value' in v and 'unit' in v:
-                                    v = f'{v["value"]}{v["unit"]}'
+                    value2 = []
+                    for x in value:
+                        val = x
+                        for v in values[val_key]:
+                            if isinstance(v, dict) and 'value' in v and 'unit' in v:
+                                v = f'{v["value"]}{v["unit"]}'
 
-                                if control and val_key in control and control[val_key] == v:
-                                    control_value = f'{val_key}:\"{v}\"'
-                                elif v.startswith(f'{val_key}:{"{"}'):
-                                    value2.append(f'{val}|{v}')
-                                else:
-                                    value2.append(f'{val}|{val_key}:\"{v}\"')
-                        value = value2
+                            if control and val_key in control and control[val_key] == v:
+                                control_value = f'{val_key}:\"{v}\"'
+                            elif v.startswith(f'{val_key}:{"{"}'):
+                                value2.append(f'{val}|{v}')
+                            else:
+                                value2.append(f'{val}|{val_key}:\"{v}\"')
+                    value = value2
                 possible_values[elem] = value
 
                 #TODO: more than two diseases
