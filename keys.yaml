@@ -517,88 +517,32 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
-                knockdown:
+                gene_editing:
                   mandatory: False
                   list: True
-                  display_name: 'Knockdown'
+                  display_name: 'Gene editing'
                   desc: ''
                   special_case:
                       group: 'gene'
                       control:
-                        knockdown_method: 'WT'
+                        editing_method: 'WT'
                   value:
-                    knockdown_method:
+                    editing_type:
                       mandatory: True
+                      list: False
+                      display_name: 'Type'
+                      desc: ''
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    editing_method:
+                      mandatory: False
                       list: False
                       display_name: 'Method'
                       desc: ''
                       value: null
                       whitelist: True
                       input_type: select
-                    gene:
-                      mandatory: False
-                      list: False
-                      display_name: 'Gene'
-                      desc: ''
-                      special_case:
-                        merge: gene_name
-                      value:
-                        gene_name:
-                          mandatory: True
-                          list: False
-                          display_name: 'Gene Name'
-                          desc: ''
-                          value: null
-                          whitelist: True
-                          input_type: select
-                        ensembl_id:
-                          mandatory: True
-                          list: False
-                          display_name: 'ENSEMBL-ID'
-                          desc: ''
-                          value: null
-                          whitelist: True
-                          input_type: select
-                knockout:
-                  mandatory: False
-                  list: True
-                  display_name: 'Knockout'
-                  desc: ''
-                  special_case:
-                    group: 'gene'
-                  value:
-                    gene:
-                      mandatory: False
-                      list: False
-                      display_name: 'Gene'
-                      desc: ''
-                      special_case:
-                        merge: gene_name
-                      value:
-                        gene_name:
-                          mandatory: True
-                          list: False
-                          display_name: 'Gene Name'
-                          desc: ''
-                          value: null
-                          whitelist: True
-                          input_type: select
-                        ensembl_id:
-                          mandatory: True
-                          list: False
-                          display_name: 'ENSEMBL-ID'
-                          desc: ''
-                          value: null
-                          whitelist: True
-                          input_type: select
-                overexpression:
-                  mandatory: False
-                  list: True
-                  display_name: 'Overexpression'
-                  desc: ''
-                  special_case:
-                    group: 'gene'
-                  value:
                     gene:
                       mandatory: False
                       list: False
