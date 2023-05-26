@@ -275,7 +275,8 @@ def get_conditions(factors, organism_name, key_yaml):
                 # -> this is the case if a factor takes a list of single values
                 # -> then the value had to be converted to a dictionary to
                 # include the key 'multi' which is undone here
-                if all(k in ['multi', factors[i]['factor'], 'ident_key'] for k
+
+                if all(k in ['multi', factors[i]['factor'], 'control', 'ident_key'] for k
                        in list(val.keys())):
 
                     # overwrite val with the values under the key <factor> in

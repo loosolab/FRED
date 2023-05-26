@@ -532,7 +532,7 @@ experimental_setting:
                   desc: ''
                   special_case:
                       control:
-                        editing_method: 'WT'
+                        editing_type: 'WT'
                   value:
                     editing_type:
                       mandatory: True

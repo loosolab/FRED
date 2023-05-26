@@ -1678,9 +1678,7 @@ def get_combis(values, key, multi, result_dict):
 
     if 'multi' in values:
         values.pop('multi')
-    values = {k: v for k, v in values.items() if
-           not (type(v) in [list, dict] and len(v) == 0)
-           and v is not None}
+
     if isinstance(values, list):
         if multi:
             possible_values = []
@@ -1699,6 +1697,9 @@ def get_combis(values, key, multi, result_dict):
         else:
             return values
     else:
+        values = {k: v for k, v in values.items() if
+                  not (type(v) in [list, dict] and len(v) == 0)
+                  and v is not None}
         if multi:
             if 'ident_key' in values and values['ident_key'] is not None:
                 ident_key = values['ident_key']
@@ -1717,12 +1718,15 @@ def get_combis(values, key, multi, result_dict):
                 values.pop('control')
             depend = []
             for elem in values[start]:
-
+                value = []
                 possible_values[elem] = []
-                if elem.startswith(f'{start}:{"{"}'):
-                    value = [elem]
+                if control and start in control and control[start] == elem:
+                    control_value = f'{start}:\"{elem}\"'
                 else:
-                    value = [f'{start}:"{elem}"']
+                    if elem.startswith(f'{start}:{"{"}'):
+                        value = [elem]
+                    else:
+                        value = [f'{start}:"{elem}"']
                 if start == ident_key:
                     depend += value
 
@@ -1790,10 +1794,14 @@ def get_combis(values, key, multi, result_dict):
             else:
                 start = list(values.keys())[0]
             for elem in values[start]:
-                if elem.startswith(f'{start}:'):
-                    v = [elem]
+                v = []
+                if control and start in control and control[start] == elem:
+                    control_value = f'{start}:\"{elem}\"'
                 else:
-                    v = [f'{start}:\"{elem}\"']
+                    if elem.startswith(f'{start}:'):
+                        v = [elem]
+                    else:
+                        v = [f'{start}:\"{elem}\"']
                 for k in values:
                     if k != start:
                         v2 = []
