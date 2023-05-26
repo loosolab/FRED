@@ -16,7 +16,7 @@ def save_object(dictionary, path, filename):
 
     # search for all metadata files
     metafiles, validation_reports = file_reading.iterate_dir_metafiles(
-        [path.split('/')[0]], return_false=True)
+        [path], return_false=True)
 
     # TODO: own function
     correct_file = None
