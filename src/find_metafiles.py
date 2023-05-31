@@ -285,7 +285,7 @@ def calculate_match(metafile, search_parameters):
                 and_param = and_param.rstrip(f':{should_be_found}')
 
                 # split the search parameter into keys and value
-                p = generate.split_cond(and_param)[0]
+                p = generate.split_cond2(and_param)[0]
 
                 # if there is a value for the keys than split it at ':' to get
                 # a list of all chained metadata keys and save them in 'params'
