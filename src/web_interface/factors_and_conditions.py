@@ -391,6 +391,25 @@ def get_conditions(factors, organism_name, key_yaml):
 
             # split the condition into key-value pairs
             split_condition = generate.split_cond(cond)
+            search_condition = []
+
+            # TODO: own function for items
+            for elem in split_condition:
+                if isinstance(elem[1], dict):
+                    for key in elem[1]:
+                        if isinstance(elem[1][key], dict):
+                            val = "|".join(
+                                [f'{k}:"{elem[1][key][k]}"' for k in elem[1][key]])
+                            val = f'{key}:{"{"}{val}{"}"}'
+                            if val in real_val:
+                                search_condition.append(f'{elem[0]}:"{real_val[val]}"')
+                        else:
+                            search_condition.append(f'{elem[0]}:"{elem[1][key]}"')
+                elif isinstance(elem[1], list):
+                    for item in elem[1]:
+                        search_condition.append(f'{elem[0]}:"{item}"')
+                else:
+                    search_condition.append(f'{elem[0]}:"{elem[1]}"')
 
             # call functions to fill the samples with the values from the
             # condition
@@ -406,6 +425,7 @@ def get_conditions(factors, organism_name, key_yaml):
             # input fields
             d = {'correct_value': cond,
                  'title': title,
+                 'search': search_condition,
                  'readd': readd,
                  'position': 'experimental_setting:condition',
                  'list': True, 'mandatory': True, 'list_value': [],
