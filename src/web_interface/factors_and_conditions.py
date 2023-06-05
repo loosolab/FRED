@@ -403,7 +403,7 @@ def get_conditions(factors, organism_name, key_yaml):
                         for key in elem[1]:
                             if isinstance(elem[1][key], dict):
                                 val = "|".join(
-                                    [f'{k}:"{elem[1][key][k]}"' for k in elem[1][key]].lower())
+                                    [f'{k}:"{elem[1][key][k]}"' for k in elem[1][key]])
                                 val = f'{key}:{"{"}{val}{"}"}'
                                 if val in real_val:
                                     search_condition.append(f'{elem[0]}:"{real_val[val]}"'.lower())
