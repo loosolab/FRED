@@ -1479,6 +1479,8 @@ def split_cond(condition):
             if count % 2 == 0:
                 conditions.append(cond)
                 cond = '"'
+            else:
+                cond += condition[i]
         elif condition[i] == ':':
             cond += f'"{condition[i]}'
         elif condition[i] == '{':

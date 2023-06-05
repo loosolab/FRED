@@ -385,7 +385,6 @@ def get_conditions(factors, organism_name, key_yaml):
 
         # iterate over conditions
         for cond in conditions:
-
             # generate a sample name from the condition
             sample_name = generate.get_short_name(cond, {'organism': organism_name}, key_yaml)
 
@@ -393,7 +392,7 @@ def get_conditions(factors, organism_name, key_yaml):
             split_condition = generate.split_cond(cond)
             search_condition = []
 
-            # TODO: own function for items
+            # TODO: remove list (can there be a list?) or own function for items
             for elem in split_condition:
                 if isinstance(elem[1], dict):
                     for key in elem[1]:
