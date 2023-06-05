@@ -50,12 +50,19 @@ def get_meta_info(path, project_id):
                         html_str += f'<li>{elem}</li>'
                     html_str += '</ul>'
                 if len(error[1]) > 0:
+                    print(error[1])
                     html_str += f'<b>Invalid keys:</b><br>'
                     html_str += '<ul>'
                     for elem in error[1]:
                         value = correct_file
                         for key in elem.split(':'):
-                            value = value[key]
+                            if isinstance(value, list):
+                                for l_elem in value:
+                                   if key in l_elem:
+                                       value = l_elem[key]
+                                       break  
+                            else:
+                                value = value[key]
                         html_str += f'<li>{elem}: {value}</li>'
                         correct_file = wi_utils.pop_key(correct_file,
                                                         elem.split(':'), value)
