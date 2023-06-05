@@ -401,14 +401,14 @@ def get_conditions(factors, organism_name, key_yaml):
                                 [f'{k}:"{elem[1][key][k]}"' for k in elem[1][key]])
                             val = f'{key}:{"{"}{val}{"}"}'
                             if val in real_val:
-                                search_condition.append(f'{elem[0]}:"{real_val[val]}"')
+                                search_condition.append(f'{elem[0]}:"{real_val[val]}"'.lower())
                         else:
-                            search_condition.append(f'{elem[0]}:"{elem[1][key]}"')
+                            search_condition.append(f'{elem[0]}:"{elem[1][key]}"'.lower())
                 elif isinstance(elem[1], list):
                     for item in elem[1]:
-                        search_condition.append(f'{elem[0]}:"{item}"')
+                        search_condition.append(f'{elem[0]}:"{item}"'.lower())
                 else:
-                    search_condition.append(f'{elem[0]}:"{elem[1]}"')
+                    search_condition.append(f'{elem[0]}:"{elem[1]}"'.lower())
 
             # call functions to fill the samples with the values from the
             # condition
