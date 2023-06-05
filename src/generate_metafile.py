@@ -1674,9 +1674,9 @@ def get_combis(values, key, multi, result_dict):
         whitelist = None
 
     control_value = None
-    if 'ident_key' in values and values['ident_key'] is not None:
-        if not values['ident_key'] in values:
-            multi = False
+    #if 'ident_key' in values and values['ident_key'] is not None:
+    #    if not values['ident_key'] in values:
+    #        multi = False
 
     if 'multi' in values:
         values.pop('multi')
@@ -1703,7 +1703,7 @@ def get_combis(values, key, multi, result_dict):
                   not (type(v) in [list, dict] and len(v) == 0)
                   and v is not None}
         if multi:
-            if 'ident_key' in values and values['ident_key'] is not None:
+            if 'ident_key' in values and values['ident_key'] is not None and values['ident_key'] in values:
                 ident_key = values['ident_key']
                 start = ident_key
                 values.pop('ident_key')
@@ -1794,6 +1794,8 @@ def get_combis(values, key, multi, result_dict):
                 start = values['ident_key']
                 values.pop('ident_key')
             else:
+                if 'ident_key' in values:
+                    values.pop('ident_key')
                 start = list(values.keys())[0]
             for elem in values[start]:
                 v = []
