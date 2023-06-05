@@ -395,20 +395,28 @@ def get_conditions(factors, organism_name, key_yaml):
             # TODO: remove list (can there be a list?) or own function for items
             for elem in split_condition:
                 if isinstance(elem[1], dict):
-                    for key in elem[1]:
-                        if isinstance(elem[1][key], dict):
-                            val = "|".join(
-                                [f'{k}:"{elem[1][key][k]}"' for k in elem[1][key]])
-                            val = f'{key}:{"{"}{val}{"}"}'
-                            if val in real_val:
-                                search_condition.append(f'{elem[0]}:"{real_val[val]}"'.lower())
-                        else:
-                            search_condition.append(f'{elem[0]}:"{elem[1][key]}"'.lower())
+                    val = "|".join([f'{k}:"{elem[1][k]}"' for k in elem[1]])
+                    val = f'{elem[0]}:{"{"}{val}{"}"}'
+                    if val in real_val:
+                        search_condition.append(f'{elem[0]}:"{real_val[val]}"'.lower())
+                    else:
+                        for key in elem[1]:
+                            if isinstance(elem[1][key], dict):
+                                val = "|".join(
+                                    [f'{k}:"{elem[1][key][k]}"' for k in elem[1][key]].lower())
+                                val = f'{key}:{"{"}{val}{"}"}'
+                                if val in real_val:
+                                    search_condition.append(f'{elem[0]}:"{real_val[val]}"'.lower())
+                            else:
+                                search_condition.append(f'{elem[0]}:"{elem[1][key]}"'.lower())
                 elif isinstance(elem[1], list):
                     for item in elem[1]:
                         search_condition.append(f'{elem[0]}:"{item}"'.lower())
                 else:
-                    search_condition.append(f'{elem[0]}:"{elem[1]}"'.lower())
+                    if elem[1] in real_val:
+                        search_condition.append(f'{elem[0]}:"{real_val[elem[1]]}"'.lower())
+                    else:
+                        search_condition.append(f'{elem[0]}:"{elem[1]}"'.lower())
 
             # call functions to fill the samples with the values from the
             # condition
