@@ -2,7 +2,7 @@ project:
   mandatory: True
   list:  False
   display_name: 'Project'
-  desc: 'This part contains general information about the project.'
+  desc: 'Here you need to enter a detailed description of the project. This field can be used for all data that does not fit into existing fields, including further information on the exact mutant/knockout/knockdown exon/position, etc.'
   value:
     id:
       mandatory: True
@@ -216,7 +216,7 @@ experimental_setting:
     conditions:
       mandatory: True
       list: True
-      display_name: 'Conditions'
+      display_name: 'Final Conditions'
       desc: 'In this section you have to select your investigated conditions, which were build based on your entered experimental factors.'
       value:
         condition_name:
