@@ -217,7 +217,7 @@ experimental_setting:
       mandatory: True
       list: True
       display_name: 'Conditions'
-      desc: ''
+      desc: 'In this section you have to select your investigated conditions, which were build based on your entered experimental factors.'
       value:
         condition_name:
           mandatory: True
