@@ -432,7 +432,10 @@ def parse_factor(factors, key_yaml):
 
         for i in range(len(factors['values'])):
             if isinstance(factors['values'][i], dict):
+                remove_keys = []
                 for key in factors['values'][i]:
+                    if factors['values'][i][key] is None or (isinstance(factors['values'][i][key], list) and len(factors['values'][i][key]) == 0):
+                        remove_keys.append(key)
                     if key == 'gene':
                         headers = 'gene_name ensembl_id'
 
@@ -444,6 +447,8 @@ def parse_factor(factors, key_yaml):
                     #        factors['values'][i][key]['factor'] = key
                     #    factors['values'][i][key] = parse_factor(factors['values'][i][key], key_yaml)
                     #    factors['values'][i][key].pop('factor')
+                for r_key in remove_keys:
+                    factors[i]['values'].pop(r_key)
 
     else:
 
