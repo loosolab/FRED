@@ -45,6 +45,43 @@ def parse_object(wi_object, key_yaml):
     return result
 
 
+def get_sequencer_name(sample_name):
+    splitted_name = sample_name.split('-')
+    new_name = []
+    for elem in splitted_name:
+        new_elem, gene = split_name(elem)
+        if new_elem != '':
+            new_name.append(new_elem)
+    sample_name = '_'.join(new_name)
+    return sample_name
+
+
+def split_name(elem, gene=True):
+    new_name = []
+    if '+' in elem:
+        new_split = elem.split('+')
+        for part in new_split:
+            new_part, gene = split_name(part, gene)
+            if new_part != '':
+                new_name.append(new_part)
+        elem = '-'.join(new_name)
+
+    if '#' in elem:
+        remove = elem.split('#')[0]
+        elem, gene = split_name(elem.lstrip(f'{remove}#'), gene)
+
+    if '.' in elem:
+        if elem == 'gn.NA':
+            gene = False
+            elem = ''
+        elif elem.startswith('embl.') and gene == True:
+            elem = ''
+        else:
+            elem = elem.split('.')[1]
+
+    return elem, gene
+
+
 def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                nom):
     """
@@ -173,8 +210,11 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                 if wi_object['position'].split(':')[-1] == \
                         'technical_replicates':
 
+                    sequencer_name = get_sequencer_name(sample_name.rstrip(f'_{sample_name.split("_")[-1]}'))
+                    print(sequencer_name)
                     # TODO: comment
                     t_sample_name = []
+                    t_sequencer_name = []
                     count = [x['value'] for x in wi_object['input_fields'] if
                              x['position'].split(':')[-1] == 'count'][0]
 
@@ -185,7 +225,13 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                                                  f'{sample_name}'
                                                  f'_t{"{:02d}".format(c + 1)}_'
                                                  f'm{"{:02d}".format(m + 1)}')
-                    val = {'count': count, 'sample_name': t_sample_name}
+                            t_sequencer_name.append(f'{project_id}_'
+                                                    f'{organism}_'
+                                                    f'{sequencer_name}'
+                                                    f'{sample_name.split("_")[-1]}'
+                                                    f'_t{"{:02d}".format(c + 1)}_'
+                                                    f'm{"{:02d}".format(m + 1)}')
+                    val = {'count': count, 'sample_name': t_sample_name, 'seqeuncer_name': t_sequencer_name}
 
                 # no special case
                 else:

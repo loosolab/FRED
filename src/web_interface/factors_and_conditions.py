@@ -385,6 +385,7 @@ def get_conditions(factors, organism_name, key_yaml):
 
         # iterate over conditions
         for cond in conditions:
+
             # generate a sample name from the condition
             sample_name = generate.get_short_name(cond, {'organism': organism_name}, key_yaml)
 
@@ -571,6 +572,10 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
             # save the unchanged sample name as 'correct_value'
             sample[i]['correct_value'] = sample_name.split('_')[0]
+
+        #elif sample[i]['position'].endswith('samples:sequencer_name'):
+        #    sample[i]['value'] = sequencer_name
+        #    sample[i]['input_disabled'] = True
 
         # input field is a factor
         elif sample[i]['position'].split(':')[-1] in factors:
