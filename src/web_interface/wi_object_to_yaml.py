@@ -210,8 +210,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                 if wi_object['position'].split(':')[-1] == \
                         'technical_replicates':
 
-                    sequencer_name = get_sequencer_name(sample_name.rstrip(f'_{sample_name.split("_")[-1]}'))
-                    print(sequencer_name)
+                    #sequencer_name = get_sequencer_name(sample_name.rstrip(f'_{sample_name.split("_")[-1]}'))
                     # TODO: comment
                     t_sample_name = []
                     #t_sequencer_name = []
@@ -311,8 +310,12 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
 
                     else:
 
-                        # save value
-                        val = convert_value
+                        if isinstance(convert_value, str):
+                            val = convert_value.replace('\\n', ' ').replace('\n', ' ').replace('\\', ' ')
+                            val = ' '.join(val.split())
+                        else:
+                            # save value
+                            val = convert_value
 
                         # set the number of replicates
                         if wi_object['position'].split(':')[-1] == \
