@@ -53,7 +53,6 @@ def get_sequencer_name(sample_name):
         if new_elem != '':
             new_name.append(new_elem)
     sample_name = '_'.join(new_name)
-    print(sample_name)
     return sample_name
 
 
@@ -215,7 +214,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     print(sequencer_name)
                     # TODO: comment
                     t_sample_name = []
-                    t_sequencer_name = []
+                    #t_sequencer_name = []
                     count = [x['value'] for x in wi_object['input_fields'] if
                              x['position'].split(':')[-1] == 'count'][0]
 
@@ -226,13 +225,13 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                                                  f'{sample_name}'
                                                  f'_t{"{:02d}".format(c + 1)}_'
                                                  f'm{"{:02d}".format(m + 1)}')
-                            t_sequencer_name.append(f'{project_id}_'
-                                                    f'{organism}_'
-                                                    f'{sequencer_name}_'
-                                                    f'{sample_name.split("_")[-1]}'
-                                                    f'_t{"{:02d}".format(c + 1)}_'
-                                                    f'm{"{:02d}".format(m + 1)}')
-                    val = {'count': count, 'sample_name': t_sample_name, 'seqeuncer_name': t_sequencer_name}
+                            #t_sequencer_name.append(f'{project_id}_'
+                            #                        f'{organism}_'
+                            #                        f'{sequencer_name}_'
+                            #                        f'{sample_name.split("_")[-1]}'
+                            #                        f'_t{"{:02d}".format(c + 1)}_'
+                            #                        f'm{"{:02d}".format(m + 1)}')
+                    val = {'count': count, 'sample_name': t_sample_name}
 
                 # no special case
                 else:

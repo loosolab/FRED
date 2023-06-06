@@ -612,14 +612,6 @@ experimental_setting:
                       value: null
                       whitelist: False
                       input_type: short_text
-                    sequencer_name:
-                      mandatory: True
-                      list: False
-                      display_name: 'Sequencer Name'
-                      desc: ''
-                      value: null
-                      whitelist: False
-                      input_type: short_text
 
 technical_details:
   mandatory: True
