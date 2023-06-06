@@ -53,6 +53,7 @@ def get_sequencer_name(sample_name):
         if new_elem != '':
             new_name.append(new_elem)
     sample_name = '_'.join(new_name)
+    print(sample_name)
     return sample_name
 
 
@@ -68,13 +69,13 @@ def split_name(elem, gene=True):
 
     if '#' in elem:
         remove = elem.split('#')[0]
-        elem, gene = split_name(elem.lstrip(f'{remove}#'), gene)
+        elem, gene = split_name(elem[len(f'{remove}#'):], gene)
 
     if '.' in elem:
-        if elem == 'gn.NA':
+        if elem.lower() == 'gn.na':
             gene = False
             elem = ''
-        elif elem.startswith('embl.') and gene == True:
+        elif elem.lower().startswith('embl.') and gene is True:
             elem = ''
         else:
             elem = elem.split('.')[1]
