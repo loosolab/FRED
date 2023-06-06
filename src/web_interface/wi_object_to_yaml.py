@@ -448,7 +448,7 @@ def parse_factor(factors, key_yaml):
                     #    factors['values'][i][key] = parse_factor(factors['values'][i][key], key_yaml)
                     #    factors['values'][i][key].pop('factor')
                 for r_key in remove_keys:
-                    factors[i]['values'].pop(r_key)
+                    factors['values'][i].pop(r_key)
 
     else:
 
