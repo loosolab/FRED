@@ -1444,7 +1444,7 @@ def get_short_value(factor, short_factor, value, key_yaml, short_cond, result_di
                         list(new_vals.keys())])
         short_cond += f'{short_factor}#{val}'
     else:
-        info = list(utils.find_keys(key_yaml, value))
+        info = list(utils.find_keys(key_yaml, factor))
         if len(info) > 0 and 'special_case' in info[0] and 'value_unit' in \
                 info[0]['special_case']:
             short_units = \
