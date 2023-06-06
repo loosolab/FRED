@@ -227,7 +227,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                                                  f'm{"{:02d}".format(m + 1)}')
                             t_sequencer_name.append(f'{project_id}_'
                                                     f'{organism}_'
-                                                    f'{sequencer_name}'
+                                                    f'{sequencer_name}_'
                                                     f'{sample_name.split("_")[-1]}'
                                                     f'_t{"{:02d}".format(c + 1)}_'
                                                     f'm{"{:02d}".format(m + 1)}')
