@@ -65,9 +65,6 @@ def get_factors(organism, key_yaml):
             if w_keys is not None:
                 values[factor]['whitelist_keys'] = w_keys
 
-            if 'special_case' in node and node['special_case'] == 'counter':
-                values[factor]['counter'] = True
-
     # add the values to the dictionary
     factor_value['values'] = values
 
@@ -289,7 +286,6 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 else:
                     for key in [x for x in list(val.keys()) if x not in ['multi', 'ident_key']]:
-                        key_info = list(utils.find_keys(key_yaml, key))
                         if key == 'gene':
                             for v in range(len(val[key])):
 
@@ -309,9 +305,6 @@ def get_conditions(factors, organism_name, key_yaml):
                                              f'{str_value}{"}"}'
                                 # save the original value in real_val with the new value as key
                                 real_val[val[key][v]] = full_value
-                        elif len(key_info) > 0:
-                            if 'special_case' in key_info[0] and key_info[0]['special_case'] == 'counter':
-                                val[key] = [str(i) for i in range(1, int(val[key])+1)]
 
                 # generate combinations of the values of the dictionary for the
                 # conditions and overwrite the values with them
