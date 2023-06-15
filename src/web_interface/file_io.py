@@ -18,11 +18,12 @@ def save_object(dictionary, path, filename):
     metafiles, validation_reports = file_reading.iterate_dir_metafiles(
         [path], return_false=True)
 
+    project_id = dictionary['project']['id']
     # TODO: own function
     correct_file = None
     for metafile in metafiles:
         if 'project' in metafile and 'id' in metafile['project'] and \
-                metafile['project']['id'] == dictionary["project"]["id"]:
+                metafile['project']['id'] == project_id:
             correct_file = metafile
             break
 
@@ -31,11 +32,11 @@ def save_object(dictionary, path, filename):
         new_filename = path
         utils.save_as_yaml(dictionary, path)
     else:
-        new_filename = f'{filename}_{dictionary["project"]["id"]}' \
+        new_filename = f'{project_id}_{filename}' \
                        f'_metadata.yaml'
         utils.save_as_yaml(dictionary, os.path.join(path, new_filename))
         new_filename = os.path.join(path, new_filename)
-    return new_filename
+    return new_filename, project_id
 
 
 def save_filenames(file_str, path):

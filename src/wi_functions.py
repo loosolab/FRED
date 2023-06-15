@@ -68,7 +68,8 @@ def get_summary(wi_object):
 
 def save_object(dictionary, path, filename):
 
-    return file_io.save_object(dictionary, path, filename)
+    object, id = file_io.save_object(dictionary, path, filename)
+    return object, id
 
 
 def save_filenames(file_str, path):
