@@ -135,6 +135,7 @@ def get_factor_values(key, node, filled_object):
             k_val['required'] = node['value'][k]['mandatory']
             k_val['position'] = k
             k_val['value'] = []
+            k_val['desc'] = node['value'][k]['desc']
 
             # change single_autofill to multi_autofill because all factors can
             # have multiple values
@@ -176,7 +177,7 @@ def get_factor_values(key, node, filled_object):
             new_w = {'whitelist': whitelist, 'position': key,
                      'displayName': node['display_name'], 'required': True,
                      'value': [], 'input_type': input_type,
-                     'whitelist_type': whitelist_type}
+                     'desc': node['desc'], 'whitelist_type': whitelist_type}
 
             # add search info if factor is of type single- or multi-autofill
             if input_type == 'multi_autofill':
