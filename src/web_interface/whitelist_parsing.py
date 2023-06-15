@@ -74,7 +74,6 @@ def parse_whitelist(key_name, node, filled_object):
 
         # read in whitelist
         whitelist = utils.get_whitelist(key_name, filled_object)
-
         # test if the right keys are present in the whitelist
         # -> format check
         if whitelist is not None and 'whitelist_type' in whitelist and \

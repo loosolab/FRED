@@ -574,6 +574,18 @@ experimental_setting:
                           value: null
                           whitelist: True
                           input_type: select
+                    mutation:
+                      mandatory: False
+                      list: False
+                      display_name: 'Mutation'
+                      desc: "This field is used to indicate when there are multiple mutations on the same gene (e.g. full locus deletion, PTC1, PTC2, ...). 
+Selection as experimental factor: At this point the total number of mutations is requested. For 'FLD', 'PTC1' and 'PTC2' this is 3. These are entered into the conditions as 'Mutation 1', 'Mutation 2' and 'Mutation 3'. Which mutation corresponds to which index should be indicated in the description (e.g. Mutation 1 = FLD, ...). 
+Entry as additional information in the samples:
+Here the index of the respective mutation is entered. (e.g. 1 for 'FLD', 2 for 'PTC1', ...)."
+                      special_case: counter
+                      value: null
+                      whitelist: False
+                      input_type: number
                 enrichment:
                   mandatory: False
                   list: False
