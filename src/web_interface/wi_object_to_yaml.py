@@ -28,6 +28,7 @@ def parse_object(wi_object, key_yaml):
     sample_name = ''
     nom = 1
     global_count = 1
+    local_count = 1
 
     # iterate over parts (from general structure to ensure order)
     for key in key_yaml:
@@ -36,9 +37,9 @@ def parse_object(wi_object, key_yaml):
         if key in wi_object:
 
             # parse every part into yaml format
-            result[key], organism, sample_name, nom, global_count = parse_part(
+            result[key], organism, sample_name, nom, global_count, local_count = parse_part(
                 wi_object[key], key_yaml, wi_object['all_factors'], project_id,
-                organism, sample_name, nom, global_count)
+                organism, sample_name, nom, global_count, local_count)
 
     # remove keys with value None
     result = {k: v for k, v in result.items() if v is not None}
@@ -84,7 +85,7 @@ def split_name(elem, gene=True):
 
 
 def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
-               nom, global_count):
+               nom, global_count, local_count):
     """
     This function parses a part of the wi object to create the yaml structure
     :param key_yaml: the read in general structure
@@ -129,16 +130,17 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
 
                         # define emtpy list to save parsed samples to
                         samples = []
+                        local_count = 1
 
                         # iterate over all samples
                         for sub_elem in \
                                 wi_object['list_value'][i]['list_value']:
 
                             # convert samples
-                            sample, organism, sample_name, nom, global_count = \
+                            sample, organism, sample_name, nom, global_count, local_count = \
                                 parse_list_part(sub_elem, key_yaml, factors,
                                                 project_id, organism,
-                                                sample_name, nom, global_count)
+                                                sample_name, nom, global_count, local_count)
 
                             # remove empty keys
                             sample = {k: v for k, v in sample.items() if v is
@@ -171,10 +173,10 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
 
                         # call parse function using the experimental factors
                         # with the same index as the setting
-                        c_val, organism, sample_name, nom, global_count = \
+                        c_val, organism, sample_name, nom, global_count, local_count = \
                             parse_list_part(wi_object['list_value'][i],
                                             key_yaml, factors[i], project_id,
-                                            organism, sample_name, nom, global_count)
+                                            organism, sample_name, nom, global_count, local_count)
 
                         # add the converted value to the list
                         val.append(c_val)
@@ -183,10 +185,10 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     else:
 
                         # call parse function with all experimental factors
-                        c_val, organism, sample_name, nom, global_count = \
+                        c_val, organism, sample_name, nom, global_count, local_count = \
                             parse_list_part(wi_object['list_value'][i],
                                             key_yaml, factors, project_id,
-                                            organism, sample_name, nom, global_count)
+                                            organism, sample_name, nom, global_count, local_count)
 
                         # add the converted value to the list
                         val.append(c_val)
@@ -218,7 +220,6 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     count = [x['value'] for x in wi_object['input_fields'] if
                              x['position'].split(':')[-1] == 'count'][0]
 
-                    local_count = 1
                     for c in range(count):
                         for m in range(nom):
                             t_sample_name.append(f'{project_id}_'
@@ -239,10 +240,10 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                 else:
 
                     # call this function on the input fields
-                    val, organism, sample_name, nom, global_count = \
+                    val, organism, sample_name, nom, global_count, local_count = \
                         parse_part(wi_object['input_fields'], key_yaml,
                                    factors, project_id, organism, sample_name,
-                                   nom, global_count)
+                                   nom, global_count, local_count)
 
             # no input fields
             else:
@@ -329,15 +330,15 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
     elif isinstance(wi_object, list):
 
         # call parse list function
-        val, organism, sample_name, nom, global_count = parse_list_part(
+        val, organism, sample_name, nom, global_count, local_count = parse_list_part(
             wi_object, key_yaml, factors, project_id, organism, sample_name,
-            nom, global_count)
+            nom, global_count, local_count)
 
-    return val, organism, sample_name, nom, global_count
+    return val, organism, sample_name, nom, global_count, local_count
 
 
 def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
-                    sample_name, nom, global_count):
+                    sample_name, nom, global_count, local_count):
     """
     This function parses a part of the wi object of type list into the yaml
     structure
@@ -391,9 +392,9 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
         else:
 
             # call parse part function
-            val, organism, sample_name, nom, global_count = parse_part(
+            val, organism, sample_name, nom, global_count, local_count = parse_part(
                 wi_object[i], key_yaml, factors, project_id, organism,
-                sample_name, nom, global_count)
+                sample_name, nom, global_count, local_count)
 
         # test if the value is not empty
         if val is not None and (
@@ -403,7 +404,7 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
             # overwrite the old value with the converted one
             res[wi_object[i]['position'].split(':')[-1]] = val
 
-    return res if len(res) > 0 else None, organism, sample_name, nom, global_count
+    return res if len(res) > 0 else None, organism, sample_name, nom, global_count, local_count
 
 
 def parse_factor(factors, key_yaml):
