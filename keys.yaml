@@ -624,6 +624,14 @@ Here the index of the respective mutation is entered. (e.g. 1 for 'FLD', 2 for '
                       value: null
                       whitelist: False
                       input_type: short_text
+                    filenames:
+                      mandatory: True
+                      list: True
+                      display_name: 'Filenames'
+                      desc: ''
+                      value: null
+                      whitelist: False
+                      input_type: short_text
 
 technical_details:
   mandatory: True
