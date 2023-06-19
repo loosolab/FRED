@@ -574,14 +574,6 @@ experimental_setting:
                           value: null
                           whitelist: True
                           input_type: select
-                    mutation:
-                      mandatory: False
-                      list: False
-                      display_name: 'Mutation'
-                      desc: "Enter a short free text. Use only if you have different mutations on the same gene (e.g. FLD, PTC1, PTC2,...)."
-                      value: null
-                      whitelist: False
-                      input_type: restricted_short_text
                 enrichment:
                   mandatory: False
                   list: False
