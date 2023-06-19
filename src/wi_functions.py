@@ -1,3 +1,4 @@
+import copy
 import sys
 
 sys.path.append('metadata-organizer')
@@ -53,8 +54,8 @@ def get_conditions(factors, organism_name):
 
 
 def validate_object(wi_object):
-
-    return validation.validate_object(wi_object)
+    new_object = copy.deepcopy(wi_object)
+    return validation.validate_object(new_object)
 
 
 def get_summary(wi_object):
