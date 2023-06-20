@@ -18,7 +18,7 @@ def get_factors(organism, key_yaml):
 
     f_node = list(utils.find_keys(key_yaml, 'factor'))[0]
     # initialize dictionary with all factors
-    factor_list, whitelist_type, input_type, headers, whitelist_keys = \
+    factor_list, whitelist_type, input_type, headers, whitelist_keys, double = \
         whitelist_parsing.parse_whitelist(
             'factor', f_node, {'organism': organism})
     factor_value = {'factor': factor_list}
@@ -39,7 +39,7 @@ def get_factors(organism, key_yaml):
         if len(node) > 0:
 
             # call function 'get_factor_values' to get whitelist information
-            whitelist, whitelist_type, input_type, headers, w_keys = \
+            whitelist, whitelist_type, input_type, headers, w_keys, double, nested_infos = \
                 get_factor_values(factor, node[0], {'organism': organism})
 
             # change single_autofill to multi_autofill because all factors can
@@ -64,6 +64,10 @@ def get_factors(organism, key_yaml):
                 values[factor]['headers'] = headers
             if w_keys is not None:
                 values[factor]['whitelist_keys'] = w_keys
+            if len(double) > 0:
+                values[factor]['double'] = double
+            if nested_infos is not None:
+                values[factor]['nested_infos'] = nested_infos
 
     # add the values to the dictionary
     factor_value['values'] = values
@@ -71,7 +75,7 @@ def get_factors(organism, key_yaml):
     return factor_value
 
 
-def get_factor_values(key, node, filled_object):
+def get_factor_values(key, node, filled_object, nested_infos=None):
     """
     This function is used to get the whitelists of experimental factors
     including the whitelist type, input type, headers and whitelist keys
@@ -96,6 +100,7 @@ def get_factor_values(key, node, filled_object):
     headers = None
     w_keys = None
     whitelist_type = None
+    double = []
 
     # value is a dictionary and no special case
     if isinstance(node['value'], dict) and not (
@@ -104,9 +109,12 @@ def get_factor_values(key, node, filled_object):
 
         # initialize whitelist as empty list
         whitelist = []
+        nested_infos = {}
 
         # iterate over the keys of the value
         for k in node['value']:
+
+            key_info = {}
 
             # initialize an empty dictionary to store the properties of
             # the key
@@ -114,14 +122,19 @@ def get_factor_values(key, node, filled_object):
 
             # call this function to get the whitelist information for the keys
             k_val['whitelist'], k_val['whitelist_type'], k_val['input_type'], \
-                header, whitelist_keys = get_factor_values(k, node['value'][k],
-                                                           filled_object)
+                header, whitelist_keys, doubled, nested_infos = get_factor_values(k, node['value'][k],
+                                                           filled_object, nested_infos=nested_infos)
 
             # add header and whitelist keys to dictionary if they are defined
             if header is not None:
                 k_val['headers'] = header
+                key_info['headers'] = header
             if whitelist_keys is not None:
                 k_val['whitelist_keys'] = whitelist_keys
+                key_info['whitelist_keys'] = whitelist_keys
+            if len(doubled) > 0:
+                k_val['double'] = doubled
+                key_info['double'] = doubled
 
             # add key 'unit' if key is of special case value_unit
             if k_val['input_type'] == 'value_unit':
@@ -147,15 +160,19 @@ def get_factor_values(key, node, filled_object):
 
             # add dictionary with properties of the key to the whitelist
             whitelist.append(k_val)
+            if len(key_info) > 0:
+                nested_infos[k] = key_info
 
         # set input type to nested
         input_type = 'nested'
+        if len(nested_infos) == 0:
+            nested_infos = None
 
     # value is not a dictionary or special_case: merge or value_unit
     else:
 
         # read and parse whitelist
-        whitelist, whitelist_type, input_type, headers, w_keys = \
+        whitelist, whitelist_type, input_type, headers, w_keys, double = \
             whitelist_parsing.parse_whitelist(key, node,
                                               filled_object)
 
@@ -202,7 +219,7 @@ def get_factor_values(key, node, filled_object):
                               'desc': f'Can the factor {key} occur multiple '
                                       f'times in one condition?'})
 
-    return whitelist, whitelist_type, input_type, headers, w_keys
+    return whitelist, whitelist_type, input_type, headers, w_keys, double, nested_infos
 
 
 def get_conditions(factors, organism_name, key_yaml):
@@ -286,6 +303,9 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 else:
                     for key in [x for x in list(val.keys()) if x not in ['multi', 'ident_key']]:
+
+                        # TODO: headers + whitelist_keys
+
                         if key == 'gene':
                             for v in range(len(val[key])):
 

@@ -67,6 +67,7 @@ def parse_whitelist(key_name, node, filled_object):
     input_type = 'short_text'
     headers = None
     whitelist_keys = None
+    double = []
 
     # whitelist is defined or special case merge
     if ('whitelist' in node and node['whitelist']) or (
@@ -74,59 +75,64 @@ def parse_whitelist(key_name, node, filled_object):
 
         # read in whitelist
         whitelist = utils.get_whitelist(key_name, filled_object)
-        # test if the right keys are present in the whitelist
-        # -> format check
-        if whitelist is not None and 'whitelist_type' in whitelist and \
-                'whitelist' in whitelist:
 
-            # set whitelist type , headers, whitelist_keys, whitelist and
-            # input_type
-            whitelist_type = whitelist['whitelist_type']
-            headers = whitelist['headers'] if 'headers' in whitelist else None
-            whitelist_keys = whitelist['whitelist_keys'] if \
-                'whitelist_keys' in whitelist else None
-            whitelist = whitelist['whitelist']
-            input_type = 'select'
+        if whitelist is not None:
 
-            # TODO: remove?
-            if whitelist_type == 'depend':
-                whitelist = None
-                input_type = 'dependable'
+            if 'double' in whitelist:
+                double = whitelist['double']
 
-            # TODO: test if plain_group is already there
-            elif whitelist_type == 'group':
-                if isinstance(whitelist, dict):
-                    new_w = []
-                    for key in whitelist:
-                        new_w.append(
-                            {'title': key,
-                             'whitelist': whitelist[key]})
-                    input_type = 'group_select'
-                    whitelist = new_w
-                else:
-                    input_type = 'select'
-                    whitelist_type = 'plain_group'
+            # test if the right keys are present in the whitelist
+            # -> format check
+            if 'whitelist_type' in whitelist and 'whitelist' in whitelist:
 
-            # TODO: better solution for department
-            # test if whitelist is longer than 30
-            if whitelist and len(whitelist) > 30 and \
-                    key_name not in ['department', 'factor']:
+                # set whitelist type , headers, whitelist_keys, whitelist and
+                # input_type
+                whitelist_type = whitelist['whitelist_type']
+                headers = whitelist['headers'] if 'headers' in whitelist else None
+                whitelist_keys = whitelist['whitelist_keys'] if \
+                    'whitelist_keys' in whitelist else None
+                whitelist = whitelist['whitelist']
+                input_type = 'select'
 
-                # set whitelist type to multi_autofill if it is a list
-                if node['list']:
-                    input_type = 'multi_autofill'
+                # TODO: remove?
+                if whitelist_type == 'depend':
+                    whitelist = None
+                    input_type = 'dependable'
 
-                # set whitelist type to single_autofill if it is a string
-                else:
-                    input_type = 'single_autofill'
+                # TODO: test if plain_group is already there
+                elif whitelist_type == 'group':
+                    if isinstance(whitelist, dict):
+                        new_w = []
+                        for key in whitelist:
+                            new_w.append(
+                                {'title': key,
+                                 'whitelist': whitelist[key]})
+                        input_type = 'group_select'
+                        whitelist = new_w
+                    else:
+                        input_type = 'select'
+                        whitelist_type = 'plain_group'
 
-                # set whitelist to None
-                # -> whitelists on the website will be called with
-                # get_single_whitelist function (from whitelist_parsing) and
-                # used with an autocompletion
-                # -> whitelist only gets send to website if the field is
-                # actually entered which saves space and time
-                whitelist = None
+                # TODO: better solution for department
+                # test if whitelist is longer than 30
+                if whitelist and len(whitelist) > 30 and \
+                        key_name not in ['department', 'factor']:
+
+                    # set whitelist type to multi_autofill if it is a list
+                    if node['list']:
+                        input_type = 'multi_autofill'
+
+                    # set whitelist type to single_autofill if it is a string
+                    else:
+                        input_type = 'single_autofill'
+
+                    # set whitelist to None
+                    # -> whitelists on the website will be called with
+                    # get_single_whitelist function (from whitelist_parsing) and
+                    # used with an autocompletion
+                    # -> whitelist only gets send to website if the field is
+                    # actually entered which saves space and time
+                    whitelist = None
 
     # special case: value unit
     elif 'special_case' in node and 'value_unit' in node['special_case']:
@@ -152,4 +158,4 @@ def parse_whitelist(key_name, node, filled_object):
         # set input type as defines in general structure
         input_type = node['input_type']
 
-    return whitelist, whitelist_type, input_type, headers, whitelist_keys
+    return whitelist, whitelist_type, input_type, headers, whitelist_keys, double

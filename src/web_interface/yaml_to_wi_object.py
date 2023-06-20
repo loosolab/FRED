@@ -67,7 +67,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
                                        'value_unit' in node['special_case']):
 
             # read and parse whitelist
-            whitelist, whitelist_type, input_type, headers, whitelist_keys = \
+            whitelist, whitelist_type, input_type, headers, whitelist_keys, double = \
                 whitelist_parsing.parse_whitelist(pos.split(':')[-1], node,
                                                   filled_object)
 
@@ -168,7 +168,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
     else:
 
         # read and parse whitelist
-        whitelist, whitelist_type, input_type, headers, whitelist_keys = \
+        whitelist, whitelist_type, input_type, headers, whitelist_keys, double = \
             whitelist_parsing.parse_whitelist(pos.split(':')[-1], node,
                                               filled_object)
 
