@@ -576,7 +576,7 @@ experimental_setting:
                           input_type: select
                     modification:
                       mandatory: False
-                      list: False
+                      list: True
                       display_name: 'Modification'
                       desc: 'Enter a short free text for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
                       value: null
