@@ -45,8 +45,8 @@ project:
         ldap_name:
           mandatory: True
           list: False
-          display_name: 'LDAP Name'
-          desc: "For public projects enter '---'."
+          display_name: 'MPI Login Name'
+          desc: "It consists of the first letter of your first name and the first six letters of your last name. For public projects enter '---'."
           value: null
           whitelist: False
           input_type: short_text
@@ -574,6 +574,14 @@ experimental_setting:
                           value: null
                           whitelist: True
                           input_type: select
+                    modification:
+                      mandatory: False
+                      list: False
+                      display_name: 'Modification'
+                      desc: 'Enter a short free text for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
+                      value: null
+                      whitelist: False
+                      input_type: restricted_short_text
                 enrichment:
                   mandatory: False
                   list: False
