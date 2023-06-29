@@ -747,7 +747,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                         # input field is of type single_autofill
                         if 'input_type' in sample[i] and \
-                                sample[i]['input_type'] == 'single_autofill':
+                                sample[i]['input_type'] in ['single_autofill', 'restricted_short_text']:
                             # initialize the key 'list_value' and move the
                             # value under the key 'value' to the key
                             # 'list_value'

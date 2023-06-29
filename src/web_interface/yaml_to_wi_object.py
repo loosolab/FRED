@@ -202,7 +202,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
         # test if the key takes multiple values or uses autofill and add the
         # property 'list_value' as a place to save those values to via the
         # website
-        if node['list'] or input_type == 'single_autofill':
+        if node['list'] or input_type in ['single_autofill', 'restricted_short_text']:
             part_object['list_value'] = []
 
         # add the key 'search_info' to all fields using autofill to help get
