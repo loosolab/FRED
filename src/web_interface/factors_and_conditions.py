@@ -28,7 +28,8 @@ def get_factors(organism, key_yaml):
         plain_factors += elem['whitelist']
     # initialize empty dictionary to store values of each factor
     values = {}
-
+    # TODO: remove
+    plain_factors.append('modification2')
     # iterate over factors
     for factor in plain_factors:
 
