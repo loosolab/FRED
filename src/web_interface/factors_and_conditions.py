@@ -21,6 +21,8 @@ def get_factors(organism, key_yaml):
     factor_list, whitelist_type, input_type, headers, whitelist_keys, double = \
         whitelist_parsing.parse_whitelist(
             'factor', f_node, {'organism': organism})
+    #TODO: remove
+    factor_list[0]['whitelist'].append('modification2')
     factor_value = {'factor': factor_list}
     plain_factors = []
 
@@ -28,8 +30,7 @@ def get_factors(organism, key_yaml):
         plain_factors += elem['whitelist']
     # initialize empty dictionary to store values of each factor
     values = {}
-    # TODO: remove
-    plain_factors.append('modification2')
+
     # iterate over factors
     for factor in plain_factors:
 
