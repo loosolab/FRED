@@ -21,8 +21,7 @@ def get_factors(organism, key_yaml):
     factor_list, whitelist_type, input_type, headers, whitelist_keys, double = \
         whitelist_parsing.parse_whitelist(
             'factor', f_node, {'organism': organism})
-    #TODO: remove
-    factor_list[0]['whitelist'].append('modification2')
+
     factor_value = {'factor': factor_list}
     plain_factors = []
 
@@ -189,38 +188,6 @@ def get_factor_values(key, node, filled_object, nested_infos=None):
             if input_type == 'single_autofill':
                 input_type = 'multi_autofill'
 
-            # create a dictionary that contains all properties of the factor
-            new_w = {'whitelist': whitelist, 'position': key,
-                     'displayName': node['display_name'], 'required': True,
-                     'value': [], 'input_type': input_type,
-                     'desc': node['desc'], 'whitelist_type': whitelist_type}
-
-            # add search info if factor is of type single- or multi-autofill
-            if input_type == 'multi_autofill':
-                new_w['whitelist'] = None
-                new_w['search_info'] = {'organism': filled_object['organism'],
-                                        'key_name': key}
-
-            # set the dictionary with the properties of the factor as one value
-            # of the whitelist
-            # -> moved factor down one level
-            # -> needed in order to add second key 'Multi' (see below)
-            whitelist = [new_w]
-            whitelist_type = 'list_select'
-
-            # set input type to nested
-            input_type = 'nested'
-
-        # add the key 'Multi'
-        # -> used for experimental factors of type list
-        # -> True if one factor can occur multiple times in one condition
-        if whitelist:
-            whitelist.append({'displayName': 'Multi', 'position': 'multi',
-                              'whitelist': [True, False], 'input_type': 'bool',
-                              'value': False,
-                              'desc': f'Can the factor {key} occur multiple '
-                                      f'times in one condition?'})
-
     return whitelist, whitelist_type, input_type, headers, w_keys, double, nested_infos
 
 
@@ -266,7 +233,7 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 # initialize multi with False -> bool to define weather a
                 # factor can occur multiple times in one condition
-                multi = False
+                multi = True
 
                 # remove keys with value None or empty lists and dictionaries
                 val = {k: v for k, v in val.items() if
@@ -283,50 +250,29 @@ def get_conditions(factors, organism_name, key_yaml):
                     'special_case' in factor_infos[0] and 'control' in \
                     factor_infos[0]['special_case'] else None
 
-                # multi was defined in the value (user input)
-                if 'multi' in val:
+                for key in [x for x in list(val.keys()) if x not in ['multi', 'ident_key']]:
 
-                    # set multi to the value defined by the user if an ident
-                    # key is defined else False
-                    multi = val['multi']
+                    # TODO: headers + whitelist_keys
 
-                # test if the value of the factor contains just the 'factor',
-                # 'multi' and 'ident_key' as keys
-                # -> this is the case if a factor takes a list of single values
-                # -> then the value had to be converted to a dictionary to
-                # include the key 'multi' which is undone here
+                    if key == 'gene':
+                        for v in range(len(val[key])):
 
-                if all(k in ['multi', factors[i]['factor'], 'control', 'ident_key'] for k
-                       in list(val.keys())):
+                            headers = 'gene_name ensembl_id'
 
-                    # overwrite val with the values under the key <factor> in
-                    # val
-                    val = val[factors[i]['factor']]
+                            # save the original value
+                            full_value = copy.deepcopy(val[key][v])
 
-                else:
-                    for key in [x for x in list(val.keys()) if x not in ['multi', 'ident_key']]:
-
-                        # TODO: headers + whitelist_keys
-
-                        if key == 'gene':
-                            for v in range(len(val[key])):
-
-                                headers = 'gene_name ensembl_id'
-
-                                # save the original value
-                                full_value = copy.deepcopy(val[key][v])
-
-                                # split the value according to the header and save them as a
-                                # string
-                                str_value = wi_utils.parse_headers(
+                            # split the value according to the header and save them as a
+                            # string
+                            str_value = wi_utils.parse_headers(
                                         headers, val[key][v],
                                         mode='str')
 
-                                # # rewrite the value to '<factor>:{<values>}'
-                                val[key][v] = f'{key}:{"{"}' \
-                                             f'{str_value}{"}"}'
-                                # save the original value in real_val with the new value as key
-                                real_val[val[key][v]] = full_value
+                            # # rewrite the value to '<factor>:{<values>}'
+                            val[key][v] = f'{key}:{"{"}' \
+                                          f'{str_value}{"}"}'
+                            # save the original value in real_val with the new value as key
+                            real_val[val[key][v]] = full_value
 
                 # generate combinations of the values of the dictionary for the
                 # conditions and overwrite the values with them
