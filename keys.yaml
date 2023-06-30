@@ -582,14 +582,6 @@ experimental_setting:
                       value: null
                       whitelist: False
                       input_type: restricted_short_text
-                modification2:
-                  mandatory: False
-                  list: False
-                  display_name: 'Modification2'
-                  desc: 'Enter a short free text for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
-                  value: null
-                  whitelist: False
-                  input_type: restricted_short_text
                 enrichment:
                   mandatory: False
                   list: False
