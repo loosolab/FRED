@@ -214,7 +214,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                 if wi_object['position'].split(':')[-1] == \
                         'technical_replicates':
 
-                    file_name = get_file_name(sample_name.rstrip(f'_{sample_name.split("_")[-1]}'), double)
+                    file_name = get_file_name(sample_name.removesuffix(f'_{sample_name.split("_")[-1]}'), double)
                     # TODO: comment
                     t_sample_name = []
                     t_file_name = []

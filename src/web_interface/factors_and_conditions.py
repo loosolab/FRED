@@ -279,6 +279,10 @@ def get_conditions(factors, organism_name, key_yaml):
                 factors[i]['values'] = generate.get_combis(
                     val, factors[i]['factor'], multi, {'organism': organism_name.split(' ')[0]})
 
+        elif factor_infos[0]['list']:
+
+            factors[i]['values'] = generate.get_combis(factors[i]['values'], factors[i]['factor'], True, {'organism': organism_name.split(' ')[0]})
+
         # iterate over all values
         for j in range(len(factors[i]['values'])):
 
