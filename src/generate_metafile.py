@@ -84,7 +84,7 @@ def get_validation(result, mode, size=80):
 
 
 def get_redo_value(node, item, optional, mandatory_mode, result_dict,
-                   first_node, is_factor, do_redo, mode, size=80):
+                   first_node, is_factor, do_redo, mode, key_yaml, size=80):
     """
     This function tests whether a list must be specified for a value and,
     depending on this, calls a function to enter the value.
@@ -115,7 +115,7 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                 value = fill_metadata_structure(node['value'], item, {},
                                                 optional,
                                                 mandatory_mode, result_dict,
-                                                first_node, is_factor, mode, size=size)
+                                                first_node, is_factor, mode, key_yaml, size=size)
             else:
 
                 # set redo to True to initiate while loop
@@ -131,7 +131,7 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                     # call function to fill in metadata
                     value.append(fill_metadata_structure(
                         node['value'], item, {}, optional, mandatory_mode,
-                        result_dict, first_node, is_factor, mode, size=size))
+                        result_dict, first_node, is_factor, mode, key_yaml, size=size))
 
                     # ask the user if another item should be added to the list
                     # if do_redo is set to True
@@ -163,13 +163,13 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
             # call function to fill in metadata
             value = fill_metadata_structure(node, item, {}, optional,
                                             mandatory_mode, result_dict,
-                                            first_node, is_factor, mode)
+                                            first_node, is_factor, mode, key_yaml)
 
     return value
 
 
 def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
-                            result_dict, first_node, is_factor, mode, size=80):
+                            result_dict, first_node, is_factor, mode, key_yaml, size=80):
     """
     This function calls other functions to fill in metadata information for a
     key depending on its type.
@@ -225,7 +225,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                     if 'organism' not in return_dict and 'organism' in result_dict:
                         return_dict['organism'] = result_dict['organism']
                     return_dict[item] = get_experimental_factors(node,
-                                                                 return_dict, mode)
+                                                                 return_dict, mode, key_yaml)
 
                 # if the key is 'conditions', call a function to create and
                 # choose the analyzed conditions from the entered experimental
@@ -238,7 +238,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                     return_dict[item] = get_conditions(
                         copy.deepcopy(return_dict['experimental_factors']),
                         node[item]['value'],
-                        mandatory_mode, return_dict, mode)
+                        mandatory_mode, return_dict, mode, key_yaml)
 
                 # test if the key is editable
                 elif item not in not_editable:
@@ -250,7 +250,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                            optional,
                                                            mandatory_mode,
                                                            return_dict, False,
-                                                           is_factor, True, mode)
+                                                           is_factor, True, mode, key_yaml)
 
                     else:
 
@@ -437,7 +437,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                     part_node, option, {},
                                                     optional, mandatory_mode,
                                                     result_dict, False,
-                                                    is_factor, mode)
+                                                    is_factor, mode, key_yaml)
 
                                                 # merge the prefilled optional
                                                 # key with the new input
@@ -466,7 +466,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                     possible_input[0],
                                                     optional, mandatory_mode,
                                                     result_dict, False,
-                                                    is_factor, True, mode)
+                                                    is_factor, True, mode, key_yaml)
 
                                                 # save the now filled key in
                                                 # the dictionary
@@ -514,7 +514,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                      optional,
                                                      mandatory_mode,
                                                      result_dict, False,
-                                                     is_factor, True, mode)
+                                                     is_factor, True, mode, key_yaml)
                                 if node[option]['list']:
                                     if option in return_dict:
                                         return_dict[option] += val
@@ -530,7 +530,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
             else:
                 value = enter_information(node, key, return_dict, optional,
                                           mandatory_mode, result_dict,
-                                          first_node, is_factor, mode)
+                                          first_node, is_factor, mode, key_yaml)
             return value
 
     return return_dict
@@ -539,7 +539,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
 # --------------------------EXPERIMENTAL SETTING-------------------------------
 
 
-def get_experimental_factors(node, result_dict, mode, size=80):
+def get_experimental_factors(node, result_dict, mode, key_yaml, size=80):
     """
     This function prompts the user to specify the examined experimental
     factors, as well as the analyzed values for each selected factor.
@@ -573,7 +573,7 @@ def get_experimental_factors(node, result_dict, mode, size=80):
         # call the get_redo_value function to fill in the values for the
         # experimental factor
         used_values = get_redo_value(fac_node, fac, False, False, result_dict,
-                                     False, True, True, mode)
+                                     False, True, True, mode, key_yaml)
 
         # if the experimental factor contains a dictionary as value and the
         # structure of the factor contains a group key than add the group key
@@ -601,7 +601,7 @@ def get_experimental_factors(node, result_dict, mode, size=80):
     return experimental_factors
 
 
-def get_conditions(factors, node, mandatory_mode, result_dict, mode, size=80):
+def get_conditions(factors, node, mandatory_mode, result_dict, mode, key_yaml, size=80):
     """
     This function generates all combinations of the specified experimental
     factors and their values and lets the user choose which of those he likes
@@ -631,7 +631,7 @@ def get_conditions(factors, node, mandatory_mode, result_dict, mode, size=80):
 
             # overwrite the values with the combinations
             factors[i]['values'] = get_combinations(factors[i]['values'],
-                                                    factors[i]['factor'], result_dict)
+                                                    factors[i]['factor'], result_dict, key_yaml)
             is_dict.append(f'{factors[i]["values"]}')
 
             # remove ident_key from result dictionary
@@ -924,7 +924,7 @@ def fill_replicates(condition, bio, input_pooled, node,
             samples, fill_metadata_structure(
                 node['biological_replicates']
                 ['value']['samples']['value'], 'samples', samples,
-                False, mandatory_mode, result_dict, False, False, mode))
+                False, mandatory_mode, result_dict, False, False, mode, key_yaml))
 
         # set number of measurements to 1 if it is not yet specified
         if 'number_of_measurements' not in samples:
@@ -1105,7 +1105,7 @@ def print_sample_names(result, input_id, path, size=80):
 
 
 def enter_information(node, key, return_dict, optional, mandatory_mode,
-                      result_dict, first_node, is_factor, mode, size=80):
+                      result_dict, first_node, is_factor, mode, key_yaml, size=80):
     """
     This function is used to create prompts for the user to enter information
     and parses the input.
@@ -1144,7 +1144,7 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
         return fill_metadata_structure(node['value'], key, return_dict,
                                        optional,
                                        mandatory_mode, result_dict, False,
-                                       is_factor, mode)
+                                       is_factor, mode, key_yaml)
 
     else:
         # call parse_input_value to fill in a single value
@@ -1615,7 +1615,7 @@ def merge_dicts(a, b):
     return res
 
 
-def get_combinations(values, key, result_dict, size=80):
+def get_combinations(values, key, result_dict, key_yaml, size=80):
     """
     This function creates combinations for experimental factors that can occur
     multiple times in one condition and lets the user choose those that were
@@ -1641,7 +1641,7 @@ def get_combinations(values, key, result_dict, size=80):
             ['True ', 'False '], f'\nCan one sample contain multiple {key}s?')
 
     if multi or is_dict:
-        merge_values = get_combis(values, key, multi, result_dict)
+        merge_values = get_combis(values, key, multi, result_dict, key_yaml)
         print(
             f'\nPlease select the analyzed combinations for {key} '
             f'(1-{len(merge_values)}) divided by comma:\n')
@@ -1652,7 +1652,7 @@ def get_combinations(values, key, result_dict, size=80):
     return used_values
 
 
-def get_combis(values, key, multi, result_dict):
+def get_combis(values, key, multi, result_dict, keys_yaml):
     """
     This function creates all combinations for one experimental factor that can
     occur multiple tims in one conditions.
@@ -1663,7 +1663,6 @@ def get_combis(values, key, multi, result_dict):
     :return: disease_values: a list of all possible combinations of the
                              experimental factor
     """
-
     if key == 'gene_editing':
         whitelist_key = 'editing_method'
         depend_key = 'editing_type'
@@ -1674,6 +1673,7 @@ def get_combis(values, key, multi, result_dict):
         whitelist = None
 
     control_value = None
+    control_values = []
     #if 'ident_key' in values and values['ident_key'] is not None:
     #    if not values['ident_key'] in values:
     #        multi = False
@@ -1733,6 +1733,8 @@ def get_combis(values, key, multi, result_dict):
                     depend += value
 
                 for val_key in values:
+                    val_info = [x for x in list(utils.find_keys(keys_yaml, val_key)) if isinstance(x, dict)]
+
                     value2 = []
                     if val_key != start:
                         for x in value:
@@ -1764,22 +1766,31 @@ def get_combis(values, key, multi, result_dict):
                                 else:
                                     if f'{val_key}:\"{v}\"' not in val:
                                         value2.append(f'{val}|{val_key}:\"{v}\"')
+                                if len(val_info) > 0 and 'special_case' in val_info[0] and 'insert_control' in val_info[0]['special_case']:
+                                    print(val_key)
+                                    control_values.append(f'|{val_key}:\"{v}\"')
+                                    new_c_vals = []
+                                    for c_val in control_values:
+                                        if val_key not in c_val:
+                                            new_c_vals.append(f'{c_val}|{val_key}:\"{v}\"')
+                                    control_values += new_c_vals
                         value = value2
                 possible_values[elem] = value
 
-                #TODO: more than two diseases
                 for z in possible_values:
-                    if ident_key is None or z != elem:
-                        for x in possible_values[elem]:
-                            disease_values.append(f'{key}:{"{"}{x}{"}"}')
-                            for y in possible_values[z]:
-                                if y != control_value and y != x:
-                                    disease_values.append(f'{key}:{"{"}{y}{"}"}')
-                                    if f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}' not in disease_values and f'{key}:{"{"}{y}{"}"}-{key}:{"{"}{x}{"}"}' not in disease_values:
-                                        disease_values.append(
-                                            f'{key}:{"{"}{x}{"}"}-{key}:{"{"}{y}{"}"}')
+                    for x in possible_values[z]:
+                        part_values = []
+                        disease_values.append(f'{key}:{"{"}{x}{"}"}')
+                        for d in disease_values:
+                            if f'{key}:{"{"}{x}{"}"}' not in d and f'{d}-{key}:{"{"}{x}{"}"}' not in disease_values and f'{key}:{"{"}{x}{"}"}-{d}' not in disease_values:
+                                part_values.append(
+                                    f'{d}-{key}:{"{"}{x}{"}"}')
+                        disease_values += part_values
+
             if control_value is not None:
                 disease_values.append(f'{key}:{"{"}{control_value}{"}"}')
+                for cntr in control_values:
+                    disease_values.append(f'{key}:{"{"}{control_value}{cntr}{"}"}')
 
         else:
             disease_values = []

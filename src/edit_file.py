@@ -33,7 +33,7 @@ def edit_file(path, mode, mandatory_only, size=80):
 
             file[key] = generate_metafile.get_redo_value(
                 key_yaml[key], key, True, mandatory_only, file, True, False,
-                True, mode)
+                True, mode, key_yaml)
 
         while True:
 
@@ -88,7 +88,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
             # call 'get_redo_value' function to repeat the input
             item = generate_metafile.get_redo_value(
                 key_yaml, key_name, not key_yaml['mandatory'], mandatory_mode,
-                result_dict, True, False, True, mode)
+                result_dict, True, False, True, mode, key_yaml)
 
         # list elements contain dictionary
         else:
@@ -214,7 +214,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
                 # get input for new element
                 item += generate_metafile.get_redo_value(
                     key_yaml, key_name, not key_yaml['mandatory'],
-                    mandatory_mode, result_dict, True, False, True, mode)
+                    mandatory_mode, result_dict, True, False, True, mode, key_yaml)
 
     # item to edit is a dictionary
     elif isinstance(item, dict):
@@ -243,7 +243,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
             # redo input for the whole dictionary
             new_item = generate_metafile.get_redo_value(
                 key_yaml, key_name, not key_yaml['mandatory'], mandatory_mode,
-                result_dict, True, False, False, mode)
+                result_dict, True, False, False, mode, key_yaml)
 
             # input value is a list
             if isinstance(new_item, list):
@@ -272,7 +272,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
                     item = generate_metafile.get_redo_value(
                         key_yaml, 'experimental_setting',
                         not key_yaml['mandatory'], mandatory_mode, result_dict,
-                        True, False, False, mode)[0]
+                        True, False, False, mode, key_yaml)[0]
 
                 # the key 'experimental_factors was selected and not the key
                 # 'organism' (part experimental_setting)
@@ -289,7 +289,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
                     item = generate_metafile.get_redo_value(
                         new_yaml, 'experimental_setting',
                         not key_yaml['mandatory'], mandatory_mode,
-                        copy.deepcopy(item), True, False, False, mode)[0]
+                        copy.deepcopy(item), True, False, False, mode, key_yaml)[0]
 
                 # the key 'conditions was selected and not the keys 'organism'
                 # or 'experimental_factors'
@@ -336,7 +336,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
                     item = generate_metafile.get_redo_value(
                         new_yaml, 'experimental_setting',
                         not key_yaml['mandatory'], mandatory_mode,
-                        copy.deepcopy(item), True, False, False, mode)[0]
+                        copy.deepcopy(item), True, False, False, mode, key_yaml)[0]
 
                 # no special case -> used for all the other keys
                 else:
@@ -355,7 +355,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
                         # call function to input information
                         item[key] = generate_metafile.get_redo_value(
                             key_yaml['value'][key], key, True, mandatory_mode,
-                            result_dict, True, False, True, mode)
+                            result_dict, True, False, True, mode, key_yaml)
 
     # item is a single value
     else:

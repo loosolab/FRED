@@ -579,6 +579,8 @@ experimental_setting:
                       list: False
                       display_name: 'Modification'
                       desc: 'Enter a short free text for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
+                      special_case:
+                        insert_control: True
                       value: null
                       whitelist: False
                       input_type: restricted_short_text

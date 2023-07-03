@@ -102,7 +102,7 @@ def generate(path, input_id, mandatory_mode, mode, size=80):
                                      **generate_functions.get_redo_value(
                                          key_yaml[item], item, False,
                                          mandatory_mode, result_dict, True,
-                                         False, True, mode)}
+                                         False, True, mode, key_yaml)}
 
             # key is not present in the result dictionary
             else:
@@ -110,7 +110,7 @@ def generate(path, input_id, mandatory_mode, mode, size=80):
                 # call fucntion to fill in values
                 result_dict[item] = generate_functions.get_redo_value(
                     key_yaml[item], item, not key_yaml[item]['mandatory'],
-                    mandatory_mode, result_dict, True, False, True, mode)
+                    mandatory_mode, result_dict, True, False, True, mode, key_yaml)
 
             # start a loop for editing
             while True:
