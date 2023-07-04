@@ -1482,11 +1482,20 @@ def split_cond(condition):
             else:
                 cond += condition[i]
         elif condition[i] == ':':
-            cond += f'"{condition[i]}'
+            if count % 2 == 0:
+                cond += f'"{condition[i]}'
+            else:
+                cond += condition[i]
         elif condition[i] == '{':
-            cond += f'{condition[i]}"'
+            if count % 2 == 0:
+                cond += f'{condition[i]}"'
+            else:
+                cond += condition[i]
         elif condition[i] == '|':
-            cond += f',"'
+            if count % 2 == 0:
+                cond += f',"'
+            else:
+                cond += condition[i]
         else:
             cond += condition[i]
     conditions.append(cond)
@@ -1767,7 +1776,6 @@ def get_combis(values, key, multi, result_dict, keys_yaml):
                                     if f'{val_key}:\"{v}\"' not in val:
                                         value2.append(f'{val}|{val_key}:\"{v}\"')
                                 if len(val_info) > 0 and 'special_case' in val_info[0] and 'insert_control' in val_info[0]['special_case']:
-                                    print(val_key)
                                     control_values.append(f'|{val_key}:\"{v}\"')
                                     new_c_vals = []
                                     for c_val in control_values:
