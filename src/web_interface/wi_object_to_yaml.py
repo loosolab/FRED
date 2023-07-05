@@ -112,8 +112,8 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
         # test if the values were stored in the 'list_value' key
         # (if the key takes a list or is of type single- or multi-autofill)
         if 'list_value' in wi_object and not (
-                'input_type' in wi_object and wi_object['input_type'] ==
-                'single_autofill'):
+                'input_type' in wi_object and wi_object['input_type'] in
+                ['single_autofill', 'restricted_short_text']):
 
             # define an empty list to store the converted list values
             val = []
@@ -252,7 +252,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                 # set the value that should be converted (saved in list_value
                 # if input type is 'single_autofill', else saved in value)
                 convert_value = wi_object['list_value'][0] if \
-                    wi_object['input_type'] == 'single_autofill' and \
+                    wi_object['input_type'] in ['single_autofill', 'restricted_short_text'] and \
                     len(wi_object['list_value']) > 0 else wi_object['value']
 
                 # test if value was filled
