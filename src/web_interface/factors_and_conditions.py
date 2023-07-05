@@ -704,6 +704,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                             sample[i]['list_value'] = [] if \
                                 sample[i]['value'] is None \
                                 else [sample[i]['value']]
+                            sample[i]['value'] = None
 
             if is_factor:
                 # disable the input for the filled input field
