@@ -558,7 +558,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                 # input field of current factor
                 if sample[i]['position'].split(':')[-1] == c[0]:
-
+                    print(c[0])
                     # extract properties of the factor from the general
                     # structure
                     info = list(utils.find_keys(key_yaml, c[0]))
@@ -600,6 +600,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                 # TODO: rework with real_val
 
                                 if 'input_fields' in sample[i]:
+                                    print('HIER')
                                     # call this function on the keys of the
                                     # value in order to fill them
                                     filled_value = get_samples(
@@ -652,7 +653,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                             # save the filled value in 'input_fields' if the
                             # input field takes a dictionary
-                            elif 'input_fields' in sample:
+                            elif 'input_fields' in sample[i]:
                                 sample[i]['input_fields'] = filled_value
 
                             # save the filled value in 'value'
