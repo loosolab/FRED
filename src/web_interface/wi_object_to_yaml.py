@@ -417,7 +417,7 @@ def parse_factor(factors, key_yaml, double):
         if 'nested_infos' in factors:
             for key_ in factors['nested_infos']:
                 if 'double' in factors['nested_infos'][key_]:
-                    double = set(double + factors['nested_infos'][key_]['double'])
+                    double = list(set(double + factors['nested_infos'][key_]['double']))
 
         # remove key 'multi'
         if 'multi' in factors['values'][0]:
