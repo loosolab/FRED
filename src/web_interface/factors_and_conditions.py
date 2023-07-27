@@ -603,9 +603,10 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                     # call this function on the keys of the
                                     # value in order to fill them
                                     filled_value = get_samples(
-                                        [(x, c[1][x]) for x in c[1] if not (
-                                                c[1] == 'technical_replicates'
-                                                and x == 'sample_name')],
+                                        [(x, c[1][x]) for x in c[1] #if not (
+                                                #c[1] == 'technical_replicates'
+                                                #and x == 'sample_name')
+                                        ],
                                         copy.deepcopy(
                                             sample[i]['input_fields']),
                                         info, key_yaml, sample_name,
