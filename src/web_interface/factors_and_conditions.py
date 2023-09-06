@@ -60,6 +60,20 @@ def get_factors(organism, key_yaml):
                 values[factor]['search_info'] = {'organism': organism,
                                                  'key_name': factor}
 
+            if input_type == 'restricted_short_text':
+                # default
+                values[factor]['restriction'] = {'regex': ' ',
+                                                 'length': 10}
+
+                if 'special_case' in node and 'restriction' in node[
+                    'special_case']:
+                    if 'regex' in node['special_case']['restriction']:
+                        values[factor]['restriction']['regex'] = \
+                            node['special_case']['restriction']['regex']
+                    if 'length' in node['special_case']['restriction']:
+                        values[factor]['restriction']['length'] = \
+                            node['special_case']['restriction']['length']
+
             # add header and whitelist keys if they are defined
             if headers is not None:
                 values[factor]['headers'] = headers
@@ -152,6 +166,24 @@ def get_factor_values(key, node, filled_object, nested_infos=None):
             # have multiple values
             if k_val['input_type'] == 'single_autofill':
                 k_val['input_type'] = 'multi_autofill'
+
+            if k_val['input_type'] == 'restricted_short_text':
+
+                # default
+                k_val['restriction'] = {'regex': ' ', 'length': 10}
+
+                if 'special_case' in node['value'][k] and 'restriction' in  \
+                        node['value'][k]['special_case']:
+                    if 'regex' in  node['value'][k]['special_case'][
+                            'restriction']:
+                        k_val['restriction']['regex'] = \
+                            node['value'][k]['special_case']['restriction'][
+                                'regex']
+                    if 'length' in node['value'][k]['special_case'][
+                            'restriction']:
+                        k_val['restriction']['length'] = \
+                            node['value'][k]['special_case']['restriction'][
+                                'length']
 
             # add search info if the input is of type single- or multi-autofill
             if k_val['input_type'] == 'multi_autofill':
@@ -558,7 +590,6 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                 # input field of current factor
                 if sample[i]['position'].split(':')[-1] == c[0]:
-                    print(c[0])
                     # extract properties of the factor from the general
                     # structure
                     info = list(utils.find_keys(key_yaml, c[0]))
@@ -600,7 +631,6 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                 # TODO: rework with real_val
 
                                 if 'input_fields' in sample[i]:
-                                    print('HIER')
                                     # call this function on the keys of the
                                     # value in order to fill them
                                     filled_value = get_samples(
@@ -699,7 +729,8 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                         # input field is of type single_autofill
                         if 'input_type' in sample[i] and \
-                                sample[i]['input_type'] in ['single_autofill', 'restricted_short_text']:
+                                sample[i]['input_type'] in [
+                                'single_autofill', 'restricted_short_text']:
                             # initialize the key 'list_value' and move the
                             # value under the key 'value' to the key
                             # 'list_value'
@@ -708,8 +739,8 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                 else [sample[i]['value']]
                             sample[i]['value'] = None
 
-            if is_factor:
-                # disable the input for the filled input field
-                sample[i]['input_disabled'] = True
+                            if is_factor:
+                                # disable the input for the filled input field
+                                sample[i]['input_disabled'] = True
 
     return sample

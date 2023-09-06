@@ -205,6 +205,20 @@ def parse_empty(node, pos, key_yaml, filled_object,
         if node['list'] or input_type in ['single_autofill', 'restricted_short_text']:
             part_object['list_value'] = []
 
+        if input_type == 'restricted_short_text':
+
+            # default
+            part_object['restriction'] = {'regex': ' ',
+                                          'length': 10}
+
+            if 'special_case' in node and 'restriction' in node['special_case']:
+                if 'regex' in node['special_case']['restriction']:
+                    part_object['restriction']['regex'] = \
+                        node['special_case']['restriction']['regex']
+                if 'length' in node['special_case']['restriction']:
+                    part_object['restriction']['length'] = \
+                    node['special_case']['restriction']['length']
+
         # add the key 'search_info' to all fields using autofill to help get
         # the correct whitelist via the website
         if input_type == 'single_autofill' or input_type == 'multi_autofill':

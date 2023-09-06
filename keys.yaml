@@ -580,7 +580,9 @@ experimental_setting:
                       display_name: 'Modification'
                       desc: 'Enter a short free text for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
                       special_case:
-                        insert_control: True
+                        restriction:
+                          regex: /[^a-zA-Z0-9]/g
+                          length: 6
                       value: null
                       whitelist: False
                       input_type: restricted_short_text
@@ -650,7 +652,11 @@ technical_details:
           desc: ''
           value: null
           whitelist: False
-          input_type: short_text
+          special_case:
+            restriction:
+              regex: /^exp[0-9]*/g
+              length: 5
+          input_type: restricted_short_text
         technique:
           mandatory: True
           list: True
@@ -659,26 +665,10 @@ technical_details:
           value: null
           whitelist: True
           input_type: select
-    sample_preparation:
-      mandatory: False
-      list: True
-      display_name: 'Sample preparation'
-      desc: 'Here you can insert links to files or URLs that contain information regarding the sample preparation.'
-      value: null
-      whitelist: False
-      input_type: short_text
-    further_description:
-      mandatory: False
-      list: True
-      display_name: 'Further description'
-      desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
-      value: null
-      whitelist: False
-      input_type: short_text
     analysis-runs:
       mandatory: False
       list: True
-      display_name: 'Runs'
+      display_name: 'Analysis Runs'
       desc: ''
       value:
         date:
@@ -713,3 +703,19 @@ technical_details:
           value: null
           whitelist: False
           input_type: short_text
+    sample_preparation:
+      mandatory: False
+      list: True
+      display_name: 'Sample preparation'
+      desc: 'Here you can insert links to files or URLs that contain information regarding the sample preparation.'
+      value: null
+      whitelist: False
+      input_type: short_text
+    further_description:
+      mandatory: False
+      list: True
+      display_name: 'Further description'
+      desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
+      value: null
+      whitelist: False
+      input_type: short_text
