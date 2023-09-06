@@ -637,10 +637,10 @@ technical_details:
   display_name: 'Technical Details'
   desc: 'This part contains all technical details of the experiment including an analysis part that stores additional information e.g. about runs.'
   value:
-    technique:
+    techniques:
       mandatory: True
       list: True
-      display_name: 'Technique'
+      display_name: 'Techniques'
       desc: ''
       value: 
         setting:
@@ -651,7 +651,7 @@ technical_details:
           value: null
           whitelist: False
           input_type: short_text
-        used_technique:
+        technique:
           mandatory: True
           list: True
           display_name: 'Technique'
