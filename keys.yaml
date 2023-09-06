@@ -581,7 +581,7 @@ experimental_setting:
                       desc: 'Enter a short free text for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
                       special_case:
                         restriction:
-                          regex: /[^a-zA-Z0-9]/g
+                          regex: [^a-zA-Z0-9]
                           max_length: 6
                       value: null
                       whitelist: False
@@ -654,7 +654,7 @@ technical_details:
           whitelist: False
           special_case:
             restriction:
-              regex: /^exp[0-9]*/g
+              regex: ^exp[0-9]*
               max_length: 5
           input_type: restricted_short_text
         technique:
