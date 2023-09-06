@@ -642,9 +642,23 @@ technical_details:
       list: True
       display_name: 'Technique'
       desc: ''
-      value: null
-      whitelist: True
-      input_type: select
+      value: 
+        setting:
+          mandatory: True
+          list: False
+          display_name: 'Setting'
+          desc: ''
+          value: null
+          whitelist: False
+          input_type: short_text
+        used_technique:
+          mandatory: True
+          list: True
+          display_name: 'Technique'
+          desc: ''
+          value: null
+          whitelist: True
+          input_type: select
     analysis:
       mandatory: False
       list: False
