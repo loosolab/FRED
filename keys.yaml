@@ -654,7 +654,7 @@ technical_details:
           whitelist: False
           special_case:
             restriction:
-              regex: '^exp[0-9]*'
+              regex: '\b(?!e(x(p[0-9]*)?)?\b)\w+'
               max_length: 5
           input_type: restricted_short_text
         technique:
