@@ -582,7 +582,7 @@ experimental_setting:
                       special_case:
                         restriction:
                           regex: /[^a-zA-Z0-9]/g
-                          length: 6
+                          max_length: 6
                       value: null
                       whitelist: False
                       input_type: restricted_short_text
@@ -655,7 +655,7 @@ technical_details:
           special_case:
             restriction:
               regex: /^exp[0-9]*/g
-              length: 5
+              max_length: 5
           input_type: restricted_short_text
         technique:
           mandatory: True

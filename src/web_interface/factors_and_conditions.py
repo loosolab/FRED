@@ -63,16 +63,16 @@ def get_factors(organism, key_yaml):
             if input_type == 'restricted_short_text':
                 # default
                 values[factor]['restriction'] = {'regex': ' ',
-                                                 'length': 10}
+                                                 'max_length': 10}
 
                 if 'special_case' in node and 'restriction' in node[
                     'special_case']:
                     if 'regex' in node['special_case']['restriction']:
                         values[factor]['restriction']['regex'] = \
                             node['special_case']['restriction']['regex']
-                    if 'length' in node['special_case']['restriction']:
-                        values[factor]['restriction']['length'] = \
-                            node['special_case']['restriction']['length']
+                    if 'max_length' in node['special_case']['restriction']:
+                        values[factor]['restriction']['max_length'] = \
+                            node['special_case']['restriction']['max_length']
 
             # add header and whitelist keys if they are defined
             if headers is not None:
@@ -170,7 +170,7 @@ def get_factor_values(key, node, filled_object, nested_infos=None):
             if k_val['input_type'] == 'restricted_short_text':
 
                 # default
-                k_val['restriction'] = {'regex': ' ', 'length': 10}
+                k_val['restriction'] = {'regex': ' ', 'max_length': 10}
 
                 if 'special_case' in node['value'][k] and 'restriction' in  \
                         node['value'][k]['special_case']:
@@ -179,11 +179,11 @@ def get_factor_values(key, node, filled_object, nested_infos=None):
                         k_val['restriction']['regex'] = \
                             node['value'][k]['special_case']['restriction'][
                                 'regex']
-                    if 'length' in node['value'][k]['special_case'][
+                    if 'max_length' in node['value'][k]['special_case'][
                             'restriction']:
-                        k_val['restriction']['length'] = \
+                        k_val['restriction']['max_length'] = \
                             node['value'][k]['special_case']['restriction'][
-                                'length']
+                                'max_length']
 
             # add search info if the input is of type single- or multi-autofill
             if k_val['input_type'] == 'multi_autofill':
