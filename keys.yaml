@@ -659,63 +659,57 @@ technical_details:
           value: null
           whitelist: True
           input_type: select
-    analysis:
+    sample_preparation:
       mandatory: False
-      list: False
-      display_name: 'Analysis'
+      list: True
+      display_name: 'Sample preparation'
+      desc: 'Here you can insert links to files or URLs that contain information regarding the sample preparation.'
+      value: null
+      whitelist: False
+      input_type: short_text
+    further_description:
+      mandatory: False
+      list: True
+      display_name: 'Further description'
+      desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
+      value: null
+      whitelist: False
+      input_type: short_text
+    analysis-runs:
+      mandatory: False
+      list: True
+      display_name: 'Runs'
       desc: ''
       value:
-        sample_preparation:
+        date:
+          mandatory: True
+          list: False
+          display_name: 'Date'
+          desc: 'The date has the format dd.mm.yyyy'
+          value: null
+          whitelist: False
+          input_type: date
+        reference_genome:
+          mandatory: False
+          list: False
+          display_name: 'Reference Genome'
+          desc: ''
+          value: null
+          whitelist: True
+          input_type: select
+        parameters:
           mandatory: False
           list: True
-          display_name: 'Sample preparation'
-          desc: 'Here you can insert links to files or URLs that contain information regarding the sample preparation.'
+          display_name: 'Parameters'
+          desc: 'Here you can insert links to files that contain the parameters used for the run.'
           value: null
           whitelist: False
           input_type: short_text
-        further_description:
+        output:
           mandatory: False
           list: True
-          display_name: 'Further description'
-          desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
+          display_name: 'Output'
+          desc: 'Here you can insert links to the output files of the run.'
           value: null
           whitelist: False
           input_type: short_text
-        runs:
-          mandatory: False
-          list: True
-          display_name: 'Runs'
-          desc:  ''
-          value:
-            date:
-              mandatory: True
-              list: False
-              display_name: 'Date'
-              desc: 'The date has the format dd.mm.yyyy'
-              value: null
-              whitelist: False
-              input_type: date
-            reference_genome:
-              mandatory: False
-              list: False
-              display_name: 'Reference Genome'
-              desc: ''
-              value: null
-              whitelist: True
-              input_type: select
-            parameters:
-              mandatory: False
-              list: True
-              display_name: 'Parameters'
-              desc: 'Here you can insert links to files that contain the parameters used for the run.'
-              value: null
-              whitelist: False
-              input_type: short_text
-            output:
-              mandatory: False
-              list: True
-              display_name: 'Output'
-              desc: 'Here you can insert links to the output files of the run.'
-              value: null
-              whitelist: False
-              input_type: short_text
