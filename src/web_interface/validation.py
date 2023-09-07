@@ -71,19 +71,21 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                         if sub_elem['position'].split(':')[-1] == 'setting':
                             tech_settings.append(sub_elem['value'])
                 warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
-                if warning:
-                    warnings.append(
-                        f'{wi_object["position"]}: {warn_text}')
-                    warn_text = warn_text.replace('\n', '<br>')
-                    warning_desc = \
-                        f'{warning_desc}' \
-                        f'{"<br>" if warning_desc != "" else ""}' \
-                        f'<font color="orange">{warn_text}</font>'
-                    wi_object['desc'] =  \
-                        f'{wi_object["backup_desc"]}' \
-                        f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
-                        f'{warning_desc}'
-            if not any([isinstance(x, dict) or isinstance(x, list) for x in
+                print(warning, warn_text)
+                print(wi_object)
+                #if warning:
+                #    warnings.append(
+                #        f'{wi_object["position"]}: {warn_text}')
+                #    warn_text = warn_text.replace('\n', '<br>')
+                #    warning_desc = \
+                #        f'{warning_desc}' \
+                #        f'{"<br>" if warning_desc != "" else ""}' \
+                #        f'<font color="orange">{warn_text}</font>'
+                #    wi_object['desc'] =  \
+                #        f'{wi_object["backup_desc"]}' \
+                #        f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
+                #        f'{warning_desc}'
+            elif not any([isinstance(x, dict) or isinstance(x, list) for x in
                         wi_object['list_value']]):
                 error = False
                 messages = []
