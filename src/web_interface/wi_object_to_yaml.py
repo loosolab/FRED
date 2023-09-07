@@ -44,7 +44,7 @@ def parse_object(wi_object, key_yaml):
 
     # remove keys with value None
     result = {k: v for k, v in result.items() if v is not None}
-
+    result = utils.create_filenames(result, double)
     return result
 
 
@@ -214,28 +214,29 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                 if wi_object['position'].split(':')[-1] == \
                         'technical_replicates':
 
-                    file_name = get_file_name(sample_name.removesuffix(f'_{sample_name.split("_")[-1]}'), double)
+                    pass
+                    #file_name = get_file_name(sample_name.removesuffix(f'_{sample_name.split("_")[-1]}'), double)
                     # TODO: comment
-                    t_sample_name = []
-                    t_file_name = []
-                    count = [x['value'] for x in wi_object['input_fields'] if
-                             x['position'].split(':')[-1] == 'count'][0]
+                    #t_sample_name = []
+                    #t_file_name = []
+                    #count = [x['value'] for x in wi_object['input_fields'] if
+                    #         x['position'].split(':')[-1] == 'count'][0]
 
-                    for c in range(count):
-                        for m in range(nom):
-                            t_sample_name.append(f'{project_id}_'
-                                                 f'{organism}_'
-                                                 f'{sample_name}'
-                                                 f'_t{"{:02d}".format(c + 1)}_'
-                                                 f'm{"{:02d}".format(m + 1)}')
-                            t_file_name.append(f'{project_id}__'
-                                               f'{global_count}__'
-                                               f'{file_name}__'
-                                               f'{local_count}')
-                            local_count += 1
-                            global_count += 1
+                    #for c in range(count):
+                    #    for m in range(nom):
+                    #        t_sample_name.append(f'{project_id}_'
+                    #                             f'{organism}_'
+                    #                             f'{sample_name}'
+                    #                             f'_t{"{:02d}".format(c + 1)}_'
+                    #                             f'm{"{:02d}".format(m + 1)}')
+                    #        t_file_name.append(f'{project_id}__'
+                    #                           f'{global_count}__'
+                    #                           f'{file_name}__'
+                    #                           f'{local_count}')
+                    #        local_count += 1
+                    #        global_count += 1
 
-                    val = {'count': count, 'sample_name': t_sample_name, 'filenames': t_file_name}
+                    #val = {'count': count, 'sample_name': t_sample_name, 'filenames': t_file_name}
 
                 # no special case
                 else:

@@ -286,3 +286,76 @@ def find_list_key(item, l):
     for k in l.split(':'):
         item = list(find_keys(item, k))
     return item
+
+
+def create_filenames(metafile, double):
+    #TODO: get indices
+    file_index = 1
+    organisms = get_whitelist(os.path.join('abbrev', 'organism_name'),
+                                   metafile)['whitelist']
+    project_id = list(find_keys(metafile, 'id'))
+    if len(project_id) > 0:
+        project_id = project_id[0]
+        if 'experimental_setting' in metafile:
+            for setting_elem in metafile['experimental_setting']:
+                if 'setting' in setting_elem:
+                    setting_id = setting_elem['setting']
+                    #TODO: techniques
+                    organism = list(find_keys(setting_elem, 'organism_name'))
+                    if len(organism) > 0:
+                        organism = organisms[organism[0]]
+                        if 'conditions' in setting_elem:
+                            for cond_elem in setting_elem['conditions']:
+                                if 'biological_replicates' in cond_elem and 'samples' in cond_elem['biological_replicates']:
+                                    for sample_elem in cond_elem['biological_replicates']['samples']:
+                                        if 'sample_name' in sample_elem and 'number_of_measurements' in sample_elem and 'technical_replicates' in sample_elem and 'count' in sample_elem['technical_replicates']:
+                                            b_name = sample_elem['sample_name']
+                                            local_count = 1
+                                            filename = get_file_name(sample_name.removesuffix(f'_{b_name.split("_")[-1]}'), double)
+                                            filenames = []
+                                            sample_names = []
+                                            for t_count in range(1, sample_elem['technical_replicates']['count']+1):
+                                                for m_count in range(1, sample_elem['number_of_measurements']+1):
+                                                    sample_name = f'{project_id}_{setting_id}_{organism}_{b_name}_t{"{:02d}".format(t_count)}_m{"{:02d}".format(m_count)}'
+                                                    sample_names.append(sample_name)
+                                                    filenames.append(f'{project_id}__{file_index}__{filename}__{local_count}')
+                                            sample_elem['technical_replicates']['sample_name'] = sample_names
+                                            sample_elem['technical_replicates']['filenames'] = filenames
+    return metafile
+
+
+def get_file_name(sample_name, double):
+    splitted_name = sample_name.split('-')
+    new_name = []
+    for elem in splitted_name:
+        new_elem, gene = split_name(elem, double)
+        if new_elem != '':
+            new_name.append(new_elem)
+    sample_name = '_'.join(new_name)
+    return sample_name
+
+
+def split_name(elem, double, gene=True):
+    new_name = []
+    if '+' in elem:
+        new_split = elem.split('+')
+        for part in new_split:
+            new_part, gene = split_name(part, double, gene=gene)
+            if new_part != '':
+                new_name.append(new_part)
+        elem = '-'.join(new_name)
+
+    if '#' in elem:
+        remove = elem.split('#')[0]
+        elem, gene = split_name(elem[len(f'{remove}#'):], double, gene=gene)
+
+    if '.' in elem:
+        if elem.lower() in [f'gn.{x.lower()}' for x in double]:
+            gene = False
+            elem = ''
+        elif elem.lower().startswith('embl.') and gene is True:
+            elem = ''
+        else:
+            elem = elem.split('.')[1]
+
+    return elem, gene
