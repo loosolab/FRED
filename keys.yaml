@@ -9,9 +9,13 @@ project:
       list: False
       display_name: 'ID'
       desc: ''
+      special_case:
+        restriction:
+          regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
+          max_length: 7
       value: null
       whitelist: False
-      input_type: short_text
+      input_type: restricted_short_text
     project_name:
       mandatory: True
       list: False
@@ -650,7 +654,7 @@ technical_details:
           list: False
           display_name: 'Setting'
           desc: ''
-          value: null
+          value: exp1
           whitelist: False
           special_case:
             restriction:
