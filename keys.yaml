@@ -32,6 +32,30 @@ project:
       value: null
       whitelist: False
       input_type: date
+    description:
+      mandatory: True
+      list: False
+      display_name: 'Description'
+      desc: 'Here you need to enter a detailed description of the project.'
+      value: null
+      whitelist: False
+      input_type: long_text
+    further_description:
+      mandatory: False
+      list: True
+      display_name: 'Further Description / Additional Info'
+      desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
+      value: null
+      whitelist: False
+      input_type: short_text
+    graphical_abstract:
+      mandatory: False
+      list: True
+      display_name: 'Graphical Abstract'
+      desc: 'Here you can insert links to files containing a graphical abstract.'
+      value: null
+      whitelist: False
+      input_type: short_text
     owner:
       mandatory: True
       list: False
@@ -139,31 +163,8 @@ project:
           desc: ''
           value: null
           whitelist: False
-          input_type: short_text
-    description:
-      mandatory: True
-      list: False
-      display_name: 'Description'
-      desc: 'Here you need to enter a detailed description of the project.'
-      value: null
-      whitelist: False
-      input_type: long_text
-    further_description:
-      mandatory: False
-      list: True
-      display_name: 'Further Description / Additional Info'
-      desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
-      value: null
-      whitelist: False
-      input_type: short_text
-    graphical_abstract:
-      mandatory: False
-      list: True
-      display_name: 'Graphical Abstract'
-      desc: 'Here you can insert links to files containing a graphical abstract.'
-      value: null
-      whitelist: False
-      input_type: short_text
+          input_type:
+            short_text
 
 experimental_setting:
   mandatory: True

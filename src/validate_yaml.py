@@ -449,6 +449,8 @@ def validate_logic(metafile, mode='metadata'):
         techniques = list(utils.find_keys(metafile, 'setting'))
         setting_ids = list(utils.find_keys(metafile, 'setting_id'))
         warning, warn_message = validate_techniques(setting_ids, techniques)
+        if warning:
+            logical_warn.append(f'Invalid techniques:\n{warn_message}')
     elif mode == 'mamplan':
         if 'tags' in metafile and 'organization' in metafile['tags'] and metafile['tags']['organization'] is not None:
             if 'public' in metafile['tags']['organization']:
