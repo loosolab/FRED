@@ -294,36 +294,42 @@ def create_filenames(metafile, double):
     organisms = get_whitelist(os.path.join('abbrev', 'organism_name'),
                                    metafile)['whitelist']
     project_id = list(find_keys(metafile, 'id'))
-    if len(project_id) > 0:
+    techniques = list(find_keys(metafile, 'techniques'))
+    if len(project_id) > 0 and len(techniques) > 0:
         project_id = project_id[0]
-        print('ID', project_id)
         if 'experimental_setting' in metafile:
             for setting_elem in metafile['experimental_setting']:
                 if 'setting_id' in setting_elem:
                     setting_id = setting_elem['setting_id']
-                    #TODO: techniques
-                    organism = list(find_keys(setting_elem, 'organism_name'))
-                    print('ORGANISM', organism)
-                    if len(organism) > 0:
-                        organism = organisms[organism[0]]
-                        if 'conditions' in setting_elem:
-                            for cond_elem in setting_elem['conditions']:
-                                if 'biological_replicates' in cond_elem and 'samples' in cond_elem['biological_replicates']:
-                                    for sample_elem in cond_elem['biological_replicates']['samples']:
-                                        if 'sample_name' in sample_elem and 'number_of_measurements' in sample_elem and 'technical_replicates' in sample_elem and 'count' in sample_elem['technical_replicates']:
-                                            b_name = sample_elem['sample_name']
-                                            local_count = 1
-                                            filename = get_file_name(b_name.removesuffix(f'_{b_name.split("_")[-1]}'), double)
-                                            filenames = []
-                                            sample_names = []
-                                            for t_count in range(1, sample_elem['technical_replicates']['count']+1):
-                                                for m_count in range(1, sample_elem['number_of_measurements']+1):
-                                                    sample_name = f'{project_id}_{setting_id}_{organism}_{b_name}_t{"{:02d}".format(t_count)}_m{"{:02d}".format(m_count)}'
-                                                    sample_names.append(sample_name)
-                                                    filenames.append(f'{project_id}__{file_index}__{filename}__{local_count}')
-                                            sample_elem['technical_replicates']['sample_name'] = sample_names
-                                            sample_elem['technical_replicates']['filenames'] = filenames
-                                            print(sample_elem)
+                    used_techs = None
+                    for techs in techniques:
+                        if techs['setting'] == setting_id:
+                            used_techs = techs['technique']
+                    if used_techs is not None:
+                        for u_t in used_techs:
+                            #TODO: abbrev technique
+                            organism = list(find_keys(setting_elem, 'organism_name'))
+                            if len(organism) > 0:
+                                organism = organisms[organism[0]]
+                                if 'conditions' in setting_elem:
+                                    for cond_elem in setting_elem['conditions']:
+                                        if 'biological_replicates' in cond_elem and 'samples' in cond_elem['biological_replicates']:
+                                            for sample_elem in cond_elem['biological_replicates']['samples']:
+                                                if 'sample_name' in sample_elem and 'number_of_measurements' in sample_elem and 'technical_replicates' in sample_elem and 'count' in sample_elem['technical_replicates']:
+                                                    b_name = sample_elem['sample_name']
+                                                    local_count = 1
+                                                    filename = get_file_name(b_name.removesuffix(f'_{b_name.split("_")[-1]}'), double)
+                                                    filenames = []
+                                                    sample_names = []
+                                                    for t_count in range(1, sample_elem['technical_replicates']['count']+1):
+                                                        for m_count in range(1, sample_elem['number_of_measurements']+1):
+                                                            sample_name = f'{project_id}_{setting_id}_{organism}_{b_name}_{u_t}_t{"{:02d}".format(t_count)}_m{"{:02d}".format(m_count)}'
+                                                            sample_names.append(sample_name)
+                                                            filenames.append(f'{project_id}__{file_index}__{filename}__{u_t}__{local_count}')
+                                                            file_index += 1
+                                                            local_count += 1
+                                                    sample_elem['technical_replicates']['sample_name'] = sample_names
+                                                    sample_elem['technical_replicates']['filenames'] = filenames
     return metafile
 
 
