@@ -26,8 +26,7 @@ def validate_object(wi_object):
                 settings.append(elem['value'])
     warnings = {}
     errors = {}
-
-    print(wi_object)
+    print(settings)
     for part in ['project', 'experimental_setting', 'technical_details']:
         part, wi_object[part], pooled, organisms, warnings[part], \
             errors[part] = validate_part(part, wi_object[part], [], pooled,
@@ -70,9 +69,8 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                     for sub_elem in elem:
                         if sub_elem['position'].split(':')[-1] == 'setting':
                             tech_settings.append(sub_elem['value'])
-                warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
-                print(warning, warn_text)
-                print(wi_object)
+                print(tech_settings)
+                #warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
                 #if warning:
                 #    warnings.append(
                 #        f'{wi_object["position"]}: {warn_text}')
