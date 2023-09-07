@@ -28,9 +28,13 @@ def validate_object(wi_object):
     errors = {}
     print(settings)
     for part in ['project', 'experimental_setting', 'technical_details']:
-        part, wi_object[part], pooled, organisms, warnings[part], \
-            errors[part] = validate_part(part, wi_object[part], [], pooled,
-                                         organisms, settings, [])
+        try:
+            part, wi_object[part], pooled, organisms, warnings[part], \
+                errors[part] = validate_part(part, wi_object[part], [], pooled,
+                                             organisms, settings, [])
+        except TypeError:
+            print(wi_object)
+            print('PART', part)
 
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings}
