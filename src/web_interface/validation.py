@@ -28,14 +28,11 @@ def validate_object(wi_object):
     errors = {}
     print(settings)
     for part in ['project', 'experimental_setting', 'technical_details']:
-        try:
-            part, wi_object[part], pooled, organisms, warnings[part], \
+
+        part, wi_object[part], pooled, organisms, warnings[part], \
                 errors[part] = validate_part(part, wi_object[part], [], pooled,
                                              organisms, settings, [])
-        except TypeError:
-            print(wi_object)
-            print('PART', part)
-
+        
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings}
     return validation_object
@@ -69,24 +66,23 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
         if wi_object['list']:
             if wi_object['position'].split(':')[-1] == 'techniques':
                 tech_settings = []
-                for elem in wi_object['list_value']:
-                    for sub_elem in elem:
-                        if sub_elem['position'].split(':')[-1] == 'setting':
-                            tech_settings.append(sub_elem['value'])
-                print(tech_settings)
-                #warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
-                #if warning:
-                #    warnings.append(
-                #        f'{wi_object["position"]}: {warn_text}')
-                #    warn_text = warn_text.replace('\n', '<br>')
-                #    warning_desc = \
-                #        f'{warning_desc}' \
-                #        f'{"<br>" if warning_desc != "" else ""}' \
-                #        f'<font color="orange">{warn_text}</font>'
-                #    wi_object['desc'] =  \
-                #        f'{wi_object["backup_desc"]}' \
-                #        f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
-                #        f'{warning_desc}'
+                for t_elem in wi_object['list_value']:
+                    for t_sub_elem in t_elem:
+                        if t_sub_elem['position'].split(':')[-1] == 'setting':
+                            tech_settings.append(t_sub_elem['value'])
+                warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
+                if warning:
+                    warnings.append(
+                        f'{wi_object["position"]}: {warn_text}')
+                    warn_text = warn_text.replace('\n', '<br>')
+                    warning_desc = \
+                        f'{warning_desc}' \
+                        f'{"<br>" if warning_desc != "" else ""}' \
+                        f'<font color="orange">{warn_text}</font>'
+                    wi_object['desc'] =  \
+                        f'{wi_object["backup_desc"]}' \
+                        f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
+                        f'{warning_desc}'
             elif not any([isinstance(x, dict) or isinstance(x, list) for x in
                         wi_object['list_value']]):
                 error = False
