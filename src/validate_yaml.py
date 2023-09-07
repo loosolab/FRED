@@ -446,6 +446,9 @@ def validate_logic(metafile, mode='metadata'):
                         organisms, run['reference_genome'])
                     if warning:
                         logical_warn.append((f'Run from {run["date"]}', warn_message))
+        techniques = list(utils.find_keys(metafile, 'setting'))
+        setting_ids = list(utils.find_keys(metafile, 'setting_id'))
+        warning, warn_message = validate_techniques(setting_ids, techniques)
     elif mode == 'mamplan':
         if 'tags' in metafile and 'organization' in metafile['tags'] and metafile['tags']['organization'] is not None:
             if 'public' in metafile['tags']['organization']:
@@ -454,6 +457,23 @@ def validate_logic(metafile, mode='metadata'):
         if 'project' in metafile and 'id' in metafile['project'] and metafile['project']['id'] is not None and metafile['project']['id'] != metafile['project']['id'].lower():
             logical_warn.append(('project:id', 'The ID should be lowercase'))
     return logical_warn
+
+
+def validate_techniques(setting_ids, techniques):
+    invalid = False
+    message = None
+    missing_technique = list(set(setting_ids)-set(techniques))
+    unknown_techniques = list(set(techniques)- set(setting_ids))
+    if len(missing_technique) > 0 or len(unknown_techniques) > 0:
+        invalid = True
+        message = ''
+        if len(missing_technique) > 0:
+            message += f'Techniques are missing for experimental setting ' \
+                       f'{", ".join(missing_technique)}.\n'
+            message += f'Techniques were given for experimental setting ' \
+                       f'{", ".join(unknown_techniques)} which was not ' \
+                       f'defined.'
+    return invalid, message
 
 
 def validate_reference_genome(organisms, reference_genome):
