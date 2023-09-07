@@ -214,13 +214,12 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                 if wi_object['position'].split(':')[-1] == \
                         'technical_replicates':
 
-                    pass
                     #file_name = get_file_name(sample_name.removesuffix(f'_{sample_name.split("_")[-1]}'), double)
                     # TODO: comment
                     #t_sample_name = []
                     #t_file_name = []
-                    #count = [x['value'] for x in wi_object['input_fields'] if
-                    #         x['position'].split(':')[-1] == 'count'][0]
+                    count = [x['value'] for x in wi_object['input_fields'] if
+                             x['position'].split(':')[-1] == 'count'][0]
 
                     #for c in range(count):
                     #    for m in range(nom):
@@ -236,7 +235,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     #        local_count += 1
                     #        global_count += 1
 
-                    #val = {'count': count, 'sample_name': t_sample_name, 'filenames': t_file_name}
+                    val = {'count': count}
 
                 # no special case
                 else:
