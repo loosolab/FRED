@@ -176,13 +176,9 @@ experimental_setting:
       list: False
       display_name: 'Setting ID'
       desc: ''
-      special_case:
-        restriction:
-          regex: '\b(?!e(x(p[0-9]*)?)?\b)\w+'
-          max_length: 5
-      value: exp1
+      value: exp
       whitelist: False
-      input_type: restricted_short_text
+      input_type: short_text
     organism:
       mandatory: True
       list: False
