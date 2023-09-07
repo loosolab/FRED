@@ -303,8 +303,10 @@ def create_filenames(metafile, double):
                     setting_id = setting_elem['setting_id']
                     used_techs = None
                     for techs in techniques:
+                        print(techs)
                         if techs['setting'] == setting_id:
                             used_techs = techs['technique']
+                            break
                     if used_techs is not None:
                         for u_t in used_techs:
                             #TODO: abbrev technique
