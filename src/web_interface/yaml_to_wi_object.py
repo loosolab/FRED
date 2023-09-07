@@ -51,7 +51,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
     # disable input for the keys condition_name and sample_name because they
     # are generated
     input_disabled = True if pos.split(':')[-1] \
-        in ['condition_name', 'sample_name', 'setting_id'] else False
+        in ['condition_name', 'sample_name'] else False
 
     # initialize a whitelist object to store all whitelists
     whitelist_object = {}
