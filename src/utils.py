@@ -296,12 +296,14 @@ def create_filenames(metafile, double):
     project_id = list(find_keys(metafile, 'id'))
     if len(project_id) > 0:
         project_id = project_id[0]
+        print('ID', project_id)
         if 'experimental_setting' in metafile:
             for setting_elem in metafile['experimental_setting']:
                 if 'setting' in setting_elem:
                     setting_id = setting_elem['setting']
                     #TODO: techniques
                     organism = list(find_keys(setting_elem, 'organism_name'))
+                    print('ORGANISM', organism)
                     if len(organism) > 0:
                         organism = organisms[organism[0]]
                         if 'conditions' in setting_elem:
@@ -311,7 +313,7 @@ def create_filenames(metafile, double):
                                         if 'sample_name' in sample_elem and 'number_of_measurements' in sample_elem and 'technical_replicates' in sample_elem and 'count' in sample_elem['technical_replicates']:
                                             b_name = sample_elem['sample_name']
                                             local_count = 1
-                                            filename = get_file_name(sample_name.removesuffix(f'_{b_name.split("_")[-1]}'), double)
+                                            filename = get_file_name(b_name.removesuffix(f'_{b_name.split("_")[-1]}'), double)
                                             filenames = []
                                             sample_names = []
                                             for t_count in range(1, sample_elem['technical_replicates']['count']+1):
@@ -321,6 +323,7 @@ def create_filenames(metafile, double):
                                                     filenames.append(f'{project_id}__{file_index}__{filename}__{local_count}')
                                             sample_elem['technical_replicates']['sample_name'] = sample_names
                                             sample_elem['technical_replicates']['filenames'] = filenames
+                                            print(sample_elem)
     return metafile
 
 
