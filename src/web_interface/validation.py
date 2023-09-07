@@ -32,7 +32,7 @@ def validate_object(wi_object):
         part, wi_object[part], pooled, organisms, warnings[part], \
                 errors[part] = validate_part(part, wi_object[part], [], pooled,
                                              organisms, settings, [])
-        
+
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings}
     return validation_object
@@ -83,6 +83,8 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                         f'{wi_object["backup_desc"]}' \
                         f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
                         f'{warning_desc}'
+                else:
+                    wi_object['desc'] = wi_object['backup_desc']
             elif not any([isinstance(x, dict) or isinstance(x, list) for x in
                         wi_object['list_value']]):
                 error = False
