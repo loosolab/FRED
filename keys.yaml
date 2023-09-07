@@ -171,6 +171,14 @@ experimental_setting:
   display_name: 'Experimental setting'
   desc: 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for different organisms.'
   value:
+    setting_id:
+      mandatory: True
+      list: False
+      display_name: 'Setting ID'
+      desc: ''
+      value: exp
+      whitelist: False
+      input_type: short_text
     organism:
       mandatory: True
       list: False
