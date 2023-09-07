@@ -302,8 +302,7 @@ def create_filenames(metafile, double):
                 if 'setting_id' in setting_elem:
                     setting_id = setting_elem['setting_id']
                     used_techs = None
-                    for techs in techniques:
-                        print(techs)
+                    for techs in techniques[0]:
                         if techs['setting'] == setting_id:
                             used_techs = techs['technique']
                             break
