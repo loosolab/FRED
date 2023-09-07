@@ -27,6 +27,7 @@ def validate_object(wi_object):
     warnings = {}
     errors = {}
 
+    print(wi_object)
     for part in ['project', 'experimental_setting', 'technical_details']:
         part, wi_object[part], pooled, organisms, warnings[part], \
             errors[part] = validate_part(part, wi_object[part], [], pooled,
@@ -71,9 +72,9 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                             tech_settings.append(sub_elem['value'])
                 warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
                 if warning:
-                    warn_text = warn_text.replace('\n', '<br>')
                     warnings.append(
                         f'{wi_object["position"]}: {warn_text}')
+                    warn_text = warn_text.replace('\n', '<br>')
                     warning_desc = \
                         f'{warning_desc}' \
                         f'{"<br>" if warning_desc != "" else ""}' \
@@ -82,7 +83,7 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                         f'{wi_object["backup_desc"]}' \
                         f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
                         f'{warning_desc}'
-            elif not any([isinstance(x, dict) or isinstance(x, list) for x in
+            if not any([isinstance(x, dict) or isinstance(x, list) for x in
                         wi_object['list_value']]):
                 error = False
                 messages = []
