@@ -64,7 +64,11 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
 
         if wi_object['list']:
             if wi_object['position'].split(':')[-1] == 'techniques':
-                tech_settings = [x['setting']['value'] for x in wi_object['list_value']]
+                tech_settings = []
+                for elem in wi_object['list_value']:
+                    for sub_elem in elem:
+                        if sub_elem['position'].split(':')[-1] == 'setting':
+                            tech_settings.append(sub_elem['value'])
                 warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
                 if warning:
                     warn_text = warn_text.replace('\n', '<br>')
