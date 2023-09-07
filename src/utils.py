@@ -300,7 +300,7 @@ def create_filenames(metafile, double):
         if 'experimental_setting' in metafile:
             for setting_elem in metafile['experimental_setting']:
                 if 'setting_id' in setting_elem:
-                    setting_id = setting_elem['setting']
+                    setting_id = setting_elem['setting_id']
                     #TODO: techniques
                     organism = list(find_keys(setting_elem, 'organism_name'))
                     print('ORGANISM', organism)
