@@ -8,7 +8,7 @@ project:
       mandatory: True
       list: False
       display_name: 'ID'
-      desc: ''
+      desc: 'test description'
       special_case:
         restriction:
           regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
@@ -20,7 +20,7 @@ project:
       mandatory: True
       list: False
       display_name: 'Project Name'
-      desc: ''
+      desc: 'test description'
       value: null
       whitelist: False
       input_type: short_text
@@ -98,7 +98,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Address'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: False
           input_type: short_text
@@ -106,7 +106,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Telephone'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: False
           input_type: short_text
@@ -152,7 +152,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Address'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: False
           input_type: short_text
@@ -160,7 +160,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Telephone'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: False
           input_type:
@@ -176,7 +176,7 @@ experimental_setting:
       mandatory: True
       list: False
       display_name: 'Setting ID'
-      desc: ''
+      desc: 'test description'
       value: exp
       whitelist: False
       input_type: short_text
@@ -192,7 +192,7 @@ experimental_setting:
           mandatory: True
           list: False
           display_name: 'Organism Name'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: True
           input_type: select
@@ -200,7 +200,7 @@ experimental_setting:
           mandatory: True
           list: False
           display_name: 'Taxonomy ID'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: True
           input_type: select
@@ -214,7 +214,7 @@ experimental_setting:
           mandatory: True
           list: False
           display_name: 'Factor'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: True
           input_type: select
@@ -222,7 +222,7 @@ experimental_setting:
           mandatory: True
           list: False
           display_name: 'Values'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: True
           input_type: select
@@ -236,7 +236,7 @@ experimental_setting:
           mandatory: True
           list: False
           display_name: 'Condition Name'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: False
           input_type: short_text
@@ -250,7 +250,7 @@ experimental_setting:
               mandatory: False
               list: False
               display_name: 'Count'
-              desc: ''
+              desc: 'test description'
               value: null
               whitelist: False
               input_type: number
@@ -258,13 +258,13 @@ experimental_setting:
               mandatory: False
               list: True
               display_name: 'Samples'
-              desc: ''
+              desc: 'test description'
               value:
                 sample_name:
                   mandatory: True
                   list: False
                   display_name: 'Sample Name'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: False
                   input_type: long_text
@@ -272,7 +272,7 @@ experimental_setting:
                   mandatory: True
                   list: False
                   display_name: 'Pooled'
-                  desc: ''
+                  desc: 'test description'
                   value: False
                   whitelist: False
                   input_type: bool
@@ -280,7 +280,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Number of Measurements'
-                  desc: ''
+                  desc: 'test description'
                   value: 1
                   whitelist: False
                   input_type: number
@@ -288,7 +288,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Genetic background'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: True
                   input_type: select
@@ -296,7 +296,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Gender'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: True
                   input_type: select
@@ -304,7 +304,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Life stage'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: True
                   input_type: select
@@ -312,7 +312,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Age'
-                  desc: ''
+                  desc: 'test description'
                   special_case:
                     value_unit: time
                   value:
@@ -320,7 +320,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Value'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: False
                       input_type: number
@@ -328,7 +328,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Unit'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -336,7 +336,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Ethnicity'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: True
                   input_type: select
@@ -344,7 +344,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Tissue'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: True
                   input_type: select
@@ -352,7 +352,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Cell type'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: True
                   input_type: select
@@ -360,7 +360,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Cell line'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: True
                   input_type: select
@@ -368,7 +368,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Cellular Component'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: True
                   input_type: select
@@ -376,7 +376,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Disease'
-                  desc: ''
+                  desc: 'test description'
                   special_case:
                     group: 'disease_type'
                     control:
@@ -386,7 +386,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Type'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -394,7 +394,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Status'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -402,7 +402,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Stage'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -410,7 +410,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Injury'
-                  desc: ''
+                  desc: 'test description'
                   special_case:
                     group: 'injury_type'
                     control:
@@ -420,7 +420,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Status'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -428,7 +428,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Type'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -436,7 +436,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Treatment'
-                  desc: ''
+                  desc: 'test description'
                   special_case:
                     group: 'treatment_type'
                     control:
@@ -446,7 +446,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Type'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -454,7 +454,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Status'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -462,7 +462,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Duration'
-                      desc: ''
+                      desc: 'test description'
                       special_case:
                         value_unit: time
                       value:
@@ -470,7 +470,7 @@ experimental_setting:
                           mandatory: True
                           list: False
                           display_name: 'Value'
-                          desc: ''
+                          desc: 'test description'
                           value: null
                           whitelist: False
                           input_type: number
@@ -478,7 +478,7 @@ experimental_setting:
                           mandatory: False
                           list: False
                           display_name: 'Unit'
-                          desc: ''
+                          desc: 'test description'
                           value: null
                           whitelist: True
                           input_type: select
@@ -486,7 +486,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Time Point'
-                  desc: ''
+                  desc: 'test description'
                   special_case:
                     value_unit: time
                   value:
@@ -494,7 +494,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Value'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: False
                       input_type: number
@@ -502,7 +502,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Unit'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -510,7 +510,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Body-Mass-Index'
-                  desc: ''
+                  desc: 'test description'
                   special_case:
                     value_unit: bmi
                   value:
@@ -518,7 +518,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Value'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: False
                       input_type: number
@@ -526,7 +526,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Unit'
-                      desc: ''
+                      desc: 'test description'
                       value: 'kg/m2'
                       whitelist: True
                       input_type: select
@@ -534,7 +534,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Flow'
-                  desc: ''
+                  desc: 'test description'
                   value: null
                   whitelist: True
                   input_type: select
@@ -542,7 +542,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Gene editing'
-                  desc: ''
+                  desc: 'test description'
                   special_case:
                       control:
                         editing_type: 'WT'
@@ -551,7 +551,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Type'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -559,7 +559,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Method'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: True
                       input_type: select
@@ -567,7 +567,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Gene'
-                      desc: ''
+                      desc: 'test description'
                       special_case:
                         merge: gene_name
                       value:
@@ -575,7 +575,7 @@ experimental_setting:
                           mandatory: True
                           list: False
                           display_name: 'Gene Name'
-                          desc: ''
+                          desc: 'test description'
                           value: null
                           whitelist: True
                           input_type: select
@@ -583,7 +583,7 @@ experimental_setting:
                           mandatory: True
                           list: False
                           display_name: 'ENSEMBL-ID'
-                          desc: ''
+                          desc: 'test description'
                           value: null
                           whitelist: True
                           input_type: select
@@ -611,7 +611,7 @@ experimental_setting:
                   mandatory: True
                   list: False
                   display_name: 'Donor Count'
-                  desc: ''
+                  desc: 'test description'
                   value: 1
                   whitelist: False
                   input_type: number
@@ -625,7 +625,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Count'
-                      desc: ''
+                      desc: 'test description'
                       value: 1
                       whitelist: False
                       input_type: number
@@ -633,7 +633,7 @@ experimental_setting:
                       mandatory: True
                       list: True
                       display_name: 'Samples'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: False
                       input_type: short_text
@@ -641,7 +641,7 @@ experimental_setting:
                       mandatory: True
                       list: True
                       display_name: 'Filenames'
-                      desc: ''
+                      desc: 'test description'
                       value: null
                       whitelist: False
                       input_type: short_text
@@ -656,13 +656,13 @@ technical_details:
       mandatory: True
       list: True
       display_name: 'Techniques'
-      desc: ''
+      desc: 'test description'
       value: 
         setting:
           mandatory: True
           list: False
           display_name: 'Setting'
-          desc: ''
+          desc: 'test description'
           value: exp1
           whitelist: False
           special_case:
@@ -674,7 +674,7 @@ technical_details:
           mandatory: True
           list: True
           display_name: 'Technique'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: True
           input_type: select
@@ -682,7 +682,7 @@ technical_details:
       mandatory: False
       list: True
       display_name: 'Analysis Runs'
-      desc: ''
+      desc: 'test description'
       value:
         date:
           mandatory: True
@@ -696,7 +696,7 @@ technical_details:
           mandatory: False
           list: False
           display_name: 'Reference Genome'
-          desc: ''
+          desc: 'test description'
           value: null
           whitelist: True
           input_type: select
