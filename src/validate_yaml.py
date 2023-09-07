@@ -472,6 +472,7 @@ def validate_techniques(setting_ids, techniques):
         if len(missing_technique) > 0:
             message += f'Techniques are missing for experimental setting ' \
                        f'{", ".join(missing_technique)}.\n'
+        if len(unknown_techniques) > 0:
             message += f'Techniques were given for experimental setting ' \
                        f'{", ".join(unknown_techniques)} which was not ' \
                        f'defined.'

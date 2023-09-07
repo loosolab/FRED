@@ -13,6 +13,7 @@ def validate_object(wi_object):
     """
     pooled = None
     organisms = []
+    settings = []
     for setting in wi_object['experimental_setting']['list_value']:
         for elem in setting:
             if elem['position'].split(':')[-1] == 'organism':
@@ -21,20 +22,22 @@ def validate_object(wi_object):
                         ' ')[0])
                 else:
                     organisms.append(elem['value'].split(' ')[0])
+            elif elem['position'].split(':')[-1] == 'setting_id':
+                settings.append(elem['value'])
     warnings = {}
     errors = {}
 
     for part in ['project', 'experimental_setting', 'technical_details']:
         part, wi_object[part], pooled, organisms, warnings[part], \
             errors[part] = validate_part(part, wi_object[part], [], pooled,
-                                         organisms, [])
+                                         organisms, settings, [])
 
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings}
     return validation_object
 
 
-def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
+def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors):
     """
     This function is used to validate a part of the WI object. If an error or a
     warning is found than it is added to the description of the key whose value
@@ -60,7 +63,22 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
             wi_object['backup_desc'] = wi_object['desc']
 
         if wi_object['list']:
-            if not any([isinstance(x, dict) or isinstance(x, list) for x in
+            if wi_object['position'].split(':')[-1] == 'techniques':
+                tech_settings = [x['setting']['value'] for x in wi_object['list_value']]
+                warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
+                if warning:
+                    warn_text = warn_text.replace('\n', '<br>')
+                    warnings.append(
+                        f'{wi_object["position"]}: {warn_text}')
+                    warning_desc = \
+                        f'{warning_desc}' \
+                        f'{"<br>" if warning_desc != "" else ""}' \
+                        f'<font color="orange">{warn_text}</font>'
+                    wi_object['desc'] =  \
+                        f'{wi_object["backup_desc"]}' \
+                        f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
+                        f'{warning_desc}'
+            elif not any([isinstance(x, dict) or isinstance(x, list) for x in
                         wi_object['list_value']]):
                 error = False
                 messages = []
@@ -92,14 +110,14 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
                     'list_value'], pooled, organisms, warnings, errors = \
                     validate_part(
                         elem, wi_object['list_value'], warnings, pooled,
-                        organisms, errors)
+                        organisms, settings, errors)
         else:
             if 'input_fields' in wi_object:
                 elem, wi_object[
                     'input_fields'], pooled, organisms, warnings, errors = \
                     validate_part(
                         elem, wi_object['input_fields'], warnings, pooled,
-                        organisms, errors)
+                        organisms, settings, errors)
             else:
                 if wi_object['value'] is not None and wi_object['value'] != '':
                     if wi_object['input_type'] == 'date':
@@ -147,5 +165,5 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, errors):
         for i in range(len(wi_object)):
             elem, wi_object[
                 i], pooled, organisms, warnings, errors = validate_part(
-                elem, wi_object[i], warnings, pooled, organisms, errors)
+                elem, wi_object[i], warnings, pooled, organisms, settings, errors)
     return elem, wi_object, pooled, organisms, warnings, errors
