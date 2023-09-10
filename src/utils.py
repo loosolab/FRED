@@ -289,8 +289,18 @@ def find_list_key(item, l):
 
 
 def create_filenames(metafile, double):
-    #TODO: get indices
-    file_index = 1
+    file_indices = list(find_keys(metafile, 'filenames'))
+    print(file_indices)
+    if len(file_indices) > 0:
+        indices = []
+        for i in file_indices:
+            indices += [int(x.split('__')[1]) for x in i]
+        print(indices)
+        file_index = max(indices) + 1
+        print(file_index)
+    else:
+        file_index = 1
+
     organisms = get_whitelist(os.path.join('abbrev', 'organism_name'),
                                    metafile)['whitelist']
     project_id = list(find_keys(metafile, 'id'))
@@ -301,36 +311,65 @@ def create_filenames(metafile, double):
             for setting_elem in metafile['experimental_setting']:
                 if 'setting_id' in setting_elem:
                     setting_id = setting_elem['setting_id']
-                    used_techs = None
-                    for techs in techniques[0]:
-                        if techs['setting'] == setting_id:
-                            used_techs = techs['technique']
-                            break
-                    if used_techs is not None:
-                        for u_t in used_techs:
-                            #TODO: abbrev technique
-                            organism = list(find_keys(setting_elem, 'organism_name'))
-                            if len(organism) > 0:
-                                organism = organisms[organism[0]]
-                                if 'conditions' in setting_elem:
-                                    for cond_elem in setting_elem['conditions']:
-                                        if 'biological_replicates' in cond_elem and 'samples' in cond_elem['biological_replicates']:
-                                            for sample_elem in cond_elem['biological_replicates']['samples']:
-                                                if 'sample_name' in sample_elem and 'number_of_measurements' in sample_elem and 'technical_replicates' in sample_elem and 'count' in sample_elem['technical_replicates']:
-                                                    b_name = sample_elem['sample_name']
-                                                    local_count = 1
-                                                    filename = get_file_name(b_name.removesuffix(f'_{b_name.split("_")[-1]}'), double)
-                                                    filenames = []
-                                                    sample_names = []
-                                                    for t_count in range(1, sample_elem['technical_replicates']['count']+1):
-                                                        for m_count in range(1, sample_elem['number_of_measurements']+1):
-                                                            sample_name = f'{project_id}_{setting_id}_{organism}_{b_name}_{u_t}_t{"{:02d}".format(t_count)}_m{"{:02d}".format(m_count)}'
-                                                            sample_names.append(sample_name)
-                                                            filenames.append(f'{project_id}__{file_index}__{filename}__{u_t}__{local_count}')
-                                                            file_index += 1
-                                                            local_count += 1
-                                                    sample_elem['technical_replicates']['sample_name'] = sample_names
-                                                    sample_elem['technical_replicates']['filenames'] = filenames
+                    organism = list(find_keys(setting_elem, 'organism_name'))
+                    if len(organism) > 0:
+                        organism = organisms[organism[0]]
+                        if 'conditions' in setting_elem:
+                            for cond_elem in setting_elem['conditions']:
+                                if 'biological_replicates' in cond_elem and 'samples' in \
+                                        cond_elem['biological_replicates']:
+                                    for sample_elem in cond_elem['biological_replicates']['samples']:
+                                        if 'technical_replicates' in sample_elem and 'count' in sample_elem['technical_replicates']:
+                                            if 'sample_name' in sample_elem and 'number_of_measurements' in sample_elem:
+                                                used_techs = None
+                                                for techs in techniques[0]:
+                                                    if techs['setting'] == setting_id:
+                                                        used_techs = techs['technique']
+                                                        break
+                                                if used_techs is not None:
+                                                    abbrev_techniques = get_whitelist(os.path.join('abbrev', 'technique'), metafile)['whitelist']
+                                                    filename_length = len(used_techs) * sample_elem['technical_replicates']['count'] * sample_elem['number_of_measurements']
+                                                    do_samples = False
+                                                    do_files = False
+                                                    sample_techniques = []
+                                                    file_techniques = []
+                                                    old_filenames = []
+                                                    old_samples = []
+                                                    if 'sample_name' not in sample_elem['technical_replicates']:
+                                                        do_samples = True
+                                                    elif len(sample_elem['technical_replicates']['sample_name']) < filename_length:
+                                                        do_samples = True
+                                                        sample_techniques = set(list([x.split('_')[2] for x in sample_elem['technical_replicates']['sample_name']]))
+                                                        old_samples = sample_elem['technical_replicates']['sample_name']
+                                                    if 'filenames' not in sample_elem['technical_replicates']:
+                                                        do_files = True
+                                                    elif len(sample_elem['technical_replicates']['filenames']) < filename_length:
+                                                        do_files = True
+                                                        file_techniques = set(list([x.split('__')[2] for x in sample_elem['technical_replicates']['filenames']]))
+                                                        old_filenames = sample_elem['technical_replicates']['filenames']
+                                                    print(do_samples, do_files)
+                                                    if do_samples or do_files:
+                                                        filenames = old_filenames
+                                                        sample_names = old_samples
+                                                        for u_t in used_techs:
+                                                            abbrev_tech = abbrev_techniques[u_t]
+                                                            b_name = sample_elem['sample_name']
+                                                            local_count = 1
+                                                            filename = get_file_name(b_name.removesuffix(f'_{b_name.split("_")[-1]}'), double)
+                                                            for t_count in range(1, sample_elem['technical_replicates']['count'] + 1):
+                                                                for m_count in range(1, sample_elem['number_of_measurements'] + 1):
+                                                                    if abbrev_tech not in sample_techniques:
+                                                                        sample_name = f'{project_id}_{setting_id}_{abbrev_tech}_{organism}_{b_name}_t{"{:02d}".format(t_count)}_m{"{:02d}".format(m_count)}'
+                                                                        sample_names.append(sample_name)
+                                                                    if abbrev_tech not in file_techniques:
+                                                                        filenames.append(f'{project_id}__{file_index}__{abbrev_tech}__{filename}__{local_count}')
+                                                                        file_index += 1
+                                                                        local_count += 1
+                                                        if do_samples:
+                                                            sample_elem['technical_replicates']['sample_name'] = sample_names
+                                                        if do_files:
+                                                            sample_elem['technical_replicates']['filenames'] = filenames
+
     return metafile
 
 
