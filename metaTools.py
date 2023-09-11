@@ -188,7 +188,7 @@ def fetch_whitelists():
     print('Fetching whitelists...\n')
     if not os.path.exists('metadata_whitelists'):
         repo = git.Repo.clone_from(
-            'https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/',
+            'https://github.com/loosolab/FRED.git',
             'metadata_whitelists')
     else:
         repo = git.Repo('metadata_whitelists')
