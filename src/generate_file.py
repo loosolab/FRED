@@ -16,7 +16,6 @@ def generate_file(path, input_id, mandatory_mode, mode, size=80):
     user input. It writes the metadata into a yaml file after validating it.
     :param path: the path to the folder the metadata file should be saved to
     :param input_id: the ID of the experiment
-    :param name: the name of the experiment
     :param mandatory_mode: if True only mandatory files are filled out
     """
 
@@ -48,7 +47,7 @@ def generate_file(path, input_id, mandatory_mode, mode, size=80):
 
         # edit metafile
         elif handling == 'edit file':
-            edit_file.edit_file(exist, mode, mandatory_mode, size=size)
+            edit_file.edit_file(input_id, exist, mode, mandatory_mode, size=size)
 
         # overwrite metafile
         else:
@@ -99,7 +98,7 @@ def generate(path, input_id, mandatory_mode, mode, size=80):
                 # call function to fill in values and merge them with prefilled
                 # information
                 result_dict[item] = {**result_dict[item],
-                                     **generate_functions.get_redo_value(
+                                     **generate_functions.get_redo_value(input_id,
                                          key_yaml[item], item, False,
                                          mandatory_mode, result_dict, True,
                                          False, True, mode)}
@@ -108,7 +107,7 @@ def generate(path, input_id, mandatory_mode, mode, size=80):
             else:
 
                 # call fucntion to fill in values
-                result_dict[item] = generate_functions.get_redo_value(
+                result_dict[item] = generate_functions.get_redo_value(input_id,
                     key_yaml[item], item, not key_yaml[item]['mandatory'],
                     mandatory_mode, result_dict, True, False, True, mode)
 
@@ -132,7 +131,7 @@ def generate(path, input_id, mandatory_mode, mode, size=80):
                 # call the editing function for the part if the input contains
                 # errors
                 else:
-                    result_dict[item] = edit_file.edit_item(
+                    result_dict[item] = edit_file.edit_item(input_id,
                         item, result_dict[item], key_yaml[item], key_yaml,
                         result_dict, mandatory_mode, mode, size=size,
                         not_editable=not_editable)

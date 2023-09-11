@@ -1,5 +1,3 @@
-import sys
-
 from tabulate import tabulate
 import src.utils as utils
 import src.validate_yaml as validate_yaml
@@ -84,7 +82,7 @@ def get_validation(result, mode, size=80):
     return report
 
 
-def get_redo_value(node, item, optional, mandatory_mode, result_dict,
+def get_redo_value(project_id, node, item, optional, mandatory_mode, result_dict,
                    first_node, is_factor, do_redo, mode, size=80):
     """
     This function tests whether a list must be specified for a value and,
@@ -113,7 +111,7 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
             if is_factor:
 
                 # call function to input metadata for factor
-                value = fill_metadata_structure(node['value'], item, {},
+                value = fill_metadata_structure(project_id, node['value'], item, {},
                                                 optional,
                                                 mandatory_mode, result_dict,
                                                 first_node, is_factor, mode, size=size)
@@ -130,7 +128,7 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
                 while redo:
 
                     # call function to fill in metadata
-                    value.append(fill_metadata_structure(
+                    value.append(fill_metadata_structure(project_id,
                         node['value'], item, {}, optional, mandatory_mode,
                         result_dict, first_node, is_factor, mode, size=size))
 
@@ -162,14 +160,14 @@ def get_redo_value(node, item, optional, mandatory_mode, result_dict,
         else:
 
             # call function to fill in metadata
-            value = fill_metadata_structure(node, item, {}, optional,
+            value = fill_metadata_structure(project_id, node, item, {}, optional,
                                             mandatory_mode, result_dict,
                                             first_node, is_factor, mode)
 
     return value
 
 
-def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
+def fill_metadata_structure(project_id, node, key, return_dict, optional, mandatory_mode,
                             result_dict, first_node, is_factor, mode, size=80):
     """
     This function calls other functions to fill in metadata information for a
@@ -225,7 +223,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                 if item == 'experimental_factors':
                     if 'organism' not in return_dict and 'organism' in result_dict:
                         return_dict['organism'] = result_dict['organism']
-                    return_dict[item] = get_experimental_factors(node,
+                    return_dict[item] = get_experimental_factors(project_id,node,
                                                                  return_dict, mode)
 
                 # if the key is 'conditions', call a function to create and
@@ -236,7 +234,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                         return_dict['organism'] = result_dict['organism']
                     if 'experimental_factors' not in return_dict and 'experimental_factors' in result_dict:
                         return_dict['experimental_factors'] = result_dict['experimental_factors']
-                    return_dict[item] = get_conditions(
+                    return_dict[item] = get_conditions(project_id,
                         copy.deepcopy(return_dict['experimental_factors']),
                         node[item]['value'],
                         mandatory_mode, return_dict, mode)
@@ -247,7 +245,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                     # TODO: specify function
                     # if the key is mandatory, call the ... function on it
                     if node[item]['mandatory']:
-                        return_dict[item] = get_redo_value(node[item], item,
+                        return_dict[item] = get_redo_value(project_id, node[item], item,
                                                            optional,
                                                            mandatory_mode,
                                                            return_dict, False,
@@ -434,7 +432,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                 # function for the structure
                                                 # of the optional key without
                                                 # the already filled keys
-                                                val = fill_metadata_structure(
+                                                val = fill_metadata_structure(project_id,
                                                     part_node, option, {},
                                                     optional, mandatory_mode,
                                                     result_dict, False,
@@ -462,7 +460,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
 
                                                 # call function to fill the
                                                 # unfilled key
-                                                val = get_redo_value(
+                                                val = get_redo_value(project_id,
                                                     part_node,
                                                     possible_input[0],
                                                     optional, mandatory_mode,
@@ -510,7 +508,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                                                           result_dict)
                                 return_dict[option] = value
                             else:
-                                val = get_redo_value(node[option],
+                                val = get_redo_value(project_id, node[option],
                                                      option,
                                                      optional,
                                                      mandatory_mode,
@@ -529,7 +527,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
                 value = parse_input_value(key, node['desc'], True, 'str',
                                           result_dict)
             else:
-                value = enter_information(node, key, return_dict, optional,
+                value = enter_information(project_id, node, key, return_dict, optional,
                                           mandatory_mode, result_dict,
                                           first_node, is_factor, mode)
             return value
@@ -540,7 +538,7 @@ def fill_metadata_structure(node, key, return_dict, optional, mandatory_mode,
 # --------------------------EXPERIMENTAL SETTING-------------------------------
 
 
-def get_experimental_factors(node, result_dict, mode, size=80):
+def get_experimental_factors(project_id, node, result_dict, mode, size=80):
     """
     This function prompts the user to specify the examined experimental
     factors, as well as the analyzed values for each selected factor.
@@ -573,7 +571,7 @@ def get_experimental_factors(node, result_dict, mode, size=80):
 
         # call the get_redo_value function to fill in the values for the
         # experimental factor
-        used_values = get_redo_value(fac_node, fac, False, False, result_dict,
+        used_values = get_redo_value(project_id, fac_node, fac, False, False, result_dict,
                                      False, True, True, mode)
 
         # if the experimental factor contains a dictionary as value and the
@@ -602,7 +600,7 @@ def get_experimental_factors(node, result_dict, mode, size=80):
     return experimental_factors
 
 
-def get_conditions(factors, node, mandatory_mode, result_dict, mode, size=80):
+def get_conditions(project_id, factors, node, mandatory_mode, result_dict, mode, size=80):
     """
     This function generates all combinations of the specified experimental
     factors and their values and lets the user choose which of those he likes
@@ -725,14 +723,14 @@ def get_conditions(factors, node, mandatory_mode, result_dict, mode, size=80):
         used_combinations = parse_input_list(combinations, False)
 
     # call get_replicate_count to fill in information for every condition
-    conditions = get_replicate_count(used_combinations, node, mandatory_mode,
+    conditions = get_replicate_count(project_id, used_combinations, node, mandatory_mode,
                                      result_dict, mode)
 
     # return the filled conditions
     return conditions
 
 
-def get_replicate_count(conditions, node, mandatory_mode, result_dict, mode, size=80):
+def get_replicate_count(project_id, conditions, node, mandatory_mode, result_dict, mode, size=80):
     """
     This function is used to ask the user for the number of biological
     replicates for every condition. Per replicate, it calls a function to fill
@@ -778,7 +776,7 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict, mode, siz
 
             # call fill_replicates to enter information for the replicate and
             # save it in the replicates dictionary
-            replicates['biological_replicates'] = fill_replicates(
+            replicates['biological_replicates'] = fill_replicates(project_id,
                 condition, bio, input_pooled,
                 node, mandatory_mode, result_dict, mode)
 
@@ -790,7 +788,7 @@ def get_replicate_count(conditions, node, mandatory_mode, result_dict, mode, siz
     return condition_infos
 
 
-def fill_replicates(condition, bio, input_pooled, node,
+def fill_replicates(project_id, condition, bio, input_pooled, node,
                     mandatory_mode, result_dict, mode, size=80):
     """
     This function is used to enter information for biological replicates.
@@ -922,7 +920,7 @@ def fill_replicates(condition, bio, input_pooled, node,
         # by the fill_metadata_structure function called on the sample
         # structure
         samples = merge_dicts(
-            samples, fill_metadata_structure(
+            samples, fill_metadata_structure(project_id,
                 node['biological_replicates']
                 ['value']['samples']['value'], 'samples', samples,
                 False, mandatory_mode, result_dict, False, False, mode))
@@ -934,7 +932,7 @@ def fill_replicates(condition, bio, input_pooled, node,
         # call the get_technical_replicates function to create the technical
         # replicates and save them to the sample
         samples['technical_replicates'] = get_technical_replicates(
-            short_name, organism, samples['number_of_measurements'])
+            short_name, project_id, organism, samples['number_of_measurements'])
 
         # add the filled sample to the replicate
         replicates['samples'].append(samples)
@@ -943,7 +941,7 @@ def fill_replicates(condition, bio, input_pooled, node,
     return replicates
 
 
-def get_technical_replicates(sample_name, organism, nom):
+def get_technical_replicates(sample_name, input_id, organism, nom):
     """
     This function is used to ask for the number of technical replicates and to
     create the filenames.
@@ -975,7 +973,7 @@ def get_technical_replicates(sample_name, organism, nom):
             # add sample name containing id, organism, sample identifier,
             # index of technical replicate and index of measurement to samples
             # list
-            samples.append(f'{id}_{organism}_{sample_name}_'
+            samples.append(f'{input_id}_{organism}_{sample_name}_'
                            f't{"{:02d}".format(i + 1)}_'
                            f'm{"{:02d}".format(j + 1)}')
 
@@ -1105,7 +1103,7 @@ def print_sample_names(result, input_id, path, size=80):
 # ---------------------------------UTILITIES------------------------------------
 
 
-def enter_information(node, key, return_dict, optional, mandatory_mode,
+def enter_information(project_id, node, key, return_dict, optional, mandatory_mode,
                       result_dict, first_node, is_factor, mode, size=80):
     """
     This function is used to create prompts for the user to enter information
@@ -1142,7 +1140,7 @@ def enter_information(node, key, return_dict, optional, mandatory_mode,
             print(f'{node["desc"]}\n')
 
         # call fill_metadata_structure to fill in the dictionary
-        return fill_metadata_structure(node['value'], key, return_dict,
+        return fill_metadata_structure(project_id, node['value'], key, return_dict,
                                        optional,
                                        mandatory_mode, result_dict, False,
                                        is_factor, mode)
