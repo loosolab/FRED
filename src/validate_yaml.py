@@ -429,6 +429,17 @@ def validate_logic(metafile, mode='metadata'):
     logical_warn = []
 
     if mode == 'metadata':
+        techniques = list(utils.find_keys(metafile, 'setting'))
+        setting_ids = list(utils.find_keys(metafile, 'setting_id'))
+        warning, warn_message = validate_techniques(setting_ids, techniques)
+        if warning:
+            logical_warn.append((f'Invalid techniques:', warn_message))
+        invalid_file, invalid_sample, file_message, sample_message = validate_filenames(metafile)
+        print(invalid_file, invalid_sample)
+        if invalid_file:
+            logical_warn.append((f'Invalid number of filenames:', file_message))
+        if invalid_sample:
+            logical_warn.append((f'Invalid number of sample names:', sample_message))
         samples = list(utils.find_keys(metafile, 'samples'))
         for cond in samples:
             for sample in cond:
@@ -446,11 +457,6 @@ def validate_logic(metafile, mode='metadata'):
                         organisms, run['reference_genome'])
                     if warning:
                         logical_warn.append((f'Run from {run["date"]}', warn_message))
-        techniques = list(utils.find_keys(metafile, 'setting'))
-        setting_ids = list(utils.find_keys(metafile, 'setting_id'))
-        warning, warn_message = validate_techniques(setting_ids, techniques)
-        if warning:
-            logical_warn.append(f'Invalid techniques:\n{warn_message}')
     elif mode == 'mamplan':
         if 'tags' in metafile and 'organization' in metafile['tags'] and metafile['tags']['organization'] is not None:
             if 'public' in metafile['tags']['organization']:
@@ -459,6 +465,44 @@ def validate_logic(metafile, mode='metadata'):
         if 'project' in metafile and 'id' in metafile['project'] and metafile['project']['id'] is not None and metafile['project']['id'] != metafile['project']['id'].lower():
             logical_warn.append(('project:id', 'The ID should be lowercase'))
     return logical_warn
+
+
+def validate_filenames(metafile):
+    invalid_file = False
+    invalid_sample = False
+    file_message = ''
+    sample_message = ''
+    technique = list(utils.find_keys(metafile, 'techniques'))
+    if len(technique) > 0:
+        techniques = {}
+        for elem in technique[0]:
+            techniques[elem['setting']] = elem['technique']
+        print(techniques)
+        settings = list(utils.find_keys(metafile, 'experimental_setting'))
+        if len(settings) > 0:
+            for setting in settings[0]:
+                if 'setting_id' in setting and setting['setting_id'] in techniques:
+                    used_techniques = techniques[setting['setting_id']]
+                    samples = list(utils.find_keys(setting, 'samples'))
+                    if len(samples) > 0:
+                        for sample in samples[0]:
+                            sample_name = sample['sample_name'] if 'sample_name' in sample else ''
+                            m = sample['number_of_measurements'] if 'number_of_measurements' in sample else 0
+                            t = sample['technical_replicates']['count'] if 'technical_replicates' in sample and 'count' in sample['technical_replicates'] else 0
+                            tech = len(used_techniques)
+                            file_count = m * t * tech
+                            print('FC', file_count)
+                            if file_count > 0:
+                                if 'technical_replicates' in sample:
+                                    if 'sample_name' in sample['technical_replicates']:
+                                        if len(sample['technical_replicates']['sample_name']) != file_count:
+                                            invalid_sample = True
+                                            sample_message += f'Number of sample names ({len(sample["technical_replicates"]["sample_name"])}) for sample \'{sample_name}\' does not match expected number of sample names ({file_count})\n'
+                                    if 'filenames' in sample['technical_replicates']:
+                                        if len(sample['technical_replicates']['filenames']) != file_count:
+                                            invalid_file = True
+                                            file_message += f'Number of filenames ({len(sample["technical_replicates"]["sample_name"])}) for sample \'{sample_name}\' does not match expected number of filenames ({file_count})\n'
+    return invalid_file, invalid_sample, file_message, sample_message
 
 
 def validate_techniques(setting_ids, techniques):
@@ -471,7 +515,7 @@ def validate_techniques(setting_ids, techniques):
         message = ''
         if len(missing_technique) > 0:
             message += f'Techniques are missing for experimental setting ' \
-                       f'{", ".join(missing_technique)}.\n'
+                       f'{", ".join(missing_technique)}.'
         if len(unknown_techniques) > 0:
             message += f'Techniques were given for experimental setting ' \
                        f'{", ".join(unknown_techniques)} which was not ' \
