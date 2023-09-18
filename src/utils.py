@@ -290,14 +290,11 @@ def find_list_key(item, l):
 
 def create_filenames(metafile, double):
     file_indices = list(find_keys(metafile, 'filenames'))
-    print(file_indices)
     if len(file_indices) > 0:
         indices = []
         for i in file_indices:
             indices += [int(x.split('__')[1]) for x in i]
-        print(indices)
         file_index = max(indices) + 1
-        print(file_index)
     else:
         file_index = 1
 
@@ -320,12 +317,15 @@ def create_filenames(metafile, double):
                                 if techs['setting'] == setting_id:
                                     used_techs = techs['technique']
                                     break
+                            abbrev_techniques = {}
                             if used_techs is not None:
                                 abbrev_techniques = get_whitelist(
                                     os.path.join('abbrev', 'technique'),
                                     metafile)['whitelist']
+                            old_filenames = {}
+                            old_sample_names = {}
                             for u_t in used_techs:
-                                abbrev_tech = abbrev_techniques[u_t]
+                                abbrev_tech = abbrev_techniques[u_t] if u_t in abbrev_techniques else u_t
                                 for cond_elem in setting_elem['conditions']:
                                     if 'biological_replicates' in cond_elem and 'samples' in \
                                             cond_elem['biological_replicates']:
@@ -333,28 +333,27 @@ def create_filenames(metafile, double):
                                             if 'technical_replicates' in sample_elem and 'count' in sample_elem['technical_replicates']:
                                                 if 'sample_name' in sample_elem and 'number_of_measurements' in sample_elem:
                                                     filename_length = len(used_techs) * sample_elem['technical_replicates']['count'] * sample_elem['number_of_measurements']
-                                                    do_samples = False
-                                                    do_files = False
                                                     sample_techniques = []
                                                     file_techniques = []
-                                                    old_filenames = []
-                                                    old_samples = []
-                                                    if 'sample_name' not in sample_elem['technical_replicates']:
-                                                        do_samples = True
-                                                    elif len(sample_elem['technical_replicates']['sample_name']) < filename_length:
+                                                    sample_names = []
+                                                    filenames = []
+                                                    do_samples = False
+                                                    do_files = False
+                                                    if sample_elem['sample_name'] not in old_sample_names.keys():
+                                                        old_sample_names[sample_elem['sample_name']] = len(sample_elem['technical_replicates']['sample_name']) if 'sample_name' in sample_elem['technical_replicates'] else []
+                                                    print(old_sample_names, filename_length)
+                                                    if old_sample_names[sample_elem['sample_name']] < filename_length:
                                                         do_samples = True
                                                         sample_techniques = set(list([x.split('_')[2] for x in sample_elem['technical_replicates']['sample_name']]))
-                                                        old_samples = sample_elem['technical_replicates']['sample_name']
-                                                    if 'filenames' not in sample_elem['technical_replicates']:
-                                                        do_files = True
-                                                    elif len(sample_elem['technical_replicates']['filenames']) < filename_length:
+
+                                                    if sample_elem['sample_name'] not in old_filenames.keys():
+                                                        old_filenames[sample_elem['sample_name']] = len(sample_elem['technical_replicates']['filenames']) if 'filenames' in sample_elem['technical_replicates'] else []
+                                                    if old_filenames[sample_elem['sample_name']] < filename_length:
                                                         do_files = True
                                                         file_techniques = set(list([x.split('__')[2] for x in sample_elem['technical_replicates']['filenames']]))
-                                                        old_filenames = sample_elem['technical_replicates']['filenames']
+                                                    print(old_filenames,
+                                                          filename_length)
                                                     if do_samples or do_files:
-                                                        filenames = old_filenames
-                                                        sample_names = old_samples
-
                                                         b_name = sample_elem[
                                                             'sample_name']
                                                         local_count = 1
@@ -379,11 +378,17 @@ def create_filenames(metafile, double):
                                                                         f'{project_id}__{file_index}__{abbrev_tech}__{filename}__{local_count}')
                                                                     file_index += 1
                                                                     local_count += 1
-
                                                         if do_samples:
-                                                            sample_elem['technical_replicates']['sample_name'] = sample_names
+                                                            if 'sample_name' in sample_elem['technical_replicates']:
+                                                                sample_elem['technical_replicates']['sample_name'] += sample_names
+                                                            else:
+                                                                sample_elem['technical_replicates']['sample_name'] = sample_names
                                                         if do_files:
-                                                            sample_elem['technical_replicates']['filenames'] = filenames
+                                                            if 'filenames' in sample_elem['technical_replicates']:
+                                                                sample_elem['technical_replicates']['filenames'] += filenames
+                                                            else:
+                                                                sample_elem[
+                                                                    'technical_replicates']['filenames'] = filenames
 
     return metafile
 
