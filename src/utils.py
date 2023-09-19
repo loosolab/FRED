@@ -329,6 +329,7 @@ def create_filenames(metafile, double):
                                 for cond_elem in setting_elem['conditions']:
                                     if 'biological_replicates' in cond_elem and 'samples' in \
                                             cond_elem['biological_replicates']:
+                                        local_count = 1
                                         for sample_elem in cond_elem['biological_replicates']['samples']:
                                             if 'technical_replicates' in sample_elem and 'count' in sample_elem['technical_replicates']:
                                                 if 'sample_name' in sample_elem and 'number_of_measurements' in sample_elem:
@@ -341,7 +342,6 @@ def create_filenames(metafile, double):
                                                     do_files = False
                                                     if sample_elem['sample_name'] not in old_sample_names.keys():
                                                         old_sample_names[sample_elem['sample_name']] = len(sample_elem['technical_replicates']['sample_name']) if 'sample_name' in sample_elem['technical_replicates'] else 0
-                                                    print(old_sample_names, filename_length)
                                                     if old_sample_names[sample_elem['sample_name']] < filename_length:
                                                         do_samples = True
                                                         if old_sample_names[sample_elem['sample_name']] > 0:
@@ -353,12 +353,9 @@ def create_filenames(metafile, double):
                                                         do_files = True
                                                         if old_filenames[sample_elem['sample_name']] > 0:
                                                             file_techniques = set(list([x.split('__')[2] for x in sample_elem['technical_replicates']['filenames']]))
-                                                    print(old_filenames,
-                                                          filename_length)
                                                     if do_samples or do_files:
                                                         b_name = sample_elem[
                                                             'sample_name']
-                                                        local_count = 1
                                                         filename = get_file_name(
                                                             b_name.removesuffix(
                                                                 f'_{b_name.split("_")[-1]}'),
