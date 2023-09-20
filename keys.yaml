@@ -679,7 +679,7 @@ technical_details:
           value: null
           whitelist: True
           input_type: select
-    analysis-runs:
+    analysis_runs:
       mandatory: False
       list: True
       display_name: 'Analysis Runs'
