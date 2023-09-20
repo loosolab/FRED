@@ -596,6 +596,7 @@ experimental_setting:
                         restriction:
                           regex: '[^a-zA-Z0-9]'
                           max_length: 6
+                        insert_control: True
                       value: null
                       whitelist: False
                       input_type: restricted_short_text
