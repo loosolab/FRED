@@ -73,7 +73,7 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                 warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
                 if warning:
                     warnings.append(
-                        f'{wi_object["position"]}: {warn_text}')
+                        f'{wi_object["position"]}: <font color="red">{warn_text}</font>')
                     warn_text = warn_text.replace('\n', '<br>')
                     warning_desc = \
                         f'{warning_desc}' \
