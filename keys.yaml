@@ -900,6 +900,44 @@ experimental_setting:
                       value: null
                       whitelist: True
                       input_type: select
+                sub_not_factor:
+                  mandatory: False
+                  list: False
+                  display_name: 'Sub not factor'
+                  desc: '<font color="red">test description</font>'
+                  value:
+                    description:
+                      mandatory: True
+                      list: False
+                      display_name: 'Description'
+                      desc: 'Here you need to enter a detailed description of the project.'
+                      value: null
+                      whitelist: False
+                      input_type: long_text
+                    date:
+                      mandatory: True
+                      list: False
+                      display_name: 'Date'
+                      desc: 'The date has the format dd.mm.yyyy'
+                      value: null
+                      whitelist: False
+                      input_type: date
+                    test_short:
+                      mandatory: True
+                      list: False
+                      display_name: 'Short text'
+                      desc: '<font color="red">test description</font>'
+                      value: null
+                      whitelist: False
+                      input_type: short_text
+                    test_number:
+                      mandatory: False
+                      list: False
+                      display_name: 'Number Input'
+                      desc: '<font color="red">test description</font>'
+                      value: null
+                      whitelist: False
+                      input_type: number
                 medical_treatment:
                   mandatory: False
                   list: True
