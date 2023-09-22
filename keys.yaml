@@ -863,38 +863,43 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                 sub_factor:
-                  genetic_background:
-                    mandatory: False
-                    list: True
-                    display_name: 'Genetic background'
-                    desc: '<font color="red">test description</font>'
-                    value: null
-                    whitelist: True
-                    input_type: select
-                  pooled:
-                    mandatory: True
-                    list: False
-                    display_name: 'Pooled'
-                    desc: '<font color="red">test description</font>'
-                    value: False
-                    whitelist: False
-                    input_type: bool
-                  tissue:
-                    mandatory: False
-                    list: True
-                    display_name: 'Multi Autofill'
-                    desc: '<font color="red">test description</font>'
-                    value: null
-                    whitelist: True
-                    input_type: select
-                  cell_type:
-                    mandatory: False
-                    list: False
-                    display_name: 'Single Autofill'
-                    desc: '<font color="red">test description</font>'
-                    value: null
-                    whitelist: True
-                    input_type: select
+                  mandatory: False
+                  list: False
+                  display_name: 'Sub factor'
+                  desc: '<font color="red">test description</font>'
+                  value:
+                    genetic_background:
+                      mandatory: False
+                      list: True
+                      display_name: 'Genetic background'
+                      desc: '<font color="red">test description</font>'
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    pooled:
+                      mandatory: True
+                      list: False
+                      display_name: 'Pooled'
+                      desc: '<font color="red">test description</font>'
+                      value: False
+                      whitelist: False
+                      input_type: bool
+                    tissue:
+                      mandatory: False
+                      list: True
+                      display_name: 'Multi Autofill'
+                      desc: '<font color="red">test description</font>'
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    cell_type:
+                      mandatory: False
+                      list: False
+                      display_name: 'Single Autofill'
+                      desc: '<font color="red">test description</font>'
+                      value: null
+                      whitelist: True
+                      input_type: select
                 medical_treatment:
                   mandatory: False
                   list: True
