@@ -6,7 +6,7 @@ project:
   value:
     id:
       mandatory: True
-      list: False
+      list: True
       display_name: 'ID'
       desc: '<font color="red">test description</font>'
       special_case:
