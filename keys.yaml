@@ -950,7 +950,7 @@ experimental_setting:
                       input_type: select
                 sub_not_factor:
                   mandatory: False
-                  list: False
+                  list: True
                   display_name: 'Sub not factor'
                   desc: '<font color="red">test description</font>'
                   value:
