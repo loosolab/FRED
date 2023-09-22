@@ -24,6 +24,14 @@ project:
       value: null
       whitelist: False
       input_type: short_text
+    reference_genome:
+      mandatory: False
+      list: False
+      display_name: 'Reference Genome'
+      desc: '<font color="red">test description</font>'
+      value: null
+      whitelist: True
+      input_type: select
     date:
       mandatory: True
       list: False
@@ -150,6 +158,14 @@ project:
           value: null
           whitelist: False
           input_type: short_text
+        reference_genome:
+          mandatory: False
+          list: False
+          display_name: 'Reference Genome'
+          desc: '<font color="red">test description</font>'
+          value: null
+          whitelist: True
+          input_type: select
         restrict:
           mandatory: True
           list: True
@@ -344,6 +360,14 @@ experimental_setting:
   display_name: 'Experimental setting'
   desc: 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for different organisms.'
   value:
+    reference_genome:
+      mandatory: False
+      list: False
+      display_name: 'Reference Genome'
+      desc: '<font color="red">test description</font>'
+      value: null
+      whitelist: True
+      input_type: select
     restrict:
       mandatory: True
       list: True
@@ -450,6 +474,14 @@ experimental_setting:
       display_name: 'Test sub'
       desc: '<font color="red">test description</font>'
       value:
+        reference_genome:
+          mandatory: False
+          list: False
+          display_name: 'Reference Genome'
+          desc: '<font color="red">test description</font>'
+          value: null
+          whitelist: True
+          input_type: select
         pooled:
           mandatory: True
           list: False
@@ -1207,6 +1239,14 @@ technical_details:
           value: null
           whitelist: True
           input_type: select
+        gender:
+          mandatory: False
+          list: False
+          display_name: 'Single Select'
+          desc: '<font color="red">test description</font>'
+          value: null
+          whitelist: True
+          input_type: select
         parameters:
           mandatory: False
           list: False
@@ -1335,6 +1375,14 @@ technical_details:
       mandatory: False
       list: False
       display_name: 'Reference Genome'
+      desc: '<font color="red">test description</font>'
+      value: null
+      whitelist: True
+      input_type: select
+    gender:
+      mandatory: False
+      list: False
+      display_name: 'Single Select'
       desc: '<font color="red">test description</font>'
       value: null
       whitelist: True
