@@ -32,6 +32,78 @@ project:
       value: null
       whitelist: False
       input_type: date
+    gender:
+      mandatory: False
+      list: False
+      display_name: 'Single Select'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    genetic_background:
+      mandatory: False
+      list: True
+      display_name: 'Single Select'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    tissue:
+      mandatory: False
+      list: True
+      display_name: 'Multi Autofill'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    cell_type:
+      mandatory: False
+      list: False
+      display_name: 'Single Autofill'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    test_number:
+      mandatory: False
+      list: False
+      display_name: 'Number Input'
+      desc: 'test description'
+      value: null
+      whitelist: False
+      input_type: number
+    test_value_unit:
+      mandatory: False
+      list: False
+      display_name: 'Value unit'
+      desc: 'test description'
+      special_case:
+        value_unit: time
+      value:
+        value:
+          mandatory: True
+          list: False
+          display_name: 'Value'
+          desc: 'test description'
+          value: null
+          whitelist: False
+          input_type: number
+        unit:
+          mandatory: True
+          list: False
+          display_name: 'Unit'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+    pooled:
+      mandatory: True
+      list: False
+      display_name: 'Pooled'
+      desc: 'test description'
+      value: False
+      whitelist: False
+      input_type: bool
     description:
       mandatory: True
       list: False
@@ -78,6 +150,106 @@ project:
           value: null
           whitelist: False
           input_type: short_text
+        restrict:
+          mandatory: True
+          list: False
+          display_name: 'ID'
+          desc: 'test description'
+          special_case:
+            restriction:
+              regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
+              max_length: 7
+          value: null
+          whitelist: False
+          input_type: restricted_short_text
+        description:
+          mandatory: True
+          list: False
+          display_name: 'Description'
+          desc: 'Here you need to enter a detailed description of the project.'
+          value: null
+          whitelist: False
+          input_type: long_text
+        gender:
+          mandatory: False
+          list: False
+          display_name: 'Single Select'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        genetic_background:
+          mandatory: False
+          list: True
+          display_name: 'Single Select'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        tissue:
+          mandatory: False
+          list: True
+          display_name: 'Multi Autofill'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        cell_type:
+          mandatory: False
+          list: False
+          display_name: 'Single Autofill'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        test_number:
+          mandatory: False
+          list: False
+          display_name: 'Number Input'
+          desc: 'test description'
+          value: null
+          whitelist: False
+          input_type: number
+        test_value_unit:
+          mandatory: False
+          list: False
+          display_name: 'Value unit'
+          desc: 'test description'
+          special_case:
+            value_unit: time
+          value:
+            value:
+              mandatory: True
+              list: False
+              display_name: 'Value'
+              desc: 'test description'
+              value: null
+              whitelist: False
+              input_type: number
+            unit:
+              mandatory: True
+              list: False
+              display_name: 'Unit'
+              desc: 'test description'
+              value: null
+              whitelist: True
+              input_type: select
+        date:
+          mandatory: True
+          list: False
+          display_name: 'Date'
+          desc: 'The date has the format dd.mm.yyyy'
+          value: null
+          whitelist: False
+          input_type: date
+        pooled:
+          mandatory: True
+          list: False
+          display_name: 'Pooled'
+          desc: 'test description'
+          value: False
+          whitelist: False
+          input_type: bool
         department:
           mandatory: True
           list: False
@@ -172,6 +344,228 @@ experimental_setting:
   display_name: 'Experimental setting'
   desc: 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for different organisms.'
   value:
+    restrict:
+      mandatory: True
+      list: False
+      display_name: 'ID'
+      desc: 'test description'
+      special_case:
+        restriction:
+          regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
+          max_length: 7
+      value: null
+      whitelist: False
+      input_type: restricted_short_text
+    description:
+      mandatory: True
+      list: False
+      display_name: 'Description'
+      desc: 'Here you need to enter a detailed description of the project.'
+      value: null
+      whitelist: False
+      input_type: long_text
+    gender:
+      mandatory: False
+      list: False
+      display_name: 'Single Select'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    genetic_background:
+      mandatory: False
+      list: True
+      display_name: 'Single Select'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    tissue:
+      mandatory: False
+      list: True
+      display_name: 'Multi Autofill'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    cell_type:
+      mandatory: False
+      list: False
+      display_name: 'Single Autofill'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    test_number:
+      mandatory: False
+      list: False
+      display_name: 'Number Input'
+      desc: 'test description'
+      value: null
+      whitelist: False
+      input_type: number
+    test_value_unit:
+      mandatory: False
+      list: False
+      display_name: 'Value unit'
+      desc: 'test description'
+      special_case:
+        value_unit: time
+      value:
+        value:
+          mandatory: True
+          list: False
+          display_name: 'Value'
+          desc: 'test description'
+          value: null
+          whitelist: False
+          input_type: number
+        unit:
+          mandatory: True
+          list: False
+          display_name: 'Unit'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+    date:
+      mandatory: True
+      list: False
+      display_name: 'Date'
+      desc: 'The date has the format dd.mm.yyyy'
+      value: null
+      whitelist: False
+      input_type: date
+    test_short:
+      mandatory: True
+      list: False
+      display_name: 'Short text'
+      desc: 'test description'
+      value: null
+      whitelist: False
+      input_type: short_text
+    sub_fields:
+      mandatory: False
+      list: False
+      display_name: 'Test sub'
+      desc: 'test description'
+      value:
+        pooled:
+          mandatory: True
+          list: False
+          display_name: 'Pooled'
+          desc: 'test description'
+          value: False
+          whitelist: False
+          input_type: bool
+        restrict:
+          mandatory: True
+          list: False
+          display_name: 'ID'
+          desc: 'test description'
+          special_case:
+            restriction:
+              regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
+              max_length: 7
+          value: null
+          whitelist: False
+          input_type: restricted_short_text
+        description:
+          mandatory: True
+          list: False
+          display_name: 'Description'
+          desc: 'Here you need to enter a detailed description of the project.'
+          value: null
+          whitelist: False
+          input_type: long_text
+        gender:
+          mandatory: False
+          list: False
+          display_name: 'Single Select'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        genetic_background:
+          mandatory: False
+          list: True
+          display_name: 'Single Select'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        tissue:
+          mandatory: False
+          list: True
+          display_name: 'Multi Autofill'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        cell_type:
+          mandatory: False
+          list: False
+          display_name: 'Single Autofill'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        test_number:
+          mandatory: False
+          list: False
+          display_name: 'Number Input'
+          desc: 'test description'
+          value: null
+          whitelist: False
+          input_type: number
+        test_value_unit:
+          mandatory: False
+          list: False
+          display_name: 'Value unit'
+          desc: 'test description'
+          special_case:
+            value_unit: time
+          value:
+            value:
+              mandatory: True
+              list: False
+              display_name: 'Value'
+              desc: 'test description'
+              value: null
+              whitelist: False
+              input_type: number
+            unit:
+              mandatory: True
+              list: False
+              display_name: 'Unit'
+              desc: 'test description'
+              value: null
+              whitelist: True
+              input_type: select
+        date:
+          mandatory: True
+          list: False
+          display_name: 'Date'
+          desc: 'The date has the format dd.mm.yyyy'
+          value: null
+          whitelist: False
+          input_type: date
+        test_short:
+          mandatory: True
+          list: False
+          display_name: 'Short text'
+          desc: 'test description'
+          value: null
+          whitelist: False
+          input_type: short_text
+    pooled:
+      mandatory: True
+      list: False
+      display_name: 'Pooled'
+      desc: 'test description'
+      value: False
+      whitelist: False
+      input_type: bool
     setting_id:
       mandatory: True
       list: False
@@ -268,6 +662,42 @@ experimental_setting:
                   value: null
                   whitelist: False
                   input_type: long_text
+                restrict:
+                  mandatory: True
+                  list: False
+                  display_name: 'ID'
+                  desc: 'test description'
+                  special_case:
+                    restriction:
+                      regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
+                      max_length: 7
+                  value: null
+                  whitelist: False
+                  input_type: restricted_short_text
+                test_short:
+                  mandatory: True
+                  list: False
+                  display_name: 'Short text'
+                  desc: 'test description'
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+                description:
+                  mandatory: True
+                  list: False
+                  display_name: 'Description'
+                  desc: 'Here you need to enter a detailed description of the project.'
+                  value: null
+                  whitelist: False
+                  input_type: long_text
+                date:
+                  mandatory: True
+                  list: False
+                  display_name: 'Date'
+                  desc: 'The date has the format dd.mm.yyyy'
+                  value: null
+                  whitelist: False
+                  input_type: date
                 pooled:
                   mandatory: True
                   list: False
@@ -432,6 +862,39 @@ experimental_setting:
                       value: null
                       whitelist: True
                       input_type: select
+                sub_factor:
+                  genetic_background:
+                    mandatory: False
+                    list: True
+                    display_name: 'Genetic background'
+                    desc: 'test description'
+                    value: null
+                    whitelist: True
+                    input_type: select
+                  pooled:
+                    mandatory: True
+                    list: False
+                    display_name: 'Pooled'
+                    desc: 'test description'
+                    value: False
+                    whitelist: False
+                    input_type: bool
+                  tissue:
+                    mandatory: False
+                    list: True
+                    display_name: 'Multi Autofill'
+                    desc: 'test description'
+                    value: null
+                    whitelist: True
+                    input_type: select
+                  cell_type:
+                    mandatory: False
+                    list: False
+                    display_name: 'Single Autofill'
+                    desc: 'test description'
+                    value: null
+                    whitelist: True
+                    input_type: select
                 medical_treatment:
                   mandatory: False
                   list: True
@@ -703,12 +1166,96 @@ technical_details:
           input_type: select
         parameters:
           mandatory: False
-          list: True
+          list: False
           display_name: 'Parameters'
           desc: 'Here you can insert links to files that contain the parameters used for the run.'
           value: null
           whitelist: False
           input_type: short_text
+        genetic_background:
+          mandatory: False
+          list: True
+          display_name: 'Single Select'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        tissue:
+          mandatory: False
+          list: True
+          display_name: 'Multi Autofill'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        cell_type:
+          mandatory: False
+          list: False
+          display_name: 'Single Autofill'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+        test_number:
+          mandatory: False
+          list: False
+          display_name: 'Number Input'
+          desc: 'test description'
+          value: null
+          whitelist: False
+          input_type: number
+        test_value_unit:
+          mandatory: False
+          list: False
+          display_name: 'Value unit'
+          desc: 'test description'
+          special_case:
+            value_unit: time
+          value:
+            value:
+              mandatory: True
+              list: False
+              display_name: 'Value'
+              desc: 'test description'
+              value: null
+              whitelist: False
+              input_type: number
+            unit:
+              mandatory: True
+              list: False
+              display_name: 'Unit'
+              desc: 'test description'
+              value: null
+              whitelist: True
+              input_type: select
+        pooled:
+          mandatory: True
+          list: False
+          display_name: 'Pooled'
+          desc: 'test description'
+          value: False
+          whitelist: False
+          input_type: bool
+        description:
+          mandatory: True
+          list: False
+          display_name: 'Description'
+          desc: 'Here you need to enter a detailed description of the project.'
+          value: null
+          whitelist: False
+          input_type: long_text
+        restrict:
+          mandatory: True
+          list: False
+          display_name: 'ID'
+          desc: 'test description'
+          special_case:
+            restriction:
+              regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
+              max_length: 7
+          value: null
+          whitelist: False
+          input_type: restricted_short_text
         output:
           mandatory: False
           list: True
@@ -727,9 +1274,109 @@ technical_details:
       input_type: short_text
     further_description:
       mandatory: False
-      list: True
+      list: False
       display_name: 'Further description'
       desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
       value: null
       whitelist: False
       input_type: short_text
+    date:
+      mandatory: True
+      list: False
+      display_name: 'Date'
+      desc: 'The date has the format dd.mm.yyyy'
+      value: null
+      whitelist: False
+      input_type: date
+    reference_genome:
+      mandatory: False
+      list: False
+      display_name: 'Reference Genome'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    genetic_background:
+      mandatory: False
+      list: True
+      display_name: 'Single Select'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    tissue:
+      mandatory: False
+      list: True
+      display_name: 'Multi Autofill'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    cell_type:
+      mandatory: False
+      list: False
+      display_name: 'Single Autofill'
+      desc: 'test description'
+      value: null
+      whitelist: True
+      input_type: select
+    test_number:
+      mandatory: False
+      list: False
+      display_name: 'Number Input'
+      desc: 'test description'
+      value: null
+      whitelist: False
+      input_type: number
+    test_value_unit:
+      mandatory: False
+      list: False
+      display_name: 'Value unit'
+      desc: 'test description'
+      special_case:
+        value_unit: time
+      value:
+        value:
+          mandatory: True
+          list: False
+          display_name: 'Value'
+          desc: 'test description'
+          value: null
+          whitelist: False
+          input_type: number
+        unit:
+          mandatory: True
+          list: False
+          display_name: 'Unit'
+          desc: 'test description'
+          value: null
+          whitelist: True
+          input_type: select
+    pooled:
+      mandatory: True
+      list: False
+      display_name: 'Pooled'
+      desc: 'test description'
+      value: False
+      whitelist: False
+      input_type: bool
+    description:
+      mandatory: True
+      list: False
+      display_name: 'Description'
+      desc: 'Here you need to enter a detailed description of the project.'
+      value: null
+      whitelist: False
+      input_type: long_text
+    restrict:
+      mandatory: True
+      list: False
+      display_name: 'ID'
+      desc: 'test description'
+      special_case:
+        restriction:
+          regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
+          max_length: 7
+      value: null
+      whitelist: False
+      input_type: restricted_short_text
