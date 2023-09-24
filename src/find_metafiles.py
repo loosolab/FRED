@@ -37,7 +37,7 @@ def find_projects(dir_path, search, return_dict):
     # split parameters linked via or into list
 
     # read in all *_metadata.yaml(yml) within the path
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles([dir_path])
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles([dir_path],return_false=True)
 
     # put round brackets around the search string
     search = '(' + search + ')'
@@ -49,70 +49,74 @@ def find_projects(dir_path, search, return_dict):
     # iterate over the read in metadata files
     for metafile in metafiles:
 
-        # initialize parameter sub_list and sub with empty string
-        # sub stores parts of the search string that is read in
-        # whenever a bracket is reached, the string in sub is evaluated and the
-        # result is added to sub_list
-        sub_list = ''
-        sub = ''
+        if 'project' in metafile and 'id' in metafile['project']:
 
-        # set brace_count to 0 meaning that there is currently no open brace
-        brace_count = 0
+            # initialize parameter sub_list and sub with empty string
+            # sub stores parts of the search string that is read in
+            # whenever a bracket is reached, the string in sub is evaluated and
+            # the result is added to sub_list
+            sub_list = ''
+            sub = ''
 
-        # iterate over search string
-        for letter in search:
+            # set brace_count to 0 meaning that there is currently no open
+            # brace
+            brace_count = 0
 
-            # if an opening bracket is reached, add 1 to brace_count, add the
-            # string within sub to the sub_list and set sub to an empty string
-            if letter == '(':
-                brace_count += 1
-                sub_list += sub
-                sub = ''
+            # iterate over search string
+            for letter in search:
 
-            # if a closing bracket is reached, subtract 1 from brace_count
-            elif letter == ')':
-                brace_count -= 1
-
-                # test if the closing bracket is the last bracket in the search
+                # if an opening bracket is reached, add 1 to brace_count, add
+                # the string within sub to the sub_list and set sub to an empty
                 # string
-                if brace_count != 0:
-
-                    # if it is the last bracket, add the string in sub to the
-                    # sub_list
+                if letter == '(':
+                    brace_count += 1
                     sub_list += sub
+                    sub = ''
+
+                # if a closing bracket is reached, subtract 1 from brace_count
+                elif letter == ')':
+                    brace_count -= 1
+
+                    # test if the closing bracket is the last bracket in the
+                    # search string
+                    if brace_count != 0:
+
+                        # if it is the last bracket, add the string in sub to
+                        # the sub_list
+                        sub_list += sub
+
+                    else:
+
+                        # if it is a bracket within the search string and sub
+                        # is not an empty string then use the function
+                        # parse_search_parameters to evaluate the string in sub
+                        # and add the result to the sub_string
+                        if sub != '':
+                            res = parse_search_parameters(metafile, sub)
+                            sub_list += str(True) if res else str(False)
+
+                    # set sub to an empty string again
+                    sub = ''
 
                 else:
 
-                    # if it is a bracket within the search string and sub is
-                    # not an empty string then use the function
-                    # parse_search_parameters to evaluate the string in sub and
-                    # add the result to the sub_string
-                    if sub != '':
-                        res = parse_search_parameters(metafile, sub)
-                        sub_list += str(True) if res else str(False)
+                    # add the current character of the search string to sub
+                    sub += letter
 
-                # set sub to an empty string again
-                sub = ''
+            # evaluate the sub_list with parse_search_parameters if it does not
+            # equal True or False
+            if sub_list != 'True' and sub_list != 'False':
+                sub_list = str(parse_search_parameters(metafile, sub_list))
 
-            else:
-
-                # add the current character of the search string to sub
-                sub += letter
-
-        # evaluate the sub_list with parse_search_parameters if it does not
-        # equal True or False
-        if sub_list != 'True' and sub_list != 'False':
-            sub_list = str(parse_search_parameters(metafile, sub_list))
-
-        # add a dictionary containing information about the metadata file to
-        # result if it matches the search
-        # key: project id
-        # value: whole metafile or path to metafile depending on whether
-        # result_dict is set to True or False
-        if sub_list == 'True':
-            result.append(
-                {metafile['project']['id']: metafile['path']
-                    if return_dict == False else metafile})
+            # add a dictionary containing information about the metadata file
+            # to result if it matches the search
+            # key: project id
+            # value: whole metafile or path to metafile depending on whether
+            # result_dict is set to True or False
+            if sub_list == 'True':
+                result.append(
+                    {metafile['project']['id']: metafile['path']
+                        if return_dict == False else metafile})
 
     # return the list of matching metadata files
     return result
