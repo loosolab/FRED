@@ -241,13 +241,13 @@ experimental_setting:
           whitelist: False
           input_type: short_text
         biological_replicates:
-          mandatory: True
+          mandatory: False
           list: False
           display_name: 'Biological Replicates'
           desc: 'A biological replicate is a biological distinct sample.'
           value:
             count:
-              mandatory: True
+              mandatory: False
               list: False
               display_name: 'Count'
               desc: ''
@@ -255,7 +255,7 @@ experimental_setting:
               whitelist: False
               input_type: number
             samples:
-              mandatory: True
+              mandatory: False
               list: True
               display_name: 'Samples'
               desc: ''
