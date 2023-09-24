@@ -1658,7 +1658,7 @@ def get_combinations(values, key, result_dict, key_yaml, size=80):
         used_values = parse_input_list(merge_values, False)
     else:
         used_values = values
-    return used_values
+    return list(set(used_values))
 
 
 def get_combis(values, key, multi, result_dict, keys_yaml):
