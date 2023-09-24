@@ -610,6 +610,8 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                             # save the value and unit in the sample
                             sample[i]['value'] = value_unit['value']
                             sample[i]['value_unit'] = value_unit['unit']
+                            if is_factor:
+                                sample[i]['input_disables'] = True
 
                         # value is a dictionary
                         elif isinstance(c[1], dict):
@@ -689,7 +691,8 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                             # save the filled value in 'value'
                             else:
                                 sample[i]['value'] = filled_value
-
+                            if is_factor:
+                                sample[i]['input_disabled'] = True
                         # value is not a dictionary
                         else:
 
