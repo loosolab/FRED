@@ -1037,7 +1037,7 @@ def get_condition_combinations(factors):
                             f'{factors[i]["factor"]}:"{value}"-{c}')
 
     # return a list of all combinations
-    return combinations
+    return list(set(combinations))
 
 
 # ---------------------------------SUMMARY--------------------------------------
@@ -1658,7 +1658,7 @@ def get_combinations(values, key, result_dict, key_yaml, size=80):
         used_values = parse_input_list(merge_values, False)
     else:
         used_values = values
-    return list(set(used_values))
+    return used_values
 
 
 def get_combis(values, key, multi, result_dict, keys_yaml):
