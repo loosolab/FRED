@@ -25,7 +25,7 @@ project:
       whitelist: False
       input_type: short_text
     reference_genome:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Reference Genome'
       desc: '<font color="red">test description</font>'
@@ -41,7 +41,7 @@ project:
       whitelist: False
       input_type: date
     gender:
-      mandatory: False
+      mandatory: True
       list: False
       display_name: 'Single Select'
       desc: '<font color="red">test description</font>'
@@ -49,7 +49,7 @@ project:
       whitelist: True
       input_type: select
     genetic_background:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Single Select'
       desc: '<font color="red">test description</font>'
@@ -57,7 +57,7 @@ project:
       whitelist: True
       input_type: select
     tissue:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Multi Autofill'
       desc: '<font color="red">test description</font>'
@@ -65,7 +65,7 @@ project:
       whitelist: True
       input_type: select
     cell_type:
-      mandatory: False
+      mandatory: True
       list: False
       display_name: 'Single Autofill'
       desc: '<font color="red">test description</font>'
@@ -73,7 +73,7 @@ project:
       whitelist: True
       input_type: select
     test_number:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Number Input'
       desc: '<font color="red">test description</font>'
@@ -81,7 +81,7 @@ project:
       whitelist: False
       input_type: number
     test_value_unit:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Value unit'
       desc: '<font color="red">test description</font>'
@@ -121,7 +121,7 @@ project:
       whitelist: False
       input_type: long_text
     further_description:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Further Description / Additional Info'
       desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
@@ -129,7 +129,7 @@ project:
       whitelist: False
       input_type: short_text
     graphical_abstract:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Graphical Abstract'
       desc: 'Here you can insert links to files containing a graphical abstract.'
@@ -159,7 +159,7 @@ project:
           whitelist: False
           input_type: short_text
         reference_genome:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Reference Genome'
           desc: '<font color="red">test description</font>'
@@ -187,7 +187,7 @@ project:
           whitelist: False
           input_type: long_text
         gender:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Single Select'
           desc: '<font color="red">test description</font>'
@@ -195,7 +195,7 @@ project:
           whitelist: True
           input_type: select
         genetic_background:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Single Select'
           desc: '<font color="red">test description</font>'
@@ -203,7 +203,7 @@ project:
           whitelist: True
           input_type: select
         tissue:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Multi Autofill'
           desc: '<font color="red">test description</font>'
@@ -211,7 +211,7 @@ project:
           whitelist: True
           input_type: select
         cell_type:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Single Autofill'
           desc: '<font color="red">test description</font>'
@@ -219,7 +219,7 @@ project:
           whitelist: True
           input_type: select
         test_number:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Number Input'
           desc: '<font color="red">test description</font>'
@@ -227,7 +227,7 @@ project:
           whitelist: False
           input_type: number
         test_value_unit:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Value unit'
           desc: '<font color="red">test description</font>'
@@ -283,7 +283,7 @@ project:
           whitelist: False
           input_type: short_text
         address:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Address'
           desc: '<font color="red">test description</font>'
@@ -291,7 +291,7 @@ project:
           whitelist: False
           input_type: short_text
         telephone:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Telephone'
           desc: '<font color="red">test description</font>'
@@ -299,7 +299,7 @@ project:
           whitelist: False
           input_type: short_text
     nerd:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Nerd'
       desc: 'A nerd is a person assigned to the project to perform analysis.'
@@ -337,7 +337,7 @@ project:
           whitelist: False
           input_type: short_text
         address:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Address'
           desc: '<font color="red">test description</font>'
@@ -345,7 +345,7 @@ project:
           whitelist: False
           input_type: short_text
         telephone:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Telephone'
           desc: '<font color="red">test description</font>'
@@ -361,7 +361,7 @@ experimental_setting:
   desc: 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for different organisms.'
   value:
     reference_genome:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Reference Genome'
       desc: '<font color="red">test description</font>'
@@ -389,7 +389,7 @@ experimental_setting:
       whitelist: False
       input_type: long_text
     gender:
-      mandatory: False
+      mandatory: True
       list: False
       display_name: 'Single Select'
       desc: '<font color="red">test description</font>'
@@ -397,7 +397,7 @@ experimental_setting:
       whitelist: True
       input_type: select
     genetic_background:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Single Select'
       desc: '<font color="red">test description</font>'
@@ -405,7 +405,7 @@ experimental_setting:
       whitelist: True
       input_type: select
     tissue:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Multi Autofill'
       desc: '<font color="red">test description</font>'
@@ -413,7 +413,7 @@ experimental_setting:
       whitelist: True
       input_type: select
     cell_type:
-      mandatory: False
+      mandatory: True
       list: False
       display_name: 'Single Autofill'
       desc: '<font color="red">test description</font>'
@@ -421,7 +421,7 @@ experimental_setting:
       whitelist: True
       input_type: select
     test_number:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Number Input'
       desc: '<font color="red">test description</font>'
@@ -429,7 +429,7 @@ experimental_setting:
       whitelist: False
       input_type: number
     test_value_unit:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Value unit'
       desc: '<font color="red">test description</font>'
@@ -469,13 +469,13 @@ experimental_setting:
       whitelist: False
       input_type: short_text
     sub_fields:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Test sub'
       desc: '<font color="red">test description</font>'
       value:
         reference_genome:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Reference Genome'
           desc: '<font color="red">test description</font>'
@@ -511,7 +511,7 @@ experimental_setting:
           whitelist: False
           input_type: long_text
         gender:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Single Select'
           desc: '<font color="red">test description</font>'
@@ -519,7 +519,7 @@ experimental_setting:
           whitelist: True
           input_type: select
         genetic_background:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Single Select'
           desc: '<font color="red">test description</font>'
@@ -527,7 +527,7 @@ experimental_setting:
           whitelist: True
           input_type: select
         tissue:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Multi Autofill'
           desc: '<font color="red">test description</font>'
@@ -535,7 +535,7 @@ experimental_setting:
           whitelist: True
           input_type: select
         cell_type:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Single Autofill'
           desc: '<font color="red">test description</font>'
@@ -543,7 +543,7 @@ experimental_setting:
           whitelist: True
           input_type: select
         test_number:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Number Input'
           desc: '<font color="red">test description</font>'
@@ -551,7 +551,7 @@ experimental_setting:
           whitelist: False
           input_type: number
         test_value_unit:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Value unit'
           desc: '<font color="red">test description</font>'
@@ -667,13 +667,13 @@ experimental_setting:
           whitelist: False
           input_type: short_text
         biological_replicates:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Biological Replicates'
           desc: 'A biological replicate is a biological distinct sample.'
           value:
             count:
-              mandatory: False
+              mandatory: True
               list: False
               display_name: 'Count'
               desc: '<font color="red">test description</font>'
@@ -681,7 +681,7 @@ experimental_setting:
               whitelist: False
               input_type: number
             samples:
-              mandatory: False
+              mandatory: True
               list: True
               display_name: 'Samples'
               desc: '<font color="red">test description</font>'
@@ -695,7 +695,7 @@ experimental_setting:
                   whitelist: False
                   input_type: long_text
                 reference_genome:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Reference Genome'
                   desc: '<font color="red">test description</font>'
@@ -747,7 +747,7 @@ experimental_setting:
                   whitelist: False
                   input_type: bool
                 number_of_measurements:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Number of Measurements'
                   desc: '<font color="red">test description</font>'
@@ -755,7 +755,7 @@ experimental_setting:
                   whitelist: False
                   input_type: number
                 genetic_background:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Genetic background'
                   desc: '<font color="red">test description</font>'
@@ -763,7 +763,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 gender:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Gender'
                   desc: '<font color="red">test description</font>'
@@ -771,7 +771,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 life_stage:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Life stage'
                   desc: '<font color="red">test description</font>'
@@ -779,7 +779,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 age:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Age'
                   desc: '<font color="red">test description</font>'
@@ -803,7 +803,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                 ethnicity:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Ethnicity'
                   desc: '<font color="red">test description</font>'
@@ -811,7 +811,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 tissue:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Tissue'
                   desc: '<font color="red">test description</font>'
@@ -819,7 +819,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 cell_type:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Cell type'
                   desc: '<font color="red">test description</font>'
@@ -827,7 +827,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 cell_line:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Cell line'
                   desc: '<font color="red">test description</font>'
@@ -835,7 +835,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 cellular_compartment:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Cellular Component'
                   desc: '<font color="red">test description</font>'
@@ -843,7 +843,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 disease:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Disease'
                   desc: '<font color="red">test description</font>'
@@ -853,7 +853,7 @@ experimental_setting:
                       disease_status: 'healthy'
                   value:
                     disease_type:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Type'
                       desc: '<font color="red">test description</font>'
@@ -869,7 +869,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                     disease_stage:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Stage'
                       desc: '<font color="red">test description</font>'
@@ -877,7 +877,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                 injury:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Injury'
                   desc: '<font color="red">test description</font>'
@@ -895,7 +895,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                     injury_type:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Type'
                       desc: '<font color="red">test description</font>'
@@ -903,13 +903,25 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                 sub_factor:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Sub factor'
                   desc: '<font color="red">test description</font>'
                   value:
+                    restrict:
+                      mandatory: True
+                      list: True
+                      display_name: 'ID'
+                      desc: '<font color="red">test description</font>'
+                      special_case:
+                        restriction:
+                          regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
+                          max_length: 7
+                      value: null
+                      whitelist: False
+                      input_type: restricted_short_text
                     reference_genome:
-                      mandatory: False
+                      mandatory: True
                       list: True
                       display_name: 'Reference Genome'
                       desc: '<font color="red">test description</font>'
@@ -917,7 +929,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                     genetic_background:
-                      mandatory: False
+                      mandatory: True
                       list: True
                       display_name: 'Genetic background'
                       desc: '<font color="red">test description</font>'
@@ -933,7 +945,7 @@ experimental_setting:
                       whitelist: False
                       input_type: bool
                     tissue:
-                      mandatory: False
+                      mandatory: True
                       list: True
                       display_name: 'Multi Autofill'
                       desc: '<font color="red">test description</font>'
@@ -941,7 +953,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                     cell_type:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Single Autofill'
                       desc: '<font color="red">test description</font>'
@@ -949,7 +961,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                 sub_not_factor:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Sub not factor'
                   desc: '<font color="red">test description</font>'
@@ -979,7 +991,7 @@ experimental_setting:
                       whitelist: False
                       input_type: short_text
                     test_number:
-                      mandatory: False
+                      mandatory: True
                       list: True
                       display_name: 'Number Input'
                       desc: '<font color="red">test description</font>'
@@ -987,7 +999,7 @@ experimental_setting:
                       whitelist: False
                       input_type: number
                 medical_treatment:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Treatment'
                   desc: '<font color="red">test description</font>'
@@ -997,7 +1009,7 @@ experimental_setting:
                       treatment_status: 'not treated'
                   value:
                     treatment_type:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Type'
                       desc: '<font color="red">test description</font>'
@@ -1013,7 +1025,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                     treatment_duration:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Duration'
                       desc: '<font color="red">test description</font>'
@@ -1029,7 +1041,7 @@ experimental_setting:
                           whitelist: False
                           input_type: number
                         unit:
-                          mandatory: False
+                          mandatory: True
                           list: False
                           display_name: 'Unit'
                           desc: '<font color="red">test description</font>'
@@ -1037,7 +1049,7 @@ experimental_setting:
                           whitelist: True
                           input_type: select
                 time_point:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Time Point'
                   desc: '<font color="red">test description</font>'
@@ -1045,7 +1057,7 @@ experimental_setting:
                     value_unit: time
                   value:
                     value:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Value'
                       desc: '<font color="red">test description</font>'
@@ -1053,7 +1065,7 @@ experimental_setting:
                       whitelist: False
                       input_type: number
                     unit:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Unit'
                       desc: '<font color="red">test description</font>'
@@ -1061,7 +1073,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                 body_mass_index:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Body-Mass-Index'
                   desc: '<font color="red">test description</font>'
@@ -1069,7 +1081,7 @@ experimental_setting:
                     value_unit: bmi
                   value:
                     value:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Value'
                       desc: '<font color="red">test description</font>'
@@ -1077,7 +1089,7 @@ experimental_setting:
                       whitelist: False
                       input_type: number
                     unit:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Unit'
                       desc: '<font color="red">test description</font>'
@@ -1085,7 +1097,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                 physical_treatment:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Flow'
                   desc: '<font color="red">test description</font>'
@@ -1093,7 +1105,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 gene_editing:
-                  mandatory: False
+                  mandatory: True
                   list: True
                   display_name: 'Gene editing'
                   desc: '<font color="red">test description</font>'
@@ -1110,7 +1122,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                     editing_method:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Method'
                       desc: '<font color="red">test description</font>'
@@ -1118,7 +1130,7 @@ experimental_setting:
                       whitelist: True
                       input_type: select
                     gene:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Gene'
                       desc: '<font color="red">test description</font>'
@@ -1142,7 +1154,7 @@ experimental_setting:
                           whitelist: True
                           input_type: select
                     modification:
-                      mandatory: False
+                      mandatory: True
                       list: False
                       display_name: 'Modification'
                       desc: 'Enter a short free text for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
@@ -1155,7 +1167,7 @@ experimental_setting:
                       whitelist: False
                       input_type: restricted_short_text
                 enrichment:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: 'Enrichment / Histone-Mark / Pull-Down'
                   desc: 'Enrichment for bound protein/histone mark as a result of an antibody pulldown or similar procedure (e.g. ChIPSeq, Cut&Tag, RiboTag)'
@@ -1234,7 +1246,7 @@ technical_details:
           whitelist: True
           input_type: select
     analysis_runs:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Analysis Runs'
       desc: '<font color="red">test description</font>'
@@ -1248,7 +1260,7 @@ technical_details:
           whitelist: False
           input_type: date
         reference_genome:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Reference Genome'
           desc: '<font color="red">test description</font>'
@@ -1256,7 +1268,7 @@ technical_details:
           whitelist: True
           input_type: select
         gender:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Single Select'
           desc: '<font color="red">test description</font>'
@@ -1264,7 +1276,7 @@ technical_details:
           whitelist: True
           input_type: select
         parameters:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Parameters'
           desc: 'Here you can insert links to files that contain the parameters used for the run.'
@@ -1272,7 +1284,7 @@ technical_details:
           whitelist: False
           input_type: short_text
         genetic_background:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Single Select'
           desc: '<font color="red">test description</font>'
@@ -1280,7 +1292,7 @@ technical_details:
           whitelist: True
           input_type: select
         tissue:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Multi Autofill'
           desc: '<font color="red">test description</font>'
@@ -1288,7 +1300,7 @@ technical_details:
           whitelist: True
           input_type: select
         cell_type:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Single Autofill'
           desc: '<font color="red">test description</font>'
@@ -1296,7 +1308,7 @@ technical_details:
           whitelist: True
           input_type: select
         test_number:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Number Input'
           desc: '<font color="red">test description</font>'
@@ -1304,7 +1316,7 @@ technical_details:
           whitelist: False
           input_type: number
         test_value_unit:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Value unit'
           desc: '<font color="red">test description</font>'
@@ -1356,7 +1368,7 @@ technical_details:
           whitelist: False
           input_type: restricted_short_text
         output:
-          mandatory: False
+          mandatory: True
           list: True
           display_name: 'Output'
           desc: 'Here you can insert links to the output files of the run.'
@@ -1364,7 +1376,7 @@ technical_details:
           whitelist: False
           input_type: short_text
     sample_preparation:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Sample preparation'
       desc: 'Here you can insert links to files or URLs that contain information regarding the sample preparation.'
@@ -1372,7 +1384,7 @@ technical_details:
       whitelist: False
       input_type: short_text
     further_description:
-      mandatory: False
+      mandatory: True
       list: False
       display_name: 'Further description'
       desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
@@ -1388,7 +1400,7 @@ technical_details:
       whitelist: False
       input_type: date
     reference_genome:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Reference Genome'
       desc: '<font color="red">test description</font>'
@@ -1396,7 +1408,7 @@ technical_details:
       whitelist: True
       input_type: select
     gender:
-      mandatory: False
+      mandatory: True
       list: False
       display_name: 'Single Select'
       desc: '<font color="red">test description</font>'
@@ -1404,7 +1416,7 @@ technical_details:
       whitelist: True
       input_type: select
     genetic_background:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Single Select'
       desc: '<font color="red">test description</font>'
@@ -1412,7 +1424,7 @@ technical_details:
       whitelist: True
       input_type: select
     tissue:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Multi Autofill'
       desc: '<font color="red">test description</font>'
@@ -1420,7 +1432,7 @@ technical_details:
       whitelist: True
       input_type: select
     cell_type:
-      mandatory: False
+      mandatory: True
       list: False
       display_name: 'Single Autofill'
       desc: '<font color="red">test description</font>'
@@ -1428,7 +1440,7 @@ technical_details:
       whitelist: True
       input_type: select
     test_number:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Number Input'
       desc: '<font color="red">test description</font>'
@@ -1436,7 +1448,7 @@ technical_details:
       whitelist: False
       input_type: number
     test_value_unit:
-      mandatory: False
+      mandatory: True
       list: True
       display_name: 'Value unit'
       desc: '<font color="red">test description</font>'
