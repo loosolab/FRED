@@ -148,7 +148,7 @@ def parse_whitelist(key_name, node, filled_object):
 
         # set whitelist to True and False, input type to select and whitelist
         # type to plain
-        whitelist = [True, False]
+        whitelist = ['True', 'False']
         whitelist_type = 'plain'
         input_type = 'select'
 
