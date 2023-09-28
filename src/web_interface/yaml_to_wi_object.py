@@ -192,6 +192,13 @@ def parse_empty(node, pos, key_yaml, filled_object,
                        'input_type': input_type,
                        'input_disabled': input_disabled}
 
+        if part_object['input_type'] == 'bool' and part_object['value'] is not \
+                None:
+            if part_object['value']:
+                part_object['value'] = 'True'
+            else:
+                part_object['value'] = 'False'
+
         # add headers and whitelist keys to the empty object if they are
         # defined
         if headers is not None:

@@ -178,6 +178,8 @@ experimental_setting:
       display_name: 'Setting ID'
       desc: 'The Setting ID is automatically assigned to uniquely identify an experimental setting.'
       value: exp
+      special_case:
+        generated: now
       whitelist: False
       input_type: short_text
     organism:
@@ -465,6 +467,29 @@ experimental_setting:
                       desc: ''
                       special_case:
                         value_unit: time
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: 'Value'
+                          desc: ''
+                          value: null
+                          whitelist: False
+                          input_type: number
+                        unit:
+                          mandatory: False
+                          list: False
+                          display_name: 'Unit'
+                          desc: ''
+                          value: null
+                          whitelist: True
+                          input_type: select
+                    treatment_amount:
+                      mandatory: False
+                      list: False
+                      display_name: 'Amount'
+                      special_case:
+                        value_unit: volume
                       value:
                         value:
                           mandatory: True
