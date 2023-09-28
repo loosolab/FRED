@@ -488,6 +488,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Amount'
+                      desc: ''
                       special_case:
                         value_unit: volume
                       value:
