@@ -321,7 +321,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                                 key_yaml,
                                 wi_object['position'].split(':')[-1]))
                             if len(info) > 0 and 'input_type' in info[0] and \
-                                    info['input_type'] == 'bool':
+                                    info[0]['input_type'] == 'bool':
                                 if convert_value == 'True':
                                     val = True
                                 else:
