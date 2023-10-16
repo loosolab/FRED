@@ -1,10 +1,11 @@
 import src.validate_yaml as validate_yaml
 import src.web_interface.wi_utils as wi_utils
+import src.web_interface.wi_object_to_yaml as oty
 
 # TODO: rewrite and documentation
 
 
-def validate_object(wi_object):
+def validate_object(wi_object, key_yaml, finish):
     """
     This function performs a validation over the wi object
     :param wi_object: the filled wi object
@@ -26,13 +27,19 @@ def validate_object(wi_object):
                 settings.append(elem['value'])
     warnings = {}
     errors = {}
-    print(settings)
+
     for part in ['project', 'experimental_setting', 'technical_details']:
 
         part, wi_object[part], pooled, organisms, warnings[part], \
                 errors[part] = validate_part(part, wi_object[part], [], pooled,
                                              organisms, settings, [])
 
+    if finish:
+        parsed = oty.parse_object(wi_object, key_yaml)
+        valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
+        invalid_value, logical_warn = validate_yaml.validate_file(parsed, 'metadata', logical_validation=False)
+        for elem in missing_mandatory_keys:
+            errors[elem.split(':')[0]].append(f'{elem}: Missing mandatory input')
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings}
     return validation_object

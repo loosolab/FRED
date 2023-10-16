@@ -53,9 +53,9 @@ def get_conditions(factors, organism_name):
     return fac_cond.get_conditions(factors, organism_name, key_yaml)
 
 
-def validate_object(wi_object):
+def validate_object(wi_object, key_yaml, finish=False):
     new_object = copy.deepcopy(wi_object)
-    return validation.validate_object(new_object)
+    return validation.validate_object(new_object, key_yaml, finish)
 
 
 def get_summary(wi_object):
