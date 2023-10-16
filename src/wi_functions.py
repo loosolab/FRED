@@ -53,7 +53,9 @@ def get_conditions(factors, organism_name):
     return fac_cond.get_conditions(factors, organism_name, key_yaml)
 
 
-def validate_object(wi_object, key_yaml, finish=False):
+def validate_object(wi_object, finish=False):
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), '..', 'keys.yaml'))
     new_object = copy.deepcopy(wi_object)
     return validation.validate_object(new_object, key_yaml, finish)
 
