@@ -10,6 +10,7 @@ project:
       display_name: 'ID'
       desc: 'Enter the ID of your project, consisting of three lowercase letters followed by a number.'
       special_case:
+        generated: now
         restriction:
           regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
           max_length: 7
@@ -177,7 +178,7 @@ experimental_setting:
       list: False
       display_name: 'Setting ID'
       desc: 'The Setting ID is automatically assigned to uniquely identify an experimental setting.'
-      value: exp
+      value: exp1
       special_case:
         generated: now
       whitelist: False
@@ -211,6 +212,8 @@ experimental_setting:
       list: True
       display_name: 'Experimental Factors'
       desc: 'This part contains the factors that were investigated in the experiment.'
+      special_case:
+        generated: now
       value:
         factor:
           mandatory: True
@@ -233,6 +236,8 @@ experimental_setting:
       list: True
       display_name: 'Final Conditions'
       desc: 'In this section you have to select your investigated conditions, which were build based on your entered experimental factors.'
+      special_case:
+        generated: now
       value:
         condition_name:
           mandatory: True
@@ -243,13 +248,13 @@ experimental_setting:
           whitelist: False
           input_type: short_text
         biological_replicates:
-          mandatory: False
+          mandatory: True
           list: False
           display_name: 'Biological Replicates'
           desc: 'A biological replicate is a biological distinct sample.'
           value:
             count:
-              mandatory: False
+              mandatory: True
               list: False
               display_name: 'Count'
               desc: ''
@@ -257,7 +262,7 @@ experimental_setting:
               whitelist: False
               input_type: number
             samples:
-              mandatory: False
+              mandatory: True
               list: True
               display_name: 'Samples'
               desc: ''
