@@ -295,7 +295,8 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Genetic background'
-                  desc: 'Here a mutation can be specified if no further details about the type of mutation are known (e.g. WT, Mut). If the mutation is known in more detail, it is recommended to specify it via gene editing.'
+                  desc: 'Enter mutation (e.g. Mut, WT)'
+                  factor_desc: 'Here a mutation can be specified if no further details about the type of mutation are known (e.g. WT, Mut). If the mutation is known in more detail, it is recommended to specify it via gene editing.'
                   value: null
                   whitelist: True
                   input_type: select
@@ -573,7 +574,8 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Gene editing'
-                  desc: 'Here, mutations can be stored in higher detail, since additional information, such as the type of mutation or genes, can also be specified.'
+                  desc: 'Enter mutations in higher detail (e.g. WT, knockdown of gene DFFA)'
+                  factor_desc: 'Here, mutations can be stored in higher detail, since additional information, such as the type of mutation or genes, can also be specified.'
                   special_case:
                       control:
                         editing_type: 'WT'
