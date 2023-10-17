@@ -2,13 +2,13 @@ project:
   mandatory: True
   list:  False
   display_name: 'Project'
-  desc: 'Here you need to enter a detailed description of the project. This field can be used for all data that does not fit into existing fields, including further information on the exact mutant/knockout/knockdown exon/position, etc.'
+  desc: 'This section collects general information about the project and the people responsible for it.'
   value:
     id:
       mandatory: True
       list: False
       display_name: 'ID'
-      desc: 'Enter the ID of your project, consisting of three lowercase letters followed by a number.'
+      desc: 'Enter the ID of your project, consisting of three lowercase letters followed by a number. (e.g. dst123, dof54, ...)'
       special_case:
         generated: now
         restriction:
@@ -37,7 +37,7 @@ project:
       mandatory: True
       list: False
       display_name: 'Description'
-      desc: 'Here you need to enter a detailed description of the project.'
+      desc: 'Here you need to enter a detailed description of the project. This field can be used for all data that does not fit into existing fields, including further information on the exact exon/position, etc.'
       value: null
       whitelist: False
       input_type: long_text
@@ -145,7 +145,7 @@ project:
           mandatory: True
           list: False
           display_name: 'E-Mail'
-          desc: "Enter the Nerds email address here. For public projects enter '---'."
+          desc: "Enter the Nerds email address here."
           value: null
           whitelist: False
           input_type: short_text
@@ -171,7 +171,7 @@ experimental_setting:
   mandatory: True
   list: True
   display_name: 'Experimental setting'
-  desc: 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for different organisms.'
+  desc: 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for multiple sample submissions.'
   value:
     setting_id:
       mandatory: True
@@ -211,7 +211,7 @@ experimental_setting:
       mandatory: True
       list: True
       display_name: 'Experimental Factors'
-      desc: 'This part contains the factors that were investigated in the experiment.'
+      desc: 'Define here your investigated factors (e.g. WT/KO, 3h/6h), which can be combined later to conditions (WT-3h, WT-6h, ...). Enter only those information as factors, which you use to compare your samples with each other.'
       special_case:
         generated: now
       value:
@@ -234,8 +234,8 @@ experimental_setting:
     conditions:
       mandatory: True
       list: True
-      display_name: 'Final Conditions'
-      desc: 'In this section you have to select your investigated conditions, which were build based on your entered experimental factors.'
+      display_name: 'Samples'
+      desc: 'This section shows all the conditions generated from the factors. Select the ones you are actually investigating, i.e. for which you have samples.'
       special_case:
         generated: now
       value:
@@ -251,7 +251,7 @@ experimental_setting:
           mandatory: True
           list: False
           display_name: 'Biological Replicates'
-          desc: 'A biological replicate is a biological distinct sample.'
+          desc: 'A biological replicate is a sample extracted from a specific organism that corresponds to the condition.'
           value:
             count:
               mandatory: True
@@ -295,7 +295,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Genetic background'
-                  desc: ''
+                  desc: 'Here a mutation can be specified if no further details about the type of mutation are known (e.g. WT, Mut). If the mutation is known in more detail, it is recommended to specify it via gene editing.'
                   value: null
                   whitelist: True
                   input_type: select
@@ -517,7 +517,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Time Point'
-                  desc: ''
+                  desc: 'Here, time points can be specified that cannot be represented via other fields of the metadata, such as sample collections after 12h and 24h.'
                   special_case:
                     value_unit: time
                   value:
@@ -564,7 +564,7 @@ experimental_setting:
                 physical_treatment:
                   mandatory: False
                   list: False
-                  display_name: 'Flow'
+                  display_name: 'Physical Treatment'
                   desc: ''
                   value: null
                   whitelist: True
@@ -573,7 +573,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Gene editing'
-                  desc: ''
+                  desc: 'Here, mutations can be stored in higher detail, since additional information, such as the type of mutation or genes, can also be specified.'
                   special_case:
                       control:
                         editing_type: 'WT'
@@ -582,7 +582,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Type'
-                      desc: ''
+                      desc: 'The type of mutation (e.g. WT, knockdown, ...).'
                       value: null
                       whitelist: True
                       input_type: select
@@ -590,7 +590,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Method'
-                      desc: ''
+                      desc: 'The method by which the mutation was created (e.g. CRISPR-Cas9).'
                       value: null
                       whitelist: True
                       input_type: select
@@ -598,7 +598,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Gene'
-                      desc: ''
+                      desc: 'The mutant gene consisting of gene name and Ensembl ID.'
                       special_case:
                         merge: gene_name
                       value:
@@ -622,7 +622,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Modification'
-                      desc: 'Enter a short free text for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
+                      desc: 'Enter a short free text (max. 6 characters) for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
                       special_case:
                         restriction:
                           regex: '[^a-zA-Z0-9]'
@@ -643,7 +643,7 @@ experimental_setting:
                   mandatory: True
                   list: False
                   display_name: 'Donor Count'
-                  desc: ''
+                  desc: 'The donor count indicates how many specimens of an organism were pooled together in a sample.'
                   value: 1
                   whitelist: False
                   input_type: number
@@ -651,7 +651,7 @@ experimental_setting:
                   mandatory: True
                   list: False
                   display_name: 'Technical Replicates'
-                  desc: 'Technical replicates are generated by performing a test on a biological replicate multiple times.'
+                  desc: 'A technical replicate is the result of the measurement of one biological replicate (e.g. if one biological replicate is sequenced twice then there are two technical replicates).'
                   value:
                     count:
                       mandatory: True
