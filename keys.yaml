@@ -235,7 +235,7 @@ experimental_setting:
       mandatory: True
       list: True
       display_name: 'Samples'
-      desc: 'This section shows all the conditions generated from the factors. Select the ones you are actually investigating, i.e. for which you have samples.'
+      desc: 'This section shows all your selected conditions for which you have to enter samples.'
       special_case:
         generated: now
       value:
