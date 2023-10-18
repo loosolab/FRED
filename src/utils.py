@@ -436,8 +436,7 @@ def print_desc(desc, format='plain'):
             if isinstance(elem, str):
                 new_desc += elem
             else:
-                new_desc += tabulate(elem, tablefmt=format)
-                new_desc += '\n'
+                new_desc += tabulate(elem, tablefmt=format).replace('>\n<', '><')
     else:
         new_desc = desc
     return new_desc
