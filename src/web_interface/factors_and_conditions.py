@@ -16,13 +16,14 @@ def get_factors(organism, key_yaml):
     :return: factor_value: a dictionary containing factors and whitelists
     """
 
+    factor_desc = list(utils.find_keys(key_yaml, 'experimental_factors'))[0]['factor_desc']
     f_node = list(utils.find_keys(key_yaml, 'factor'))[0]
     # initialize dictionary with all factors
     factor_list, whitelist_type, input_type, headers, whitelist_keys, double = \
         whitelist_parsing.parse_whitelist(
             'factor', f_node, {'organism': organism})
 
-    factor_value = {'factor': factor_list}
+    factor_value = {'factor': factor_list, 'desc': factor_desc}
     plain_factors = []
 
     for elem in factor_list:
