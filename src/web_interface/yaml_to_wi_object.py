@@ -152,7 +152,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
             # information for one expandable with its input fields
             part_object = {'position': pos, 'mandatory': node['mandatory'],
                            'list': node['list'], 'title': node['display_name'],
-                           'desc': utils.parse_desc(node['desc'], 'html').replace('\n','<br>'), 'input_fields': input_fields,
+                           'desc': utils.print_desc(node['desc'], 'html').replace('\n','<br>'), 'input_fields': input_fields,
                            'input_disabled': input_disabled}
 
             if 'special_case' in node:
@@ -188,7 +188,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
         part_object = {'position': pos, 'mandatory': node['mandatory'],
                        'list': node['list'],
                        'displayName': node['display_name'],
-                       'desc': utils.parse_desc(node['desc'], 'html').replace('\n','<br>'), 'value': node['value'],
+                       'desc': utils.print_desc(node['desc'], 'html').replace('\n','<br>'), 'value': node['value'],
                        'whitelist': whitelist,
                        'whitelist_type': whitelist_type,
                        'input_type': input_type,

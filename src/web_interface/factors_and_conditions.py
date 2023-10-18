@@ -54,7 +54,7 @@ def get_factors(organism, key_yaml):
                               'input_type': input_type,
                               'whitelist_type': whitelist_type,
                               'displayName': node[0]['display_name'],
-                              'desc': utils.parse_desc(node[0]['factor_desc'] if 'factor_desc' in node[0] else node[0]['desc'], 'html').replace('\n','<br>')}
+                              'desc': utils.print_desc(node[0]['factor_desc'] if 'factor_desc' in node[0] else node[0]['desc'], 'html').replace('\n','<br>')}
 
             # add search_info if input is of type single- or multi-autofill
             if input_type == 'multi_autofill':
