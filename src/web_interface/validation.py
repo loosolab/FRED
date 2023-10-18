@@ -37,7 +37,7 @@ def validate_object(wi_object, key_yaml, finish):
     if finish:
         parsed = oty.parse_object(wi_object, key_yaml)
         valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
-        invalid_value, logical_warn = validate_yaml.validate_file(parsed, 'metadata', logical_validation=False)
+        invalid_value, logical_warn = validate_yaml.validate_file(parsed, 'metadata', logical_validation=False, generated=False)
         for elem in missing_mandatory_keys:
             errors[elem.split(':')[0]].append(f'{elem}: Missing mandatory input')
     validation_object = {'object': wi_object, 'errors': errors,

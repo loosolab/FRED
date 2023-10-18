@@ -11,7 +11,7 @@ generated = ['condition_name', 'sample_name']
 factor = None
 
 
-def validate_file(metafile, mode, logical_validation=True, yaml=None, whitelist_path=None):
+def validate_file(metafile, mode, logical_validation=True, yaml=None, generated=True, whitelist_path=None):
     """
     In this function all functions for the validation of a metadata file are
     called. The validation is based on the data in the file 'keys.yaml'. It is
@@ -38,7 +38,7 @@ def validate_file(metafile, mode, logical_validation=True, yaml=None, whitelist_
         new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
                                                 [x.split(':')[-1] for x in
-                                                 invalid_keys])
+                                                 invalid_keys], generated)
     if len(missing_mandatory_keys) > 0 or len(invalid_keys) > 0 or len(
             invalid_entries) > 0 or len(invalid_value) > 0:
         valid = False
@@ -299,7 +299,7 @@ def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None
     return False
 
 
-def test_for_mandatory(metafile, key_yaml, invalid_keys):
+def test_for_mandatory(metafile, key_yaml, invalid_keys, generated):
     """
     This function calls a function to get the missing mandatory keys for every 
     part of the metadata object.
@@ -311,11 +311,11 @@ def test_for_mandatory(metafile, key_yaml, invalid_keys):
     missing_keys = []
     for key in key_yaml:
         missing_keys += get_missing_keys(key_yaml[key], metafile,
-                                         invalid_keys, key, [], len(metafile[key]) if key in metafile and key_yaml[key]['list'] else 1)
+                                         invalid_keys, key, [], len(metafile[key]) if key in metafile and key_yaml[key]['list'] else 1, generated)
     return missing_keys
 
 
-def get_missing_keys(node, metafile, invalid_keys, pre, missing, list_len):
+def get_missing_keys(node, metafile, invalid_keys, pre, missing, list_len, generated):
     """
     This function tests if all mandatory keys from the structure file
     'keys.yaml' are present in the metadata file.
@@ -329,7 +329,7 @@ def get_missing_keys(node, metafile, invalid_keys, pre, missing, list_len):
     metafile = find_key(metafile, pre)
 
     if len(metafile) == 0:
-        if node['mandatory']:
+        if node['mandatory'] and (('special_case' in node and generated in node['special_case'] and generated) or not ('special_case' in node and generated in node['special_case'])):
             missing.append(pre)
     else:
          if pre.split(':')[-1] not in invalid_keys:
@@ -342,7 +342,7 @@ def get_missing_keys(node, metafile, invalid_keys, pre, missing, list_len):
                         for key in node['value']:
                             missing = get_missing_keys(node['value'][key], elem,
                                            invalid_keys, pre + ':' + key,
-                                           missing, len(metafile[0]) if node['list'] else 1)
+                                           missing, len(metafile[0]) if node['list'] else 1, generated)
                 else:
                     for key in node['value']:
                         missing = get_missing_keys(node['value'][key], metafile[0],
@@ -350,7 +350,7 @@ def get_missing_keys(node, metafile, invalid_keys, pre, missing, list_len):
                                                    pre + ':' + key,
                                                    missing,
                                                    len(metafile[0]) if node[
-                                                       'list'] else 1)
+                                                       'list'] else 1, generated)
     return list(set(missing))
 
 
