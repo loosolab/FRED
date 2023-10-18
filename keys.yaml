@@ -690,13 +690,13 @@ technical_details:
       mandatory: True
       list: True
       display_name: 'Techniques'
-      desc: ''
+      desc: 'Enter the sequencing technique for each experimental setting.'
       value: 
         setting:
           mandatory: True
           list: False
           display_name: 'Setting'
-          desc: ''
+          desc: "The ID of the setting for which you want to add a technique (e.g. 'exp1', 'exp2', ...)."
           value: exp1
           whitelist: False
           special_case:
@@ -708,7 +708,7 @@ technical_details:
           mandatory: True
           list: True
           display_name: 'Technique'
-          desc: ''
+          desc: "The technique you want to use to sequence the samples of the specified experimental setting (e.g. 'bulk RNA-seq')."
           value: null
           whitelist: True
           input_type: select
@@ -716,13 +716,13 @@ technical_details:
       mandatory: False
       list: True
       display_name: 'Analysis Runs'
-      desc: ''
+      desc: 'Here you can enter information about performed analysis runs. It is usually filled in by the nerd.'
       value:
         date:
           mandatory: True
           list: False
           display_name: 'Date'
-          desc: 'The date has the format dd.mm.yyyy'
+          desc: "Select the date you performed the run. The date has the format dd.mm.yyyy (e.g. '18.10.2023')."
           value: null
           whitelist: False
           input_type: date
@@ -730,7 +730,7 @@ technical_details:
           mandatory: False
           list: False
           display_name: 'Reference Genome'
-          desc: ''
+          desc: "Select the reference genome you used in the analysis run (e.g. 'hg38')"
           value: null
           whitelist: True
           input_type: select
@@ -762,7 +762,7 @@ technical_details:
       mandatory: False
       list: True
       display_name: 'Further description'
-      desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
+      desc: 'Here you can insert links to files or URLs that contain additional information. (e.g. a presentation or a paper).'
       value: null
       whitelist: False
       input_type: short_text
