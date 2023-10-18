@@ -171,13 +171,19 @@ experimental_setting:
   mandatory: True
   list: True
   display_name: 'Experimental setting'
-  desc: 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for multiple sample submissions.'
+  desc: 'This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for multiple sample submissions.\n
+  Experimental Factors:\n
+  test\n
+  example\n\n
+  Conditions:\n
+  test\n
+  example'
   value:
     setting_id:
       mandatory: True
       list: False
       display_name: 'Setting ID'
-      desc: 'The Setting ID is automatically assigned to uniquely identify an experimental setting.'
+      desc: "The Setting ID is automatically assigned to uniquely identify an experimental setting (e.g. 'exp1', 'exp2', ...)."
       value: exp1
       special_case:
         generated: now
@@ -187,7 +193,7 @@ experimental_setting:
       mandatory: True
       list: False
       display_name: 'Organism'
-      desc: 'The organism identifier is composed of the organism name and the Taxonomy ID.'
+      desc: "The organism identifier is composed of the organism name and the Taxonomy ID (e.g. 'human 9606')."
       special_case:
         merge: organism_name
       value:
@@ -211,7 +217,8 @@ experimental_setting:
       mandatory: True
       list: True
       display_name: 'Experimental Factors'
-      desc: 'Define here your investigated factors (e.g. WT/KO, 3h/6h), which can be combined later to conditions (WT-3h, WT-6h, ...). Enter only those information as factors, which you use to compare your samples with each other.'
+      desc: 'Select your investigated factors and conditions.'
+      factor_desc: "Define here your investigated factors (e.g. 'WT'/'KO', '3h'/'6h'), which can be combined later to conditions (e.g. 'WT-3h', 'WT-6h', ...). Enter only those information as factors, which you use to compare your samples with each other."
       special_case:
         generated: now
       value:
@@ -257,7 +264,7 @@ experimental_setting:
               mandatory: True
               list: False
               display_name: 'Count'
-              desc: ''
+              desc: 'Enter the number of biological replicates.'
               value: null
               whitelist: False
               input_type: number
@@ -265,13 +272,13 @@ experimental_setting:
               mandatory: True
               list: True
               display_name: 'Samples'
-              desc: ''
+              desc: 'In this part, information on each biological replicate is entered.'
               value:
                 sample_name:
                   mandatory: True
                   list: False
                   display_name: 'Sample Name'
-                  desc: ''
+                  desc: 'A unique name is automatically assigned to every sample.'
                   value: null
                   whitelist: False
                   input_type: long_text
@@ -279,7 +286,7 @@ experimental_setting:
                   mandatory: True
                   list: False
                   display_name: 'Pooled'
-                  desc: ''
+                  desc: 'Indicate if your sample is pooled, i.e. the sample is a collection of multiple donors from one organism. '
                   value: False
                   whitelist: False
                   input_type: bool
@@ -295,8 +302,8 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Genetic background'
-                  desc: 'Enter mutation (e.g. Mut, WT)'
-                  factor_desc: 'Here a mutation can be specified if no further details about the type of mutation are known (e.g. WT, Mut). If the mutation is known in more detail, it is recommended to specify it via gene editing.'
+                  desc: "Enter the genetic background of the sample (e.g. 'Mut', 'WT')."
+                  factor_desc: "Here a mutation can be specified if no further details about the type of mutation are known (e.g. 'WT', 'Mut'). If the mutation is known in more detail, it is recommended to specify it via gene editing."
                   value: null
                   whitelist: True
                   input_type: select
@@ -574,8 +581,8 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Gene editing'
-                  desc: 'Enter mutations in higher detail (e.g. WT, knockdown of gene DFFA)'
-                  factor_desc: 'Here, mutations can be stored in higher detail, since additional information, such as the type of mutation or genes, can also be specified.'
+                  desc: "Enter a mutations of the sample in higher detail (e.g. 'WT', 'knockdown of gene DFFA')"
+                  factor_desc: "Here, mutations can be stored in higher detail, since additional information, such as the type of mutation (e.g. 'WT', 'knockdown', 'knockout', ...) or genes (e.g. 'Panx2'), can also be specified."
                   special_case:
                       control:
                         editing_type: 'WT'
