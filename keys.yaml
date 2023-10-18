@@ -172,8 +172,8 @@ experimental_setting:
   list: True
   display_name: 'Experimental setting'
   desc:
-    - "This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for multiple sample submissions.\n\n"
-    - [["Experimental Factors:", "Conditions:"], ["test", "test"], ["Example", "Example"]]
+    - "This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for multiple sample submissions."
+    - [["Experimental Factors:", "Conditions:"], ["The experimental factors correspond to the properties studied in the experiment. These properties differ between the individual sample groups.", "The conditions result from the combinations of all entered experimental factors. From all conditions formed, those that reflect the studied sample groups must be selected. "], ["Example:\ngenetic background: Mut, WT\ntime point: 12h, 24h", "Example:\n- Mut-12h\n- Mut-24h\n- WT-12h\n- WT-24h"]]
   value:
     setting_id:
       mandatory: True
@@ -246,7 +246,7 @@ experimental_setting:
           mandatory: True
           list: False
           display_name: 'Condition Name'
-          desc: ''
+          desc: 'The condition name is automatically generated.'
           value: null
           whitelist: False
           input_type: short_text
@@ -290,7 +290,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Number of Measurements'
-                  desc: ''
+                  desc: 'The number of measurements is used to indicate how many times a technical replicate is measured (e.g. a technical replicate applied on a gel, which is cut into 6 bands that are measured individually, corresponds to a number of measurements of 6).'
                   value: 1
                   whitelist: False
                   input_type: number
@@ -307,7 +307,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Gender'
-                  desc: ''
+                  desc: "Specify the gender of the sample donor (e.g. 'male')."
                   value: null
                   whitelist: True
                   input_type: select
@@ -315,7 +315,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Life stage'
-                  desc: ''
+                  desc: "Specify the life stage of the sample donor (e.g. 'adult')"
                   value: null
                   whitelist: True
                   input_type: select
@@ -323,7 +323,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Age'
-                  desc: ''
+                  desc: "Specify the age of the sample donor (e.g. '2 years')"
                   special_case:
                     value_unit: time
                   value:
@@ -347,7 +347,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Ethnicity'
-                  desc: ''
+                  desc: "Specify the ethnicity of the sample donor (e.g. 'caucasian')"
                   value: null
                   whitelist: True
                   input_type: select
@@ -355,7 +355,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Tissue'
-                  desc: ''
+                  desc: "Indicate the tissue the sample was taken from (e.g. 'lung')."
                   value: null
                   whitelist: True
                   input_type: select
@@ -363,7 +363,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Cell type'
-                  desc: ''
+                  desc: "Specify which cells the sample contains (e.g. 'Cardiomyocytes')."
                   value: null
                   whitelist: True
                   input_type: select
@@ -371,7 +371,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Cell line'
-                  desc: ''
+                  desc: "Specify which cell line was used for the sample (e.g. 'HUVEC')."
                   value: null
                   whitelist: True
                   input_type: select
@@ -379,7 +379,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Cellular Component'
-                  desc: ''
+                  desc: "Indicate to which cellular compartment the sample corresponds (e.g. 'mitochondrion')."
                   value: null
                   whitelist: True
                   input_type: select
@@ -387,7 +387,8 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Disease'
-                  desc: ''
+                  desc: 'Specify the health status of the sample donor.'
+                  factor_desc: "Here it is possible to indicate which state of health the donor is in. This can be additionally refined by stating specific diseases and their stages."
                   special_case:
                     group: 'disease_type'
                     control:
@@ -397,7 +398,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Type'
-                      desc: ''
+                      desc: "The nature of the disease (e.g. 'Asthma', 'Covid', ...)."
                       value: null
                       whitelist: True
                       input_type: select
@@ -405,7 +406,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Status'
-                      desc: ''
+                      desc: "The state of health (e.g. 'healthy', 'ill', ...)."
                       value: null
                       whitelist: True
                       input_type: select
@@ -413,7 +414,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Stage'
-                      desc: ''
+                      desc: "The stage of the disease (e.g. 'early', 'late', ...)."
                       value: null
                       whitelist: True
                       input_type: select
@@ -421,7 +422,8 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Injury'
-                  desc: ''
+                  desc: "Indicate any injuries sustained by the sample donor."
+                  factor_desc: "Here you can specify whether injuries were inflicted on the sample donor. These injuries can be differentiated according to the type of injury."
                   special_case:
                     group: 'injury_type'
                     control:
@@ -431,7 +433,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Status'
-                      desc: ''
+                      desc: "Specify the status of the injury (e.g. 'injured', 'non-injured')."
                       value: null
                       whitelist: True
                       input_type: select
@@ -439,15 +441,16 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Type'
-                      desc: ''
+                      desc: "Specify the type of injury (e.g. 'sham', 'amputation', ...)."
                       value: null
                       whitelist: True
                       input_type: select
                 medical_treatment:
                   mandatory: False
                   list: True
-                  display_name: 'Treatment'
-                  desc: ''
+                  display_name: 'Medical Treatment'
+                  desc: "Here you can specify whether substances were administered to the sample donor. The type of substance, the dose and the duration of administration can be further detailed."
+                  factor_desc: "Indicate whether substances were administered to the sample donor."
                   special_case:
                     group: 'treatment_type'
                     control:
@@ -457,7 +460,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Type'
-                      desc: ''
+                      desc: "The type of substance administered to the sample donor (e.g. 'Cardiotoxin')."
                       value: null
                       whitelist: True
                       input_type: select
@@ -465,7 +468,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Status'
-                      desc: ''
+                      desc: "The status of administration (e.g. 'treated', 'not treated', ...)."
                       value: null
                       whitelist: True
                       input_type: select
@@ -473,7 +476,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Duration'
-                      desc: ''
+                      desc: "The duration of the administration (e.g. '2 weeks')."
                       special_case:
                         value_unit: time
                       value:
@@ -497,7 +500,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Amount'
-                      desc: ''
+                      desc: "The amount that was administered (e.g. '20 μM')."
                       special_case:
                         value_unit: volume
                       value:
@@ -521,7 +524,8 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Time Point'
-                  desc: 'Here, time points can be specified that cannot be represented via other fields of the metadata, such as sample collections after 12h and 24h.'
+                  desc: "Inidicate a time point (e.g. '24 hours')."
+                  factor_desc: "Here, time points can be specified that cannot be represented via other fields of the metadata, such as the duration between sample collections (e.g. '12 hours',  '24 hours', ...)."
                   special_case:
                     value_unit: time
                   value:
@@ -545,7 +549,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Body-Mass-Index'
-                  desc: ''
+                  desc: "Specify the body mass index of the sample donor (e.g. '20 kg/m2')."
                   special_case:
                     value_unit: bmi
                   value:
@@ -569,7 +573,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Physical Treatment'
-                  desc: ''
+                  desc: "Specify whether the sample has undergone physical treatment (e.g. 'hypoxia', 'sheer stress', ...)."
                   value: null
                   whitelist: True
                   input_type: select
@@ -603,7 +607,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Gene'
-                      desc: 'The mutant gene consisting of gene name and Ensembl ID.'
+                      desc: "The mutant gene consisting of gene name and Ensembl ID (e.g. 'GPX2 ENSG00000176153')."
                       special_case:
                         merge: gene_name
                       value:
@@ -627,7 +631,7 @@ experimental_setting:
                       mandatory: False
                       list: False
                       display_name: 'Modification'
-                      desc: 'Enter a short free text (max. 6 characters) for e.g. mutations or isoforms. (e.g. FLD, PTC1, ...)'
+                      desc: 'Free text (max. 6 characters) to specify mutations or gene isoforms. (e.g. FLD, PTC1, ...)'
                       special_case:
                         restriction:
                           regex: '[^a-zA-Z0-9]'
@@ -640,7 +644,8 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Enrichment / Histone-Mark / Pull-Down'
-                  desc: 'Enrichment for bound protein/histone mark as a result of an antibody pulldown or similar procedure (e.g. ChIPSeq, Cut&Tag, RiboTag)'
+                  factor_desc: 'Here you can enter the enrichment for bound proteins or histone marks as a result of an antibody pulldown or similar procedure (e.g. ChIPSeq, Cut&Tag, RiboTag).'
+                  desc: "State the enrichment for a protein or histone mark (e.g. 'GPX2', 'H2BK12ac', 'IgG', ...)."
                   value: null
                   whitelist: True
                   input_type: select
@@ -662,7 +667,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: 'Count'
-                      desc: ''
+                      desc: 'The number of technical replicates.'
                       value: 1
                       whitelist: False
                       input_type: number
@@ -670,7 +675,7 @@ experimental_setting:
                       mandatory: True
                       list: True
                       display_name: 'Samples'
-                      desc: ''
+                      desc: 'Unique sample names generated for every technical replicate.'
                       value: null
                       whitelist: False
                       input_type: short_text
@@ -678,7 +683,7 @@ experimental_setting:
                       mandatory: True
                       list: True
                       display_name: 'Filenames'
-                      desc: ''
+                      desc: 'Unique filenames generated for every technical replicate.'
                       value: null
                       whitelist: False
                       input_type: short_text
