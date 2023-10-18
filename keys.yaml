@@ -8,7 +8,7 @@ project:
       mandatory: True
       list: False
       display_name: 'ID'
-      desc: 'Enter the ID of your project, consisting of three lowercase letters followed by a number. (e.g. dst123, dof54, ...)'
+      desc: "Enter the ID of your project, consisting of three lowercase letters followed by a number. (e.g. 'dst123', 'dof54', ...)"
       special_case:
         generated: now
         restriction:
@@ -21,7 +21,7 @@ project:
       mandatory: True
       list: False
       display_name: 'Project Name'
-      desc: "Give your project a descriptive name. (e.g. 'mouse heart investigation on the role of gene Panx2'"
+      desc: "Give your project a descriptive name. (e.g. 'mouse heart investigation on the role of gene Panx2')"
       value: null
       whitelist: False
       input_type: short_text
@@ -29,7 +29,7 @@ project:
       mandatory: True
       list: False
       display_name: 'Date'
-      desc: "Date your experiment. The date has the format 'dd.mm.yyyy'"
+      desc: "Date your experiment. The date has the format 'dd.mm.yyyy' (e.g. '18.10.2023')."
       value: null
       whitelist: False
       input_type: date
@@ -53,7 +53,7 @@ project:
       mandatory: False
       list: True
       display_name: 'Graphical Abstract'
-      desc: 'Here you can insert links to a graphical abstract.'
+      desc: 'Here you can insert links to a graphical abstracts.'
       value: null
       whitelist: False
       input_type: short_text
@@ -75,7 +75,7 @@ project:
           mandatory: True
           list: False
           display_name: 'MPI Login Name'
-          desc: "It consists of the first letter of your first name and the first six letters of your last name (e.g. mmuster for Max Mustermann; jdoe for John Doe). For public projects enter '---'."
+          desc: "It consists of the first letter of your first name and the first six letters of your last name (e.g. 'mmuster' for Max Mustermann; 'jdoe' for John Doe). For public projects enter '---'."
           value: null
           whitelist: False
           input_type: short_text
@@ -83,7 +83,7 @@ project:
           mandatory: True
           list: False
           display_name: 'Department'
-          desc: "Specify the department to which you belong (e.g. Abt-K). For public projects enter 'public'."
+          desc: "Specify the department to which you belong (e.g. 'Abt-K'). For public projects enter 'public'."
           value: null
           whitelist: True
           input_type: select
@@ -91,7 +91,7 @@ project:
           mandatory: True
           list: False
           display_name: 'E-Mail'
-          desc: "Enter your email address here (e.g. max.mustermann@mpi-bn.mpg.de). For public projects enter '---'."
+          desc: "Enter your email address here (e.g. 'max.mustermann@mpi-bn.mpg.de'). For public projects enter '---'."
           value: null
           whitelist: False
           input_type: short_text
@@ -99,7 +99,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Address'
-          desc: 'Here you can enter your address (e.g. Ludwigstraße 43, 61231 Bad Nauheim).'
+          desc: "Here you can enter your address (e.g. 'Ludwigstraße 43, 61231 Bad Nauheim')."
           value: null
           whitelist: False
           input_type: short_text
@@ -129,7 +129,7 @@ project:
           mandatory: True
           list: False
           display_name: 'MPI Login Name'
-          desc: "It consists of the first letter of the Nerds first name and the first six letters of his last name (e.g. mmuster for Max Mustermann; jdoe for John Doe)."
+          desc: "It consists of the first letter of the Nerds first name and the first six letters of his last name (e.g. 'mmuster' for Max Mustermann; 'jdoe' for John Doe)."
           value: null
           whitelist: False
           input_type: short_text
@@ -137,7 +137,7 @@ project:
           mandatory: True
           list: False
           display_name: 'Department'
-          desc: "Specify the department to which the Nerd belongs (e.g. AG-nerds)."
+          desc: "Specify the department to which the Nerd belongs (e.g. 'AG-nerds')."
           value: null
           whitelist: True
           input_type: select
@@ -145,7 +145,7 @@ project:
           mandatory: True
           list: False
           display_name: 'E-Mail'
-          desc: "Enter the Nerds email address here (e.g. max.mustermann@mpi-bn.mpg.de)."
+          desc: "Enter the Nerds email address here (e.g. 'max.mustermann@mpi-bn.mpg.de')."
           value: null
           whitelist: False
           input_type: short_text
@@ -153,7 +153,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Address'
-          desc: 'Here you can enter the Nerds address (e.g. Ludwigstraße 43, 61231 Bad Nauheim).'
+          desc: "Here you can enter the Nerds address (e.g. 'Ludwigstraße 43, 61231 Bad Nauheim')."
           value: null
           whitelist: False
           input_type: short_text
