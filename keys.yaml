@@ -21,7 +21,7 @@ project:
       mandatory: True
       list: False
       display_name: 'Project Name'
-      desc: 'Give your project a descriptive name.'
+      desc: "Give your project a descriptive name. (e.g. 'mouse heart investigation on the role of gene Panx2'"
       value: null
       whitelist: False
       input_type: short_text
@@ -29,7 +29,7 @@ project:
       mandatory: True
       list: False
       display_name: 'Date'
-      desc: 'The date has the format dd.mm.yyyy'
+      desc: "Date your experiment. The date has the format 'dd.mm.yyyy'"
       value: null
       whitelist: False
       input_type: date
@@ -37,7 +37,7 @@ project:
       mandatory: True
       list: False
       display_name: 'Description'
-      desc: 'Here you need to enter a detailed description of the project. This field can be used for all data that does not fit into existing fields, including further information on the exact exon/position, etc.'
+      desc: 'Here you need to enter a detailed description of the project (e.g. an abstract). This field can further be used for all data that does not fit into existing fields, including further information on the exact exon/position, etc.'
       value: null
       whitelist: False
       input_type: long_text
@@ -45,7 +45,7 @@ project:
       mandatory: False
       list: True
       display_name: 'Further Description / Additional Info'
-      desc: 'Here you can insert links to files or URLs that contain additional information. This can be a presentation or a paper, for example.'
+      desc: 'Here you can insert links to files or URLs that contain additional information. (e.g. link to presentation, paper or GEO)'
       value: null
       whitelist: False
       input_type: short_text
@@ -53,7 +53,7 @@ project:
       mandatory: False
       list: True
       display_name: 'Graphical Abstract'
-      desc: 'Here you can insert links to files containing a graphical abstract.'
+      desc: 'Here you can insert links to a graphical abstract.'
       value: null
       whitelist: False
       input_type: short_text
@@ -67,7 +67,7 @@ project:
           mandatory: True
           list: False
           display_name: 'Name'
-          desc: "The name should be entered in the format 'Last name, First name'. For public projects enter 'public'."
+          desc: "The name should be entered in the format 'Last name, First name' (e.g. 'Mustermann, Max'). For public projects enter 'public'."
           value: null
           whitelist: False
           input_type: short_text
@@ -75,7 +75,7 @@ project:
           mandatory: True
           list: False
           display_name: 'MPI Login Name'
-          desc: "It consists of the first letter of your first name and the first six letters of your last name. For public projects enter '---'."
+          desc: "It consists of the first letter of your first name and the first six letters of your last name (e.g. mmuster for Max Mustermann; jdoe for John Doe). For public projects enter '---'."
           value: null
           whitelist: False
           input_type: short_text
@@ -83,7 +83,7 @@ project:
           mandatory: True
           list: False
           display_name: 'Department'
-          desc: "Specify the department to which you belong. For public projects enter 'public'."
+          desc: "Specify the department to which you belong (e.g. Abt-K). For public projects enter 'public'."
           value: null
           whitelist: True
           input_type: select
@@ -91,7 +91,7 @@ project:
           mandatory: True
           list: False
           display_name: 'E-Mail'
-          desc: "Enter your email address here. For public projects enter '---'."
+          desc: "Enter your email address here (e.g. max.mustermann@mpi-bn.mpg.de). For public projects enter '---'."
           value: null
           whitelist: False
           input_type: short_text
@@ -99,7 +99,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Address'
-          desc: 'Here you can enter your address.'
+          desc: 'Here you can enter your address (e.g. Ludwigstraße 43, 61231 Bad Nauheim).'
           value: null
           whitelist: False
           input_type: short_text
@@ -107,7 +107,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Telephone'
-          desc: 'Here you can enter your phone number.'
+          desc: "Here you can enter your phone number (e.g. '+49 123456789')."
           value: null
           whitelist: False
           input_type: short_text
@@ -121,7 +121,7 @@ project:
           mandatory: True
           list: False
           display_name: 'Name'
-          desc: "The name should be entered in the format 'Last name, First name'."
+          desc: "The name should be entered in the format 'Last name, First name' (e.g. 'Mustermann, Max')."
           value: null
           whitelist: False
           input_type: short_text
@@ -129,7 +129,7 @@ project:
           mandatory: True
           list: False
           display_name: 'MPI Login Name'
-          desc: "It consists of the first letter of the Nerds first name and the first six letters of his last name."
+          desc: "It consists of the first letter of the Nerds first name and the first six letters of his last name (e.g. mmuster for Max Mustermann; jdoe for John Doe)."
           value: null
           whitelist: False
           input_type: short_text
@@ -137,7 +137,7 @@ project:
           mandatory: True
           list: False
           display_name: 'Department'
-          desc: "Specify the department to which the Nerd belongs."
+          desc: "Specify the department to which the Nerd belongs (e.g. AG-nerds)."
           value: null
           whitelist: True
           input_type: select
@@ -145,7 +145,7 @@ project:
           mandatory: True
           list: False
           display_name: 'E-Mail'
-          desc: "Enter the Nerds email address here."
+          desc: "Enter the Nerds email address here (e.g. max.mustermann@mpi-bn.mpg.de)."
           value: null
           whitelist: False
           input_type: short_text
@@ -153,7 +153,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Address'
-          desc: 'Here you can enter the Nerds address.'
+          desc: 'Here you can enter the Nerds address (e.g. Ludwigstraße 43, 61231 Bad Nauheim).'
           value: null
           whitelist: False
           input_type: short_text
@@ -161,7 +161,7 @@ project:
           mandatory: False
           list: False
           display_name: 'Telephone'
-          desc: 'Here you can enter the Nerds phone number.'
+          desc: "Here you can enter the Nerds phone number (e.g. '+49 123456789')."
           value: null
           whitelist: False
           input_type:
