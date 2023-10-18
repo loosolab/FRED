@@ -194,7 +194,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
                        'input_type': input_type,
                        'input_disabled': input_disabled}
 
-        if part_object['input_type'] == 'bool' and part_object['value'] is not \
+        if part_object['whitelist'] == ['True', 'False'] and part_object['value'] is not \
                 None:
             if part_object['value']:
                 part_object['value'] = 'True'
