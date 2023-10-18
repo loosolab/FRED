@@ -172,8 +172,8 @@ experimental_setting:
   list: True
   display_name: 'Experimental setting'
   desc:
-    - "This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for multiple sample submissions.\n"
-    - [["Experimental Factors:", "Conditions:"], ["The experimental factors correspond to the properties studied in the experiment. These properties differ between the individual sample groups.", "The conditions result from the combinations of all entered experimental factors. From all conditions formed, those that reflect the studied sample groups must be selected. "], ["Example:\ngenetic background: Mut, WT\ntime point: 12h, 24h", "Example:\n- Mut-12h\n- Mut-24h\n- WT-12h\n- WT-24h"]]
+    - "This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for multiple sample submissions.\n\n"
+    - [["Experimental Factors:", "Conditions:", "Biological Replicates:", "Technical Replicates:"], ["The experimental factors correspond to the properties studied in the experiment. These properties differ between the individual sample groups.", "The conditions result from the combinations of all entered experimental factors. From all conditions formed, those that reflect the studied sample groups must be selected.", "A biological replicate is a retrieved sample that can be assigned to a condition.", "A technical replicate is the result of measuring a biological replicate."], ["Example:\ngenetic background: Mut, WT\ntime point: 12h, 24h", "Example:\n- Mut-12h\n- Mut-24h\n- WT-12h\n- WT-24h", "A biological replicate corresponds to the tube that you send to sequencing.", "If one biological replicate is sequenced twice then there are two technical replicates."]]
   value:
     setting_id:
       mandatory: True
@@ -290,7 +290,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Number of Measurements'
-                  desc: 'The number of measurements is used to indicate how many times a technical replicate is measured (e.g. a technical replicate applied on a gel, which is cut into 6 bands that are measured individually, corresponds to a number of measurements of 6).'
+                  desc: 'The number of measurements is used to indicate how many times a technical replicate is measured.'
                   value: 1
                   whitelist: False
                   input_type: number
@@ -581,7 +581,7 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Gene editing'
-                  desc: "Enter a mutations of the sample in higher detail (e.g. 'WT', 'knockdown of gene DFFA')"
+                  desc: "Enter mutations of the sample in higher detail (e.g. 'WT', 'KO-DFFA')"
                   factor_desc: "Here, mutations can be stored in higher detail, since additional information, such as the type of mutation (e.g. 'WT', 'knockdown', 'knockout', ...) or genes (e.g. 'Panx2'), can also be specified."
                   special_case:
                       control:
