@@ -1,5 +1,5 @@
 import time
-
+from tabulate import tabulate
 import yaml
 import os
 import copy
@@ -427,3 +427,17 @@ def split_name(elem, double, gene=True):
             elem = elem.split('.')[1]
 
     return elem, gene
+
+
+def print_desc(desc, format='plain'):
+    new_desc = ''
+    if isinstance(desc, list):
+        for elem in desc:
+            if isinstance(elem, str):
+                new_desc += elem
+            else:
+                new_desc += tabulate(elem, tablefmt=format)
+                new_desc += '\n'
+    else:
+        new_desc = desc
+    return new_desc

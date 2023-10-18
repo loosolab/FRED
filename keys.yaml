@@ -171,13 +171,9 @@ experimental_setting:
   mandatory: True
   list: True
   display_name: 'Experimental setting'
-  desc: "This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for multiple sample submissions.\n
-  Experimental Factors:\n
-  test\n
-  example\n\n
-  Conditions:\n
-  test\n
-  example"
+  desc:
+    - "This part contains the investigated experimental factors and conditions as well as information about the samples. You can specify multiple experimental settings for multiple sample submissions.\n\n"
+    - [["Experimental Factors:", "Conditions:"], ["test", "test"], ["Example", "Example"]]
   value:
     setting_id:
       mandatory: True

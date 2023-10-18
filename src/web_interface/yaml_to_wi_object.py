@@ -1,6 +1,7 @@
 import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.wi_utils as wi_utils
 import datetime
+import src.utils as utils
 
 # TODO: example of format in wi_object (Keys)
 
@@ -98,7 +99,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
             part_object = {'position': pos, 'mandatory': node['mandatory'],
                            'list': node['list'],
                            'displayName': node['display_name'],
-                           'desc': node['desc'].replace('\n','<br>'), 'value': None,
+                           'desc': utils.print_desc(node['desc'], 'html').replace('\n','<br>'),
+                           'value': None,
                            'whitelist': whitelist,
                            'whitelist_type': whitelist_type,
                            'input_type': input_type,
@@ -150,7 +152,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
             # information for one expandable with its input fields
             part_object = {'position': pos, 'mandatory': node['mandatory'],
                            'list': node['list'], 'title': node['display_name'],
-                           'desc': node['desc'].replace('\n','<br>'), 'input_fields': input_fields,
+                           'desc': utils.parse_desc(node['desc'], 'html').replace('\n','<br>'), 'input_fields': input_fields,
                            'input_disabled': input_disabled}
 
             if 'special_case' in node:
@@ -186,7 +188,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
         part_object = {'position': pos, 'mandatory': node['mandatory'],
                        'list': node['list'],
                        'displayName': node['display_name'],
-                       'desc': node['desc'].replace('\n','<br>'), 'value': node['value'],
+                       'desc': utils.parse_desc(node['desc'], 'html').replace('\n','<br>'), 'value': node['value'],
                        'whitelist': whitelist,
                        'whitelist_type': whitelist_type,
                        'input_type': input_type,
