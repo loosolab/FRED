@@ -106,6 +106,14 @@ def parse_empty(node, pos, key_yaml, filled_object,
                            'input_type': input_type,
                            'input_disabled': input_disabled}
 
+            if part_object['whitelist'] == ['True', 'False'] and part_object[
+                'value'] is not \
+                    None:
+                if part_object['value']:
+                    part_object['value'] = 'True'
+                else:
+                    part_object['value'] = 'False'
+                    
             # special case : value unit -> add key value_unit to dict
             if input_type == 'value_unit':
                 part_object['value_unit'] = node['value']['unit']['value']
