@@ -449,8 +449,8 @@ experimental_setting:
                   mandatory: False
                   list: True
                   display_name: 'Medical Treatment'
-                  desc: "Here you can specify whether substances were administered to the sample donor. The type of substance, the dose and the duration of administration can be further detailed."
-                  factor_desc: "Indicate whether substances were administered to the sample donor."
+                  factor_desc: "Here you can specify whether substances were administered to the sample donor. The type of substance, the dose and the duration of administration can be further detailed."
+                  desc: "Indicate whether substances were administered to the sample donor."
                   special_case:
                     group: 'treatment_type'
                     control:
