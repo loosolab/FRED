@@ -265,7 +265,7 @@ experimental_setting:
               whitelist: False
               input_type: number
             samples:
-              mandatory: True
+              mandatory: False
               list: True
               display_name: 'Samples'
               desc: 'In this part, information on each biological replicate is entered.'
@@ -676,6 +676,8 @@ experimental_setting:
                       list: True
                       display_name: 'Samples'
                       desc: 'Unique sample names generated for every technical replicate.'
+                      special_case:
+                        generated: end
                       value: null
                       whitelist: False
                       input_type: short_text
@@ -684,6 +686,8 @@ experimental_setting:
                       list: True
                       display_name: 'Filenames'
                       desc: 'Unique filenames generated for every technical replicate.'
+                      special_case:
+                        generated: end
                       value: null
                       whitelist: False
                       input_type: short_text
