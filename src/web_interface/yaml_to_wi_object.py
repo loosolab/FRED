@@ -48,7 +48,6 @@ def parse_empty(node, pos, key_yaml, filled_object,
                                only filled if 'get_whitelist_object' is set to
                                True
     """
-
     # disable input for the keys condition_name and sample_name because they
     # are generated
     input_disabled = True if pos.split(':')[-1] \
@@ -59,7 +58,6 @@ def parse_empty(node, pos, key_yaml, filled_object,
 
     # test if the value of the current node is a dictionary
     if isinstance(node['value'], dict):
-
         # initialize the input type with None
         input_type = None
 
@@ -106,7 +104,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
                            'input_type': input_type,
                            'input_disabled': input_disabled}
 
-            if part_object['whitelist'] == ['True', 'False'] and part_object[
+            if (part_object['whitelist'] == ['True', 'False'] or part_object['whitelist'] == 'pooled') and part_object[
                 'value'] is not \
                     None:
                 if part_object['value']:
@@ -175,7 +173,6 @@ def parse_empty(node, pos, key_yaml, filled_object,
 
     # the key does not contain a dictionary as value
     else:
-
         # read and parse whitelist
         whitelist, whitelist_type, input_type, headers, whitelist_keys, double = \
             whitelist_parsing.parse_whitelist(pos.split(':')[-1], node,
@@ -201,7 +198,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
                        'input_type': input_type,
                        'input_disabled': input_disabled}
 
-        if part_object['whitelist'] == ['True', 'False'] and part_object['value'] is not \
+        if (part_object['whitelist'] == ['True', 'False'] or part_object['whitelist'] == 'pooled') and part_object['value'] is not \
                 None:
             if part_object['value']:
                 part_object['value'] = 'True'
