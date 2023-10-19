@@ -329,7 +329,7 @@ def get_missing_keys(node, metafile, invalid_keys, pre, missing, list_len, gener
     metafile = find_key(metafile, pre)
 
     if len(metafile) == 0:
-        if node['mandatory'] and (('special_case' in node and generated in node['special_case'] and generated) or not ('special_case' in node and generated in node['special_case'])):
+        if node['mandatory'] and (('special_case' in node and 'generated' in node['special_case'] and generated) or not ('special_case' in node and 'generated' in node['special_case'])):
             missing.append(pre)
     else:
          if pre.split(':')[-1] not in invalid_keys:
