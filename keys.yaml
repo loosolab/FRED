@@ -365,7 +365,7 @@ experimental_setting:
                   whitelist: True
                   input_type: select
                 strain:
-                  mandatoty: False
+                  mandatory: False
                   list: False
                   display_name: 'Strain'
                   desc: ''
