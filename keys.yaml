@@ -375,6 +375,14 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
+                strain:
+                  mandatory: False
+                  list: False
+                  display_name: 'Strain'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
                 cellular_compartment:
                   mandatory: False
                   list: True
