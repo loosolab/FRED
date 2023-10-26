@@ -166,6 +166,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
                 if 'control' in node['special_case']:
                     part_object['control'] = node['special_case']['control']
 
+            if 'short_desc' in node:
+                part_object['short_desc'] = node['short_desc']
         # test if the key takes multiple values and add the property
         # 'list_value' as a place to save those values to via the website
         if node['list'] or input_type == 'single_autofill':
