@@ -86,8 +86,10 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                             tech_settings.append(t_sub_elem['value'])
                 warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
                 if warning:
-                    warnings.append(
-                        f'{wi_object["position"]}: {warn_text}')
+                    warnings.append({'position': wi_object['position'],
+                                     'title': 'Invalid Technique',
+                                     'message': warn_text})
+
                     warn_text = warn_text.replace('\n', '<br>')
                     warning_desc = \
                         f'{warning_desc}' \
