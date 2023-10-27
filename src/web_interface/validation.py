@@ -38,6 +38,8 @@ def validate_object(wi_object, key_yaml, finish):
     if finish:
         parsed = oty.parse_object(wi_object, key_yaml)
         for part in ['project', 'experimental_setting', 'technical_details']:
+            if part not in parsed:
+                parsed[part] = {}
             valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
             invalid_value, logical_warn = validate_yaml.validate_file(parsed[part], 'metadata', logical_validation=False, generated=False)
             for elem in missing_mandatory_keys:
