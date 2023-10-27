@@ -248,6 +248,8 @@ experimental_setting:
           list: False
           display_name: 'Condition Name'
           desc: 'The condition name is automatically generated.'
+          special_case:
+              generated: now
           value: null
           whitelist: False
           input_type: short_text
@@ -380,6 +382,14 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Strain'
+                  desc: ''
+                  value: null
+                  whitelist: True
+                  input_type: select
+                signal:
+                  mandatory: False
+                  list: False
+                  display_name: 'Signal'
                   desc: ''
                   value: null
                   whitelist: True
