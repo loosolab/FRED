@@ -1,5 +1,8 @@
 import time
+
+import prettytable
 from tabulate import tabulate
+import textwrap
 import yaml
 import os
 import copy
@@ -429,14 +432,20 @@ def split_name(elem, double, gene=True):
     return elem, gene
 
 
-def print_desc(desc, format='plain'):
+def print_desc(desc, format='plain', size=70):
     new_desc = ''
     if isinstance(desc, list):
         for elem in desc:
             if isinstance(elem, str):
                 new_desc += elem
             else:
+                if format == 'plain':
+                    for i in range(len(elem)):
+                        for j in range(len(elem[i])):
+                            elem[i][j] = '\n'.join(['\n'.join(textwrap.wrap(line, size * 1/len(elem[i]) - 1, break_long_words=False, replace_whitespace=False)) for line in elem[i][j].splitlines() if line.strip() != ''])
                 new_desc += tabulate(elem, tablefmt=format).replace('>\n<', '><')
     else:
         new_desc = desc
     return new_desc
+
+
