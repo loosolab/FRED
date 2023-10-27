@@ -1,6 +1,7 @@
 import src.validate_yaml as validate_yaml
 import src.web_interface.wi_utils as wi_utils
 import src.web_interface.wi_object_to_yaml as oty
+import src.utils as utils
 
 # TODO: rewrite and documentation
 
@@ -36,10 +37,14 @@ def validate_object(wi_object, key_yaml, finish):
 
     if finish:
         parsed = oty.parse_object(wi_object, key_yaml)
-        valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
-        invalid_value, logical_warn = validate_yaml.validate_file(parsed, 'metadata', logical_validation=False, generated=False)
-        for elem in missing_mandatory_keys:
-            errors[elem.split(':')[0]].append(f'{elem}: Missing mandatory input')
+        for part in ['project', 'experimental_setting', 'technical_details']:
+            valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
+            invalid_value, logical_warn = validate_yaml.validate_file(parsed[part], 'metadata', logical_validation=False, generated=False)
+            for elem in missing_mandatory_keys:
+                diaplay_name = utils.find_keys(key_yaml, elem.solit(':')[-1])[0]['display_name']
+                errors[part].append({'position': elem,
+                                     'title': f'Missing {diaplay_name}',
+                                     'message': 'Missing mandatory input'})
     validation_object = {'object': wi_object, 'errors': errors,
                          'warnings': warnings}
     return validation_object
@@ -143,12 +148,15 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                         wi_object['position'].split(':')[-1])
                     wi_object['error'] = not valid
                     if not valid:
-                        errors.append(f'{wi_object["position"]}: {message}')
+                        errors.append({'position': wi_object["position"],
+                                       'title': f'Invalid {wi_object["display_name"]}',
+                                       'message': message})
                         error_desc = f'{error_desc}' \
                                      f'{"<br>" if error_desc != "" else ""}' \
                                      f'<font color="red">{message}</font>'
                     warning = False
                     warn_text = None
+                    warn_title = ''
                     key = wi_object['position'].split(':')[-1]
                     if key == 'pooled':
                         pooled = wi_object['value']
@@ -156,16 +164,19 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                         warning, warn_text = \
                             validate_yaml.validate_donor_count(
                                 pooled, wi_object['value'])
+                        warn_title = 'Illogical donor count'
                     elif key == 'organism':
                         organisms.append(wi_object['value'].split(' ')[0])
                     elif key == 'reference_genome':
                         warning, warn_text = \
                             validate_yaml.validate_reference_genome(
                                 organisms, wi_object['value'])
+                        warn_title = 'Illogical reference genome'
                     wi_object['warning'] = warning
                     if warning:
-                        warnings.append(
-                            f'{wi_object["position"]}: {warn_text}')
+                        warnings.append({'position': wi_object["position"],
+                                         'title': warn_title,
+                                         'message': warn_text})
                         warning_desc = \
                             f'{warning_desc}' \
                             f'{"<br>" if warning_desc != "" else ""}' \
