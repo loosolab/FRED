@@ -1,3 +1,5 @@
+import copy
+
 import src.utils as utils
 import src.web_interface.wi_utils as wi_utils
 import os
@@ -39,7 +41,7 @@ def parse_object(wi_object, key_yaml):
 
             # parse every part into yaml format
             result[key], organism, sample_name, nom, global_count, local_count, double = parse_part(
-                wi_object[key], key_yaml, wi_object['all_factors'], project_id,
+                wi_object[key], key_yaml, copy.deepcopy(wi_object['all_factors']), project_id,
                 organism, sample_name, nom, global_count, local_count, double)
 
     # remove keys with value None
