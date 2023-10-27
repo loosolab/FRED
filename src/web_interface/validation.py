@@ -41,10 +41,10 @@ def validate_object(wi_object, key_yaml, finish):
             if part not in parsed:
                 parsed[part] = {}
             valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
-            invalid_value, logical_warn = validate_yaml.validate_file(parsed[part], 'metadata', logical_validation=False, generated=False)
+            invalid_value, logical_warn = validate_yaml.validate_file(parsed[part], key_yaml[part]['value'], 'metadata', logical_validation=False, generated=False)
             for elem in missing_mandatory_keys:
                 diaplay_name = list(utils.find_keys(key_yaml, elem.split(':')[-1]))[0]['display_name']
-                errors[part].append({'position': elem,
+                errors[part].append({'position': f'{part}:{elem}',
                                      'title': f'Missing {diaplay_name}',
                                      'message': 'Missing mandatory input'})
     validation_object = {'object': wi_object, 'errors': errors,

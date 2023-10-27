@@ -11,7 +11,7 @@ generated = ['condition_name', 'sample_name']
 factor = None
 
 
-def validate_file(metafile, mode, logical_validation=True, yaml=None, generated=True, whitelist_path=None):
+def validate_file(metafile, key_yaml, mode, logical_validation=True, yaml=None, generated=True, whitelist_path=None):
     """
     In this function all functions for the validation of a metadata file are
     called. The validation is based on the data in the file 'keys.yaml'. It is
@@ -26,16 +26,9 @@ def validate_file(metafile, mode, logical_validation=True, yaml=None, generated=
     """
     logical_warn = []
     valid = True
-    if mode == 'metadata':
-        key_yaml_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..', 'keys.yaml')
-        key_yaml = utils.read_in_yaml(key_yaml_path)
-    else:
-        key_yaml_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..', 'mamplan_keys.yaml')
-        key_yaml = utils.read_in_yaml(key_yaml_path)
+
     invalid_keys, invalid_entries, invalid_value = \
-        new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
+        new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml, whitelist_path=whitelist_path, mode=mode)
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
                                                 [x.split(':')[-1] for x in
                                                  invalid_keys], generated)
@@ -136,7 +129,7 @@ def print_warning(logical_warn, size=80):
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
              invalid_entry, invalid_value, input_type, is_factor,
-             local_factor, full_metadata, key_yaml_path, whitelist_path=None, mode='metadata'):
+             local_factor, full_metadata, full_yaml, whitelist_path=None, mode='metadata'):
     """
     This function test if all keys in the metadata file are valid.
     :param metafile: the metadata file
@@ -159,7 +152,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             'value' in metafile and 'unit' in metafile):
         for key in metafile:
             if not key_yaml and key_name.split(':')[-1] in is_factor or (key_name.split(':')[-1] == 'values' and local_factor is not None):
-                new_yaml1 = utils.read_in_yaml(key_yaml_path)
+                new_yaml1 = full_yaml
                 if key_name.split(':')[-1] in is_factor:
                     new_yaml = list(utils.find_keys(new_yaml1, key_name.split(':')[-1]))
                 else:
@@ -209,7 +202,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     metafile[key], key_yaml[key]['value'], sub_lists,
                     f'{key_name}:{key}' if key_name != '' else key,
                     invalid_keys, invalid_entry, invalid_value, input_type,
-                    is_factor, local_factor, full_metadata, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
+                    is_factor, local_factor, full_metadata, full_yaml, whitelist_path=whitelist_path, mode=mode)
                 invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
@@ -217,7 +210,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             res_keys, res_entries, res_values = new_test(
                 item, key_yaml, sub_lists, key_name, invalid_keys,
                 invalid_entry, invalid_value, input_type, is_factor,
-                local_factor, full_metadata, key_yaml_path, whitelist_path=whitelist_path, mode=mode)
+                local_factor, full_metadata, full_yaml, whitelist_path=whitelist_path, mode=mode)
             invalid_keys = res_keys
             sub_lists = sub_lists[:-1]
     else:
@@ -329,7 +322,7 @@ def get_missing_keys(node, metafile, invalid_keys, pre, missing, list_len, gener
     metafile = find_key(metafile, pre)
 
     if len(metafile) == 0:
-        if node['mandatory'] and (('special_case' in node and 'generated' in node['special_case'] and generated) or not ('special_case' in node and 'generated' in node['special_case'])):
+        if node['mandatory'] and (('special_case' in node and 'generated' in node['special_case'] and node['special_case']['generated'] == 'end' and generated) or not ('special_case' in node and 'generated' in node['special_case'] and node['special_case']['generated'] == 'end')):
             missing.append(pre)
     else:
          if pre.split(':')[-1] not in invalid_keys:
