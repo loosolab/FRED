@@ -151,7 +151,7 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                     wi_object['error'] = not valid
                     if not valid:
                         errors.append({'position': wi_object["position"],
-                                       'title': f'Invalid {wi_object["display_name"]}',
+                                       'title': f'Invalid {wi_object["displayName"]}',
                                        'message': message})
                         error_desc = f'{error_desc}' \
                                      f'{"<br>" if error_desc != "" else ""}' \
