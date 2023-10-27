@@ -41,7 +41,7 @@ def validate_object(wi_object, key_yaml, finish):
             valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
             invalid_value, logical_warn = validate_yaml.validate_file(parsed[part], 'metadata', logical_validation=False, generated=False)
             for elem in missing_mandatory_keys:
-                diaplay_name = utils.find_keys(key_yaml, elem.split(':')[-1])[0]['display_name']
+                diaplay_name = list(utils.find_keys(key_yaml, elem.split(':')[-1]))[0]['display_name']
                 errors[part].append({'position': elem,
                                      'title': f'Missing {diaplay_name}',
                                      'message': 'Missing mandatory input'})
