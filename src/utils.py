@@ -1,6 +1,5 @@
 import time
 
-import prettytable
 from tabulate import tabulate
 import textwrap
 import yaml
