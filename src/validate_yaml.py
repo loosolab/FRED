@@ -549,11 +549,11 @@ def validate_donor_count(pooled, donor_count):
     """
     invalid = False
     message = None
-    if pooled and donor_count <= 1:
+    if pooled in [True, 'True'] and donor_count <= 1:
         invalid = True
         message = (f'Found donor count {donor_count} for pooled sample. '
                    f'The donor count should be greater than 1.')
-    elif not pooled and donor_count > 1:
+    elif pooled in [False, 'False'] and donor_count > 1:
         invalid = True
         message = (f'Found donor count {donor_count} for sample that is not '
                    f'pooled. The donor count should be 1.')
