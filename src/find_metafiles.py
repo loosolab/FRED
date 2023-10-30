@@ -20,7 +20,7 @@ except OSError:
     size = 80
 
 
-def find_projects(dir_path, search, return_dict):
+def find_projects(key_yaml, dir_path, search, return_dict):
     """
     This function iterates through the search string and evaluates all parts
     within round brackets from the inside to the outside. It calls the function
@@ -37,7 +37,7 @@ def find_projects(dir_path, search, return_dict):
     # split parameters linked via or into list
 
     # read in all *_metadata.yaml(yml) within the path
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles([dir_path],return_false=True)
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml, [dir_path],return_false=True)
 
     # put round brackets around the search string
     search = '(' + search + ')'

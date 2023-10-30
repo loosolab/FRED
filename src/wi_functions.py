@@ -94,7 +94,9 @@ def get_search_mask():
 
 def find_metadata(path, search_string):
 
-    return searching.find_metadata(path, search_string)
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), '..', 'keys.yaml'))
+    return searching.find_metadata(key_yaml, path, search_string)
 
 
 def edit_wi_object(path, project_id):

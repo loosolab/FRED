@@ -8,7 +8,7 @@ from src import validate_yaml
 # file_reading.py
 
 
-def iterate_dir_metafiles(path_metafiles, mode='metadata', logical_validation=True, yaml=None, whitelist_path=None, return_false=False):
+def iterate_dir_metafiles(path_metafiles, key_ymal, mode='metadata', logical_validation=True, yaml=None, whitelist_path=None, return_false=False):
     """
     iterate through a list of paths to find all _metadata.yaml(yml) files
     :param path_metafiles: list of paths containing yaml files
@@ -45,7 +45,7 @@ def iterate_dir_metafiles(path_metafiles, mode='metadata', logical_validation=Tr
                     metafile = read_in_yaml(ypath)
                     # test if metafile is valid
                     valid, missing_mandatory_keys, invalid_keys, \
-                        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, mode, logical_validation=logical_validation, yaml=yaml, whitelist_path=whitelist_path)
+                        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, key_yaml, mode, logical_validation=logical_validation, yaml=yaml, whitelist_path=whitelist_path)
                     # add path to dic
                     metafile['path'] = ypath
                     if not valid:

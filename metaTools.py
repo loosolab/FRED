@@ -3,6 +3,7 @@ import copy
 import pathlib
 import time
 
+from src.generate import Generation
 import git
 import os
 from src import generate_metafile
@@ -12,6 +13,7 @@ from src import validate_yaml
 from src import file_reading
 from src import edit_file
 from src import utils
+from src.new_gen import Generate
 
 
 def find(args):
@@ -24,8 +26,9 @@ def find(args):
     """
 
     # call function find_projects in find_metafiles
+    key_yaml = utils.read_in_yaml('keys.yaml')
     fetch_whitelists()
-    result = find_metafiles.find_projects(args.path, args.search, True)
+    result = find_metafiles.find_projects(key_yaml, args.path, args.search, True)
 
     # test if matching metadata files were found
     if len(result) > 0:
@@ -44,15 +47,12 @@ def generate(args):
     calls script generate_metafile to start dialog
     :param args:
     """
-    try:
-        size = os.get_terminal_size()
-        size = size.columns
-    except OSError:
-        size = 80
 
     fetch_whitelists()
-    generate_file.generate_file(args.path, args.id,
-                                    args.mandatory_only, args.mode, size=size)
+    key_yaml = utils.read_in_yaml('keys.yaml')
+    gen = Generate(args.path, args.id, args.mandatory_only, args.mode,
+                     key_yaml)
+    gen.generate()
 
 
 def validate(args):
@@ -62,13 +62,14 @@ def validate(args):
                           'corrupt_files': {'count': 0, 'report':[]},
                           'error_count': 0, 'warning_count': 0}
     structure_yaml = 'keys.yaml' if args.mode == 'metadata' else 'mamplan_keys.yaml'
+    key_yaml = utils.read_in_yaml(structure_yaml)
     if os.path.isdir(args.path):
         metafiles, validation_reports = file_reading.iterate_dir_metafiles([args.path], mode=args.mode, logical_validation=logical_validation, yaml=structure_yaml)
     else:
         metafile = utils.read_in_yaml(args.path)
         file_reports = {'file': metafile, 'error': None, 'warning': None}
         valid, missing_mandatory_keys, invalid_keys, \
-        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, args.mode, logical_validation=logical_validation, yaml=structure_yaml)
+        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, key_yaml, args.mode, logical_validation=logical_validation, yaml=structure_yaml)
         metafile['path'] = args.path
         if not valid:
             validation_reports['corrupt_files']['count'] = 1
@@ -189,7 +190,7 @@ def fetch_whitelists():
     if not os.path.exists('metadata_whitelists'):
         repo = git.Repo.clone_from(
             'https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/',
-            'metadata_whitelists')
+            'metadata_whitelists', branch='new_factors')
     else:
         repo = git.Repo('metadata_whitelists')
         o = repo.remotes.origin
