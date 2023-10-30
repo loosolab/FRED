@@ -390,8 +390,8 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Signal'
-                  desc: "The strength with which a cell receives, processes, and transmits signals to its environment and to itself (e.g. 'high')."
-                  factor_desc: "The level of cell signaling (e.g. 'high')."
+                  factor_desc: "The strength with which a cell receives, processes, and transmits signals to its environment and to itself (e.g. 'high')."
+                  desc: "The level of cell signaling (e.g. 'high')."
                   value: null
                   whitelist: True
                   input_type: select
