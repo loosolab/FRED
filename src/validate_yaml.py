@@ -183,7 +183,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             elif not key_yaml or (key_yaml and key not in key_yaml):
                 invalid_keys.append(f'{key_name}:{key}')
             else:
-                print(key, key_yaml, metafile)
+                print(key, key_yaml[key]['list'], metafile)
                 if key == 'factor':
                     global factor
                     factor = metafile[key]
