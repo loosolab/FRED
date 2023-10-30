@@ -382,7 +382,7 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Strain'
-                  desc: ''
+                  desc: "A genetic variant, a subtype or a culture within a biological species (e.g. 'N2' for C. elegans)."
                   value: null
                   whitelist: True
                   input_type: select
@@ -390,7 +390,8 @@ experimental_setting:
                   mandatory: False
                   list: False
                   display_name: 'Signal'
-                  desc: ''
+                  desc: "The strength with which a cell receives, processes, and transmits signals to its environment and to itself (e.g. 'high')."
+                  factor_desc: "The level of cell signaling (e.g. 'high')."
                   value: null
                   whitelist: True
                   input_type: select
