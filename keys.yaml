@@ -270,7 +270,7 @@ experimental_setting:
             samples:
               mandatory: False
               list: True
-              display_name: 'Samples'
+              display_name: 'Sample'
               desc: 'In this part, information on each biological replicate is entered.'
               value:
                 sample_name:
