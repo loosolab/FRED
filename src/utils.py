@@ -436,7 +436,10 @@ def print_desc(desc, format='plain', size=70):
     if isinstance(desc, list):
         for elem in desc:
             if isinstance(elem, str):
-                new_desc += elem
+                if format == 'plain':
+                    new_desc += elem
+                else:
+                    new_desc += elem.replace('\n', '<br>')
             else:
                 if format == 'plain':
                     for i in range(len(elem)):
