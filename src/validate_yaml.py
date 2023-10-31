@@ -32,6 +32,8 @@ def validate_file(metafile, key_yaml, mode, logical_validation=True, yaml=None, 
             new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml, whitelist_path=whitelist_path, mode=mode)
     else:
         invalid_keys = []
+        invalid_entries = []
+        invalid_value = []
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
                                                 [x.split(':')[-1] for x in
                                                  invalid_keys], generated)
