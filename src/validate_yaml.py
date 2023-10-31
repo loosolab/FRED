@@ -11,7 +11,7 @@ generated = ['condition_name', 'sample_name']
 factor = None
 
 
-def validate_file(metafile, key_yaml, mode, logical_validation=True, yaml=None, generated=True, whitelist_path=None):
+def validate_file(metafile, key_yaml, mode, logical_validation=True, yaml=None, generated=True, whitelist_path=None, only_mandatory = False):
     """
     In this function all functions for the validation of a metadata file are
     called. The validation is based on the data in the file 'keys.yaml'. It is
@@ -27,8 +27,11 @@ def validate_file(metafile, key_yaml, mode, logical_validation=True, yaml=None, 
     logical_warn = []
     valid = True
 
-    invalid_keys, invalid_entries, invalid_value = \
-        new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml, whitelist_path=whitelist_path, mode=mode)
+    if not only_mandatory:
+        invalid_keys, invalid_entries, invalid_value = \
+            new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml, whitelist_path=whitelist_path, mode=mode)
+    else:
+        invalid_keys = []
     missing_mandatory_keys = test_for_mandatory(metafile, key_yaml,
                                                 [x.split(':')[-1] for x in
                                                  invalid_keys], generated)
@@ -194,7 +197,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     if len(node) > 0:
                         if 'input_type' in node:
                             input_type = node['input_type']
-                elif key in key_yaml and isinstance(key_yaml[key], dict) and 'list' in key_yaml[key] and isinstance(metafile, dict) and key in metafile and isinstance(metafile[key], list) != key_yaml[key]['list']:
+                elif isinstance(key_yaml, dict) and key in key_yaml and isinstance(key_yaml[key], dict) and 'list' in key_yaml[key] and isinstance(metafile, dict) and key in metafile and isinstance(metafile[key], list) != key_yaml[key]['list']:
                     invalid_keys.append(f'{key_name}:{key}')
                 elif 'input_type' in key_yaml[key]:
                     input_type = key_yaml[key]['input_type']
