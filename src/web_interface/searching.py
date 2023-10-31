@@ -137,14 +137,34 @@ def find_metadata(key_yaml, path, search_string):
     for i in range(len(files)):
         for key in files[i]:
             res = {'id': key,
-                   'path': files[i][key]['path'],
-                   'project_name': files[i][key]['project']['project_name'],
-                   'owner': files[i][key]['project']['owner']['name'],
-                   'email': files[i][key]['project']['owner']['email'],
-                   'organisms': list(
-                       utils.find_keys(files[i][key], 'organism_name')),
-                   'description': files[i][key]['project']['description'],
-                   'date': files[i][key]['project']['date']}
+                   'path': files[i][key]['path']}
+            try:
+                res['project_name'] = files[i][key]['project']['project_name']
+            except KeyError:
+                res['project_name'] = None
+
+            try:
+                res['owner'] = files[i][key]['project']['owner']['name']
+            except KeyError:
+                res['owner'] = None
+
+            try:
+                res['email'] = files[i][key]['project']['owner']['email']
+            except KeyError:
+                res['email'] = None
+
+            res['organisms'] = list(utils.find_keys(files[i][key], 'organism_name'))
+
+            try:
+                res['description'] = files[i][key]['project']['description']
+            except KeyError:
+                res['description'] = None
+
+            try:
+                res['date'] =  files[i][key]['project']['date']
+            except KeyError:
+                res['date'] = None
+
             if 'nerd' in files[i][key]['project']:
                 nerds = []
                 for nerd in files[i][key]['project']['nerd']:

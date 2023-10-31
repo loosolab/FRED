@@ -188,27 +188,28 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             elif not key_yaml or (key_yaml and key not in key_yaml):
                 invalid_keys.append(f'{key_name}:{key}')
             else:
-                if key == 'factor':
-                    global factor
-                    factor = metafile[key]
-                    local_factor = metafile[key]
-                    is_factor.append(metafile[key])
-                input_type = None
-                if key == 'values' and factor is not None:
-                    node = list(utils.find_keys(key_yaml, factor))
-                    if len(node) > 0:
-                        if 'input_type' in node:
-                            input_type = node['input_type']
-                elif isinstance(key_yaml, dict) and key in key_yaml and isinstance(key_yaml[key], dict) and 'list' in key_yaml[key] and isinstance(metafile, dict) and key in metafile and isinstance(metafile[key], list) != key_yaml[key]['list']:
-                    invalid_keys.append(f'{key_name}:{key}')
-                elif isinstance(key_yaml, dict) and key in key_yaml and isinstance(key_yaml[key], dict) and 'input_type' in key_yaml[key]:
-                    input_type = key_yaml[key]['input_type']
-                res_keys, res_entries, res_values = new_test(
-                    metafile[key], key_yaml[key]['value'], sub_lists,
-                    f'{key_name}:{key}' if key_name != '' else key,
-                    invalid_keys, invalid_entry, invalid_value, input_type,
-                    is_factor, local_factor, full_metadata, full_yaml, whitelist_path=whitelist_path, mode=mode)
-                invalid_keys = res_keys
+                if isinstance(key_yaml, dict) and key in key_yaml and isinstance(key_yaml[key], dict):
+                    if key == 'factor':
+                        global factor
+                        factor = metafile[key]
+                        local_factor = metafile[key]
+                        is_factor.append(metafile[key])
+                    input_type = None
+                    if key == 'values' and factor is not None:
+                        node = list(utils.find_keys(key_yaml, factor))
+                        if len(node) > 0:
+                            if 'input_type' in node:
+                                input_type = node['input_type']
+                    elif 'list' in key_yaml[key] and isinstance(metafile, dict) and key in metafile and isinstance(metafile[key], list) != key_yaml[key]['list']:
+                        invalid_keys.append(f'{key_name}:{key}')
+                    elif 'input_type' in key_yaml[key]:
+                        input_type = key_yaml[key]['input_type']
+                    res_keys, res_entries, res_values = new_test(
+                        metafile[key], key_yaml[key]['value'], sub_lists,
+                        f'{key_name}:{key}' if key_name != '' else key,
+                        invalid_keys, invalid_entry, invalid_value, input_type,
+                        is_factor, local_factor, full_metadata, full_yaml, whitelist_path=whitelist_path, mode=mode)
+                    invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
             sub_lists.append(item)
