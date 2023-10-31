@@ -5,7 +5,7 @@ import os
 # TODO: comment
 
 
-def save_object(dictionary, path, filename):
+def save_object(key_yaml, dictionary, path, filename):
     """
     This function saves the yaml structure into a file
     :param dictionary: the parsed wi object in yaml format
@@ -15,7 +15,7 @@ def save_object(dictionary, path, filename):
     """
 
     # search for all metadata files
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles(
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml,
         [path], return_false=True)
 
     project_id = dictionary['project']['id']
