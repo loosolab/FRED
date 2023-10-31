@@ -7,7 +7,7 @@ import src.file_reading as file_reading
 # TODO: refactor and comment
 
 
-def get_meta_info(path, project_id):
+def get_meta_info(key_yaml, path, project_id):
     """
     This file creates an HTML summary for a project containing metadata
     :param path: the path of a folder to be searched for a project
@@ -17,7 +17,7 @@ def get_meta_info(path, project_id):
 
     # TODO: own function
     # If file must be searched
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles(
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml,
         [path], return_false=True)
     correct_file = None
     for metafile in metafiles:

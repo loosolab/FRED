@@ -82,7 +82,9 @@ def save_filenames(file_str, path):
 
 
 def get_meta_info(path, project_id):
-    html_str, metafile = searching.get_meta_info(path, project_id)
+    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), '..', 'keys.yaml'))
+    html_str, metafile = searching.get_meta_info(key_yaml, path, project_id)
     return html_str
 
 
