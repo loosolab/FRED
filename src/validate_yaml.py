@@ -199,7 +199,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                             input_type = node['input_type']
                 elif isinstance(key_yaml, dict) and key in key_yaml and isinstance(key_yaml[key], dict) and 'list' in key_yaml[key] and isinstance(metafile, dict) and key in metafile and isinstance(metafile[key], list) != key_yaml[key]['list']:
                     invalid_keys.append(f'{key_name}:{key}')
-                elif 'input_type' in key_yaml[key]:
+                elif isinstance(key_yaml, dict) and key in key_yaml and isinstance(key_yaml[key], dict) and 'input_type' in key_yaml[key]:
                     input_type = key_yaml[key]['input_type']
                 res_keys, res_entries, res_values = new_test(
                     metafile[key], key_yaml[key]['value'], sub_lists,
