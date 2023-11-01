@@ -444,11 +444,11 @@ def print_desc(desc, format='plain', size=70):
                             if format == 'plain':
                                 elem[i][j] = elem[i][j].replace('33[1m', '').replace('33[0;0m', '')
                             elem[i][j] = '\n'.join(['\n'.join(textwrap.wrap(line, size * 1/len(elem[i]) - 1, break_long_words=False, replace_whitespace=False)) for line in elem[i][j].splitlines() if line.strip() != ''])
-                new_desc += tabulate(elem, tablefmt=format).replace('>\n<', '><')
+                new_desc += tabulate(elem, tablefmt=format).replace('>\n<', '><').replace('<td>', f'<td style="width:{int(1/len(elem[0])*100)}%">')
     else:
         new_desc = desc
     if format == 'html':
-        new_desc = new_desc.replace('\x0033[1m', '<b>').replace('\x0033[0;0m', '</b>').replace('\n', '<br>')
+        new_desc = new_desc.replace('\x0033[1m', '<b>').replace('\x0033[0;0m', '</b>').replace('\n', '<br>').replace('<table>', '<table class="pgm_desc_table">')
     else:
         new_desc.replace('33[1m', '').replace('33[0;0m', '')
     return new_desc
