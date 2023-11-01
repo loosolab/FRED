@@ -388,7 +388,7 @@ def get_conditions(factors, organism_name, key_yaml):
             key_yaml, {'organism': organism_name}, get_whitelist_object=True)
 
         # overwrite sample with its input fields
-        sample_desc = sample['factor_desc']
+        sample_desc = sample['desc']
         sample = sample['input_fields']
 
         # iterate over conditions

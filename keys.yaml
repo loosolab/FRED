@@ -271,8 +271,8 @@ experimental_setting:
               mandatory: False
               list: True
               display_name: "Sample"
-              desc: "In this part, information on each biological replicate is entered."
-              factor_desc: "Check conditions and add metadata that is not part of the primary investigation based on experimental factors. \033[1mPress ‘Save Sample’ for each biological replicate.\033[0;0m"
+              short_desc: "In this part, information on each biological replicate is entered."
+              desc: "Check conditions and add metadata that is not part of the primary investigation based on experimental factors. \033[1mPress ‘Save Sample’ for each biological replicate.\033[0;0m"
               value:
                 sample_name:
                   mandatory: True
