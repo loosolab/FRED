@@ -388,6 +388,7 @@ def get_conditions(factors, organism_name, key_yaml):
             key_yaml, {'organism': organism_name}, get_whitelist_object=True)
 
         # overwrite sample with its input fields
+        sample_desc = sample['factor_desc']
         sample = sample['input_fields']
 
         # iterate over conditions
@@ -444,7 +445,7 @@ def get_conditions(factors, organism_name, key_yaml):
                  'readd': readd,
                  'position': 'experimental_setting:condition',
                  'list': True, 'mandatory': True, 'list_value': [],
-                 'input_disabled': False, 'desc': sample['factor_desc'],
+                 'input_disabled': False, 'desc': sample_desc,
                  'input_fields': copy.deepcopy(filled_sample)}
 
             # add the dictionary for the condition to the condition object
