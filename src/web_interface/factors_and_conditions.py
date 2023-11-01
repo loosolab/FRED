@@ -444,7 +444,7 @@ def get_conditions(factors, organism_name, key_yaml):
                  'readd': readd,
                  'position': 'experimental_setting:condition',
                  'list': True, 'mandatory': True, 'list_value': [],
-                 'input_disabled': False, 'desc': '',
+                 'input_disabled': False, 'desc': sample['factor_desc'],
                  'input_fields': copy.deepcopy(filled_sample)}
 
             # add the dictionary for the condition to the condition object
