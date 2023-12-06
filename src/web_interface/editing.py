@@ -21,7 +21,7 @@ def edit_wi_object(path, project_id, key_yaml):
     :return: wi_object: the filled wi object
     """
     # TODO: as Parameter at get_info
-    html_str, meta_yaml = searching.get_meta_info(path, project_id)
+    html_str, meta_yaml = searching.get_meta_info(key_yaml,path, project_id)
     whitelist_object = {}
 
     if meta_yaml is not None:
