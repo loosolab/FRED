@@ -602,6 +602,14 @@ experimental_setting:
                       value: null
                       whitelist: True
                       input_type: select
+                    disease_risk:
+                      mandatory: False
+                      list: False
+                      display_name: "Risk"
+                      desc: "Risk of contracting disease. [moderate, severe]"
+                      value: null
+                      whitelist: True
+                      input_type: select
                 ethnicity:
                   mandatory: False
                   list: False
