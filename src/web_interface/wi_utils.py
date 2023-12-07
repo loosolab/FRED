@@ -202,7 +202,7 @@ def split_value_unit(value_unit):
     """
 
     # split value and unit
-    unit = value_unit.lstrip('0123456789')
+    unit = value_unit.lstrip('0123456789.')
     value = int(value_unit[:len(value_unit) - len(unit)])
 
     return {'value': value, 'unit': unit}
