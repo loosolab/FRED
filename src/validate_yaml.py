@@ -284,7 +284,7 @@ def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None
                 'whitelist_type'] == 'group':
             #TODO: linked whitelists
             whitelist = utils.read_grouped_whitelist(whitelist, {})
-            if 'whitelist' in whitelist
+            if 'whitelist' in whitelist:
                 if not isinstance(whitelist['whitelist'], list):
                     whitelist = [x for xs in list(whitelist['whitelist'].values())
                                 if xs is not None for x in xs]
