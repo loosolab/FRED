@@ -1451,7 +1451,7 @@ def get_short_value(factor, short_factor, value, key_yaml, short_cond, result_di
             utils.get_whitelist(os.path.join('abbrev', 'unit'), result_dict)[
                 'whitelist']
             value_unit = wi_utils.split_value_unit(value)
-            short_cond += f'{short_factor}.{value_unit["value"].replace('.', 'p')}' \
+            short_cond += f'{short_factor}.{value_unit["value"].replace(".", "p")}' \
                           f'{short_units[value_unit["unit"]] if value_unit["unit"] in short_units else value_unit["unit"]}'
         else:
             val_whitelist = utils.get_whitelist(os.path.join('abbrev', factor),
