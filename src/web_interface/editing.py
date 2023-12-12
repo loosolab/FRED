@@ -81,6 +81,8 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
             # TODO: WTF?
             if 'input_fields' in f_val:
                 f_val = f_val['input_fields']
+                if 'position' in f_val and f_val['position'].split(':')[-1] == 'experimental_setting':
+                    f_val['input_disabled'] = True
             else:
                 f_val = f_val['value']
             filled_value.append(f_val)
@@ -173,7 +175,7 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                                  'position': 'experimental_setting:condition',
                                  'list': True, 'mandatory': True,
                                  'list_value': samples,
-                                 'input_disabled': False, 'desc': '',
+                                 'input_disabled': True, 'desc': '',
                                  'input_fields': input_fields}
                             conditions.append(d)
                         f['list_value'] = conditions
