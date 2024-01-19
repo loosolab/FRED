@@ -1,5 +1,4 @@
 import src.utils as utils
-import src.generate_metafile as generate
 import src.web_interface.yaml_to_wi_object as yto
 import src.web_interface.factors_and_conditions as fac_cond
 import src.web_interface.searching as searching
@@ -21,7 +20,7 @@ def edit_wi_object(path, project_id, key_yaml):
     :return: wi_object: the filled wi object
     """
     # TODO: as Parameter at get_info
-    html_str, meta_yaml = searching.get_meta_info(key_yaml,path, project_id)
+    html_str, meta_yaml = searching.get_meta_info(key_yaml, path, project_id)
     whitelist_object = {}
 
     if meta_yaml is not None:
@@ -81,7 +80,8 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
             # TODO: WTF?
             if 'input_fields' in f_val:
                 f_val = f_val['input_fields']
-                if 'position' in f_val and f_val['position'].split(':')[-1] == 'experimental_setting':
+                if 'position' in f_val and f_val['position'].split(':')[-1] \
+                        == 'experimental_setting':
                     f_val['input_disabled'] = True
             else:
                 f_val = f_val['value']
@@ -132,9 +132,9 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
 
                         for cond in meta_yaml[key]:
                             samples = []
-                            split_cond = generate.split_cond(
+                            split_cond = utils.split_cond(
                                 cond['condition_name'])
-                            sample_name = generate.get_short_name(
+                            sample_name = utils.get_short_name(
                                 cond['condition_name'], {}, key_yaml)
                             input_fields = fac_cond.get_samples(
                                 split_cond, copy.deepcopy(sample), real_val,

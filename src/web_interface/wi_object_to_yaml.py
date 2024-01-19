@@ -510,7 +510,7 @@ def parse_factor(factors, key_yaml, double):
                     and 'value_unit' in infos[0]['special_case']:
 
                 factors['values'][j] = \
-                    wi_utils.split_value_unit(
+                    utils.split_value_unit(
                         factors['values'][j])
 
     # remove the keys 'header' and 'whitelist_keys'

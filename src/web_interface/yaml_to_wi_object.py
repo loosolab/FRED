@@ -97,7 +97,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
             part_object = {'position': pos, 'mandatory': node['mandatory'],
                            'list': node['list'],
                            'displayName': node['display_name'],
-                           'desc': utils.print_desc(node['desc'], 'html').replace('\n','<br>'),
+                           'desc': utils.print_desc(node['desc'], 'html').replace('\n', '<br>'),
                            'value': None,
                            'whitelist': whitelist,
                            'whitelist_type': whitelist_type,
@@ -157,7 +157,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
             # information for one expandable with its input fields
             part_object = {'position': pos, 'mandatory': node['mandatory'],
                            'list': node['list'], 'title': node['display_name'],
-                           'desc': utils.print_desc(node['desc'], 'html').replace('\n','<br>'), 'input_fields': input_fields,
+                           'desc': utils.print_desc(node['desc'], 'html').replace('\n', '<br>'), 'input_fields': input_fields,
                            'input_disabled': input_disabled}
 
             if 'special_case' in node:
@@ -194,7 +194,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
         part_object = {'position': pos, 'mandatory': node['mandatory'],
                        'list': node['list'],
                        'displayName': node['display_name'],
-                       'desc': utils.print_desc(node['desc'], 'html').replace('\n','<br>'), 'value': node['value'],
+                       'desc': utils.print_desc(node['desc'], 'html').replace('\n', '<br>'), 'value': node['value'],
                        'whitelist': whitelist,
                        'whitelist_type': whitelist_type,
                        'input_type': input_type,
@@ -232,7 +232,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
                         node['special_case']['restriction']['regex']
                 if 'max_length' in node['special_case']['restriction']:
                     part_object['restriction']['max_length'] = \
-                    node['special_case']['restriction']['max_length']
+                        node['special_case']['restriction']['max_length']
 
         # add the key 'search_info' to all fields using autofill to help get
         # the correct whitelist via the website

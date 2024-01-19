@@ -193,25 +193,6 @@ def str_to_date(value):
     return default_time.strftime("%Y-%m-%dT%X.%fZ")
 
 
-def split_value_unit(value_unit):
-    """
-    This function splits a value_unit (e.g. 2weeks) into a value and unit and
-    returns them in a dictionary
-    :param value_unit: a string containing a number and a unit
-    :return: a dictionary containing value and unit
-    """
-
-    # split value and unit
-    unit = value_unit.lstrip('0123456789.')
-    value = value_unit[:len(value_unit) - len(unit)]
-    if '.' in value:
-        value = float(value)
-    else:
-        value = int(value)
-
-    return {'value': value, 'unit': unit}
-
-
 def parse_headers(headers, value, mode='dict'):
     """
     This function splits a value into a dictionary depending on the header

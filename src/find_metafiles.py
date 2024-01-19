@@ -3,7 +3,7 @@ import os
 from itertools import chain
 from tabulate import tabulate
 import src.utils as utils
-import src.generate_metafile as generate
+from src.generate import Generate
 import src.file_reading as file_reading
 
 
@@ -289,15 +289,15 @@ def calculate_match(metafile, search_parameters):
                 and_param = and_param.rstrip(f':{should_be_found}')
 
                 # split the search parameter into keys and value
-                p = generate.split_cond2(and_param)[0]
+                #p = generate.split_cond2(and_param)[0]
 
                 # if there is a value for the keys than split it at ':' to get
                 # a list of all chained metadata keys and save them in 'params'
-                if p[0] != '':
-                    params = p[0].split(':')
+                #if p[0] != '':
+                #    params = p[0].split(':')
 
                 # add the value to the 'params' list
-                params.append(p[1])
+                #params.append(p[1])
 
                 # add 'should_be_found' to the 'params' list
                 params.append(should_be_found)

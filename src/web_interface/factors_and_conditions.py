@@ -1,5 +1,4 @@
 import src.utils as utils
-import src.generate_metafile as generate
 import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.yaml_to_wi_object as yto
 import src.web_interface.wi_utils as wi_utils
@@ -67,8 +66,7 @@ def get_factors(organism, key_yaml):
                 values[factor]['restriction'] = {'regex': ' ',
                                                  'max_length': 10}
 
-                if 'special_case' in node and 'restriction' in node[
-                    'special_case']:
+                if 'special_case' in node and 'restriction' in node['special_case']:
                     if 'regex' in node['special_case']['restriction']:
                         values[factor]['restriction']['regex'] = \
                             node['special_case']['restriction']['regex']
@@ -265,10 +263,6 @@ def get_conditions(factors, organism_name, key_yaml):
             # value is a dictionary -> e.g. disease
             if isinstance(val, dict):
 
-                # initialize multi with False -> bool to define weather a
-                # factor can occur multiple times in one condition
-                multi = True
-
                 # remove keys with value None or empty lists and dictionaries
                 val = {k: v for k, v in val.items() if
                        not (type(v) in [list, dict] and len(v) == 0)
@@ -310,12 +304,12 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 # generate combinations of the values of the dictionary for the
                 # conditions and overwrite the values with them
-                factors[i]['values'] = generate.get_combis(
-                    val, factors[i]['factor'], multi, {'organism': organism_name.split(' ')[0]}, key_yaml)
+                factors[i]['values'] = utils.get_combis(
+                    val, factors[i]['factor'], {'organism': organism_name.split(' ')[0]}, key_yaml)
 
         elif factor_infos[0]['list']:
 
-            factors[i]['values'] = generate.get_combis(factors[i]['values'], factors[i]['factor'], True, {'organism': organism_name.split(' ')[0]}, key_yaml)
+            factors[i]['values'] = utils.get_combis(factors[i]['values'], factors[i]['factor'], {'organism': organism_name.split(' ')[0]}, key_yaml)
 
         # iterate over all values
         for j in range(len(factors[i]['values'])):
@@ -368,7 +362,7 @@ def get_conditions(factors, organism_name, key_yaml):
                 real_val[factors[i]['values'][j]] = full_value
 
     # generate the conditions
-    conditions = generate.get_condition_combinations(factors)
+    conditions = utils.get_condition_combinations(factors)
 
     # extract the properties of 'sample' from the general structure
     sample = list(utils.find_keys(key_yaml, 'samples'))
@@ -395,10 +389,10 @@ def get_conditions(factors, organism_name, key_yaml):
         for cond in conditions:
 
             # generate a sample name from the condition
-            sample_name = generate.get_short_name(cond, {'organism': organism_name}, key_yaml)
+            sample_name = utils.get_short_name(cond, {'organism': organism_name}, key_yaml)
 
             # split the condition into key-value pairs
-            split_condition = generate.split_cond(cond)
+            split_condition = utils.split_cond(cond)
             search_condition = []
 
             # TODO: remove list (can there be a list?) or own function for items
@@ -608,7 +602,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                 value_unit = c[1]
                             else:
                                 # split the value into value and unit
-                                value_unit = wi_utils.split_value_unit(c[1])
+                                value_unit = utils.split_value_unit(c[1])
 
                             # save the value and unit in the sample
                             sample[i]['value'] = value_unit['value']

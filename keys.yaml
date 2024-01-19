@@ -238,10 +238,8 @@ experimental_setting:
     conditions:
       mandatory: True
       list: True
-      display_name: "Samples"
+      display_name: "Conditions"
       desc: "Add samples to conditions."
-      special_case:
-        generated: now
       value:
         condition_name:
           mandatory: True
@@ -264,6 +262,8 @@ experimental_setting:
               list: False
               display_name: "Count"
               desc: "Enter the number of biological replicates."
+              special_case:
+                generated: end
               value: null
               whitelist: False
               input_type: number
@@ -273,12 +273,16 @@ experimental_setting:
               display_name: "Sample"
               short_desc: "In this part, information on each biological replicate is entered."
               desc: "Check conditions and add metadata that is not part of the primary investigation based on experimental factors. \033[1mPress ‘Save Sample’ for each biological replicate.\033[0;0m"
+              special_case:
+                generated: now
               value:
                 sample_name:
                   mandatory: True
                   list: False
                   display_name: "Sample Name"
                   desc: "Unique name automatically assigned to each sample."
+                  special_case:
+                    generated: now
                   value: null
                   whitelist: False
                   input_type: long_text
@@ -287,6 +291,8 @@ experimental_setting:
                   list: False
                   display_name: "Pooled"
                   desc: "Collection of multiple individuals in a pool.\n[FALSE]"
+                  special_case:
+                    generated: fill
                   value: False
                   whitelist: False
                   input_type: bool
@@ -295,6 +301,8 @@ experimental_setting:
                   list: False
                   display_name: "Pool Donor Count"
                   desc: "If pooled is TRUE, how many individuals were pooled in this sample."
+                  special_case:
+                    generated: fill
                   value: 1
                   whitelist: False
                   input_type: number
@@ -303,6 +311,8 @@ experimental_setting:
                   list: False
                   display_name: "Number of Measurements"
                   desc: "Measurements done for one biological/technical replicate (typically 1). Mostly used in combination with a specific technique such as gel slices in proteomics.\n[1]"
+                  special_case:
+                    generated: fill
                   value: 1
                   whitelist: False
                   input_type: number

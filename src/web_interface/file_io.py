@@ -15,8 +15,8 @@ def save_object(key_yaml, dictionary, path, filename):
     """
 
     # search for all metadata files
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml,
-        [path], return_false=True)
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles(
+        key_yaml, [path], return_false=True)
 
     project_id = dictionary['project']['id']
     # TODO: own function

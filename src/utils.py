@@ -1,11 +1,10 @@
-import time
-
 from tabulate import tabulate
 import textwrap
 import yaml
 import os
 import copy
 import json
+import math
 
 # The following functions were copied from Mampok
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/utils.py
@@ -18,7 +17,7 @@ def save_as_yaml(dictionary, file_path):
     :param file_path: the path of the yaml file to be created
     """
     with open(file_path, 'w') as file:
-        documents = yaml.dump(dictionary, file, sort_keys=False)
+        yaml.dump(dictionary, file, sort_keys=False)
 
 
 def read_in_yaml(yaml_file):
@@ -97,7 +96,8 @@ def find_values(node, kv):
                     if kv == val:
                         yield kv
                 else:
-                    if all(elem in str(val).lower() for elem in str(kv).lower().split(' ')):
+                    if all(elem in str(val).lower() for elem in
+                           str(kv).lower().split(' ')):
                         yield val
 
 
@@ -278,6 +278,12 @@ def get_whitelist(key, filled_object, all_plain=False, whitelist_path=None):
     return whitelist
 
 
+def find_position(item, l):
+    for elem in l:
+        item = item[elem]
+    return item
+
+
 def find_list_key(item, l):
     """
     This function finds an item in a list of dictionaries.
@@ -443,7 +449,7 @@ def print_desc(desc, format='plain', size=70):
                         for j in range(len(elem[i])):
                             if format == 'plain':
                                 elem[i][j] = elem[i][j].replace('33[1m', '').replace('33[0;0m', '')
-                            elem[i][j] = '\n'.join(['\n'.join(textwrap.wrap(line, size * 1/len(elem[i]) - 1, break_long_words=False, replace_whitespace=False)) for line in elem[i][j].splitlines() if line.strip() != ''])
+                            elem[i][j] = '\n'.join(['\n'.join(textwrap.wrap(line, math.ceil(size * 1/(len(elem[i])+1)), break_long_words=False, replace_whitespace=False)) for line in elem[i][j].splitlines() if line.strip() != ''])
                 new_desc += tabulate(elem, tablefmt=format).replace('>\n<', '><').replace('<td>', f'<td style="width:{int(1/len(elem[0])*100)}%; vertical-align:top;">')
     else:
         new_desc = desc
@@ -454,3 +460,340 @@ def print_desc(desc, format='plain', size=70):
     return new_desc
 
 
+def get_combis(values, key, result_dict, key_yaml):
+    """
+    This function creates all combinations for one experimental factor that can
+    occur multiple tims in one conditions.
+    :param values: the chosen values for the experimental factor
+    :param key: the name of the experimental factor
+    :return: disease_values: a list of all possible combinations of the
+                             experimental factor
+    """
+    if key == 'gene_editing':
+        whitelist_key = 'editing_method'
+        depend_key = 'editing_type'
+        whitelist = get_whitelist(whitelist_key, result_dict)
+    else:
+        whitelist_key = None
+        depend_key = None
+        whitelist = None
+
+    control_value = None
+    control_values = []
+
+    if isinstance(values, list):
+        possible_values = []
+        for i in range(len(values)):
+            new_vals = []
+            if isinstance(values[i], dict):
+                v = '|'.join(
+                    [f'{k}:"{values[i][k]}"' for k in values[i] if
+                     k not in ['ident_key', 'control']])
+                s = f'{key}:{"{"}{v}{"}"}'
+            else:
+                s = f'{key}:"{values[i]}"'
+            for p_val in possible_values:
+                new_vals.append(f'{p_val}-{s}')
+            possible_values += new_vals
+            possible_values.append(s)
+        return possible_values
+
+    else:
+        values = {k: v for k, v in values.items() if
+                  not (type(v) in [list, dict] and len(v) == 0)
+                  and v is not None}
+
+        if 'ident_key' in values and values[
+            'ident_key'] is not None and values['ident_key'] in values:
+            ident_key = values['ident_key']
+            start = ident_key
+            values.pop('ident_key')
+        else:
+            ident_key = None
+            if 'ident_key' in values:
+                values.pop('ident_key')
+            start = list(values.keys())[0]
+
+        possible_values = {}
+        disease_values = []
+        control = values['control'] if 'control' in values else None
+        if 'control' in values:
+            values.pop('control')
+
+        depend = []
+        for elem in values[start]:
+            value = []
+            possible_values[elem] = []
+            if control and start in control and control[start] == elem:
+                control_value = f'{start}:\"{elem}\"'
+            else:
+                if elem.startswith(f'{start}:{"{"}'):
+                    value = [elem]
+                else:
+                    value = [f'{start}:"{elem}"']
+            if start == ident_key:
+                depend += value
+
+            for val_key in values:
+
+                val_info = [x for x in
+                            list(find_keys(key_yaml, val_key))
+                            if isinstance(x, dict)]
+
+                value2 = []
+                if val_key != start:
+                    for x in value:
+                        val = x
+                        for v in values[val_key]:
+                            if isinstance(v,
+                                          dict) and 'value' in v and 'unit' in v:
+                                v = f'{v["value"]}{v["unit"]}'
+                            if control and val_key in control and \
+                                    control[val_key] == v:
+                                control_value = f'{val_key}:\"{v}\"'
+                            elif len(val_info) > 0 and 'special_case' in \
+                                    val_info[0] and 'merge' in val_info[0][
+                                'special_case']:
+                                value2.append(f'{val}|{val_key}:{v}')
+                            elif whitelist and val_key == whitelist_key:
+                                g_key = None
+                                for group_key in whitelist[
+                                    'whitelist']:
+                                    if v in whitelist['whitelist'][
+                                        group_key]:
+                                        g_key = group_key
+                                        break
+                                if g_key == 'all' or f'{depend_key}:"{g_key}"' in val:
+                                    if v.startswith(
+                                            f'{val_key}:{"{"}'):
+                                        if v not in val:
+                                            value2.append(f'{val}|{v}')
+                                    else:
+                                        if f'{val_key}:\"{v}\"' not in val:
+                                            value2.append(
+                                                f'{val}|{val_key}:\"{v}\"')
+                                else:
+                                    value2.append(val)
+                            elif v.startswith(f'{val_key}:{"{"}'):
+                                if v not in val:
+                                    value2.append(f'{val}|{v}')
+                            else:
+                                if f'{val_key}:\"{v}\"' not in val:
+                                    value2.append(
+                                        f'{val}|{val_key}:\"{v}\"')
+                            if len(val_info) > 0 and 'special_case' in \
+                                    val_info[0] and 'insert_control' in \
+                                    val_info[0]['special_case']:
+                                control_values.append(
+                                    f'|{val_key}:\"{v}\"')
+                                new_c_vals = []
+                                for c_val in control_values:
+                                    if val_key not in c_val:
+                                        new_c_vals.append(
+                                            f'{c_val}|{val_key}:\"{v}\"')
+                                control_values += new_c_vals
+                    value = value2
+
+            possible_values[elem] = value
+
+            for z in possible_values:
+                for x in possible_values[z]:
+                    part_values = []
+                    disease_values.append(f'{key}:{"{"}{x}{"}"}')
+                    for d in disease_values:
+                        if f'{key}:{"{"}{x}{"}"}' not in d and f'{d}-{key}:{"{"}{x}{"}"}' not in disease_values and f'{key}:{"{"}{x}{"}"}-{d}' not in disease_values:
+                            part_values.append(
+                                f'{d}-{key}:{"{"}{x}{"}"}')
+                    disease_values += part_values
+
+        if control_value is not None:
+            disease_values.append(f'{key}:{"{"}{control_value}{"}"}')
+            for cntr in control_values:
+                disease_values.append(
+                    f'{key}:{"{"}{control_value}{cntr}{"}"}')
+
+        return list(set(disease_values))
+
+
+def get_condition_combinations(factors):
+    """
+    This function returns all possible combinations for experimental factors
+    :param factors: multiple dictionaries containing the factors and their
+                    respective values
+    :return: a list containing all combinations of conditions
+    """
+
+    # create a list to store all conditions
+    combinations = []
+
+    # iterate over the factor dictionaries
+    for i in range(len(factors)):
+
+        # iterate over the values in a dictionary
+        for value in factors[i]['values']:
+
+            # if the value is of type value_unit, chain the value and its unit
+            # in a string
+            if isinstance(value, dict) and 'value' in value \
+                    and 'unit' in value:
+                value = f'{value["value"]}{value["unit"]}'
+
+            # if the value starts with '<factor>:' then add it to the
+            # combinations list, otherwise put the '<factor>:' in front of the
+            # value and add it to the combinations list
+            if type(value) == str and \
+                    value.split(':')[0] == factors[i]['factor']:
+                combinations.append(f'{value}')
+            else:
+                combinations.append(f'{factors[i]["factor"]}:"{value}"')
+
+            # iterate over the factor dictionarie starting at i+1
+            for j in range(i + 1, len(factors)):
+
+                # call this function on the sublist of factors from i+1
+                comb = get_condition_combinations(factors[j:])
+
+                # iterate over the combinations created from the sublist of
+                # factors
+                for c in comb:
+
+                    # if the value starts with '<factor>:' than chain it to the
+                    # created combination otherwise do the same but add
+                    # '<factor>:' in front of the value
+                    # add the chained combination to the combinations list
+                    if type(value) == str and \
+                            value.split(':')[0] == factors[i]['factor']:
+                        combinations.append(f'{value}-{c}')
+                    else:
+                        combinations.append(
+                            f'{factors[i]["factor"]}:"{value}"-{c}')
+
+    # return a list of all combinations
+    return list(set(combinations))
+
+
+def get_short_name(condition, result_dict, key_yaml):
+    """
+    This function creates an abbreviated version of a condition.
+    :param condition: the condition that should be abbreviated
+    :param result_dict: a dictionary containing all filled information
+    :return: short_condition: an abbreviated version of the condition
+    """
+    conds = split_cond(condition)
+    whitelist = get_whitelist(os.path.join('abbrev', 'factor'),
+                              result_dict)['whitelist']
+    short_cond = []
+    for c in conds:
+        if c[0] in whitelist:
+            k = whitelist[c[0]]
+        else:
+            k = c[0]
+
+        short_cond.append(
+            get_short_value(c[0], k, c[1], '', result_dict, key_yaml))
+
+    short_condition = '-'.join(short_cond).replace('/', '')
+    return short_condition
+
+
+def get_short_value(factor, short_factor, value, short_cond, result_dict, key_yaml):
+    if isinstance(value, dict):
+        cond_whitelist = get_whitelist(
+            os.path.join('abbrev', factor),
+            result_dict)
+        new_vals = {}
+        for v in value:
+            new_v = cond_whitelist['whitelist'][
+                v] if cond_whitelist and v in cond_whitelist[
+                'whitelist'] else v
+            new_vals[new_v] = get_short_value(v, new_v, value[v],
+                                              short_cond, result_dict,
+                                              key_yaml)
+
+        val = '+'.join([f'{new_vals[x].replace(" ", "")}' for x in
+                        list(new_vals.keys())])
+        short_cond += f'{short_factor}#{val}'
+    else:
+        info = list(find_keys(key_yaml, factor))
+        if len(info) > 0 and 'special_case' in info[0] and 'value_unit' in \
+                info[0]['special_case']:
+            short_units = \
+                get_whitelist(os.path.join('abbrev', 'unit'),
+                              result_dict)[
+                    'whitelist']
+            value_unit = split_value_unit(value)
+            short_cond += f'{short_factor}.{value_unit["value"]}' \
+                          f'{short_units[value_unit["unit"]] if value_unit["unit"] in short_units else value_unit["unit"]}'
+        else:
+            val_whitelist = get_whitelist(
+                os.path.join('abbrev', factor),
+                result_dict)
+            if val_whitelist and value.lower() in val_whitelist[
+                'whitelist']:
+                short_cond += f'{short_factor}.' \
+                              f'{val_whitelist["whitelist"][value.lower()]}'
+            elif val_whitelist and value in val_whitelist['whitelist']:
+                short_cond += f'{short_factor}.{val_whitelist["whitelist"][value]}'
+            else:
+                short_cond += f'{short_factor}.{value}'
+    return short_cond
+
+
+def split_value_unit(value_unit):
+    """
+    This function splits a value_unit (e.g. 2weeks) into a value and unit and
+    returns them in a dictionary
+    :param value_unit: a string containing a number and a unit
+    :return: a dictionary containing value and unit
+    """
+
+    # split value and unit
+    unit = value_unit.lstrip('0123456789.')
+    value = value_unit[:len(value_unit) - len(unit)]
+    if '.' in value:
+        value = float(value)
+    else:
+        value = int(value)
+
+    return {'value': value, 'unit': unit}
+
+
+def split_cond(condition):
+    conditions = []
+    count = 0
+    cond = '"'
+    for i in range(len(condition)):
+        if condition[i] == '\"':
+            count += 1
+            cond += condition[i]
+        elif condition[i] == '-':
+            if count % 2 == 0:
+                conditions.append(cond)
+                cond = '"'
+            else:
+                cond += condition[i]
+        elif condition[i] == ':':
+            if count % 2 == 0:
+                cond += f'"{condition[i]}'
+            else:
+                cond += condition[i]
+        elif condition[i] == '{':
+            if count % 2 == 0:
+                cond += f'{condition[i]}"'
+            else:
+                cond += condition[i]
+        elif condition[i] == '|':
+            if count % 2 == 0:
+                cond += f',"'
+            else:
+                cond += condition[i]
+        else:
+            cond += condition[i]
+    conditions.append(cond)
+    for j in range(len(conditions)):
+        d = json.loads(f'{"{"}{conditions[j]}{"}"}')
+
+        key = list(d.keys())[0]
+        conditions[j] = (key, d[key])
+
+    return conditions

@@ -3,17 +3,14 @@ import copy
 import pathlib
 import time
 
-from src.generate import Generation
+from src.generate import Generate
 import git
 import os
-from src import generate_metafile
-from src import generate_file
 from src import find_metafiles
 from src import validate_yaml
 from src import file_reading
 from src import edit_file
 from src import utils
-from src.new_gen import Generate
 
 
 def find(args):
@@ -27,7 +24,7 @@ def find(args):
 
     # call function find_projects in find_metafiles
     key_yaml = utils.read_in_yaml('keys.yaml')
-    fetch_whitelists()
+    #fetch_whitelists()
     result = find_metafiles.find_projects(key_yaml, args.path, args.search, True)
 
     # test if matching metadata files were found
@@ -47,16 +44,16 @@ def generate(args):
     calls script generate_metafile to start dialog
     :param args:
     """
-
-    fetch_whitelists()
-    key_yaml = utils.read_in_yaml('keys.yaml')
+    config = utils.read_in_yaml(args.config)
+    fetch_whitelists(config['whitelist_repository'], config['whitelist_path'])
+    key_yaml = utils.read_in_yaml(config['keys_yaml'])
     gen = Generate(args.path, args.id, args.mandatory_only, args.mode,
                      key_yaml)
     gen.generate()
 
 
 def validate(args):
-    fetch_whitelists()
+    #fetch_whitelists()
     logical_validation = False if args.skip_logic else True
     validation_reports = {'all_files': 1,
                           'corrupt_files': {'count': 0, 'report':[]},
@@ -64,7 +61,7 @@ def validate(args):
     structure_yaml = 'keys.yaml' if args.mode == 'metadata' else 'mamplan_keys.yaml'
     key_yaml = utils.read_in_yaml(structure_yaml)
     if os.path.isdir(args.path):
-        metafiles, validation_reports = file_reading.iterate_dir_metafiles([args.path], mode=args.mode, logical_validation=logical_validation, yaml=structure_yaml)
+        metafiles, validation_reports = file_reading.iterate_dir_metafiles(structure_yaml, [args.path], mode=args.mode, logical_validation=logical_validation, yaml=structure_yaml)
     else:
         metafile = utils.read_in_yaml(args.path)
         file_reports = {'file': metafile, 'error': None, 'warning': None}
@@ -98,8 +95,8 @@ def validate(args):
         else:
             options = ['print report', 'save report to txt file', 'save report to json file', 'save report to yaml file']
             print(f'Do you want to see a report? Choose from the following options (1,...,{len(options)} or n)')
-            generate_metafile.print_option_list(options, '')
-            res = generate_metafile.parse_input_list(options, True)
+            #generate_metafile.print_option_list(options, '')
+            #res = generate_metafile.parse_input_list(options, True)
 
         output_report = {'report': copy.deepcopy(validation_reports)['corrupt_files']['report']}
         for elem in output_report['report']:
@@ -185,12 +182,10 @@ def edit(args):
     edit_file.edit_file(args.path, args.mode, args.mandatory_only, size)
 
 
-def fetch_whitelists():
+def fetch_whitelists(w_repo, w_path):
     print('Fetching whitelists...\n')
     if not os.path.exists('metadata_whitelists'):
-        repo = git.Repo.clone_from(
-            'https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git/',
-            'metadata_whitelists', branch='new_factors')
+        repo = git.Repo.clone_from(w_repo, w_path, branch='new_factors')
     else:
         repo = git.Repo('metadata_whitelists')
         o = repo.remotes.origin
@@ -220,6 +215,8 @@ def main():
     create_group.add_argument('-p', '--path', type=pathlib.Path,
                                  required=True,
                                  help='The path to save the yaml')
+    create_group.add_argument('-c', '--config', type=pathlib.Path,
+                              help='Config file', default='config.yaml')
     create_group.add_argument('-id', '--id', type=str,
                                  required=True,
                                  help='The ID of the experiment')
