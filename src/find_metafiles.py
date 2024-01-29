@@ -289,15 +289,15 @@ def calculate_match(metafile, search_parameters):
                 and_param = and_param.rstrip(f':{should_be_found}')
 
                 # split the search parameter into keys and value
-                p = utils.split_cond(and_param)[0]
+                #p = generate.split_cond2(and_param)[0]
 
                 # if there is a value for the keys than split it at ':' to get
                 # a list of all chained metadata keys and save them in 'params'
-                if p[0] != '':
-                    params = p[0].split(':')
+                #if p[0] != '':
+                #    params = p[0].split(':')
 
                 # add the value to the 'params' list
-                params.append(p[1])
+                #params.append(p[1])
 
                 # add 'should_be_found' to the 'params' list
                 params.append(should_be_found)
@@ -314,7 +314,9 @@ def calculate_match(metafile, search_parameters):
             # evaluated (e.g. as part of a sub search string within brackets)
             # then set the match to True if the value equals 'True' and to
             # False if it equals 'False'
-            if len(params) == 2 and params[0] == 'True':
+            if len(params) == 1 and params[0] in ['True', 'False']:
+                match = bool(params[0])
+            elif len(params) == 2 and params[0] == 'True':
                 match = True
             elif len(params) == 2 and params[0] == 'False':
                 match = False
