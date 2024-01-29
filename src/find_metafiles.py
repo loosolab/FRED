@@ -322,6 +322,7 @@ def calculate_match(metafile, search_parameters):
             else:
 
                 # call find_entry to evaluate match
+                print(params, len(params))
                 match = find_entry(metafile, params[0:-2], params[-2])
 
             # set match to True if it was found while it was supposed to be
