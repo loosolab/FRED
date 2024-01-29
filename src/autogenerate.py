@@ -3,28 +3,53 @@ import copy
 from src import utils
 
 
-class Autogenerate():
+class Autogenerate:
 
     def __init__(self, gen, position):
+        """
+        initialize class
+        :param gen: an object generated from class Generate
+        :param position: the position of the key
+        """
         self.gen = gen
         self.position = position
 
     def get_id(self):
+        """
+        returns the project ID
+        :return: project_id from class Generate
+        """
         return self.gen.project_id
 
     def get_setting_id(self):
-        setting_ids = list(utils.find_keys('setting_id', self.gen.result_dict))
-        if len(setting_ids) > 0:
+        """
+        creates an ID for the experimental setting
+        :return: setting_id (exp1, exp2, ...)
+        """
 
+        # search for setting IDs in result_dict
+        setting_ids = list(utils.find_keys('setting_id', self.gen.result_dict))
+
+        # find the setting_id with the highest index and add 1
+        if len(setting_ids) > 0:
             max_id = 0
             for s_id in setting_ids[0]:
                 max_id = max(max_id, int(s_id.replace('exp', '')))
             setting_id = f'exp{max_id+1}'
+
+        # set setting_id to exp1 if it is the first setting
         else:
             setting_id = 'exp1'
+
         return setting_id
 
     def get_experimental_factors(self):
+        """
+        request the user to specify the experimental factors
+        :return: experimental_factors: list of dictionaries
+                 -> [{factor: <fac>, values: [<val>,...]}, ...]
+        """
+
 
         factor_list = utils.get_whitelist('factor', self.gen.result_dict)['whitelist']
         plain_list = []
