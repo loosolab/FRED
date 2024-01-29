@@ -100,8 +100,12 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
 
     wi_object[fill_key] = filled_value
 
-    if wi_object['position'].split(':')[-1] == 'id':
-        wi_object['input_disabled'] = True
+    if 'special_case' in wi_object and 'edit' in wi_object['special_case']:
+        if wi_object['special_case']['edit'] == 'not editable':
+            wi_object['input_disabled'] = True
+            wi_object['delete_disabled'] = True
+        elif wi_object['special_case']['edit'] == 'not removale':
+            wi_object['delete_disabled'] = True
     return wi_object, whitelist_object
 
 

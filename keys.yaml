@@ -14,6 +14,7 @@ project:
         restriction:
           regex: '\b(?![a-z]([a-z]([a-z][0-9]*)?)?\b)\w+'
           max_length: 7
+        edit: "not editable"
       value: null
       whitelist: False
       input_type: restricted_short_text
@@ -171,6 +172,8 @@ experimental_setting:
   mandatory: True
   list: True
   display_name: "Experimental setting"
+  special_case:
+    edit: "not removable"
   desc:
     - "Define experimental factors of interest and how they were combined to conditions that represent samples. You can specify multiple experimental settings for multiple sample submissions and/or multiple techniques that were applied (RNA/ATAC etc.).\n\n"
     - [["\033[1mExperimental Factors:\033[0;0m", "\033[1mConditions:\033[0;0m", "\033[1mBiological Replicates:\033[0;0m", "\033[1mTechnical Replicates:\033[0;0m", "\033[1mMeasurements:\033[0;0m"], ["These correspond to properties studied in the experiment, NOT all possible data pertaining to a sample. A unique combination of these represents a condition. Experimental factors can be added using ‘Edit Factors and generate Conditions’, while additional metadata can be supplied at the ‘Samples’ stage below.", "These result from unique combinations of experimental factors.", "A biological replicate captures random biological variation and typically originates from an individual organism. Each unique experimental condition should be represented by 3+ biological replicates. Usually corresponds to the tube sent for measurement.", "Result of measuring one biological replicate including all technical noise induced by experimental/measurement protocols (typically just 1). Occurs when an experiment is repeated or a sequencing library is recreated based on the same biological replicate.", "A measurement represents one readout of a technical replicate. Occurs when the same sequencing library is sequenced again or when an MS sample is splitted and/or measured multiple times. Does not contain any technical noise apart from the measurement itself. For analysis, measurements are usually joined to the technical replicate level."], ["Example:\nfactor 1 = genetic background: Mut, WT\nfactor 2 = time point: 12h, 24h", "Example:\ncondition 1 = Mut-12h\ncondition 2 = Mut-24h\ncondition 3 = WT-12h\ncondition 4 = WT-24h", "Example:\nbiological replicate 1 = Mut-12h_1\nbiological replicate 2 = Mut-12h_2\nbiological replicate 3 = Mut-12h_3", "Example:\ntechnical replicate 1 = Mut-12h_1_1\ntechnical replicate 2 = Mut-12h_1_2", "Example:\nmeasurement 1 = Mut-12h_1_1_1\nmeasurement 2 = Mut-12h_1_1_2"]]
@@ -184,6 +187,7 @@ experimental_setting:
       value: exp1
       special_case:
         generated: now
+        edit: "not editable"
       whitelist: False
       input_type: short_text
     organism:
@@ -193,6 +197,7 @@ experimental_setting:
       desc: "Identifier composed of organism name and taxonomy ID.\n[human 9606]"
       special_case:
         merge: organism_name
+        edit: "not editable"
       value:
         organism_name:
           mandatory: True
@@ -218,6 +223,7 @@ experimental_setting:
       factor_desc: "Define investigated factors (e.g. WT/KO, 3h/6h), which can be combined to conditions (e.g. WT-3h, WT-6h, ...). This should NOT include additional metadata that is identical for all samples, different for all replicates, or in general not supposed to be part of contrasts. These additional data can later be supplied at the ‘Samples’ stage."
       special_case:
         generated: now
+        edit: "not editable"
       value:
         factor:
           mandatory: True
@@ -248,6 +254,7 @@ experimental_setting:
           desc: "Unique name automatically assigned to each condition."
           special_case:
               generated: now
+              edit: "not editable"
           value: null
           whitelist: False
           input_type: short_text
@@ -275,6 +282,7 @@ experimental_setting:
               desc: "Check conditions and add metadata that is not part of the primary investigation based on experimental factors. \033[1mPress ‘Save Sample’ for each biological replicate.\033[0;0m"
               special_case:
                 generated: now
+                edit: "not removable"
               value:
                 sample_name:
                   mandatory: True
@@ -283,6 +291,7 @@ experimental_setting:
                   desc: "Unique name automatically assigned to each sample."
                   special_case:
                     generated: now
+                    edit: "not editable"
                   value: null
                   whitelist: False
                   input_type: long_text
@@ -715,6 +724,7 @@ experimental_setting:
                       desc: "Unique sample names generated for every technical replicate."
                       special_case:
                         generated: end
+                        edit: "not removable"
                       value: null
                       whitelist: False
                       input_type: short_text
@@ -725,6 +735,7 @@ experimental_setting:
                       desc: "Unique filenames generated for every technical replicate."
                       special_case:
                         generated: end
+                        edit: "not removable"
                       value: null
                       whitelist: False
                       input_type: short_text
@@ -740,6 +751,8 @@ technical_details:
       list: True
       display_name: "Techniques"
       desc: "Enter the sequencing technique for each experimental setting."
+      special_case:
+        edit: "not removable"
       value: 
         setting:
           mandatory: True

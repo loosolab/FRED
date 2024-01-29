@@ -50,8 +50,10 @@ def parse_empty(node, pos, key_yaml, filled_object,
     """
     # disable input for the keys condition_name and sample_name because they
     # are generated
-    input_disabled = True if pos.split(':')[-1] \
-        in ['condition_name', 'sample_name', 'setting_id'] else False
+    input_disabled = True if 'special_case' in node and 'generated' in \
+                             node['special_case'] and \
+                             node['special_case']['generated'] in \
+                             ['end', 'now'] else False
 
     # initialize a whitelist object to store all whitelists
     whitelist_object = {}
@@ -102,7 +104,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
                            'whitelist': whitelist,
                            'whitelist_type': whitelist_type,
                            'input_type': input_type,
-                           'input_disabled': input_disabled}
+                           'input_disabled': input_disabled,
+                           'delete_disabled': False}
 
             if (part_object['whitelist'] == ['True', 'False'] or part_object['whitelist'] == 'pooled') and part_object[
                 'value'] is not \
@@ -158,7 +161,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
             part_object = {'position': pos, 'mandatory': node['mandatory'],
                            'list': node['list'], 'title': node['display_name'],
                            'desc': utils.print_desc(node['desc'], 'html').replace('\n', '<br>'), 'input_fields': input_fields,
-                           'input_disabled': input_disabled}
+                           'input_disabled': input_disabled,
+                           'delete_disabled': False}
 
             if 'special_case' in node:
                 if 'group' in node['special_case']:
@@ -198,7 +202,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
                        'whitelist': whitelist,
                        'whitelist_type': whitelist_type,
                        'input_type': input_type,
-                       'input_disabled': input_disabled}
+                       'input_disabled': input_disabled,
+                       'delete_disabled': False}
 
         if (part_object['whitelist'] == ['True', 'False'] or part_object['whitelist'] == 'pooled') and part_object['value'] is not \
                 None:
