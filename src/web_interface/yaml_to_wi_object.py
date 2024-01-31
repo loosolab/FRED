@@ -54,7 +54,9 @@ def parse_empty(node, pos, key_yaml, filled_object,
                              node['special_case'] and \
                              node['special_case']['generated'] in \
                              ['end', 'now'] and \
-                             node['position'].split(':')[-1] != 'id' else False
+                             ('position' in node and
+                              node['position'].split(':')[-1] != 'id') else \
+        False
 
     # initialize a whitelist object to store all whitelists
     whitelist_object = {}
