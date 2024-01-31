@@ -104,7 +104,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
         if wi_object['special_case']['edit'] == 'not editable':
             wi_object['input_disabled'] = True
             wi_object['delete_disabled'] = True
-        elif wi_object['special_case']['edit'] == 'not removale':
+        elif wi_object['special_case']['edit'] == 'not removable':
             wi_object['delete_disabled'] = True
             if wi_object['list']:
                 wi_object['fixed_length'] = len(wi_object['value']) if \
