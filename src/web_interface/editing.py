@@ -100,15 +100,15 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
 
     wi_object[fill_key] = filled_value
 
-    if 'special_case' in wi_object and 'edit' in wi_object['special_case']:
-        if wi_object['special_case']['edit'] == 'not editable':
+    if 'special_case' in meta_yaml and 'edit' in meta_yaml['special_case']:
+        if meta_yaml['special_case']['edit'] == 'not editable':
             wi_object['input_disabled'] = True
             wi_object['delete_disabled'] = True
-        elif wi_object['special_case']['edit'] == 'not removable':
+        elif meta_yaml['special_case']['edit'] == 'not removable':
             wi_object['delete_disabled'] = True
-            if wi_object['list']:
-                wi_object['fixed_length'] = len(wi_object['value']) if \
-                    wi_object['value'] is not None else None
+            if meta_yaml['list']:
+                wi_object['fixed_length'] = len(filled_value) if \
+                    filled_value is not None else None
     return wi_object, whitelist_object
 
 
