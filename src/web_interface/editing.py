@@ -33,7 +33,7 @@ def edit_wi_object(path, project_id, key_yaml):
         for part in empty_object:
             if part != 'all_factors':
                 wi_object[part], whitelist_object = new_fill(
-                    meta_yaml[part], empty_object[part], key_yaml,
+                    meta_yaml[part], empty_object[part], key_yaml[part],
                     whitelist_object, real_val)
 
     else:
@@ -57,7 +57,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
             if wi_object['position'].split(':')[-1] == 'experimental_setting':
                 fill_key = 'input_fields'
                 filled_value, whitelist_object = fill_experimental_setting(
-                    wi_object, meta_yaml, key_yaml, whitelist_object, real_val)
+                    wi_object, meta_yaml, key_yaml['value'], whitelist_object, real_val)
             else:
                 fill_key = 'input_fields'
                 filled_value = copy.deepcopy(wi_object['input_fields'])
@@ -66,7 +66,8 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
                         filled_value[i], whitelist_object = new_fill(
                             meta_yaml[filled_value[i]['position'].split(
                                 ':')[-1]],
-                            filled_value[i], key_yaml, whitelist_object,
+                            filled_value[i], key_yaml['value'][filled_value[i]['position'].split(
+                                ':')[-1]], whitelist_object,
                             real_val)
 
     elif isinstance(meta_yaml, list):
@@ -100,13 +101,13 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
 
     wi_object[fill_key] = filled_value
 
-    if 'special_case' in meta_yaml and 'edit' in meta_yaml['special_case']:
-        if meta_yaml['special_case']['edit'] == 'not editable':
+    if 'special_case' in key_yaml and 'edit' in key_yaml['special_case']:
+        if key_yaml['special_case']['edit'] == 'not editable':
             wi_object['input_disabled'] = True
             wi_object['delete_disabled'] = True
-        elif meta_yaml['special_case']['edit'] == 'not removable':
+        elif key_yaml['special_case']['edit'] == 'not removable':
             wi_object['delete_disabled'] = True
-            if meta_yaml['list']:
+            if key_yaml['list']:
                 wi_object['fixed_length'] = len(filled_value) if \
                     filled_value is not None else None
     return wi_object, whitelist_object
