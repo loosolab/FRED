@@ -106,6 +106,9 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
             wi_object['delete_disabled'] = True
         elif wi_object['special_case']['edit'] == 'not removale':
             wi_object['delete_disabled'] = True
+            if wi_object['list']:
+                wi_object['fixed_length'] = len(wi_object['value']) if \
+                    wi_object['value'] is not None else None
     return wi_object, whitelist_object
 
 
