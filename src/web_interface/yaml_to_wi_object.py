@@ -53,7 +53,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
     input_disabled = True if 'special_case' in node and 'generated' in \
                              node['special_case'] and \
                              node['special_case']['generated'] in \
-                             ['end', 'now'] else False
+                             ['end', 'now'] and \
+                             node['position'].split(':')[-1] != 'id' else False
 
     # initialize a whitelist object to store all whitelists
     whitelist_object = {}
