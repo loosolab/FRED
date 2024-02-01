@@ -765,11 +765,14 @@ technical_details:
             restriction:
               regex: '\b(?!e(x(p[0-9]*)?)?\b)\w+'
               max_length: 5
+            edit: "not editable"
           input_type: restricted_short_text
         technique:
           mandatory: True
           list: True
           display_name: "Technique"
+          special_case:
+            edit: "not removable"
           desc: "Wet-Lab technique applied to generate samples.\n[bulk RNA-seq]"
           value: null
           whitelist: True
