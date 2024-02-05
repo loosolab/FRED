@@ -110,7 +110,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val):
             if key_yaml['list']:
                 wi_object['fixed_length'] = len(filled_value) if \
                     filled_value is not None else None
-                if wi_object['input_type'] in ['select', 'group_select']:
+                if 'input_type' in wi_object and wi_object['input_type'] in ['select', 'group_select']:
                     wi_object['non_editable_val'] = filled_value
     return wi_object, whitelist_object
 
