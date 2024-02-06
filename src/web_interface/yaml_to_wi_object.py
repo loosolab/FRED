@@ -1,3 +1,5 @@
+import copy
+
 import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.wi_utils as wi_utils
 import datetime
@@ -162,6 +164,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
             part_object = {'position': pos, 'mandatory': node['mandatory'],
                            'list': node['list'], 'title': node['display_name'],
                            'desc': utils.print_desc(node['desc'], 'html').replace('\n', '<br>'), 'input_fields': input_fields,
+                           'original_input': copy.deepcopy(input_fields),
                            'input_disabled': input_disabled,
                            'delete_disabled': False}
 
