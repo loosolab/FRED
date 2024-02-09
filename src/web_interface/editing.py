@@ -137,12 +137,12 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                             {'organism': organism},
                             get_whitelist_object=True)
                         sample = sample['input_fields']
-                        for s_k in sample:
-                            if 'input_type' in sample_keys[0]['value'][s_k] and sample_keys[0]['value'][s_k]['input_type'] == 'bool' and sample[s_k]['value'] is not None:
-                                if sample[s_k]['value']:
-                                    sample[s_k]['value'] = 'True'
+                        for i in range(len(sample)):
+                            if 'input_type' in sample_keys[0]['value'][sample[i]['position'].split(':')[-1]] and sample_keys[0]['value'][sample[i]['position'].split(':')[-1]]['input_type'] == 'bool' and sample[i]['value'] is not None:
+                                if sample[i]['value']:
+                                    sample[i]['value'] = 'True'
                                 else:
-                                    sample[s_k]['value'] = 'False'
+                                    sample[i]['value'] = 'False'
 
                         conditions = []
 
