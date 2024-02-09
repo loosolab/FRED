@@ -127,11 +127,11 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                 if key == 'experimental_factors':
                     pass
                 elif key == 'conditions':
-                    sample = list(utils.find_keys(key_yaml, 'samples'))
-                    if len(sample) > 0:
+                    sample_keys = list(utils.find_keys(key_yaml, 'samples'))
+                    if len(sample_keys) > 0:
 
                         sample, whitelists = yto.parse_empty(
-                            sample[0],
+                            sample_keys[0],
                             'experimental_setting:conditions:biological_'
                             'replicates:samples', key_yaml,
                             {'organism': organism},
@@ -185,9 +185,23 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                                  'position': 'experimental_setting:condition',
                                  'list': True, 'mandatory': True,
                                  'list_value': samples,
-                                 'input_disabled': True, 'desc': '',
+                                 'desc': '',
                                  'input_fields': input_fields}
+                            if 'special_case' in sample_keys and 'edit' in \
+                                    sample_keys['special_case']:
+                                if sample_keys['special_case'][
+                                    'edit'] == 'not editable':
+                                    d['input_disabled'] = True
+                                    d['delete_disabled'] = True
+                                elif sample_keys['special_case'][
+                                    'edit'] == 'not removable':
+                                    d['delete_disabled'] = True
+                                    if sample_keys['list']:
+                                        wi_object['fixed_length'] = len(
+                                            samples) if \
+                                            samples is not None else None
                             conditions.append(d)
+                        # TODO: not editable and not removable for conditions?
                         f['list_value'] = conditions
                         whitelist_object[organism] = whitelists
 
