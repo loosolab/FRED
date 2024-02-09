@@ -558,7 +558,13 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
     for i in range(len(sample)):
 
         filled_value = None
-
+        if'whitelist' in sample[i] and (sample[i]['whitelist'] == ['True', 'False'] or sample[i]['whitelist'] == 'pooled') and sample[i]['value'] is not \
+                None:
+            if sample[i]['value']:
+                sample[i]['value'] = 'True'
+            else:
+                sample[i]['value'] = 'False'
+                
         # input field: sample_name
         if sample[i]['position'].endswith('samples:sample_name'):
 
