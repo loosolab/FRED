@@ -137,6 +137,12 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                             {'organism': organism},
                             get_whitelist_object=True)
                         sample = sample['input_fields']
+                        for s_k in sample:
+                            if 'input_type' in sample_keys[0]['value'][s_k] and sample_keys[0]['value'][s_k]['input_type'] == 'bool' and sample[s_k]['value'] is not None:
+                                if sample[s_k]['value']:
+                                    sample[s_k]['value'] = 'True'
+                                else:
+                                    sample[s_k]['value'] = 'False'
 
                         conditions = []
 
@@ -187,16 +193,16 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                                  'list_value': samples,
                                  'desc': '',
                                  'input_fields': input_fields}
-                            if 'special_case' in sample_keys and 'edit' in \
-                                    sample_keys['special_case']:
-                                if sample_keys['special_case'][
+                            if 'special_case' in sample_keys[0] and 'edit' in \
+                                    sample_keys[0]['special_case']:
+                                if sample_keys[0]['special_case'][
                                     'edit'] == 'not editable':
                                     d['input_disabled'] = True
                                     d['delete_disabled'] = True
-                                elif sample_keys['special_case'][
+                                elif sample_keys[0]['special_case'][
                                     'edit'] == 'not removable':
                                     d['delete_disabled'] = True
-                                    if sample_keys['list']:
+                                    if sample_keys[0]['list']:
                                         wi_object['fixed_length'] = len(
                                             samples) if \
                                             samples is not None else None
