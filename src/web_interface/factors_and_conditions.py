@@ -725,7 +725,11 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                 sample[i]['value'] = filled_value
 
                             if is_factor:
-                                sample[i]['input_disabled'] = True
+                                if info[0]['list']:
+                                    sample[i]['delete_disabled'] = True
+                                else:
+                                    # disable the input for the filled input field
+                                    sample[i]['input_disabled'] = True
 
                         # input field is of type single_autofill
                         if 'input_type' in sample[i] and \
@@ -740,8 +744,12 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                             sample[i]['value'] = None
 
                             if is_factor:
-                                # disable the input for the filled input field
-                                sample[i]['input_disabled'] = True
+
+                                if info[0]['list']:
+                                    sample[i]['delete_disabled'] = True
+                                else:
+                                    # disable the input for the filled input field
+                                    sample[i]['input_disabled'] = True
 
                         if 'input_type' in info[0] and info[0]['input_type'] == 'bool':
                             if sample[i]['value']:
