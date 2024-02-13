@@ -743,4 +743,10 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                 # disable the input for the filled input field
                                 sample[i]['input_disabled'] = True
 
+                        if 'input_type' in sample[i] and sample[i]['input_type'] == 'bool':
+                            if sample[i]['value']:
+                                sample[i]['value'] = 'True'
+                            else:
+                                sample[i]['value'] = 'False'
+
     return sample
