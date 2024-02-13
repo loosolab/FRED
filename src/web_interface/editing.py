@@ -188,6 +188,7 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                             d = {'correct_value': cond['condition_name'],
                                  'title': title,
                                  'readd': readd,
+                                 'input_disabled': False,
                                  'position': 'experimental_setting:condition',
                                  'list': True, 'mandatory': True,
                                  'list_value': samples,
@@ -203,7 +204,7 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                                     'edit'] == 'not removable':
                                     d['delete_disabled'] = True
                                     if sample_keys[0]['list']:
-                                        wi_object['fixed_length'] = len(
+                                        d['fixed_length'] = len(
                                             samples) if \
                                             samples is not None else None
                             conditions.append(d)
