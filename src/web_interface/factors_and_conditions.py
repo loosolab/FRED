@@ -725,7 +725,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                 sample[i]['value'] = filled_value
 
                             if is_factor:
-                                if info[0]['list']:
+                                if 'list' in info[0] and info[0]['list']:
                                     sample[i]['delete_disabled'] = True
                                 else:
                                     # disable the input for the filled input field
@@ -745,7 +745,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                             if is_factor:
 
-                                if info[0]['list']:
+                                if 'list' in info[0] and info[0]['list']:
                                     sample[i]['delete_disabled'] = True
                                 else:
                                     # disable the input for the filled input field
