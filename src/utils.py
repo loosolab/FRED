@@ -297,7 +297,9 @@ def find_list_key(item, l):
 
 
 def create_filenames(metafile, double, old_filenames={}, old_sample_names={}):
-    file_indices = list(find_keys(metafile, 'filenames'))
+    file_indices = []
+    for k in old_filenames:
+        file_indices += old_filenames[k]
     if len(file_indices) > 0:
         indices = []
         for i in file_indices:
