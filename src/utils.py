@@ -343,12 +343,11 @@ def create_filenames(metafile, double, old_filenames={}, old_sample_names={}):
                                                         key_name = f'{setting_id}_{sample_elem["sample_name"]}'
                                                         sample_techniques = []
                                                         file_techniques = []
-                                                        sample_names = []
-                                                        filenames = []
                                                         do_samples = False
                                                         do_files = False
                                                         if key_name not in old_sample_names.keys():
                                                             old_sample_names[key_name] = []
+                                                        sample_names = old_sample_names[key_name]
                                                         if len(old_sample_names[key_name]) < filename_length:
                                                             do_samples = True
                                                             if len(old_sample_names[key_name]) > 0:
@@ -356,6 +355,7 @@ def create_filenames(metafile, double, old_filenames={}, old_sample_names={}):
 
                                                         if key_name not in old_filenames.keys():
                                                             old_filenames[key_name] = []
+                                                        filenames = old_filenames[key_name]
                                                         if len(old_filenames[key_name]) < filename_length:
                                                             do_files = True
                                                             if len(old_filenames[key_name]) > 0:
