@@ -348,14 +348,14 @@ def create_filenames(metafile, double, old_filenames={}, old_sample_names={}):
                                                         do_files = False
                                                         if sample_elem['sample_name'] not in old_sample_names.keys():
                                                             old_sample_names[sample_elem['sample_name']] = []
-                                                        if old_sample_names[sample_elem['sample_name']] < filename_length:
+                                                        if len(old_sample_names[sample_elem['sample_name']]) < filename_length:
                                                             do_samples = True
                                                             if len(old_sample_names[sample_elem['sample_name']]) > 0:
                                                                 sample_techniques = set(list([x.split('_')[2] for x in old_sample_names[sample_elem['sample_name']]]))
 
                                                         if sample_elem['sample_name'] not in old_filenames.keys():
                                                             old_filenames[sample_elem['sample_name']] = []
-                                                        if old_filenames[sample_elem['sample_name']] < filename_length:
+                                                        if len(old_filenames[sample_elem['sample_name']]) < filename_length:
                                                             do_files = True
                                                             if len(old_filenames[sample_elem['sample_name']]) > 0:
                                                                 file_techniques = set(list([x.split('__')[2] for x in old_filenames[sample_elem['sample_name']]]))
