@@ -47,7 +47,7 @@ def parse_object(wi_object, key_yaml):
     # remove keys with value None
     result = {k: v for k, v in result.items() if v is not None}
     result = utils.create_filenames(
-        result, double, 
+        result, double,
         wi_object['old_filenames'] if 'old_filenames' in wi_object else {},
         wi_object['old_sample_names'] if 'old_sample_names' in wi_object else {})
     return result
