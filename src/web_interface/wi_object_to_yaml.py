@@ -37,7 +37,7 @@ def parse_object(wi_object, key_yaml):
     for key in key_yaml:
 
         # make sure the key is present in the wi object
-        if key in wi_object:
+        if key in wi_object and key not in ['old_filenames', 'old_sample_names']:
 
             # parse every part into yaml format
             result[key], organism, sample_name, nom, global_count, local_count, double = parse_part(
@@ -46,7 +46,10 @@ def parse_object(wi_object, key_yaml):
 
     # remove keys with value None
     result = {k: v for k, v in result.items() if v is not None}
-    result = utils.create_filenames(result, double)
+    result = utils.create_filenames(
+        result, double, 
+        wi_object['old_filenames'] if 'old_filenames' in wi_object else {},
+        wi_object['old_sample_names'] if 'old_sample_names' in wi_object else {})
     return result
 
 
