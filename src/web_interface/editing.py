@@ -52,7 +52,7 @@ def get_filenames(wi_object, meta_yaml):
         for elem in bio_rep:
             if 'sample_name' in elem:
                 key = elem['sample_name']
-                tech_rep = list(utils.find_keys(bio_rep, 'technical_replicates'))
+                tech_rep = list(utils.find_keys(elem, 'technical_replicates'))
                 if len(tech_rep) > 0:
                     if 'filenames' in tech_rep[0]:
                         old_filenames[key] = tech_rep[0]['filenames']
