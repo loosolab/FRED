@@ -47,17 +47,24 @@ def edit_wi_object(path, project_id, key_yaml):
 def get_filenames(wi_object, meta_yaml):
     old_filenames = {}
     old_sample_names = {}
-    bio_rep = list(utils.find_keys(meta_yaml, 'samples'))
-    if len(bio_rep) > 0:
-        for elem in bio_rep:
-            if 'sample_name' in elem:
-                key = elem['sample_name']
-                tech_rep = list(utils.find_keys(elem, 'technical_replicates'))
-                if len(tech_rep) > 0:
-                    if 'filenames' in tech_rep[0]:
-                        old_filenames[key] = tech_rep[0]['filenames']
-                    if 'sample_name' in tech_rep[0]:
-                        old_sample_names[key] = tech_rep[0]['sample_name']
+    settings = list(utils.find_keys(meta_yaml, 'experimental_setting'))
+    if len(settings) > 0:
+        for setting in settings:
+            for stg in setting:
+                if 'setting_id' in stg:
+                    setting_id = stg['setting_id']
+                    bio_reps = list(utils.find_keys(stg, 'samples'))
+                    if len(bio_reps) > 0:
+                        for elem in bio_reps:
+                            for sample in elem:
+                                if 'sample_name' in sample:
+                                    key = f'{setting_id}_{sample["sample_name"]}'
+                                    tech_rep = list(utils.find_keys(sample, 'technical_replicates'))
+                                    if len(tech_rep) > 0:
+                                        if 'filenames' in tech_rep[0]:
+                                            old_filenames[key] = tech_rep[0]['filenames']
+                                        if 'sample_name' in tech_rep[0]:
+                                            old_sample_names[key] = tech_rep[0]['sample_name']
     wi_object['old_sample_names'] = old_sample_names
     wi_object['old_filenames'] = old_filenames
     return wi_object

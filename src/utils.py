@@ -340,25 +340,26 @@ def create_filenames(metafile, double, old_filenames={}, old_sample_names={}):
                                                 if 'technical_replicates' in sample_elem and 'count' in sample_elem['technical_replicates']:
                                                     if 'sample_name' in sample_elem and 'number_of_measurements' in sample_elem:
                                                         filename_length = len(used_techs) * sample_elem['technical_replicates']['count'] * sample_elem['number_of_measurements']
+                                                        key_name = f'{setting_id}_{sample_elem["sample_name"]}'
                                                         sample_techniques = []
                                                         file_techniques = []
                                                         sample_names = []
                                                         filenames = []
                                                         do_samples = False
                                                         do_files = False
-                                                        if sample_elem['sample_name'] not in old_sample_names.keys():
-                                                            old_sample_names[sample_elem['sample_name']] = []
-                                                        if len(old_sample_names[sample_elem['sample_name']]) < filename_length:
+                                                        if key_name not in old_sample_names.keys():
+                                                            old_sample_names[key_name] = []
+                                                        if len(old_sample_names[key_name]) < filename_length:
                                                             do_samples = True
-                                                            if len(old_sample_names[sample_elem['sample_name']]) > 0:
-                                                                sample_techniques = set(list([x.split('_')[2] for x in old_sample_names[sample_elem['sample_name']]]))
+                                                            if len(old_sample_names[key_name]) > 0:
+                                                                sample_techniques = set(list([x.split('_')[2] for x in old_sample_names[key_name]]))
 
-                                                        if sample_elem['sample_name'] not in old_filenames.keys():
-                                                            old_filenames[sample_elem['sample_name']] = []
-                                                        if len(old_filenames[sample_elem['sample_name']]) < filename_length:
+                                                        if key_name not in old_filenames.keys():
+                                                            old_filenames[key_name] = []
+                                                        if len(old_filenames[key_name]) < filename_length:
                                                             do_files = True
-                                                            if len(old_filenames[sample_elem['sample_name']]) > 0:
-                                                                file_techniques = set(list([x.split('__')[2] for x in old_filenames[sample_elem['sample_name']]]))
+                                                            if len(old_filenames[key_name]) > 0:
+                                                                file_techniques = set(list([x.split('__')[2] for x in old_filenames[key_name]]))
                                                         if do_samples or do_files:
                                                             b_name = sample_elem[
                                                                 'sample_name']
