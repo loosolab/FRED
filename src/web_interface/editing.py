@@ -40,6 +40,26 @@ def edit_wi_object(path, project_id, key_yaml):
         wi_object = yto.get_empty_wi_object(key_yaml)
 
     wi_object['whitelists'] = whitelist_object
+    wi_object = get_filenames(wi_object, meta_yaml)
+    return wi_object
+
+
+def get_filenames(wi_object, meta_yaml):
+    old_filenames = {}
+    old_sample_names = {}
+    bio_rep = list(utils.find_keys(meta_yaml, 'samples'))
+    if len(bio_rep) > 0:
+        for elem in bio_rep:
+            if 'sample_name' in elem:
+                key = elem['sample_name']
+                tech_rep = list(utils.find_keys(bio_rep, 'technical_replicates'))
+                if len(tech_rep) > 0:
+                    if 'filenames' in tech_rep[0]:
+                        old_filenames[key] = tech_rep[0]['filenames']
+                    if 'sample_name' in tech_rep[0]:
+                        old_sample_names[key] = tech_rep[0]['sample_name']
+    wi_object['old_sample_names'] = old_sample_names
+    wi_object['old_filenames'] = old_filenames
     return wi_object
 
 
