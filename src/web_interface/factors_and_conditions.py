@@ -553,7 +553,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
     # save all factors in a list
     factors = [cond[0] for cond in split_condition]
-    filled_value = ''
+
     # iterate over samples
     for i in range(len(sample)):
 
@@ -706,6 +706,8 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                         {'organism': organism_name})
 
                                     for key in sample[i]['whitelist_keys']:
+                                        filled_value = c[1]
+                                        print(c[1], key, f'{c[1]} ({key})' in w['whitelist'])
                                         if f'{c[1]} ({key})' in w['whitelist']:
                                             filled_value = f'{c[1]} ({key})'
                                             break
