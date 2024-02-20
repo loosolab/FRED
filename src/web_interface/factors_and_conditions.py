@@ -278,29 +278,21 @@ def get_conditions(factors, organism_name, key_yaml):
                     'special_case' in factor_infos[0] and 'control' in \
                     factor_infos[0]['special_case'] else None
 
-                for key in [x for x in list(val.keys()) if x not in ['multi', 'ident_key']]:
-
-                    # TODO: headers + whitelist_keys
-
-                    if key == 'gene':
-                        for v in range(len(val[key])):
-
-                            headers = 'gene_name ensembl_id'
-
-                            # save the original value
-                            full_value = copy.deepcopy(val[key][v])
-
-                            # split the value according to the header and save them as a
-                            # string
-                            str_value = wi_utils.parse_headers(
-                                        headers, val[key][v],
-                                        mode='str')
-
-                            # # rewrite the value to '<factor>:{<values>}'
-                            val[key][v] = f'{"{"}' \
-                                          f'{str_value}{"}"}'
-                            # save the original value in real_val with the new value as key
-                            real_val[val[key][v]] = full_value
+                if 'nested_infos' in factors[i]:
+                        for val_key in factors[i]['nested_infos']:
+                            for v in range(len(val[val_key])):
+                                full_value = copy.deepcopy(val[val_key][v])
+                                if 'whitelist_keys' in factors[i]['nested_infos'][val_key]:
+                                    for w_key in factors[i]['nested_infos'][val_key]['whitelist_keys']:
+                                        if val[val_key][v].endswith(f'({w_key})'):
+                                            val[val_key][v] = val[val_key][v].rstrip(f'({w_key})').strip()
+                                            break
+                                if 'headers' in factors[i]['nested_infos'][val_key]:
+                                    str_value = wi_utils.parse_headers(
+                                        factors[i]['nested_infos'][val_key]['headers'], val[val_key][v], mode='str')
+                                    val[val_key][v] = f'{"{"}' \
+                                                      f'{str_value}{"}"}'
+                                real_val[val[val_key][v]] = full_value
 
                 # generate combinations of the values of the dictionary for the
                 # conditions and overwrite the values with them
