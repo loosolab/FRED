@@ -302,8 +302,7 @@ def create_filenames(metafile, double, old_filenames={}, old_sample_names={}):
         file_indices += old_filenames[k]
     if len(file_indices) > 0:
         indices = []
-        for i in file_indices:
-            indices += [int(x.split('__')[1]) for x in i]
+        indices += [int(x.split('__')[1]) for x in file_indices]
         file_index = max(indices) + 1
     else:
         file_index = 1
