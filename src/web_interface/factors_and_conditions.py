@@ -553,7 +553,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
     # save all factors in a list
     factors = [cond[0] for cond in split_condition]
-
+    filled_value = ''
     # iterate over samples
     for i in range(len(sample)):
 
