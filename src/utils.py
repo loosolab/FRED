@@ -388,15 +388,15 @@ def create_filenames(metafile, double, old_filenames={}, old_sample_names={}):
 
                                                         if 'sample_name' in sample_elem['technical_replicates']:
                                                             sample_elem['technical_replicates']['sample_name'] += sample_names
-                                                            sample_elem['technical_replicates']['sample_name'] = list(set(sample_elem['technical_replicates']['sample_name']))
+                                                            sample_elem['technical_replicates']['sample_name'] = sorted(list(set(sample_elem['technical_replicates']['sample_name'])))
                                                         else:
-                                                            sample_elem['technical_replicates']['sample_name'] = list(set(sample_names))
+                                                            sample_elem['technical_replicates']['sample_name'] = sorted(list(set(sample_names)))
 
                                                         if 'filenames' in sample_elem['technical_replicates']:
                                                             sample_elem['technical_replicates']['filenames'] += filenames
-                                                            sample_elem['technical_replicates']['filenames'] = list(set(sample_elem['technical_replicates']['filenames']))
+                                                            sample_elem['technical_replicates']['filenames'] = sorted(list(set(sample_elem['technical_replicates']['filenames'])))
                                                         else:
-                                                            sample_elem['technical_replicates']['filenames'] = list(set(filenames))
+                                                            sample_elem['technical_replicates']['filenames'] = sorted(list(set(filenames)))
 
     return metafile
 
