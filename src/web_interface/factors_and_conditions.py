@@ -297,7 +297,7 @@ def get_conditions(factors, organism_name, key_yaml):
                                         mode='str')
 
                             # # rewrite the value to '<factor>:{<values>}'
-                            val[key][v] = f'{key}:{"{"}' \
+                            val[key][v] = f'{"{"}' \
                                           f'{str_value}{"}"}'
                             # save the original value in real_val with the new value as key
                             real_val[val[key][v]] = full_value
