@@ -385,17 +385,18 @@ def create_filenames(metafile, double, old_filenames={}, old_sample_names={}):
                                                                             f'{project_id}__{file_index}__{abbrev_tech}__{filename}__{local_count}')
                                                                         file_index += 1
                                                                         local_count += 1
-                                                            if do_samples:
-                                                                if 'sample_name' in sample_elem['technical_replicates']:
-                                                                    sample_elem['technical_replicates']['sample_name'] += sample_names
-                                                                else:
-                                                                    sample_elem['technical_replicates']['sample_name'] = sample_names
-                                                            if do_files:
-                                                                if 'filenames' in sample_elem['technical_replicates']:
-                                                                    sample_elem['technical_replicates']['filenames'] += filenames
-                                                                else:
-                                                                    sample_elem[
-                                                                        'technical_replicates']['filenames'] = filenames
+
+                                                        if 'sample_name' in sample_elem['technical_replicates']:
+                                                            sample_elem['technical_replicates']['sample_name'] += sample_names
+                                                            sample_elem['technical_replicates']['sample_name'] = list(set(sample_elem['technical_replicates']['sample_name']))
+                                                        else:
+                                                            sample_elem['technical_replicates']['sample_name'] = list(set(sample_names))
+
+                                                        if 'filenames' in sample_elem['technical_replicates']:
+                                                            sample_elem['technical_replicates']['filenames'] += filenames
+                                                            sample_elem['technical_replicates']['filenames'] = list(set(sample_elem['technical_replicates']['filenames']))
+                                                        else:
+                                                            sample_elem['technical_replicates']['filenames'] = list(set(filenames))
 
     return metafile
 
