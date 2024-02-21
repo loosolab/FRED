@@ -122,7 +122,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
 
             # define an empty list to store the converted list values
             val = []
-
+            is_cond = False
             # TODO: headers for list element (if gene is a list)
             # iterate over the list elements
             for i in range(len(wi_object['list_value'])):
@@ -137,7 +137,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                         # define emtpy list to save parsed samples to
                         samples = []
                         local_count = 1
-
+                        is_cond = True
                         # iterate over all samples
                         for sub_elem in \
                                 wi_object['list_value'][i]['list_value']:
@@ -208,6 +208,8 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
             # set the converted value to None if it is an empty list
             if len(val) == 0:
                 val = None
+            elif is_cond:
+                val = sorted(val, key=lambda x: x['condition_name'])
 
         # the values are not saved as a list
         else:
@@ -437,7 +439,7 @@ def parse_factor(factors, key_yaml, double):
             for key_ in factors['nested_infos']:
                 if 'double' in factors['nested_infos'][key_]:
                     double = list(set(double + factors['nested_infos'][key_]['double']))
-
+                
 
         # remove key 'multi'
         if 'multi' in factors['values'][0]:
@@ -464,14 +466,14 @@ def parse_factor(factors, key_yaml, double):
             if isinstance(factors['values'][i], dict):
                 remove_keys = []
                 for key in factors['values'][i]:
-
+                    
                     if 'nested_infos' in factors:
                         if 'whitelist_keys' in factors['nested_infos']:
                             whitelist_keys = factors['nested_infos'][key][
                                 'whitelist_keys']
                         if 'headers' in factors['nested_infos']:
                             headers = factors['nested_infos'][key]['headers']
-
+                        
                     if factors['values'][i][key] is None or (isinstance(factors['values'][i][key], list) and len(factors['values'][i][key]) == 0):
                         remove_keys.append(key)
 
