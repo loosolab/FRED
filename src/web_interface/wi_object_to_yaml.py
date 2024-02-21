@@ -426,6 +426,9 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
 
 def parse_factor(factors, key_yaml, double):
 
+    whitelist_keys = None
+    headers = None
+
     # nested factor
     if len(factors['values']) == 1 and isinstance(
             factors['values'][0], dict):
@@ -434,6 +437,10 @@ def parse_factor(factors, key_yaml, double):
             for key_ in factors['nested_infos']:
                 if 'double' in factors['nested_infos'][key_]:
                     double = list(set(double + factors['nested_infos'][key_]['double']))
+                if 'whitelist_keys' in factors['nested_infos']:
+                    whitelist_keys = factors['nested_infos']['whitelist_keys']
+                if 'headers' in factors['nested_infos']:
+                    headers = factors['nested_infos']['headers']
 
         # remove key 'multi'
         if 'multi' in factors['values'][0]:
@@ -463,6 +470,20 @@ def parse_factor(factors, key_yaml, double):
 
                     if factors['values'][i][key] is None or (isinstance(factors['values'][i][key], list) and len(factors['values'][i][key]) == 0):
                         remove_keys.append(key)
+
+                    if whitelist_keys is not None:
+                        for j in range(len(factors['values'][i][key])):
+                            factors['values'][i][key][j] = \
+                                wi_utils.parse_whitelist_keys(
+                                    whitelist_keys,
+                                    factors['values'][i][key][j], headers,
+                                    mode='dict')
+                    elif headers is not None:
+                        for j in range(len(factors['values'][i][key])):
+                            factors['values'][i][key][j] = \
+                                wi_utils.parse_headers(
+                                    headers, factors['values'][i][key][j],
+                                    mode='dict')
                     if key == 'gene':
                         headers = 'gene_name ensembl_id'
 
