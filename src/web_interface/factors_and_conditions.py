@@ -699,7 +699,6 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                                     for key in sample[i]['whitelist_keys']:
                                         filled_value = c[1]
-                                        print(c[1], key, f'{c[1]} ({key})' in w['whitelist'])
                                         if f'{c[1]} ({key})' in w['whitelist']:
                                             filled_value = f'{c[1]} ({key})'
                                             break
