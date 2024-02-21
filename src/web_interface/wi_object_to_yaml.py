@@ -467,11 +467,11 @@ def parse_factor(factors, key_yaml, double):
                 remove_keys = []
                 for key in factors['values'][i]:
                     
-                    if 'nested_infos' in factors:
-                        if 'whitelist_keys' in factors['nested_infos']:
+                    if 'nested_infos' in factors and key in factors['nested_infos']:
+                        if 'whitelist_keys' in factors['nested_infos'][key]:
                             whitelist_keys = factors['nested_infos'][key][
                                 'whitelist_keys']
-                        if 'headers' in factors['nested_infos']:
+                        if 'headers' in factors['nested_infos'][key]:
                             headers = factors['nested_infos'][key]['headers']
                         
                     if factors['values'][i][key] is None or (isinstance(factors['values'][i][key], list) and len(factors['values'][i][key]) == 0):
