@@ -476,9 +476,9 @@ def parse_factor(factors, key_yaml, double):
                         
                     if factors['values'][i][key] is None or (isinstance(factors['values'][i][key], list) and len(factors['values'][i][key]) == 0):
                         remove_keys.append(key)
-
+                    print('WITHELIST_KEYS AND HEADERS', whitelist_keys, headers)
                     if whitelist_keys is not None:
-                        print(whitelist_keys)
+
                         for j in range(len(factors['values'][i][key])):
                             factors['values'][i][key][j] = \
                                 wi_utils.parse_whitelist_keys(
