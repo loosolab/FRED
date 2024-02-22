@@ -211,7 +211,7 @@ def parse_headers(headers, value, mode='dict'):
     new_val = {} if mode == 'dict' else ''
     # iterate over the keys in the header
     for key_index in range(len(headers.split(' '))):
-        print(key_index, headers.split(' '), value)
+
         # return a dictionary
         if mode == 'dict':
 
