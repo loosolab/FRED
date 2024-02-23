@@ -47,8 +47,6 @@ project:
       list: True
       display_name: "Further Description / Additional Info"
       desc: "URLs/path to files with additional information: e.g. link to google presentation, paper, or GEO record. Direct upload of files is currently not supported.\n[manuscript 1: https://academic.oup.com/bioinformatics/article/37/12/1691/6039116?login=true]"
-      special_case:
-        edit: "not removable"
       value: null
       whitelist: False
       input_type: short_text
