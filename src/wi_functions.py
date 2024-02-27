@@ -81,10 +81,12 @@ def save_filenames(file_str, path):
     return file_io.save_filenames(file_str, path)
 
 
-def get_meta_info(path, project_id):
+def get_meta_info(path, project_ids):
     key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), '..', 'keys.yaml'))
-    html_str, metafile = searching.get_meta_info(key_yaml, path, project_id)
+    if not isinstance(project_ids, list):
+        project_ids = [project_ids]
+    html_str, metafile = searching.get_meta_info(key_yaml, path, project_ids)
     return html_str
 
 

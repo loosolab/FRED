@@ -7,7 +7,7 @@ import src.file_reading as file_reading
 # TODO: refactor and comment
 
 
-def get_meta_info(key_yaml, path, project_id):
+def get_meta_info(key_yaml, path, project_ids):
     """
     This file creates an HTML summary for a project containing metadata
     :param path: the path of a folder to be searched for a project
@@ -15,99 +15,100 @@ def get_meta_info(key_yaml, path, project_id):
     :return: html_str: the summary in HTML
     """
 
-    # TODO: own function
-    # If file must be searched
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml,
-        [path], return_false=True)
-    correct_file = None
-    for metafile in metafiles:
-        if 'project' in metafile and 'id' in metafile['project'] and \
-                metafile['project']['id'] == project_id:
-            correct_file = metafile
-            break
+    for pr_id in project_ids:
+        # TODO: own function
+        # If file must be searched
+        metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml,
+            [path], return_false=True)
+        correct_file = None
+        for metafile in metafiles:
+            if 'project' in metafile and 'id' in metafile['project'] and \
+                    metafile['project']['id'] == pr_id:
+                correct_file = metafile
+                break
 
-    if correct_file is not None:
+        if correct_file is not None:
 
-        html_str = ''
-        if validation_reports['error_count'] > 0 or \
-                validation_reports['warning_count'] > 0:
-            error = None
-            warning = None
+            html_str = f'<h2 style="text-align:center;">{pr_id}</h2><hr>'
+            if validation_reports['error_count'] > 0 or \
+                    validation_reports['warning_count'] > 0:
+                error = None
+                warning = None
 
-            for report in validation_reports['corrupt_files']['report']:
-                if report['file']['path'] == correct_file['path']:
-                    error = report['error']
-                    warning = report['warning']
-                    break
+                for report in validation_reports['corrupt_files']['report']:
+                    if report['file']['path'] == correct_file['path']:
+                        error = report['error']
+                        warning = report['warning']
+                        break
 
-            # TODO: error Handling + Ausgabe
-            if error is not None:
-                html_str += f'<font color="red"><h3><b>ERROR:</b></h3>'
-                if len(error[0]) > 0:
-                    html_str += f'<b>Missing mandatory keys:</b><br>'
+                # TODO: error Handling + Ausgabe
+                if error is not None:
+                    html_str += f'<font color="red"><h3><b>ERROR:</b></h3>'
+                    if len(error[0]) > 0:
+                        html_str += f'<b>Missing mandatory keys:</b><br>'
+                        html_str += '<ul>'
+                        for elem in error[0]:
+                            html_str += f'<li>{elem}</li>'
+                        html_str += '</ul>'
+                    if len(error[1]) > 0:
+                        print(error[1])
+                        html_str += f'<b>Invalid keys:</b><br>'
+                        html_str += '<ul>'
+                        for elem in error[1]:
+                            value = correct_file
+                            for key in elem.split(':'):
+                                if isinstance(value, list):
+                                    for l_elem in value:
+                                       if key in l_elem:
+                                           value = l_elem[key]
+                                           break
+                                else:
+                                    value = value[key]
+                            html_str += f'<li>{elem}: {value}</li>'
+                            correct_file = wi_utils.pop_key(correct_file,
+                                                            elem.split(':'), value)
+                        html_str += '</ul>'
+
+                    if len(error[2]) > 0:
+                        html_str += f'<b>Invalid entries:</b><br>'
+                        html_str += '<ul>'
+                        for elem in error[2]:
+                            html_str += f'<li>{elem.split(":")[-1]} in ' \
+                                        f'{":".join(elem.split(":")[:-1])}</li>'
+                            correct_file = wi_utils.pop_value(
+                                correct_file, elem.split(":")[:-1],
+                                elem.split(":")[-1])
+                        html_str += '</ul>'
+
+                    if len(error[3]) > 0:
+                        html_str += f'<b>Invalid values:</b><br>'
+                        html_str += '<ul>'
+                        for elem in error[3]:
+                            html_str += f'<li>{elem[0]}: {elem[1]} -> ' \
+                                        f'{elem[2]}</li>'
+                        html_str += '</ul>'
+
+                    html_str += '</font><hr style="border-top: dotted 1px; background-color: transparent;" />'
+
+                if warning is not None:
+                    html_str += f'<font color="orange"><h3><b>WARNING:</b></h3>'
                     html_str += '<ul>'
-                    for elem in error[0]:
-                        html_str += f'<li>{elem}</li>'
+                    for elem in warning:
+                        message = elem[0].replace("\'", "")
+                        html_str += f'<li>{message}: {elem[1]}</li>'
                     html_str += '</ul>'
-                if len(error[1]) > 0:
-                    print(error[1])
-                    html_str += f'<b>Invalid keys:</b><br>'
-                    html_str += '<ul>'
-                    for elem in error[1]:
-                        value = correct_file
-                        for key in elem.split(':'):
-                            if isinstance(value, list):
-                                for l_elem in value:
-                                   if key in l_elem:
-                                       value = l_elem[key]
-                                       break  
-                            else:
-                                value = value[key]
-                        html_str += f'<li>{elem}: {value}</li>'
-                        correct_file = wi_utils.pop_key(correct_file,
-                                                        elem.split(':'), value)
-                    html_str += '</ul>'
+                    html_str += '</font><hr style="border-top: dotted 1px; background-color: transparent;" />'
 
-                if len(error[2]) > 0:
-                    html_str += f'<b>Invalid entries:</b><br>'
-                    html_str += '<ul>'
-                    for elem in error[2]:
-                        html_str += f'<li>{elem.split(":")[-1]} in ' \
-                                    f'{":".join(elem.split(":")[:-1])}</li>'
-                        correct_file = wi_utils.pop_value(
-                            correct_file, elem.split(":")[:-1],
-                            elem.split(":")[-1])
-                    html_str += '</ul>'
+            if 'path' in correct_file:
+                correct_file.pop('path')
+            for elem in correct_file:
+                end = f'{"<hr><br>" if elem != list(correct_file.keys())[-1] else ""}'
+                html_str = f'{html_str}<h3>{elem}</h3>' \
+                           f'{html_output.object_to_html(correct_file[elem], 0, False)}<br>'\
+                           f'{end}'
 
-                if len(error[3]) > 0:
-                    html_str += f'<b>Invalid values:</b><br>'
-                    html_str += '<ul>'
-                    for elem in error[3]:
-                        html_str += f'<li>{elem[0]}: {elem[1]} -> ' \
-                                    f'{elem[2]}</li>'
-                    html_str += '</ul>'
-
-                html_str += '</font><hr>'
-
-            if warning is not None:
-                html_str += f'<font color="orange"><h3><b>WARNING:</b></h3>'
-                html_str += '<ul>'
-                for elem in warning:
-                    message = elem[0].replace("\'", "")
-                    html_str += f'<li>{message}: {elem[1]}</li>'
-                html_str += '</ul>'
-                html_str += '</font><hr>'
-
-        if 'path' in correct_file:
-            correct_file.pop('path')
-        for elem in correct_file:
-            end = f'{"<hr><br>" if elem != list(correct_file.keys())[-1] else ""}'
-            html_str = f'{html_str}<h3>{elem}</h3>' \
-                       f'{html_output.object_to_html(correct_file[elem], 0, False)}<br>'\
-                       f'{end}'
-
-    else:
-        html_str = 'No metadata found.'
+        else:
+            html_str = 'No metadata found.<br>'
     return html_str, correct_file
 
 
