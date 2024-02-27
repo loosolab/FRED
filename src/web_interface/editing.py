@@ -10,7 +10,7 @@ disabled_fields = []
 # TODO: code refactoring + documentation
 
 
-def edit_wi_object(path, project_id, key_yaml):
+def edit_wi_object(path, key_yaml):
     """
     This function fills an empty wi object with the information of a metadata
     file
@@ -20,8 +20,7 @@ def edit_wi_object(path, project_id, key_yaml):
     :return: wi_object: the filled wi object
     """
     # TODO: as Parameter at get_info
-    html_str, meta_yaml = searching.get_meta_info(key_yaml, path, project_id)
-    whitelist_object = {}
+    meta_yaml = utils.read_in_yaml(path)
 
     if meta_yaml is not None:
         if 'path' in meta_yaml:

@@ -104,12 +104,12 @@ def find_metadata(path, search_string):
     return searching.find_metadata(key_yaml, path, search_string)
 
 
-def edit_wi_object(path, project_id):
+def edit_wi_object(path):
     git_whitelists.get_whitelists()
     # read in general structure
     key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), '..', 'keys.yaml'))
-    return editing.edit_wi_object(path, project_id, key_yaml)
+    return editing.edit_wi_object(path, key_yaml)
 
 
 # TODO: not needed -> in summary
