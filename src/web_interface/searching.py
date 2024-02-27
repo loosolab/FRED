@@ -14,7 +14,7 @@ def get_meta_info(key_yaml, path, project_ids):
     :param project_id: the id of the project
     :return: html_str: the summary in HTML
     """
-
+    html_str = ''
     for pr_id in project_ids:
         # TODO: own function
         # If file must be searched
@@ -29,7 +29,7 @@ def get_meta_info(key_yaml, path, project_ids):
 
         if correct_file is not None:
 
-            html_str = f'<h2 style="text-align:center;">{pr_id}</h2><hr>'
+            html_str += f'<h2 style="text-align:center;">{pr_id}</h2><hr>'
             if validation_reports['error_count'] > 0 or \
                     validation_reports['warning_count'] > 0:
                 error = None
