@@ -21,7 +21,8 @@ def edit_wi_object(path, key_yaml):
     """
     # TODO: as Parameter at get_info
     meta_yaml = utils.read_in_yaml(path)
-
+    whitelist_object = {}
+    
     if meta_yaml is not None:
         if 'path' in meta_yaml:
             meta_yaml.pop('path')
