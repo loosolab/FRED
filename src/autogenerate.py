@@ -133,7 +133,9 @@ class Autogenerate:
             # call get_condition_combinations to create all conditions
             combinations = utils.get_condition_combinations(factor_dict)
             for key in factor_combis:
-                factor_combis[key] = [x for x in factor_combis[key] if x.count(key) <= 1]
+                print(key, factor_combis[key])
+                factor_combis[key] = [x for x in factor_combis[key] if x.count(f'{key}:') <= 1]
+                print(key, factor_combis[key])
             self.gen.conditions[experimental_setting] = [factor_combis, combinations]
 
         i = 1

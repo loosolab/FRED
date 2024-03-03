@@ -470,6 +470,7 @@ def get_combis(values, key, result_dict, key_yaml):
     :return: disease_values: a list of all possible combinations of the
                              experimental factor
     """
+    #TODO: remove special case
     if key == 'gene_editing':
         whitelist_key = 'editing_method'
         depend_key = 'editing_type'
