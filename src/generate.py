@@ -152,13 +152,22 @@ class Generate(Input):
                 print(utils.print_desc(structure['desc'], size=self.size),
                       '\n')
                 is_list = False
-                if 'special_case' in structure and 'merge' in \
-                        structure['special_case']:
+                if 'special_case' in structure and 'merge' in structure['special_case']:
                     self.fill_key(position + [elem_index] if structure['list'] or is_factor else position, self.parse_input_value(
-                        position[-1], structure['value'][structure[
-                            'special_case']['merge']]), return_dict)
+                            position[-1], structure['value'][structure[
+                                'special_case']['merge']]), return_dict)
                     if is_factor:
                         is_list = True
+                elif 'special_case' in structure and 'value_unit' in structure['special_case']:
+                    if structure['list'] or is_factor:
+                        self.fill_key(
+                                position,
+                                self.get_list_value_unit(position, structure),
+                                return_dict)
+                    else:
+                        self.fill_key(
+                                position,
+                                self.get_value_unit(structure), return_dict)
                 else:
                     self.input_keys(
                         structure['value'],

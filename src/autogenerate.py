@@ -86,7 +86,6 @@ class Autogenerate:
 
                 factor_info = \
                     list(utils.find_keys(self.gen.key_yaml, factors[i]['factor']))[0]
-
                 factor = factors[i]['factor']
                 values = copy.deepcopy(factors[i]['values'][0]) if len(
                     factors[i]['values']) == 1 and isinstance(
@@ -112,7 +111,6 @@ class Autogenerate:
                                             f'{elem_key}:"{values[val][j][elem_key]}"')
                                     values[val][
                                         j] = f'{"{"}{"|".join(new_val)}{"}"}'
-
                     if 'special_case' in factor_info:
                         if 'group' in factor_info['special_case']:
                             values['ident_key'] = factor_info['special_case'][
@@ -123,6 +121,9 @@ class Autogenerate:
                     # overwrite the values with the combinations
                     factor_combis[factor] = utils.get_combis(
                         values, factor, self.gen.result_dict, self.gen.key_yaml)
+                elif 'special_case' in factor_info and 'value_unit' in factor_info['special_case']:
+                    values = [f'{val["value"]}{val["unit"]}' for val in values]
+                    factor_combis[factor] = [f'{factor}:"{val}"' for val in values]
                 else:
                     factor_combis[factor] = [f'{factor}:"{val}"' for val in values]
             factor_dict = []
