@@ -56,7 +56,7 @@ def parse_object(wi_object, key_yaml):
     filename_positions = get_filename_positions(result)
     for file_pos in filename_positions:
         utils.fill_key(file_pos, utils.create_filenames(
-            result, double, file_pos, wi_object['old_filename'] if
+            result, double, file_pos, wi_object['old_filenames'] if
             'old_filenames' in wi_object else {}), result)
 
     return result
