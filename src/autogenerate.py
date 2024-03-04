@@ -182,7 +182,7 @@ class Autogenerate:
 
     def get_sample_name(self):
         if self.position[-2] == 'technical_replicates':
-            count = utils.find_position(self.gen.result_dict, self.position[:-1] + ['count'])
+            '''count = utils.find_position(self.gen.result_dict, self.position[:-1] + ['count'])
             nom = utils.find_position(self.gen.result_dict, self.position[:-2] + ['number_of_measurements'])
             sample_name = utils.find_position(self.gen.result_dict, self.position[:-2] + ['sample_name'])
             organism = utils.find_position(self.gen.result_dict, self.position[:self.position.index('experimental_setting')+2] + ['organism', 'organism_name'])
@@ -195,14 +195,20 @@ class Autogenerate:
                     # list
                     samples.append(f'{self.gen.project_id}_{organism}_{sample_name}_'
                                    f't{"{:02d}".format(i + 1)}_'
-                                   f'm{"{:02d}".format(j + 1)}')
-            return samples
+                                   f'm{"{:02d}".format(j + 1)}')'''
+            return utils.create_sample_names(self.gen.result_dict, {}, self.position)
         else:
             condition = utils.find_position(self.gen.result_dict, self.position[:-4]+['condition_name'])
             return f'{utils.get_short_name(condition, self.gen.result_dict, self.gen.key_yaml)}_b{"{:02d}".format(self.position[-2] + 1)}'
 
     def get_filenames(self):
-        return utils.find_position(self.gen.result_dict, self.position[:-1] + ['sample_name'])
+        setting_index = self.position.index('experimental_setting') + 1
+        experimental_factors = utils.find_position(self.gen.result_dict, self.position[:setting_index+1] + ['experimental_factors'])
+        double = []
+        if len(list(utils.find_keys(experimental_factors, 'gene'))) > 0 or len(list(utils.find_values(experimental_factors, 'gene'))) > 0:
+            gene_whitelist = utils.get_whitelist('gene', self.gen.result_dict)
+            double = gene_whitelist['double'] if 'double' in gene_whitelist else []
+        return utils.create_filenames(self.gen.result_dict, double, self.position, {})
 
     def get_count(self):
         return len(utils.find_position(self.gen.result_dict, self.position[:-1] + ['samples']))

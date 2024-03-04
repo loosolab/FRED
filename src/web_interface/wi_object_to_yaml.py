@@ -46,22 +46,32 @@ def parse_object(wi_object, key_yaml):
 
     # remove keys with value None
     result = {k: v for k, v in result.items() if v is not None}
-    result = utils.create_filenames(
-        result, double,
-        wi_object['old_filenames'] if 'old_filenames' in wi_object else {},
-        wi_object['old_sample_names'] if 'old_sample_names' in wi_object else {})
+
+    sample_name_positions = get_sample_name_positions(result)
+    for sample_pos in sample_name_positions:
+        utils.fill_key(sample_pos, utils.create_sample_names(
+            result, wi_object['old_filenames'] if
+            'old_filenames' in wi_object else {}, sample_pos), result)
+
+    filename_positions = get_filename_positions(result)
+    for file_pos in filename_positions:
+        utils.fill_key(file_pos, utils.create_filenames(
+            result, double, file_pos, wi_object['old_sample_names'] if
+            'old_sample_names' in wi_object else {}), result)
+
     return result
 
 
-def get_file_name(sample_name, double):
-    splitted_name = sample_name.split('-')
-    new_name = []
-    for elem in splitted_name:
-        new_elem, gene = split_name(elem, double)
-        if new_elem != '':
-            new_name.append(new_elem)
-    sample_name = '_'.join(new_name)
-    return sample_name
+def get_filename_positions(metafile):
+    positions = [x + ['filenames'] for x in utils.get_key_positions(metafile, 'technical_replicates', [], [])]
+    return positions
+
+
+def get_sample_name_positions(metafile):
+    positions = [x + ['filenames'] for x in
+                 utils.get_key_positions(metafile, 'technical_replicates', [],
+                                         [])]
+    return positions
 
 
 def split_name(elem, double, gene=True):
