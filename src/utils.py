@@ -397,9 +397,7 @@ def create_filenames(metafile, double, position, old_filenames={}):
     global_index = []
     all_filenames = list(find_keys(metafile, 'filenames'))
     if len(all_filenames) > 0:
-        print('ALL', all_filenames)
         for elem in all_filenames:
-            print('ELEM', elem)
             global_index += [int(x.split('__')[1]) for x in elem]
 
     for k in old_filenames:
@@ -474,7 +472,7 @@ def create_filenames(metafile, double, position, old_filenames={}):
                             for t_count in range(1, tech_count + 1):
                                 for m_count in range(1, sample['number_of_measurements'] + 1):
                                     if abbrev_tech not in file_techniques:
-                                        filenames.append(f'{project_id}__{global_index}__{abbrev_tech}__{filename}__{global_index}')
+                                        filenames.append(f'{project_id}__{global_index}__{abbrev_tech}__{filename}__{local_index}')
                                         global_index += 1
                                         local_index += 1
 
