@@ -49,13 +49,13 @@ def parse_object(wi_object, key_yaml):
 
     sample_name_positions = get_sample_name_positions(result)
     for sample_pos in sample_name_positions:
-        utils.fill_key(sample_pos, utils.create_sample_names(
+        result = utils.fill_key(sample_pos, utils.create_sample_names(
             result, wi_object['old_sample_names'] if
             'old_sample_names' in wi_object else {}, sample_pos), result)
 
     filename_positions = get_filename_positions(result)
     for file_pos in filename_positions:
-        utils.fill_key(file_pos, utils.create_filenames(
+        result = utils.fill_key(file_pos, utils.create_filenames(
             result, double, file_pos, wi_object['old_filenames'] if
             'old_filenames' in wi_object else {}), result)
 
