@@ -325,10 +325,9 @@ def fill_key(position, value, fill_dict):
                     for i in range(len(fill_dict[position[0]]),
                                    position[1] + 1):
                         fill_dict[position[0]].append({})
-            fill_dict = fill_key(position[1:], value, fill_dict[position[0]])
+            fill_key(position[1:], value, fill_dict[position[0]])
     else:
         print('NO POSITION')
-    return fill_dict
 
 
 def create_sample_names(metafile, old_sample_names, position):
