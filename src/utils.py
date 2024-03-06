@@ -358,33 +358,33 @@ def create_sample_names(metafile, old_sample_names, position):
                 for u_t in used_techs:
                     abbrev_tech = abbrev_techniques[
                         u_t] if u_t in abbrev_techniques else u_t
-                if abbrev_tech is not None:
-                    sample_index = position.index('samples')+1
-                    sample = find_position(metafile, position[:sample_index+1])
-                    if 'sample_name' in sample and 'number_of_measurements' in sample:
-                        tech_count = find_position(metafile, position[:-1] + ['count'])
-                        filename_length = len(used_techs) * tech_count * \
-                                          sample['number_of_measurements']
-                        key_name = f'{setting_id}_{sample["sample_name"]}'
-                        if key_name not in old_sample_names.keys():
-                            old_sample_names[key_name] = []
-                        sample_names = old_sample_names[key_name]
-                        if len(old_sample_names[key_name]) < filename_length:
-                            sample_techniques = []
-                            if len(old_sample_names[key_name]) > 0:
-                                sample_techniques = set(list(
-                                    [x.split('_')[2] for x in
-                                     old_sample_names[key_name]]))
+                    if abbrev_tech is not None:
+                        sample_index = position.index('samples')+1
+                        sample = find_position(metafile, position[:sample_index+1])
+                        if 'sample_name' in sample and 'number_of_measurements' in sample:
+                            tech_count = find_position(metafile, position[:-1] + ['count'])
+                            filename_length = len(used_techs) * tech_count * \
+                                              sample['number_of_measurements']
+                            key_name = f'{setting_id}_{sample["sample_name"]}'
+                            if key_name not in old_sample_names.keys():
+                                old_sample_names[key_name] = []
+                            sample_names = old_sample_names[key_name]
+                            if len(old_sample_names[key_name]) < filename_length:
+                                sample_techniques = []
+                                if len(old_sample_names[key_name]) > 0:
+                                    sample_techniques = set(list(
+                                        [x.split('_')[2] for x in
+                                         old_sample_names[key_name]]))
 
-                            b_name = sample['sample_name']
+                                b_name = sample['sample_name']
 
-                            for t_count in range(1, tech_count+1):
-                                for m_count in range(
-                                        1, sample['number_of_measurements']
-                                           + 1):
-                                    if abbrev_tech not in sample_techniques:
-                                        sample_name = f'{project_id}_{setting_id}_{abbrev_tech}_{organism}_{b_name}_t{"{:02d}".format(t_count)}_m{"{:02d}".format(m_count)}'
-                                        sample_names.append(sample_name)
+                                for t_count in range(1, tech_count+1):
+                                    for m_count in range(
+                                            1, sample['number_of_measurements']
+                                               + 1):
+                                        if abbrev_tech not in sample_techniques:
+                                            sample_name = f'{project_id}_{setting_id}_{abbrev_tech}_{organism}_{b_name}_t{"{:02d}".format(t_count)}_m{"{:02d}".format(m_count)}'
+                                            sample_names.append(sample_name)
 
     return sorted(list(set(sample_names)))
 
@@ -447,31 +447,31 @@ def create_filenames(metafile, double, position, old_filenames={}):
                 for u_t in used_techs:
                     abbrev_tech = abbrev_techniques[
                         u_t] if u_t in abbrev_techniques else u_t
-                if abbrev_tech is not None:
-                    sample_index = position.index('samples')+1
-                    sample = find_position(metafile, position[:sample_index+1])
-                    if 'sample_name' in sample and 'number_of_measurements' in sample:
-                        tech_count = find_position(metafile, position[:-1] + ['count'])
-                        filename_length = len(used_techs) * tech_count * \
-                                          sample['number_of_measurements']
-                        key_name = f'{setting_id}_{sample["sample_name"]}'
-                        file_techniques = []
-                        if key_name not in old_filenames.keys():
-                            old_filenames[key_name] = []
-                        filenames = old_filenames[key_name]
-                        if len(old_filenames[key_name]) < filename_length:
-                            if len(old_filenames[key_name]) > 0:
-                                file_techniques = set(list([x.split('__')[2] for x in old_filenames[key_name]]))
+                    if abbrev_tech is not None:
+                        sample_index = position.index('samples')+1
+                        sample = find_position(metafile, position[:sample_index+1])
+                        if 'sample_name' in sample and 'number_of_measurements' in sample:
+                            tech_count = find_position(metafile, position[:-1] + ['count'])
+                            filename_length = len(used_techs) * tech_count * \
+                                              sample['number_of_measurements']
+                            key_name = f'{setting_id}_{sample["sample_name"]}'
+                            file_techniques = []
+                            if key_name not in old_filenames.keys():
+                                old_filenames[key_name] = []
+                            filenames = old_filenames[key_name]
+                            if len(old_filenames[key_name]) < filename_length:
+                                if len(old_filenames[key_name]) > 0:
+                                    file_techniques = set(list([x.split('__')[2] for x in old_filenames[key_name]]))
 
-                            b_name = sample['sample_name']
-                            #TODO: change rstrip to removesuffix
-                            filename = get_file_name(b_name.rstrip(f'_{b_name.split("_")[-1]}'),double)
-                            for t_count in range(1, tech_count + 1):
-                                for m_count in range(1, sample['number_of_measurements'] + 1):
-                                    if abbrev_tech not in file_techniques:
-                                        filenames.append(f'{project_id}__{global_index}__{abbrev_tech}__{filename}__{local_index}')
-                                        global_index += 1
-                                        local_index += 1
+                                b_name = sample['sample_name']
+                                #TODO: change rstrip to removesuffix
+                                filename = get_file_name(b_name.rstrip(f'_{b_name.split("_")[-1]}'),double)
+                                for t_count in range(1, tech_count + 1):
+                                    for m_count in range(1, sample['number_of_measurements'] + 1):
+                                        if abbrev_tech not in file_techniques:
+                                            filenames.append(f'{project_id}__{global_index}__{abbrev_tech}__{filename}__{local_index}')
+                                            global_index += 1
+                                            local_index += 1
 
     return sorted(list(set(filenames)))
 
