@@ -69,10 +69,8 @@ def get_summary(wi_object):
     return html_output.get_summary(wi_object, key_yaml)
 
 
-def save_object(dictionary, path, filename):
-    key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
-        os.path.abspath(__file__)), '..', 'keys.yaml'))
-    object, id = file_io.save_object(key_yaml, dictionary, path, filename)
+def save_object(dictionary, path, edit_state):
+    object, id = file_io.save_object(dictionary, path, edit_state)
     return object, id
 
 

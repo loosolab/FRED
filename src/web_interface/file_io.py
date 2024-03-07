@@ -5,7 +5,7 @@ import os
 # TODO: comment
 
 
-def save_object(key_yaml, dictionary, path, filename):
+def save_object(dictionary, path, filename, edit_state):
     """
     This function saves the yaml structure into a file
     :param dictionary: the parsed wi object in yaml format
@@ -13,30 +13,18 @@ def save_object(key_yaml, dictionary, path, filename):
     :param filename: the name of the file
     :return: new_filename: the name under which the file was saved
     """
-
-    # search for all metadata files
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles(
-        key_yaml, [path], return_false=True)
-
-    project_id = dictionary['project']['id']
-    # TODO: own function
-    correct_file = None
-    for metafile in metafiles:
-        if 'project' in metafile and 'id' in metafile['project'] and \
-                metafile['project']['id'] == project_id:
-            correct_file = metafile
-            break
-
-    if correct_file is not None:
-        path = correct_file['path']
-        new_filename = path
-        utils.save_as_yaml(dictionary, path)
+    project_id = list(utils.find_keys(dictionary, 'id'))
+    if len(project_id) > 0:
+        project_id = project_id[0]
     else:
-        new_filename = f'{project_id}_{filename}' \
-                       f'_metadata.yaml'
-        utils.save_as_yaml(dictionary, os.path.join(path, new_filename))
-        new_filename = os.path.join(path, new_filename)
-    return new_filename, project_id
+        project_id = ''
+
+    if not edit_state:
+        filename = f'{project_id}_{filename}_metadata.yaml'
+
+    utils.save_as_yaml(dictionary, os.path.join(path, filename))
+
+    return filename, project_id
 
 
 def save_filenames(file_str, path):
