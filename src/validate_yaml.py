@@ -438,7 +438,6 @@ def validate_logic(metafile, mode='metadata'):
         if warning:
             logical_warn.append((f'Invalid techniques:', warn_message))
         invalid_file, invalid_sample, file_message, sample_message = validate_filenames(metafile)
-        print(invalid_file, invalid_sample)
         if invalid_file:
             logical_warn.append((f'Invalid number of filenames:', file_message))
         if invalid_sample:
@@ -480,7 +479,6 @@ def validate_filenames(metafile):
         techniques = {}
         for elem in technique[0]:
             techniques[elem['setting']] = elem['technique']
-        print(techniques)
         settings = list(utils.find_keys(metafile, 'experimental_setting'))
         if len(settings) > 0:
             for setting in settings[0]:
@@ -494,7 +492,6 @@ def validate_filenames(metafile):
                             t = sample['technical_replicates']['count'] if 'technical_replicates' in sample and 'count' in sample['technical_replicates'] else 0
                             tech = len(used_techniques)
                             file_count = m * t * tech
-                            print('FC', file_count)
                             if file_count > 0:
                                 if 'technical_replicates' in sample:
                                     if 'sample_name' in sample['technical_replicates']:
