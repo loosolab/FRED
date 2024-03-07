@@ -69,8 +69,8 @@ def get_summary(wi_object):
     return html_output.get_summary(wi_object, key_yaml)
 
 
-def save_object(dictionary, path, edit_state):
-    object, id = file_io.save_object(dictionary, path, edit_state)
+def save_object(dictionary, path, filename, edit_state):
+    object, id = file_io.save_object(dictionary, path, filename, edit_state)
     return object, id
 
 
