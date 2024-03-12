@@ -465,7 +465,9 @@ def create_filenames(metafile, double, position, old_filenames={}):
 
                                 b_name = sample['sample_name']
                                 #TODO: change rstrip to removesuffix
-                                filename = get_file_name(b_name.rstrip(f'_{b_name.split("_")[-1]}'),double)
+                                if b_name.endswith(f'_{b_name.split("_")[-1]}'):
+                                    b_name = b_name[:-len(f'_{b_name.split("_")[-1]}')]
+                                filename = get_file_name(b_name, double)
                                 for t_count in range(1, tech_count + 1):
                                     for m_count in range(1, sample['number_of_measurements'] + 1):
                                         if abbrev_tech not in file_techniques:
@@ -485,6 +487,14 @@ def get_file_name(sample_name, double):
             new_name.append(new_elem)
     sample_name = '_'.join(new_name)
     return sample_name
+
+
+def NestedDictValues(d):
+  for v in d.values():
+    if isinstance(v, dict):
+      yield from NestedDictValues(v)
+    else:
+      yield v
 
 
 def split_name(elem, double, gene=True):
@@ -523,14 +533,14 @@ def print_desc(desc, format='plain', size=70):
                 if format == 'plain':
                     for i in range(len(elem)):
                         for j in range(len(elem[i])):
-                            if format == 'plain':
-                                elem[i][j] = elem[i][j].replace('33[1m', '').replace('33[0;0m', '')
+                            #if format == 'plain':
+                            #    elem[i][j] = elem[i][j].replace('\u001b[1m', '').replace('\u001b[22m', '')
                             elem[i][j] = '\n'.join(['\n'.join(textwrap.wrap(line, math.ceil(size * 1/(len(elem[i])+1)), break_long_words=False, replace_whitespace=False)) for line in elem[i][j].splitlines() if line.strip() != ''])
                 new_desc += tabulate(elem, tablefmt=format).replace('>\n<', '><').replace('<td>', f'<td style="width:{int(1/len(elem[0])*100)}%; vertical-align:top;">')
     else:
         new_desc = desc
     if format == 'html':
-        new_desc = new_desc.replace('\x0033[1m', '<b>').replace('\x0033[0;0m', '</b>').replace('\n', '<br>').replace('<table>', '<table class="pgm_desc_table">')
+        new_desc = new_desc.replace('\u001b[1m', '<b>').replace('\u001b[22m', '</b>').replace('\n', '<br>').replace('<table>', '<table class="pgm_desc_table">')
     else:
         new_desc.replace('33[1m', '').replace('33[0;0m', '')
     return new_desc
