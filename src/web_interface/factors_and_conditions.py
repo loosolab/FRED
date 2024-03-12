@@ -15,7 +15,8 @@ def get_factors(organism, key_yaml):
     :return: factor_value: a dictionary containing factors and whitelists
     """
 
-    factor_desc = list(utils.find_keys(key_yaml, 'experimental_factors'))[0]['factor_desc']
+    factor_desc = list(utils.find_keys(key_yaml, 'experimental_factors'))[0][
+        'factor_desc']
     f_node = list(utils.find_keys(key_yaml, 'factor'))[0]
     # initialize dictionary with all factors
     factor_list, whitelist_type, input_type, headers, whitelist_keys, double = \
@@ -54,7 +55,11 @@ def get_factors(organism, key_yaml):
                               'input_type': input_type,
                               'whitelist_type': whitelist_type,
                               'displayName': node[0]['display_name'],
-                              'desc': utils.print_desc(node[0]['factor_desc'] if 'factor_desc' in node[0] else node[0]['desc'], 'html').replace('\n','<br>')}
+                              'desc': utils.print_desc(
+                                  node[0]['factor_desc'] if 'factor_desc' in
+                                                            node[0] else
+                                  node[0]['desc'], 'html').replace('\n',
+                                                                   '<br>')}
 
             # add search_info if input is of type single- or multi-autofill
             if input_type == 'multi_autofill':
@@ -66,7 +71,8 @@ def get_factors(organism, key_yaml):
                 values[factor]['restriction'] = {'regex': ' ',
                                                  'max_length': 10}
 
-                if 'special_case' in node and 'restriction' in node['special_case']:
+                if 'special_case' in node and 'restriction' in node[
+                    'special_case']:
                     if 'regex' in node['special_case']['restriction']:
                         values[factor]['restriction']['regex'] = \
                             node['special_case']['restriction']['regex']
@@ -137,8 +143,9 @@ def get_factor_values(key, node, filled_object, nested_infos=None):
 
             # call this function to get the whitelist information for the keys
             k_val['whitelist'], k_val['whitelist_type'], k_val['input_type'], \
-                header, whitelist_keys, doubled, nested_infos = get_factor_values(k, node['value'][k],
-                                                           filled_object, nested_infos=nested_infos)
+            header, whitelist_keys, doubled, nested_infos = get_factor_values(
+                k, node['value'][k],
+                filled_object, nested_infos=nested_infos)
 
             # add header and whitelist keys to dictionary if they are defined
             if header is not None:
@@ -172,15 +179,15 @@ def get_factor_values(key, node, filled_object, nested_infos=None):
                 # default
                 k_val['restriction'] = {'regex': ' ', 'max_length': 10}
 
-                if 'special_case' in node['value'][k] and 'restriction' in  \
+                if 'special_case' in node['value'][k] and 'restriction' in \
                         node['value'][k]['special_case']:
-                    if 'regex' in  node['value'][k]['special_case'][
-                            'restriction']:
+                    if 'regex' in node['value'][k]['special_case'][
+                        'restriction']:
                         k_val['restriction']['regex'] = \
                             node['value'][k]['special_case']['restriction'][
                                 'regex']
                     if 'max_length' in node['value'][k]['special_case'][
-                            'restriction']:
+                        'restriction']:
                         k_val['restriction']['max_length'] = \
                             node['value'][k]['special_case']['restriction'][
                                 'max_length']
@@ -270,26 +277,34 @@ def get_conditions(factors, organism_name, key_yaml):
 
                 # add an ident key to the value
                 # -> defined in general structure or None
-                val['ident_key'] = factor_infos[0]['special_case']['group'] if\
+                val['ident_key'] = factor_infos[0]['special_case']['group'] if \
                     'special_case' in factor_infos[0] and 'group' in \
                     factor_infos[0]['special_case'] else None
 
-                val['control'] = factor_infos[0]['special_case']['control'] if\
+                val['control'] = factor_infos[0]['special_case']['control'] if \
                     'special_case' in factor_infos[0] and 'control' in \
                     factor_infos[0]['special_case'] else None
 
                 if 'nested_infos' in factors[i]:
-                        for val_key in factors[i]['nested_infos']:
+                    for val_key in factors[i]['nested_infos']:
+                        if val_key in val:
                             for v in range(len(val[val_key])):
                                 full_value = copy.deepcopy(val[val_key][v])
-                                if 'whitelist_keys' in factors[i]['nested_infos'][val_key]:
-                                    for w_key in factors[i]['nested_infos'][val_key]['whitelist_keys']:
+                                if 'whitelist_keys' in factors[i]['nested_infos'][
+                                    val_key]:
+                                    for w_key in \
+                                    factors[i]['nested_infos'][val_key][
+                                        'whitelist_keys']:
                                         if val[val_key][v].endswith(f'({w_key})'):
-                                            val[val_key][v] = val[val_key][v].rstrip(f'({w_key})').strip()
+                                            val[val_key][v] = val[val_key][
+                                                v].rstrip(f'({w_key})').strip()
                                             break
-                                if 'headers' in factors[i]['nested_infos'][val_key]:
+                                if 'headers' in factors[i]['nested_infos'][
+                                    val_key]:
                                     str_value = wi_utils.parse_headers(
-                                        factors[i]['nested_infos'][val_key]['headers'], val[val_key][v], mode='str')
+                                        factors[i]['nested_infos'][val_key][
+                                            'headers'], val[val_key][v],
+                                        mode='str')
                                     val[val_key][v] = f'{"{"}' \
                                                       f'{str_value}{"}"}'
                                 real_val[val[val_key][v]] = full_value
@@ -297,11 +312,17 @@ def get_conditions(factors, organism_name, key_yaml):
                 # generate combinations of the values of the dictionary for the
                 # conditions and overwrite the values with them
                 factors[i]['values'] = utils.get_combis(
-                    val, factors[i]['factor'], {'organism': organism_name.split(' ')[0]}, key_yaml)
+                    val, factors[i]['factor'],
+                    {'organism': organism_name.split(' ')[0]}, key_yaml)
 
         elif factor_infos[0]['list']:
 
-            factors[i]['values'] = utils.get_combis(factors[i]['values'], factors[i]['factor'], {'organism': organism_name.split(' ')[0]}, key_yaml)
+            factors[i]['values'] = utils.get_combis(factors[i]['values'],
+                                                    factors[i]['factor'], {
+                                                        'organism':
+                                                            organism_name.split(
+                                                                ' ')[0]},
+                                                    key_yaml)
 
         # iterate over all values
         for j in range(len(factors[i]['values'])):
@@ -327,7 +348,6 @@ def get_conditions(factors, organism_name, key_yaml):
                 # defined within the headers
                 if headers is not None and full_value.split('(')[-1].replace(
                         ')', '') in headers:
-
                     # rewrite the value to '<factor>:{<values>}'
                     factors[i]['values'][j] = f'{factors[i]["factor"]}:{"{"}' \
                                               f'{factors[i]["values"][j]}{"}"}'
@@ -381,7 +401,9 @@ def get_conditions(factors, organism_name, key_yaml):
         for cond in conditions:
 
             # generate a sample name from the condition
-            sample_name = utils.get_short_name(cond, {'organism': organism_name}, key_yaml)
+            sample_name = utils.get_short_name(cond,
+                                               {'organism': organism_name},
+                                               key_yaml)
 
             # split the condition into key-value pairs
             split_condition = utils.split_cond(cond)
@@ -393,25 +415,31 @@ def get_conditions(factors, organism_name, key_yaml):
                     val = "|".join([f'{k}:"{elem[1][k]}"' for k in elem[1]])
                     val = f'{elem[0]}:{"{"}{val}{"}"}'
                     if val in real_val:
-                        search_condition.append(f'{elem[0]}:"{real_val[val]}"'.lower())
+                        search_condition.append(
+                            f'{elem[0]}:"{real_val[val]}"'.lower())
                     else:
                         for key in elem[1]:
                             if isinstance(elem[1][key], dict):
                                 val = "|".join(
-                                    [f'{k}:"{elem[1][key][k]}"' for k in elem[1][key]])
+                                    [f'{k}:"{elem[1][key][k]}"' for k in
+                                     elem[1][key]])
                                 val = f'{key}:{"{"}{val}{"}"}'
                                 if val in real_val:
-                                    search_condition.append(f'{elem[0]}:"{real_val[val]}"'.lower())
+                                    search_condition.append(
+                                        f'{elem[0]}:"{real_val[val]}"'.lower())
                             else:
-                                search_condition.append(f'{elem[0]}:"{elem[1][key]}"'.lower())
+                                search_condition.append(
+                                    f'{elem[0]}:"{elem[1][key]}"'.lower())
                 elif isinstance(elem[1], list):
                     for item in elem[1]:
                         search_condition.append(f'{elem[0]}:"{item}"'.lower())
                 else:
                     if elem[1] in real_val:
-                        search_condition.append(f'{elem[0]}:"{real_val[elem[1]]}"'.lower())
+                        search_condition.append(
+                            f'{elem[0]}:"{real_val[elem[1]]}"'.lower())
                     else:
-                        search_condition.append(f'{elem[0]}:"{elem[1]}"'.lower())
+                        search_condition.append(
+                            f'{elem[0]}:"{elem[1]}"'.lower())
 
             # call functions to fill the samples with the values from the
             # condition
@@ -480,7 +508,7 @@ def get_condition_title(split_condition):
         vals, readd = get_title_value(split_condition[i][1], readd)
 
         # add the string with the values to the table as a data cell
-        html += f'<td class="td_style_condition_title_value">{vals}'\
+        html += f'<td class="td_style_condition_title_value">{vals}' \
                 f'</td></tr>'
 
         # if the condition consists of multiple factors than write a '---'
@@ -495,7 +523,6 @@ def get_condition_title(split_condition):
 
 
 def get_title_value(cond_value, readd):
-
     # value is a dictionary
     if isinstance(cond_value, dict):
 
@@ -565,7 +592,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
             # save the unchanged sample name as 'correct_value'
             sample[i]['correct_value'] = sample_name.split('_')[0]
 
-        #elif sample[i]['position'].endswith('samples:sequencer_name'):
+        # elif sample[i]['position'].endswith('samples:sequencer_name'):
         #    sample[i]['value'] = sequencer_name
         #    sample[i]['input_disabled'] = True
 
@@ -623,10 +650,10 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                     # call this function on the keys of the
                                     # value in order to fill them
                                     filled_value = get_samples(
-                                        [(x, c[1][x]) for x in c[1] #if not (
-                                                #c[1] == 'technical_replicates'
-                                                #and x == 'sample_name')
-                                        ],
+                                        [(x, c[1][x]) for x in c[1]  # if not (
+                                         # c[1] == 'technical_replicates'
+                                         # and x == 'sample_name')
+                                         ],
                                         copy.deepcopy(
                                             sample[i]['input_fields']),
                                         info, key_yaml, sample_name,
@@ -703,7 +730,8 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                             filled_value = f'{c[1]} ({key})'
                                             break
                                 else:
-                                    if 'input_type' in info[0] and info[0]['input_type'] == 'number':
+                                    if 'input_type' in info[0] and info[0][
+                                        'input_type'] == 'number':
                                         filled_value = int(c[1])
                                     else:
                                         filled_value = c[1]
@@ -720,7 +748,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                         # input field is of type single_autofill
                         if 'input_type' in sample[i] and \
                                 sample[i]['input_type'] in [
-                                'single_autofill', 'restricted_short_text']:
+                            'single_autofill', 'restricted_short_text']:
                             # initialize the key 'list_value' and move the
                             # value under the key 'value' to the key
                             # 'list_value'
@@ -733,12 +761,14 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                             if 'list' in info[0] and info[0]['list']:
                                 sample[i]['delete_disabled'] = True
-                                sample[i]['fixed_length'] = len(sample[i]['list_value'])
+                                sample[i]['fixed_length'] = len(
+                                    sample[i]['list_value'])
                             else:
                                 # disable the input for the filled input field
                                 sample[i]['input_disabled'] = True
 
-                        if 'input_type' in info[0] and info[0]['input_type'] == 'bool':
+                        if 'input_type' in info[0] and info[0][
+                            'input_type'] == 'bool':
                             if sample[i]['value']:
                                 sample[i]['value'] = 'True'
                             else:
