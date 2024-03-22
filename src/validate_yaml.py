@@ -249,6 +249,9 @@ def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None
                       value
     :return: True if the entry does not match the whitelist else False
     """
+    is_plain_group = False
+    whitelist_keys = None
+
     if entry_value == None:
         entry_value = 'None'
     if whitelist_path == None:
@@ -284,6 +287,9 @@ def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None
                 'whitelist_type'] == 'group':
             #TODO: linked whitelists
             whitelist = utils.read_grouped_whitelist(whitelist, {})
+            if 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'plain_group':
+                is_plain_group = True
+                whitelist_keys = whitelist['whitelist_keys'] if 'whitelist_keys' in whitelist else None
             if 'whitelist' in whitelist:
                 if not isinstance(whitelist['whitelist'], list):
                     whitelist = [x for xs in list(whitelist['whitelist'].values())
@@ -297,8 +303,16 @@ def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None
         whitelist = utils.read_whitelist(whitelist, whitelist_path=whitelist_path)
         if whitelist:
             whitelist = whitelist['whitelist']
-    if whitelist and entry_value not in whitelist:
-        return True
+    if whitelist:
+        if is_plain_group and whitelist_keys is not None:
+            found = False
+            for key in whitelist_keys:
+                if f'{entry_value} ({key})' in whitelist:
+                    found = True
+            if not found:
+                return True
+        elif entry_value not in whitelist:
+            return True
     return False
 
 
@@ -478,7 +492,8 @@ def validate_filenames(metafile):
     if len(technique) > 0:
         techniques = {}
         for elem in technique[0]:
-            techniques[elem['setting']] = elem['technique']
+            if 'setting' in elem:
+                techniques[elem['setting']] = elem['technique']
         settings = list(utils.find_keys(metafile, 'experimental_setting'))
         if len(settings) > 0:
             for setting in settings[0]:

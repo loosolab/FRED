@@ -61,7 +61,7 @@ def validate(args):
     structure_yaml = 'keys.yaml' if args.mode == 'metadata' else 'mamplan_keys.yaml'
     key_yaml = utils.read_in_yaml(structure_yaml)
     if os.path.isdir(args.path):
-        metafiles, validation_reports = file_reading.iterate_dir_metafiles(structure_yaml, [args.path], mode=args.mode, logical_validation=logical_validation, yaml=structure_yaml)
+        metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml, [args.path], mode=args.mode, logical_validation=logical_validation, yaml=structure_yaml)
     else:
         metafile = utils.read_in_yaml(args.path)
         file_reports = {'file': metafile, 'error': None, 'warning': None}
@@ -83,6 +83,7 @@ def validate(args):
 
     if validation_reports['corrupt_files']['count'] > 0:
 
+        res = None
         if args.output is not None:
             if args.output == 'print':
                 res = ['print report']
@@ -95,8 +96,9 @@ def validate(args):
         else:
             options = ['print report', 'save report to txt file', 'save report to json file', 'save report to yaml file']
             print(f'Do you want to see a report? Choose from the following options (1,...,{len(options)} or n)')
-            #generate_metafile.print_option_list(options, '')
-            #res = generate_metafile.parse_input_list(options, True)
+            ask = Generate('', '', False, 'metadata', key_yaml)
+            ask.print_option_list(options, '')
+            res = ask.parse_input_list(options, True)
 
         output_report = {'report': copy.deepcopy(validation_reports)['corrupt_files']['report']}
         for elem in output_report['report']:
@@ -137,7 +139,7 @@ def validate(args):
                 else:
                     elem.pop('warning')
 
-        if res:
+        if res is not None:
             if args.filename is not None:
                 filename = args.filename
             else:
