@@ -176,7 +176,7 @@ experimental_setting:
     edit: "not removable"
   desc:
     - "Define experimental factors of interest and how they were combined to conditions that represent samples. You can specify multiple experimental settings for multiple sample submissions and/or multiple techniques that were applied (RNA/ATAC etc.).\n\n"
-    - [["\033[1mExperimental Factors:\033[0;0m", "\033[1mConditions:\033[0;0m", "\033[1mBiological Replicates:\033[0;0m", "\033[1mTechnical Replicates:\033[0;0m", "\033[1mMeasurements:\033[0;0m"], ["These correspond to properties studied in the experiment, NOT all possible data pertaining to a sample. A unique combination of these represents a condition. Experimental factors can be added using ‘Edit Factors and generate Conditions’, while additional metadata can be supplied at the ‘Samples’ stage below.", "These result from unique combinations of experimental factors.", "A biological replicate captures random biological variation and typically originates from an individual organism. Each unique experimental condition should be represented by 3+ biological replicates. Usually corresponds to the tube sent for measurement.", "Result of measuring one biological replicate including all technical noise induced by experimental/measurement protocols (typically just 1). Occurs when an experiment is repeated or a sequencing library is recreated based on the same biological replicate.", "A measurement represents one readout of a technical replicate. Occurs when the same sequencing library is sequenced again or when an MS sample is splitted and/or measured multiple times. Does not contain any technical noise apart from the measurement itself. For analysis, measurements are usually joined to the technical replicate level."], ["Example:\nfactor 1 = genetic background: Mut, WT\nfactor 2 = time point: 12h, 24h", "Example:\ncondition 1 = Mut-12h\ncondition 2 = Mut-24h\ncondition 3 = WT-12h\ncondition 4 = WT-24h", "Example:\nbiological replicate 1 = Mut-12h_1\nbiological replicate 2 = Mut-12h_2\nbiological replicate 3 = Mut-12h_3", "Example:\ntechnical replicate 1 = Mut-12h_1_1\ntechnical replicate 2 = Mut-12h_1_2", "Example:\nmeasurement 1 = Mut-12h_1_1_1\nmeasurement 2 = Mut-12h_1_1_2"]]
+    - [["\u001b[1mExperimental Factors:\u001b[22m", "\u001b[1mConditions:\u001b[22m", "\u001b[1mBiological Replicates:\u001b[22m", "\u001b[1mTechnical Replicates:\u001b[22m", "\u001b[1mMeasurements:\u001b[22m"], ["These correspond to properties studied in the experiment, NOT all possible data pertaining to a sample. A unique combination of these represents a condition. Experimental factors can be added using ‘Edit Factors and generate Conditions’, while additional metadata can be supplied at the ‘Samples’ stage below.", "These result from unique combinations of experimental factors.", "A biological replicate captures random biological variation and typically originates from an individual organism. Each unique experimental condition should be represented by 3+ biological replicates. Usually corresponds to the tube sent for measurement.", "Result of measuring one biological replicate including all technical noise induced by experimental/measurement protocols (typically just 1). Occurs when an experiment is repeated or a sequencing library is recreated based on the same biological replicate.", "A measurement represents one readout of a technical replicate. Occurs when the same sequencing library is sequenced again or when an MS sample is splitted and/or measured multiple times. Does not contain any technical noise apart from the measurement itself. For analysis, measurements are usually joined to the technical replicate level."], ["Example:\nfactor 1 = genetic background: Mut, WT\nfactor 2 = time point: 12h, 24h", "Example:\ncondition 1 = Mut-12h\ncondition 2 = Mut-24h\ncondition 3 = WT-12h\ncondition 4 = WT-24h", "Example:\nbiological replicate 1 = Mut-12h_1\nbiological replicate 2 = Mut-12h_2\nbiological replicate 3 = Mut-12h_3", "Example:\ntechnical replicate 1 = Mut-12h_1_1\ntechnical replicate 2 = Mut-12h_1_2", "Example:\nmeasurement 1 = Mut-12h_1_1_1\nmeasurement 2 = Mut-12h_1_1_2"]]
   short_desc: "Added experimental settings."
   value:
     setting_id:
@@ -279,7 +279,7 @@ experimental_setting:
               list: True
               display_name: "Sample"
               short_desc: "In this part, information on each biological replicate is entered."
-              desc: "Check conditions and add metadata that is not part of the primary investigation based on experimental factors. \033[1mPress ‘Save Sample’ for each biological replicate.\033[0;0m"
+              desc: "Check conditions and add metadata that is not part of the primary investigation based on experimental factors. \u001b[1mPress ‘Save Sample’ for each biological replicate.\u001b[22m"
               special_case:
                 generated: now
                 edit: "not removable"
@@ -670,6 +670,30 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
+                concentration:
+                  mandatory: False
+                  list: False
+                  display_name: "Concentration"
+                  desc: "Concentration of sample\n[10 ng/μl]"
+                  special_case:
+                    value_unit: concentration
+                  value:
+                    value:
+                      mandatory: False
+                      list: False
+                      display_name: "Value"
+                      desc: ""
+                      value: null
+                      whitelist: False
+                      input_type: number
+                      unit:
+                        mandatory: False
+                        list: False
+                        display_name: "Unit"
+                        desc: ""
+                        value: "ng/μl"
+                        whitelist: True
+                        input_type: select
                 signal:
                   mandatory: False
                   list: False
