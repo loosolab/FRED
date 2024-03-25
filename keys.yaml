@@ -686,14 +686,14 @@ experimental_setting:
                       value: null
                       whitelist: False
                       input_type: number
-                      unit:
-                        mandatory: False
-                        list: False
-                        display_name: "Unit"
-                        desc: ""
-                        value: "ng/μl"
-                        whitelist: True
-                        input_type: select
+                    unit:
+                      mandatory: False
+                      list: False
+                      display_name: "Unit"
+                      desc: ""
+                      value: "ng/μl"
+                      whitelist: True
+                      input_type: select
                 signal:
                   mandatory: False
                   list: False
