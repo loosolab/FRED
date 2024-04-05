@@ -1,7 +1,8 @@
 import os
 from src.utils import read_in_yaml
 from src import validate_yaml
-
+import multiprocessing
+from functools import partial
 
 # The following functions were inspired by Mampok and slightly customized
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/
@@ -26,41 +27,55 @@ def iterate_dir_metafiles(key_yaml, path_metafiles, mode='metadata', logical_val
     error_count = 0
     warning_count = 0
     corrupt_count = 0
-    all_files = 0
+    items = []
     for path_metafile in path_metafiles:
         for subdir, dirs, files in os.walk(path_metafile):
-            for file in files:
-                error_reports = None
-                warning_reports = None
-                corrupted = False
-                report = {}
-                # add files with suffix '_metadata.y(a)ml'
-                if file.lower().endswith(
-                        f'{mode}.yaml') or file.lower().endswith(
-                        f'{mode}.yml'):
-                    ypath = os.path.join(subdir, file)
-                    # read these yaml as dict and append to metafile-list:
-                    print('reading file ' + ypath)
-                    all_files += 1
-                    metafile = read_in_yaml(ypath)
-                    # test if metafile is valid
-                    valid, missing_mandatory_keys, invalid_keys, \
-                        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, key_yaml, mode, logical_validation=logical_validation, yaml=yaml, whitelist_path=whitelist_path)
-                    # add path to dic
-                    metafile['path'] = ypath
-                    if not valid:
-                        error_reports = (missing_mandatory_keys, invalid_keys, invalid_entries, invalid_values)
-                        corrupted = True
-                        error_count += (len(missing_mandatory_keys) + len(invalid_keys) + len(invalid_entries) + len(invalid_values))
-                        if return_false:
-                            metafile_list.append(metafile)
-                    else:
-                        metafile_list.append(metafile)
-                    if len(logical_warn) > 0:
-                        corrupted = True
-                        warning_count += len(logical_warn)
-                        warning_reports = logical_warn
-                    if corrupted:
-                        corrupt_count += 1
-                        file_reports.append({'file': metafile, 'error': error_reports, 'warning': warning_reports})
-    return metafile_list, {'all_files': all_files, 'corrupt_files': {'count': corrupt_count, 'report': file_reports}, 'error_count': error_count, 'warning_count': warning_count}
+            items += [os.path.join(subdir, file) for file in files if file.lower().endswith(f'{mode}.yaml') or file.lower().endswith(f'{mode}.yml')]
+    pool = multiprocessing.Pool()
+    results = pool.map(partial(validate, mode=mode, key_yaml=key_yaml, logical_validation=logical_validation, whitelist_path=whitelist_path, yaml=yaml), items)
+    pool.close()
+    for result in results:
+        if result[3] == 0 or return_false:
+            metafile_list.append(result[0])
+
+        if result[1]:
+            corrupt_count += 1
+            file_reports.append({'file': result[0], 'error': result[2],
+                                 'warning': result[4]})
+
+        error_count += result[3]
+        warning_count += result[5]
+    return metafile_list, {'all_files': len(results), 'corrupt_files': {'count': corrupt_count, 'report': file_reports}, 'error_count': error_count, 'warning_count': warning_count}
+
+def validate(ypath, mode, key_yaml, logical_validation, whitelist_path, yaml):
+    error_reports = None
+    warning_reports = None
+    warning_count = False
+    error_count = 0
+    corrupted = False
+    report = {}
+    # add files with suffix '_metadata.y(a)ml'
+    metafile = read_in_yaml(ypath)
+    # test if metafile is valid
+    valid, missing_mandatory_keys, invalid_keys, \
+    invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(
+            metafile, key_yaml, mode,
+            logical_validation=logical_validation, yaml=yaml,
+            whitelist_path=whitelist_path)
+    # add path to dic
+    metafile['path'] = ypath
+    if not valid:
+        error_reports = (
+                missing_mandatory_keys, invalid_keys, invalid_entries,
+                invalid_values)
+        corrupted = True
+        error_count += (len(missing_mandatory_keys) + len(
+                invalid_keys) + len(invalid_entries) + len(invalid_values))
+
+    if len(logical_warn) > 0:
+        corrupted = True
+        warning_count += len(logical_warn)
+        warning_reports = logical_warn
+    print(f'validated file {ypath}')
+    return metafile, corrupted, error_reports, error_count, warning_reports, warning_count
+
