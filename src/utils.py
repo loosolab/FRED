@@ -445,6 +445,7 @@ def create_filenames(metafile, double, position, old_filenames={}):
                     metafile)['whitelist']
                 abbrev_tech = None
                 for u_t in used_techs:
+                    tech_local_index = local_index
                     abbrev_tech = abbrev_techniques[
                         u_t] if u_t in abbrev_techniques else u_t
                     if abbrev_tech is not None:
@@ -471,9 +472,9 @@ def create_filenames(metafile, double, position, old_filenames={}):
                                 for t_count in range(1, tech_count + 1):
                                     for m_count in range(1, sample['number_of_measurements'] + 1):
                                         if abbrev_tech not in file_techniques:
-                                            filenames.append(f'{project_id}__{global_index}__{abbrev_tech}__{filename}__{local_index}')
+                                            filenames.append(f'{project_id}__{global_index}__{abbrev_tech}__{filename}__{tech_local_index}')
                                             global_index += 1
-                                            local_index += 1
+                                            tech_local_index += 1
 
     return sorted(list(set(filenames)))
 
