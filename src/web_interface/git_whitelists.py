@@ -17,7 +17,7 @@ def get_whitelists():
             'https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.'
             'git/', os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                  '..', '..', 'metadata_whitelists'),
-            branch='add_concentration')
+            branch='cleanup')
 
     # repository was already cloned
     else:
