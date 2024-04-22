@@ -11,6 +11,7 @@ from src import validate_yaml
 from src import file_reading
 from src import edit_file
 from src import utils
+import urllib.parse as parse
 
 
 def find(args):
@@ -45,7 +46,8 @@ def generate(args):
     :param args:
     """
     config = utils.read_in_yaml(args.config)
-    fetch_whitelists(config['whitelist_repository'], config['whitelist_path'])
+    fetch_whitelists(config['whitelist_repository'], config['whitelist_path'],
+                     config['branch'])
     key_yaml = utils.read_in_yaml(config['keys_yaml'])
     gen = Generate(args.path, args.id, args.mandatory_only, args.mode,
                      key_yaml)
@@ -184,15 +186,36 @@ def edit(args):
     edit_file.edit_file(args.path, args.mode, args.mandatory_only, size)
 
 
-def fetch_whitelists(w_repo, w_path):
+def fetch_whitelists(w_repo, w_path, w_branch):
     print('Fetching whitelists...\n')
-    if not os.path.exists('metadata_whitelists'):
-        repo = git.Repo.clone_from(w_repo, w_path, branch='new_factors')
+    if not os.path.exists(w_path):
+        repo = git.Repo.clone_from(w_repo, w_path, branch=w_branch)
     else:
-        repo = git.Repo('metadata_whitelists')
+        repo = git.Repo(w_path)
         o = repo.remotes.origin
         o.pull()
 
+def add_value(args):
+    config = utils.read_in_yaml(args.config)
+    if 'private_access' in config and 'name' in config['private_access'] and \
+            'token' in config['private_access'] and \
+            config['private_access']['name'] is not None and \
+            config['private_access']['token'] is not None:
+        whitelist_repo = parse.urlunparse(parse.urlparse(config['whitelist_repository'])._replace(netloc=f'{config["private_access"]["name"]}:{config["private_access"]["token"]}@{parse.urlparse(config["whitelist_repository"]).netloc}'))
+    else:
+        whitelist_repo = config['whitelist_repository']
+    fetch_whitelists(whitelist_repo, config['whitelist_path'], config['branch'])
+    key_yaml = utils.read_in_yaml(config['keys_yaml'])
+    files, errors = file_reading.iterate_dir_metafiles(key_yaml, [args.path], args.mode, False, return_false=True, whitelist_path=config['whitelist_path'])
+    position = args.position.split(':')
+    # TODO: type
+    value = args.value
+    for file in files:
+        file = utils.add_value_at_pos(key_yaml, file, position, value, args.edit_existing)
+        save_path = file['path']
+        file.pop('path')
+        print(f'edited file {save_path}')
+        utils.save_as_yaml(file, save_path)
 
 def main():
     parser = argparse.ArgumentParser(prog='metaTools.py')
@@ -249,6 +272,16 @@ def main():
                                       'be filled out')
     edit_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
     edit_function.set_defaults(func=edit)
+
+    add_value_function = subparsers.add_parser('add_value', help='')
+    add_value_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
+    add_value_function.add_argument('-pos', '--position', required=True)
+    add_value_function.add_argument('-v', '--value', required=True)
+    add_value_function.add_argument('-t', '--type', default='str', choices=['str', 'int', 'float', 'bool'])
+    add_value_function.add_argument('-p', '--path', type=pathlib.Path, required=True)
+    add_value_function.add_argument('-e', '--edit_existing', default=False, action='store_true')
+    add_value_function.add_argument('-c', '--config', type=pathlib.Path, required=True)
+    add_value_function.set_defaults(func=add_value)
 
     args = parser.parse_args()
 

@@ -389,19 +389,45 @@ def create_sample_names(metafile, old_sample_names, position):
     return sorted(list(set(sample_names)))
 
 
-#TODO: Listen
-def add_value_at_pos(metafile, position, value, overwrite=False):
-    if len(position) == 1:
-        if position[0] in metafile:
-            if metafile[position[0]] != value and overwrite:
-                metafile[position[0]] = value
+def add_value_at_pos(key_yaml, metafile, keys, value, overwrite=False, position=''):
+    if keys[0] in key_yaml:
+        key_yaml = key_yaml[keys[0]]
+        if len(keys) == 1:
+            if isinstance(metafile, list):
+                for i in range(len(metafile)):
+                    if keys[0] in metafile[i]:
+                        if key_yaml['list']:
+                            if value not in metafile[i][keys[0]]:
+                                metafile[i][keys[0]].append(value)
+                        else:
+                            if metafile[i][keys[0]] != value and overwrite:
+                                metafile[i][keys[0]] = value
+            else:
+                if keys[0] in metafile:
+                    if key_yaml['list']:
+                        if value not in metafile[keys[0]]:
+                            metafile[keys[0]].append(value)
+                    else:
+                        if metafile[keys[0]] != value and overwrite:
+                            metafile[keys[0]] = value
+                else:
+                    if key_yaml['list']:
+                        metafile[keys[0]] = [value]
+                    else:
+                        metafile[keys[0]] = value
         else:
-            metafile[position[0]] = value
+            if isinstance(metafile, list):
+                for i in range(len(metafile)):
+                    if keys[0] in metafile[i]:
+                        metafile[i][keys[0]] = add_value_at_pos(key_yaml['value'], metafile[i][keys[0]], keys[1:], value, overwrite=overwrite, position=f'{position}:{keys[0]}' if position != '' else keys[0])
+            else:
+                if keys[0] in metafile:
+                    metafile[keys[0]] = add_value_at_pos(key_yaml['value'], metafile[keys[0]], keys[1:], value, overwrite=overwrite, position=f'{position}:{keys[0]}' if position != '' else keys[0])
+                else:
+                    if not key_yaml['list']:
+                        metafile[keys[0]] = add_value_at_pos(key_yaml['value'], {}, keys[1:], value, overwrite=overwrite, position=f'{position}:{keys[0]}' if position != '' else keys[0])
     else:
-        if position[0] in metafile:
-            metafile[position[0]] = add_value_at_pos(metafile[position[0]], position[1:], value, overwrite)
-        else:
-            metafile[position[0]] = add_value_at_pos({}, position[1:], value, overwrite)
+        print(f'Key {keys[0]} was not found at position {position}.')
     return metafile
 
 
