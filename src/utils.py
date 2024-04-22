@@ -389,6 +389,22 @@ def create_sample_names(metafile, old_sample_names, position):
     return sorted(list(set(sample_names)))
 
 
+#TODO: Listen
+def add_value_at_pos(metafile, position, value, overwrite=False):
+    if len(position) == 1:
+        if position[0] in metafile:
+            if metafile[position[0]] != value and overwrite:
+                metafile[position[0]] = value
+        else:
+            metafile[position[0]] = value
+    else:
+        if position[0] in metafile:
+            metafile[position[0]] = add_value_at_pos(metafile[position[0]], position[1:], value, overwrite)
+        else:
+            metafile[position[0]] = add_value_at_pos({}, position[1:], value, overwrite)
+    return metafile
+
+
 def create_filenames(metafile, double, position, old_filenames={}):
     filenames = []
     global_index = []
@@ -566,7 +582,6 @@ def get_combis(values, key, result_dict, key_yaml):
         depend_key = None
         whitelist = None
 
-    control_value = None
     control_values = []
 
     if isinstance(values, list):
@@ -613,7 +628,7 @@ def get_combis(values, key, result_dict, key_yaml):
             value = []
             possible_values[elem] = []
             if control and start in control and control[start] == elem:
-                control_value = f'{start}:\"{elem}\"'
+                control_values = [f'{start}:\"{elem}\"']
             else:
                 if elem.startswith(f'{start}:{"{"}'):
                     value = [elem]
@@ -623,11 +638,10 @@ def get_combis(values, key, result_dict, key_yaml):
                 depend += value
 
             for val_key in values:
-
                 val_info = [x for x in
                             list(find_keys(key_yaml, val_key))
                             if isinstance(x, dict)]
-
+                new_controls = []
                 value2 = []
                 if val_key != start:
                     for x in value:
@@ -638,7 +652,7 @@ def get_combis(values, key, result_dict, key_yaml):
                                 v = f'{v["value"]}{v["unit"]}'
                             if control and val_key in control and \
                                     control[val_key] == v:
-                                control_value = f'{val_key}:\"{v}\"'
+                                control_values.append(f'{val_key}:\"{v}\"')
                             elif len(val_info) > 0 and 'special_case' in \
                                     val_info[0] and 'merge' in val_info[0][
                                 'special_case']:
@@ -669,21 +683,19 @@ def get_combis(values, key, result_dict, key_yaml):
                                 if f'{val_key}:\"{v}\"' not in val:
                                     value2.append(
                                         f'{val}|{val_key}:\"{v}\"')
-                            if len(val_info) > 0 and 'special_case' in \
+                            if len(control_values) > 0 and len(val_info) > 0 and 'special_case' in \
                                     val_info[0] and 'insert_control' in \
                                     val_info[0]['special_case']:
-                                control_values.append(
-                                    f'|{val_key}:\"{v}\"')
-                                new_c_vals = []
                                 for c_val in control_values:
-                                    if val_key not in c_val:
-                                        new_c_vals.append(
-                                            f'{c_val}|{val_key}:\"{v}\"')
-                                control_values += new_c_vals
+                                    if 'special_case' in val_info[0] and 'merge' in val_info[0]['special_case']:
+                                        new_controls.append(
+                                            f'{c_val}|{val_key}:{v}')
+                                    else:
+                                        new_controls.append(f'{c_val}|{val_key}:\"{v}\"')
                     value = value2
+                control_values += new_controls
 
             possible_values[elem] = value
-
             for z in possible_values:
                 for x in possible_values[z]:
                     part_values = []
@@ -694,11 +706,7 @@ def get_combis(values, key, result_dict, key_yaml):
                                 f'{d}-{key}:{"{"}{x}{"}"}')
                     disease_values += part_values
 
-        if control_value is not None:
-            disease_values.append(f'{key}:{"{"}{control_value}{"}"}')
-            for cntr in control_values:
-                disease_values.append(
-                    f'{key}:{"{"}{control_value}{cntr}{"}"}')
+        disease_values += [f'{key}:{"{"}{x}{"}"}' for x in control_values]
 
         return list(set(disease_values))
 
