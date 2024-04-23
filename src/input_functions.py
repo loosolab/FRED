@@ -23,11 +23,11 @@ class WhitelistCompleter:
 
 class Input:
 
-    def __init__(self, path, project_id, mandatory_only, mode, key_yaml):
+    def __init__(self, path, project_id, mandatory_only, filename, key_yaml):
         self.path = path
         self.project_id = project_id
         self.mandatory_only = mandatory_only
-        self.mode = mode
+        self.filename = filename
         self.key_yaml = key_yaml
         self.result_dict = {}
         self.size = os.get_terminal_size().columns
@@ -549,7 +549,6 @@ class Input:
             # and description
             data = [[f'{i + 1}:', f'{options[i]}', desc[i]] for i in
                     range(len(options))]
-
             # print the nested list as a table
             print(tabulate(data, tablefmt='plain',
                            maxcolwidths=[self.size * 1 / 8,

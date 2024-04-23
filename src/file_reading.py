@@ -1,3 +1,4 @@
+import copy
 import os
 from src.utils import read_in_yaml
 from src import validate_yaml
@@ -9,7 +10,7 @@ from functools import partial
 # file_reading.py
 
 
-def iterate_dir_metafiles(key_yaml, path_metafiles, mode='metadata', logical_validation=True, yaml=None, whitelist_path=None, return_false=False):
+def iterate_dir_metafiles(key_yaml, path_metafiles, filename='_metadata', logical_validation=True, yaml=None, whitelist_path=None, return_false=False):
     """
     iterate through a list of paths to find all _metadata.yaml(yml) files
     :param path_metafiles: list of paths containing yaml files
@@ -29,10 +30,9 @@ def iterate_dir_metafiles(key_yaml, path_metafiles, mode='metadata', logical_val
     corrupt_count = 0
     items = []
     for path_metafile in path_metafiles:
-        for subdir, dirs, files in os.walk(path_metafile):
-            items += [os.path.join(subdir, file) for file in files if file.lower().endswith(f'{mode}.yaml') or file.lower().endswith(f'{mode}.yml')]
+        items += [os.path.join(subdir, file) for subdir, dirs, files in os.walk(path_metafile) for file in files if file.lower().endswith(f'{filename}.yaml') or file.lower().endswith(f'{filename}.yml')]
     pool = multiprocessing.Pool()
-    results = pool.map(partial(validate, mode=mode, key_yaml=key_yaml, logical_validation=logical_validation, whitelist_path=whitelist_path, yaml=yaml), items)
+    results = pool.map(partial(validate, filename=filename, key_yaml=key_yaml, logical_validation=logical_validation, whitelist_path=whitelist_path, yaml=copy.deepcopy(key_yaml)), items)
     pool.close()
     for result in results:
         if result[3] == 0 or return_false:
@@ -47,7 +47,7 @@ def iterate_dir_metafiles(key_yaml, path_metafiles, mode='metadata', logical_val
         warning_count += result[5]
     return metafile_list, {'all_files': len(results), 'corrupt_files': {'count': corrupt_count, 'report': file_reports}, 'error_count': error_count, 'warning_count': warning_count}
 
-def validate(ypath, mode, key_yaml, logical_validation, whitelist_path, yaml):
+def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml):
     error_reports = None
     warning_reports = None
     warning_count = False
@@ -59,7 +59,7 @@ def validate(ypath, mode, key_yaml, logical_validation, whitelist_path, yaml):
     # test if metafile is valid
     valid, missing_mandatory_keys, invalid_keys, \
     invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(
-            metafile, key_yaml, mode,
+            metafile, key_yaml, filename,
             logical_validation=logical_validation, yaml=yaml,
             whitelist_path=whitelist_path)
     # add path to dic

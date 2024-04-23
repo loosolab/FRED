@@ -144,10 +144,21 @@ def print_summary(result):
         # iterate over metadata IDs
         for key in elem:
 
+            try:
+                project_name = elem[key]['project']['project_name']
+            except KeyError:
+                project_name = 'Not found'
+            try:
+                owner_name = elem[key]['project']['owner']['name']
+            except KeyError:
+                owner_name = 'Not found'
+            try:
+                project_path = elem[key]['path']
+            except KeyError:
+                project_path = 'Not found'
+
             # add the id, path, project_name and owner to res
-            res.append(
-                [key, elem[key]['path'], elem[key]['project']['project_name'],
-                 elem[key]['project']['owner']['name']])
+            res.append([key, project_path, project_name, owner_name])
 
     # convert res into a table using tabulate
     # set format to fancy_grid, define the headers as the first row and set the
@@ -301,7 +312,6 @@ def calculate_match(metafile, search_parameters):
 
                 # add 'should_be_found' to the 'params' list
                 params.append(should_be_found)
-                print('PARAMS', params)
             else:
 
                 # if there is no double quote in the search parameter then
@@ -324,7 +334,6 @@ def calculate_match(metafile, search_parameters):
             else:
 
                 # call find_entry to evaluate match
-                print(params, len(params))
                 match = find_entry(metafile, params[0:-2], params[-2])
 
             # set match to True if it was found while it was supposed to be

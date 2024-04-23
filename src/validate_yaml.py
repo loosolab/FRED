@@ -11,7 +11,7 @@ generated = ['condition_name', 'sample_name']
 factor = None
 
 
-def validate_file(metafile, key_yaml, mode, logical_validation=True, yaml=None, generated=True, whitelist_path=None, only_mandatory = False):
+def validate_file(metafile, key_yaml, filename, logical_validation=True, yaml=None, generated=True, whitelist_path=None, only_mandatory = False):
     """
     In this function all functions for the validation of a metadata file are
     called. The validation is based on the data in the file 'keys.yaml'. It is
@@ -29,7 +29,7 @@ def validate_file(metafile, key_yaml, mode, logical_validation=True, yaml=None, 
 
     if not only_mandatory:
         invalid_keys, invalid_entries, invalid_value = \
-            new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml, whitelist_path=whitelist_path, mode=mode)
+            new_test(metafile, key_yaml, [], '', [], [], [], None, [], None, metafile, key_yaml, whitelist_path=whitelist_path, filename=filename)
     else:
         invalid_keys = []
         invalid_entries = []
@@ -41,7 +41,7 @@ def validate_file(metafile, key_yaml, mode, logical_validation=True, yaml=None, 
             invalid_entries) > 0 or len(invalid_value) > 0:
         valid = False
     if logical_validation:
-        logical_warn = validate_logic(metafile, mode)
+        logical_warn = validate_logic(metafile, filename)
     return valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
         invalid_value, logical_warn
 
@@ -134,7 +134,7 @@ def print_warning(logical_warn, size=80):
 
 def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
              invalid_entry, invalid_value, input_type, is_factor,
-             local_factor, full_metadata, full_yaml, whitelist_path=None, mode='metadata'):
+             local_factor, full_metadata, full_yaml, whitelist_path=None, filename='_metadata'):
     """
     This function test if all keys in the metadata file are valid.
     :param metafile: the metadata file
@@ -179,10 +179,12 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                             else:
                                 headers = w['headers'].split(' ')
                             new_yaml[0]['value'] = headers
-                    if key not in new_yaml[0]['value']:
-                        invalid_keys.append(f'{key_name}:{key}')
-                    elif isinstance(metafile[key], list) != new_yaml[0]['list']:
-                        invalid_keys.append(f'{key_name}:{key}')
+                    #TODO: enrichment
+                    if new_yaml[0]['value'] is not None:
+                        if key not in new_yaml[0]['value']:
+                            invalid_keys.append(f'{key_name}:{key}')
+                        elif isinstance(metafile[key], list) != new_yaml[0]['list']:
+                            invalid_keys.append(f'{key_name}:{key}')
                 else:
                     invalid_keys.append(f'{key_name}:{key}')
             elif not key_yaml or (key_yaml and key not in key_yaml):
@@ -208,7 +210,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                         metafile[key], key_yaml[key]['value'], sub_lists,
                         f'{key_name}:{key}' if key_name != '' else key,
                         invalid_keys, invalid_entry, invalid_value, input_type,
-                        is_factor, local_factor, full_metadata, full_yaml, whitelist_path=whitelist_path, mode=mode)
+                        is_factor, local_factor, full_metadata, full_yaml, whitelist_path=whitelist_path, filename=filename)
                     invalid_keys = res_keys
     elif isinstance(metafile, list):
         for item in metafile:
@@ -216,7 +218,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             res_keys, res_entries, res_values = new_test(
                 item, key_yaml, sub_lists, key_name, invalid_keys,
                 invalid_entry, invalid_value, input_type, is_factor,
-                local_factor, full_metadata, full_yaml, whitelist_path=whitelist_path, mode=mode)
+                local_factor, full_metadata, full_yaml, whitelist_path=whitelist_path, filename=filename)
             invalid_keys = res_keys
             sub_lists = sub_lists[:-1]
     else:
@@ -232,7 +234,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
             invalid_entry.append(f'{key_name}:{metafile}')
 
         inv_value, message = validate_value(metafile, input_type,
-                                            key_name.split(':')[-1], mode=mode)
+                                            key_name.split(':')[-1], filename=filename)
 
         if not inv_value:
             invalid_value.append((key_name, metafile, message))
@@ -386,7 +388,7 @@ def find_key(metafile, key):
     return new_metafile
 
 
-def validate_value(input_value, value_type, key, mode='metadata'):
+def validate_value(input_value, value_type, key, filename='_metadata'):
     """
     This function tests if an entered value matches its type and contains
     invalid characters.
@@ -411,14 +413,14 @@ def validate_value(input_value, value_type, key, mode='metadata'):
                 message = 'The value has to be an integer.'
         elif value_type == 'date':
             try:
-                if mode == 'metadata':
+                if filename == '_metadata':
                     input_date = input_value.split('.')
                     date_message = f'Input must be of type \'DD.MM.YYYY\'.'
-                elif mode == 'mamplan':
+                elif filename == '_mamplan':
                     input_date = input_value.split('/')
                     date_message = f'Input must be of type \'DD/MM/YYYY\'.'
                 if len(input_date) != 3 or len(input_date[0]) != 2 or len(
-                        input_date[1]) != 2 or not ((mode == 'mamplan' and len(input_date[2]) == 2) or len(input_date[2]) == 4):
+                        input_date[1]) != 2 or not ((filename == '_mamplan' and len(input_date[2]) == 2) or len(input_date[2]) == 4):
                     raise SyntaxError
                 input_value = datetime.date(int(input_date[2]),
                                             int(input_date[1]),
@@ -428,14 +430,14 @@ def validate_value(input_value, value_type, key, mode='metadata'):
                 message = date_message
         elif type(input_value) == str and ('\"' in input_value or '{' in input_value or '}' in
                  input_value or '|' in input_value) and key not in generated:
-            if mode != 'mamplan':
+            if filename != '_mamplan':
                 valid = False
                 message = 'The value contains an invalid character ' \
                           '(\", {, } or |).'
     return valid, message
 
 
-def validate_logic(metafile, mode='metadata'):
+def validate_logic(metafile, filename='_metadata'):
     """
     This functions tests the logic of the input data.
     :param metafile: the metafile to be validated
@@ -445,7 +447,7 @@ def validate_logic(metafile, mode='metadata'):
     """
     logical_warn = []
 
-    if mode == 'metadata':
+    if filename == '_metadata':
         techniques = list(utils.find_keys(metafile, 'setting'))
         setting_ids = list(utils.find_keys(metafile, 'setting_id'))
         warning, warn_message = validate_techniques(setting_ids, techniques)
@@ -473,7 +475,7 @@ def validate_logic(metafile, mode='metadata'):
                         organisms, run['reference_genome'])
                     if warning:
                         logical_warn.append((f'Run from {run["date"]}', warn_message))
-    elif mode == 'mamplan':
+    elif filename == '_mamplan':
         if 'tags' in metafile and 'organization' in metafile['tags'] and metafile['tags']['organization'] is not None:
             if 'public' in metafile['tags']['organization']:
                 if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:

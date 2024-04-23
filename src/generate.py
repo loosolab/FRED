@@ -24,10 +24,10 @@ class Generate(Input):
         # save information to a yaml file and print the filename
         print(
             f'File is saved to '
-            f'{os.path.join(self.path, f"{self.project_id}_{self.mode}.yaml")}'
+            f'{os.path.join(self.path, f"{self.project_id}{self.filename}.yaml")}'
             f'')
         utils.save_as_yaml(self.result_dict, os.path.join(
-            self.path, f'{self.project_id}_{self.mode}.yaml'))
+            self.path, f'{self.project_id}{self.filename}.yaml'))
 
     def print_sample_names(self):
         """
@@ -77,7 +77,7 @@ class Generate(Input):
                   f'{"".center(self.size, "-")}\n'
         valid, missing_mandatory_keys, invalid_keys, \
             invalid_entries, invalid_values, logical_warn = \
-            validate_yaml.validate_file(result, self.key_yaml, self.mode)
+            validate_yaml.validate_file(result, self.key_yaml, self.filename)
         if not valid:
             validation_reports['corrupt_files']['count'] = 1
             validation_reports['error_count'] += (

@@ -14,6 +14,205 @@ from src import utils
 import urllib.parse as parse
 
 
+class FRED:
+
+    def __init__(self, config):
+        self.whitelist_repo, self.whitelist_branch, self.whitelist_path, \
+        self.username, self.password, structure, self.update_whitelists, \
+        self.output_path, self.filename = utils.parse_config(config)
+        if not os.path.exists(self.whitelist_path) or self.update_whitelists:
+            self.fetch_whitelists()
+        self.structure = utils.read_in_yaml(structure)
+
+    def fetch_whitelists(self):
+        print('Fetching whitelists...\n')
+        if not os.path.exists(self.whitelist_path):
+            repo = git.Repo.clone_from(self.whitelist_repo,
+                                       self.whitelist_path,
+                                       branch=self.whitelist_branch)
+        else:
+            repo = git.Git(self.whitelist_path)
+            repo.pull('origin', self.whitelist_branch)
+
+    def find(self, search_path, search):
+        result = find_metafiles.find_projects(self.structure, search_path,
+                                              search, True)
+        if len(result) > 0:
+
+            # print summary of matching files
+            print(find_metafiles.print_summary(result))
+
+        else:
+
+            # print information that there are no matching files
+            print('No matches found')
+
+    def generate(self, path, id, mandatory_only):
+        gen = Generate(path, id, mandatory_only, self.filename, self.structure)
+        gen.generate()
+
+    def validate(self, logical_validation, path, output, output_filename):
+        validation_reports = {'all_files': 1,
+                              'corrupt_files': {'count': 0, 'report': []},
+                              'error_count': 0, 'warning_count': 0}
+        if os.path.isdir(path):
+            metafiles, validation_reports = file_reading.iterate_dir_metafiles(
+                self.structure, [path], filename=self.filename,
+                logical_validation=logical_validation, yaml=copy.deepcopy(self.structure))
+        else:
+            metafile = utils.read_in_yaml(path)
+            file_reports = {'file': metafile, 'error': None, 'warning': None}
+            valid, missing_mandatory_keys, invalid_keys, \
+            invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(
+                metafile, self.structure, self.filename,
+                logical_validation=logical_validation, yaml=copy.deepcopy(self.structure))
+            metafile['path'] = path
+            if not valid:
+                validation_reports['corrupt_files']['count'] = 1
+                validation_reports['error_count'] += (
+                            len(missing_mandatory_keys) + len(
+                        invalid_keys) + len(invalid_entries) + len(
+                        invalid_values))
+                file_reports['error'] = (
+                missing_mandatory_keys, invalid_keys, invalid_entries,
+                invalid_values)
+            if len(logical_warn) > 0:
+                validation_reports['corrupt_files']['count'] = 1
+                validation_reports['warning_count'] += len(logical_warn)
+                file_reports['warning'] = logical_warn
+            validation_reports['corrupt_files']['report'].append(file_reports)
+
+        print(f'{validation_reports["all_files"]} files were validated.')
+        print(
+            f'Found {validation_reports["error_count"]} errors and {validation_reports["warning_count"]} warnings in {validation_reports["corrupt_files"]["count"]} of those files.')
+
+        if validation_reports['corrupt_files']['count'] > 0:
+
+            res = None
+            if output is not None:
+                if output == 'print':
+                    res = ['print report']
+                elif output == 'txt':
+                    res = ['save report to txt file']
+                elif output == 'json':
+                    res = ['save report to json file']
+                elif output == 'yaml':
+                    res = ['save report to yaml file']
+            else:
+                options = ['print report', 'save report to txt file',
+                           'save report to json file',
+                           'save report to yaml file']
+                print(
+                    f'Do you want to see a report? Choose from the following options (1,...,{len(options)} or n)')
+                ask = Generate('', '', False, self.filename, self.structure)
+                ask.print_option_list(options, '')
+                res = ask.parse_input_list(options, True)
+
+            output_report = {
+                'report': copy.deepcopy(validation_reports)['corrupt_files'][
+                    'report']}
+            for elem in output_report['report']:
+                id = list(utils.find_keys(elem['file'], 'id'))
+                if len(id) > 0:
+                    elem['id'] = id[0]
+                else:
+                    elem['id'] = 'missing'
+                elem['path'] = elem['file']['path']
+                errors = list(elem['error']) if 'error' in elem and elem[
+                    'error'] is not None else []
+                elem['error'] = {}
+                elem.pop('file')
+                for i in range(len(errors)):
+
+                    if len(errors[i]) > 0:
+                        if i == 0:
+                            elem['error']['missing_mandatory_keys'] = errors[i]
+                        elif i == 1:
+                            elem['error']['invalid_keys'] = errors[i]
+                        elif i == 2:
+                            whitelist_values = []
+                            for v in errors[i]:
+                                key = ':'.join(v.split(':')[:-1])
+                                entry = v.split(':')[-1]
+                                whitelist_values.append(
+                                    entry + ' in ' + key + '\n')
+                            elem['error']['invalid_entries'] = whitelist_values
+                        elif i == 3:
+                            value = []
+                            for v in errors[i]:
+                                value.append(f'{v[0]}: {v[1]} -> {v[2]}')
+                            elem['error']['invalid_values'] = value
+
+                if 'warning' in elem:
+                    if elem['warning'] is not None:
+                        for i in range(len(elem['warning'])):
+                            elem['warning'][
+                                i] = f'{elem["warning"][i][0]}: {elem["warning"][i][1]}'
+                    else:
+                        elem.pop('warning')
+
+            if res is not None:
+                if output_filename is None:
+                    timestamp = time.time()
+                    output_filename = f'validation_report_{str(timestamp).split(".")[0]}'
+
+                rep = ''
+                for report in validation_reports['corrupt_files']['report']:
+                    rep += f'{"".center(80, "_")}\n\n'
+                    rep += validate_yaml.print_full_report(report['file'],
+                                                           report['error'],
+                                                           report['warning'])
+                rep += f'{"".center(80, "_")}\n\n'
+
+                if 'save report to txt file' in res:
+                    txt_filename = f'{output_filename}.txt'
+                    txt_f = open(txt_filename, 'w')
+                    txt_f.write(rep)
+                    print(
+                        f'The report was saved to the file \'{txt_filename}\'.')
+                    txt_f.close()
+
+                if 'save report to json file' in res:
+                    json_filename = f'{output_filename}.json'
+                    utils.save_as_json(output_report, json_filename)
+                    print(
+                        f'The report was saved to the file \'{json_filename}\'.')
+
+                if 'save report to yaml file' in res:
+                    yaml_filename = f'{output_filename}.yaml'
+                    utils.save_as_yaml(output_report, yaml_filename)
+                    print(
+                        f'The report was saved to the file \'{yaml_filename}\'.')
+
+                if 'print report' in res:
+                    print(rep)
+
+    def edit(self, path, mandatory_only):
+        try:
+            size = os.get_terminal_size()
+            size = size.columns
+        except OSError:
+            size = 80
+
+        edit_file.edit_file(path, self.filename, mandatory_only, size)
+
+    def add_value(self, path, position, value, edit_existing):
+        files, errors = file_reading.iterate_dir_metafiles(self.structure,
+                                                           [path],
+                                                           self.filename, False,
+                                                           return_false=True,
+                                                           whitelist_path=
+                                                           self.whitelist_path)
+        position = position.split(':')
+        # TODO: type
+        for file in files:
+            file = utils.add_value_at_pos(self.structure, file, position, value,
+                                          edit_existing)
+            save_path = file['path']
+            file.pop('path')
+            print(f'edited file {save_path}')
+            utils.save_as_yaml(file, save_path)
+
 def find(args):
     """
     calls script find_metafiles to find matching files and print results
@@ -23,21 +222,8 @@ def find(args):
                 and 'not'
     """
 
-    # call function find_projects in find_metafiles
-    key_yaml = utils.read_in_yaml('keys.yaml')
-    #fetch_whitelists()
-    result = find_metafiles.find_projects(key_yaml, args.path, args.search, True)
-
-    # test if matching metadata files were found
-    if len(result) > 0:
-
-        # print summary of matching files
-        print(find_metafiles.print_summary(result))
-
-    else:
-
-        # print information that there are no matching files
-        print('No matches found')
+    finding = FRED(args.config)
+    finding.find(args.path, args.search)
 
 
 def generate(args):
@@ -45,177 +231,22 @@ def generate(args):
     calls script generate_metafile to start dialog
     :param args:
     """
-    config = utils.read_in_yaml(args.config)
-    fetch_whitelists(config['whitelist_repository'], config['whitelist_path'],
-                     config['branch'])
-    key_yaml = utils.read_in_yaml(config['keys_yaml'])
-    gen = Generate(args.path, args.id, args.mandatory_only, args.mode,
-                     key_yaml)
-    gen.generate()
+    generating = FRED(args.config)
+    generating.generate(args.path, args.id, args.mandatory_only)
 
 
 def validate(args):
-    #fetch_whitelists()
-    logical_validation = False if args.skip_logic else True
-    validation_reports = {'all_files': 1,
-                          'corrupt_files': {'count': 0, 'report':[]},
-                          'error_count': 0, 'warning_count': 0}
-    structure_yaml = 'keys.yaml' if args.mode == 'metadata' else 'mamplan_keys.yaml'
-    key_yaml = utils.read_in_yaml(structure_yaml)
-    if os.path.isdir(args.path):
-        metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml, [args.path], mode=args.mode, logical_validation=logical_validation, yaml=structure_yaml)
-    else:
-        metafile = utils.read_in_yaml(args.path)
-        file_reports = {'file': metafile, 'error': None, 'warning': None}
-        valid, missing_mandatory_keys, invalid_keys, \
-        invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(metafile, key_yaml, args.mode, logical_validation=logical_validation, yaml=structure_yaml)
-        metafile['path'] = args.path
-        if not valid:
-            validation_reports['corrupt_files']['count'] = 1
-            validation_reports['error_count'] += (len(missing_mandatory_keys) + len(invalid_keys) + len(invalid_entries) + len(invalid_values))
-            file_reports['error'] = (missing_mandatory_keys, invalid_keys, invalid_entries, invalid_values)
-        if len(logical_warn) > 0:
-            validation_reports['corrupt_files']['count'] = 1
-            validation_reports['warning_count'] += len(logical_warn)
-            file_reports['warning'] = logical_warn
-        validation_reports['corrupt_files']['report'].append(file_reports)
+    validating = FRED(args.config)
+    validating.validate(not args.skip_logic, args.path, args.output, args.filename)
 
-    print(f'{validation_reports["all_files"]} files were validated.')
-    print(f'Found {validation_reports["error_count"]} errors and {validation_reports["warning_count"]} warnings in {validation_reports["corrupt_files"]["count"]} of those files.')
-
-    if validation_reports['corrupt_files']['count'] > 0:
-
-        res = None
-        if args.output is not None:
-            if args.output == 'print':
-                res = ['print report']
-            elif args.output == 'txt':
-                res = ['save report to txt file']
-            elif args.output == 'json':
-                res = ['save report to json file']
-            elif args.output == 'yaml':
-                res = ['save report to yaml file']
-        else:
-            options = ['print report', 'save report to txt file', 'save report to json file', 'save report to yaml file']
-            print(f'Do you want to see a report? Choose from the following options (1,...,{len(options)} or n)')
-            ask = Generate('', '', False, 'metadata', key_yaml)
-            ask.print_option_list(options, '')
-            res = ask.parse_input_list(options, True)
-
-        output_report = {'report': copy.deepcopy(validation_reports)['corrupt_files']['report']}
-        for elem in output_report['report']:
-            id = list(utils.find_keys(elem['file'], 'id'))
-            if len(id) > 0:
-                elem['id'] = id[0]
-            else:
-                elem['id'] = 'missing'
-            elem['path'] = elem['file']['path']
-            errors = list(elem['error']) if 'error' in elem and elem['error'] is not None else []
-            elem['error'] = {}
-            elem.pop('file')
-            for i in range(len(errors)):
-
-                if len(errors[i]) > 0:
-                    if i == 0:
-                        elem['error']['missing_mandatory_keys'] = errors[i]
-                    elif i == 1:
-                        elem['error']['invalid_keys'] = errors[i]
-                    elif i == 2:
-                        whitelist_values = []
-                        for v in errors[i]:
-                            key = ':'.join(v.split(':')[:-1])
-                            entry = v.split(':')[-1]
-                            whitelist_values.append(
-                                entry + ' in ' + key + '\n')
-                        elem['error']['invalid_entries'] = whitelist_values
-                    elif i == 3:
-                        value = []
-                        for v in errors[i]:
-                            value.append(f'{v[0]}: {v[1]} -> {v[2]}')
-                        elem['error']['invalid_values'] = value
-
-            if 'warning' in elem:
-                if elem['warning'] is not None:
-                    for i in range(len(elem['warning'])):
-                        elem['warning'][i] = f'{elem["warning"][i][0]}: {elem["warning"][i][1]}'
-                else:
-                    elem.pop('warning')
-
-        if res is not None:
-            if args.filename is not None:
-                filename = args.filename
-            else:
-                timestamp = time.time()
-                filename = f'validation_report_{str(timestamp).split(".")[0]}'
-
-            if 'save report to txt file' in res:
-                txt_filename = f'{filename}.txt'
-                txt_f = open(txt_filename, 'w')
-
-            rep = ''
-            for report in validation_reports['corrupt_files']['report']:
-                rep += f'{"".center(80, "_")}\n\n'
-                rep += validate_yaml.print_full_report(report['file'], report['error'], report['warning'])
-            rep += f'{"".center(80, "_")}\n\n'
-
-            if 'save report to txt file' in res:
-                txt_f.write(rep)
-                print(f'The report was saved to the file \'{txt_filename}\'.')
-                txt_f.close()
-
-            if 'save report to json file' in res:
-                json_filename = f'{filename}.json'
-                utils.save_as_json(output_report, json_filename)
-                print(f'The report was saved to the file \'{json_filename}\'.')
-
-            if 'save report to yaml file' in res:
-                yaml_filename = f'{filename}.yaml'
-                utils.save_as_yaml(output_report, yaml_filename)
-                print(f'The report was saved to the file \'{yaml_filename}\'.')
-
-            if 'print report' in res:
-                print(rep)
 
 def edit(args):
-    try:
-        size = os.get_terminal_size()
-        size = size.columns
-    except OSError:
-        size = 80
-
-    edit_file.edit_file(args.path, args.mode, args.mandatory_only, size)
-
-
-def fetch_whitelists(w_repo, w_path, w_branch):
-    print('Fetching whitelists...\n')
-    if not os.path.exists(w_path):
-        repo = git.Repo.clone_from(w_repo, w_path, branch=w_branch)
-    else:
-        repo = git.Repo(w_path)
-        o = repo.remotes.origin
-        o.pull()
+    editing = FRED(args.config)
+    editing.edit(args.path, args.mandatory_only)
 
 def add_value(args):
-    config = utils.read_in_yaml(args.config)
-    if 'private_access' in config and 'name' in config['private_access'] and \
-            'token' in config['private_access'] and \
-            config['private_access']['name'] is not None and \
-            config['private_access']['token'] is not None:
-        whitelist_repo = parse.urlunparse(parse.urlparse(config['whitelist_repository'])._replace(netloc=f'{config["private_access"]["name"]}:{config["private_access"]["token"]}@{parse.urlparse(config["whitelist_repository"]).netloc}'))
-    else:
-        whitelist_repo = config['whitelist_repository']
-    fetch_whitelists(whitelist_repo, config['whitelist_path'], config['branch'])
-    key_yaml = utils.read_in_yaml(config['keys_yaml'])
-    files, errors = file_reading.iterate_dir_metafiles(key_yaml, [args.path], args.mode, False, return_false=True, whitelist_path=config['whitelist_path'])
-    position = args.position.split(':')
-    # TODO: type
-    value = args.value
-    for file in files:
-        file = utils.add_value_at_pos(key_yaml, file, position, value, args.edit_existing)
-        save_path = file['path']
-        file.pop('path')
-        print(f'edited file {save_path}')
-        utils.save_as_yaml(file, save_path)
+    adding = FRED(args.config)
+    adding.add_value(args.path, args.position, args.value, args.edit_existing)
 
 def main():
     parser = argparse.ArgumentParser(prog='metaTools.py')
@@ -231,6 +262,8 @@ def main():
                                help='The path to be searched')
     find_group.add_argument('-s', '--search', type=str, required=True,
                                help='The search parameters')
+    find_group.add_argument('-c', '--config', type=pathlib.Path,
+                              help='Config file', default='config.yaml')
     find_function.set_defaults(func=find)
 
     create_function = subparsers.add_parser('generate',
@@ -261,6 +294,8 @@ def main():
     validate_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
     validate_function.add_argument('-o', '--output', default=None, choices=['json', 'txt', 'print', 'yaml'])
     validate_function.add_argument('-f', '--filename', default=None)
+    validate_function.add_argument('-c', '--config', type=pathlib.Path,
+                              help='Config file', default='config.yaml')
     validate_function.set_defaults(func=validate)
 
     edit_function = subparsers.add_parser('edit', help='')
@@ -270,6 +305,8 @@ def main():
                                  action='store_true',
                                  help='If True, only mandatory keys will '
                                       'be filled out')
+    edit_function.add_argument('-c', '--config', type=pathlib.Path,
+                              help='Config file', default='config.yaml')
     edit_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
     edit_function.set_defaults(func=edit)
 
@@ -280,7 +317,8 @@ def main():
     add_value_function.add_argument('-t', '--type', default='str', choices=['str', 'int', 'float', 'bool'])
     add_value_function.add_argument('-p', '--path', type=pathlib.Path, required=True)
     add_value_function.add_argument('-e', '--edit_existing', default=False, action='store_true')
-    add_value_function.add_argument('-c', '--config', type=pathlib.Path, required=True)
+    add_value_function.add_argument('-c', '--config', type=pathlib.Path,
+                              help='Config file', default='config.yaml')
     add_value_function.set_defaults(func=add_value)
 
     args = parser.parse_args()

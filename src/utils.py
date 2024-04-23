@@ -10,6 +10,59 @@ import math
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/utils.py
 
 
+def parse_config(config_file):
+    config = read_in_yaml(config_file)
+    missing_keys = []
+    try:
+        whitelist_repo = config['whitelist_repository']
+    except KeyError:
+        missing_keys.append('whitelist_repository')
+        whitelist_repo = 'https://github.com/loosolab/FRED_whitelists.git'
+    if 'private_access' in config and 'username' in config['private_access'] and 'password' in config['private_access'] and config['private_access']['username'] is not None and config['private_access']['password'] is not None:
+        username = config['private_access']['username']
+        password = config['private_access']['password']
+    else:
+        username = None
+        password = None
+    try:
+        structure = config['structure']
+    except KeyError:
+        structure = 'keys.yaml'
+        missing_keys.append('structure')
+    try:
+        whitelist_branch = config['branch']
+    except KeyError:
+        whitelist_branch = 'main'
+        missing_keys.append('branch')
+    try:
+        whitelist_path = config['whitelist_path']
+    except KeyError:
+        whitelist_path = 'FRED_whitelists'
+        missing_keys.append('whitelist_path')
+    try:
+        update_whitelists = config['update_whitelists']
+    except KeyError:
+        missing_keys.append('update_whitelist')
+        update_whitelists = True
+    try:
+        output_path = config['output_path']
+    except:
+        output_path = '.'
+        missing_keys.append('output_path')
+    try:
+        filename = config['filename']
+    except:
+        filename = '_metadata'
+        missing_keys.append('filename')
+
+    if len(missing_keys) > 0:
+        print(f'The keys {", ".join(missing_keys)} could not be found in the '
+              f'config file. FRED is running with default values for those '
+              f'keys.')
+    return whitelist_repo, whitelist_branch, whitelist_path, username, \
+           password, structure, update_whitelists, output_path, filename
+
+
 def save_as_yaml(dictionary, file_path):
     """
     save dictionary as YAML file
@@ -108,7 +161,7 @@ def read_whitelist(key, whitelist_path=None):
     :return: whitelist: the read in whitelist
     """
     if whitelist_path is None:
-        whitelist_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'metadata_whitelists')
+        whitelist_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'FRED_whitelists')
     try:
         whitelist = read_in_json(os.path.join(whitelist_path, 'misc', 'json', key))
     except (AttributeError, FileNotFoundError):
@@ -216,7 +269,7 @@ def get_whitelist(key, filled_object, all_plain=False, whitelist_path=None):
     if whitelist_path is None:
         whitelist_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), '..',
-            'metadata_whitelists')
+            'FRED_whitelists')
 
     while isinstance(whitelist,
                      dict) and not group and not stay_depend and not \
