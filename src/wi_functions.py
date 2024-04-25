@@ -27,6 +27,7 @@ class Webinterface:
         self.output_path, self.filename = utils.parse_config(config)
         if not os.path.exists(self.whitelist_path) or self.update_whitelists:
             self.fetch_whitelists()
+        print(os.path.isfile(structure), os.path.dirname(structure))
         self.structure = utils.read_in_yaml(structure)
 
     def fetch_whitelists(self):
