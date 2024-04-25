@@ -30,78 +30,84 @@ class Webinterface:
         print(os.path.isfile(structure), os.path.dirname(structure))
         self.structure = utils.read_in_yaml(structure)
 
-    def fetch_whitelists(self):
-        print('Fetching whitelists...\n')
-        if not os.path.exists(self.whitelist_path):
-            repo = git.Repo.clone_from(self.whitelist_repo,
-                                       self.whitelist_path,
-                                       branch=self.whitelist_branch)
-        else:
-            repo = git.Git(self.whitelist_path)
-            repo.pull('origin', self.whitelist_branch)
+    def to_dict(self):
+        return self.__dict__
+    
 
-    def get_empty_wi_object(self):
-
-        return yto.get_empty_wi_object(self.structure)
-
-
-    def get_single_whitelist(self, ob):
-
-        return whitelist_parsing.get_single_whitelist(ob)
+def fetch_whitelists(pgm_object):
+    print('Fetching whitelists...\n')
+    if not os.path.exists(pgm_object.whitelist_path):
+        repo = git.Repo.clone_from(pgm_object.whitelist_repo,
+                                   pgm_object.whitelist_path,
+                                   branch=pgm_object.whitelist_branch)
+    else:
+        repo = git.Git(pgm_object.whitelist_path)
+        repo.pull('origin', pgm_object.whitelist_branch)
 
 
-    def get_factors(self, organism):
+def get_empty_wi_object(pgm_object):
 
-        return fac_cond.get_factors(organism, self.structure)
-
-
-    def get_conditions(self, factors, organism_name):
-
-        return fac_cond.get_conditions(factors, organism_name, self.structure)
+    return yto.get_empty_wi_object(pgm_object.structure)
 
 
-    def validate_object(self, wi_object, finish=False):
-        new_object = copy.deepcopy(wi_object)
-        return validation.validate_object(new_object, self.structure, finish)
+def get_single_whitelist(ob):
+
+    return whitelist_parsing.get_single_whitelist(ob)
 
 
-    def get_summary(self, wi_object):
+def get_factors(pgm_object, organism):
 
-        return html_output.get_summary(wi_object, self.structure)
-
-
-    def save_object(self, dictionary, path, filename, edit_state):
-        object, id = file_io.save_object(dictionary, path, filename, edit_state)
-        return object, id
+    return fac_cond.get_factors(organism, pgm_object.structure)
 
 
-    def save_filenames(self, file_str, path):
+def get_conditions(pgm_object, factors, organism_name):
 
-        return file_io.save_filenames(file_str, path)
+    return fac_cond.get_conditions(factors, organism_name,
+                                   pgm_object.structure)
 
 
-    def get_meta_info(self, path, project_ids):
-        if not isinstance(project_ids, list):
-            project_ids = [project_ids]
-        html_str, metafile = searching.get_meta_info(self.structure, path,
+def validate_object(pgm_object, wi_object, finish=False):
+    new_object = copy.deepcopy(wi_object)
+    return validation.validate_object(new_object, pgm_object.structure, finish)
+
+
+def get_summary(pgm_object, wi_object):
+
+    return html_output.get_summary(wi_object, pgm_object.structure)
+
+
+def save_object(dictionary, path, filename, edit_state):
+    object, id = file_io.save_object(dictionary, path, filename, edit_state)
+    return object, id
+
+
+def save_filenames(file_str, path):
+
+    return file_io.save_filenames(file_str, path)
+
+
+def get_meta_info(pgm_object, path, project_ids):
+    if not isinstance(project_ids, list):
+        project_ids = [project_ids]
+    html_str, metafile = searching.get_meta_info(pgm_object.structure, path,
                                                      project_ids)
-        return html_str
+    return html_str
 
 
-    def get_search_mask(self):
-        return searching.get_search_mask(self.structure)
+def get_search_mask(pgm_object):
+    return searching.get_search_mask(pgm_object.structure)
 
 
-    def find_metadata(self, path, search_string):
-        return searching.find_metadata(self.structure, path, search_string)
+def find_metadata(pgm_object, path, search_string):
+    return searching.find_metadata(pgm_object.structure, path, search_string)
 
 
-    def edit_wi_object(self, path):
-        return editing.edit_wi_object(path, self.structure)
+def edit_wi_object(pgm_object, path):
+    return editing.edit_wi_object(path, pgm_object.structure)
 
 
-    # TODO: not needed -> in summary
-    def parse_object(self, wi_object):
+# TODO: not needed -> in summary
+def parse_object(pgm_object, wi_object):
 
-        # read in general structure
-        return oty.parse_object(wi_object, self.structure)
+    # read in general structure
+    return oty.parse_object(wi_object, pgm_object.structure)
