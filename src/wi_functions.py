@@ -35,10 +35,10 @@ class Webinterface:
 
 def fetch_whitelists(pgm_object):
     print('Fetching whitelists...\n')
-    if not os.path.exists(pgm_object.whitelist_path):
+    if not os.path.exists(pgm_object['whitelist_path']):
         repo = git.Repo.clone_from(pgm_object['whitelist_repo'],
                                    pgm_object['whitelist_path'],
-                                   branch=pgm_object.whitelist_branch)
+                                   branch=pgm_object['whitelist_branch'])
     else:
         repo = git.Git(pgm_object['whitelist_path'])
         repo.pull('origin', pgm_object['whitelist_branch'])
