@@ -26,26 +26,26 @@ class Webinterface:
         self.username, self.password, structure, self.update_whitelists, \
         self.output_path, self.filename = utils.parse_config(config)
         self.structure = utils.read_in_yaml(structure)
-        if not os.path.exists(self.whitelist_path) or self.update_whitelists:
-            fetch_whitelists(self.__dict__)
+        fetch_whitelists(self.__dict__)
 
     def to_dict(self):
         return self.__dict__
 
 
 def fetch_whitelists(pgm_object):
-    print('Fetching whitelists...\n')
-    if not os.path.exists(pgm_object['whitelist_path']):
-        repo = git.Repo.clone_from(pgm_object['whitelist_repo'],
+    if not os.path.exists(pgm_object['whitelist_path']) or pgm_object['update_whitelists']:
+        print('Fetching whitelists...\n')
+        if not os.path.exists(pgm_object['whitelist_path']):
+            repo = git.Repo.clone_from(pgm_object['whitelist_repo'],
                                    pgm_object['whitelist_path'],
                                    branch=pgm_object['whitelist_branch'])
-    else:
-        repo = git.Git(pgm_object['whitelist_path'])
-        repo.pull('origin', pgm_object['whitelist_branch'])
+        else:
+            repo = git.Git(pgm_object['whitelist_path'])
+            repo.pull('origin', pgm_object['whitelist_branch'])
 
 
 def get_empty_wi_object(pgm_object):
-
+    fetch_whitelists(pgm_object)
     return yto.get_empty_wi_object(pgm_object['structure'])
 
 
@@ -94,6 +94,7 @@ def get_meta_info(pgm_object, path, project_ids):
 
 
 def get_search_mask(pgm_object):
+    fetch_whitelists(pgm_object)
     return searching.get_search_mask(pgm_object['structure'])
 
 
@@ -102,6 +103,7 @@ def find_metadata(pgm_object, path, search_string):
 
 
 def edit_wi_object(pgm_object, path):
+    fetch_whitelists(pgm_object)
     return editing.edit_wi_object(path, pgm_object['structure'])
 
 
