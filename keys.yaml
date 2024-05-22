@@ -538,6 +538,14 @@ experimental_setting:
                       value: null
                       whitelist: True
                       input_type: select
+                body_type:
+                  mandatory: False
+                  list: False
+                  display_name: "Body Type"
+                  desc: "Body type of sample donor.\n[lean]"
+                  value: null
+                  whitelist: True
+                  input_type: select
                 body_mass_index:
                   mandatory: False
                   list: False
