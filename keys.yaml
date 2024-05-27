@@ -398,7 +398,7 @@ experimental_setting:
                   input_type: select
                 enrichment:
                   mandatory: False
-                  list: True
+                  list: False
                   display_name: "Enrichment / Histone-Mark / Pull-Down"
                   desc: "Enrichment for bound proteins or histone marks as a result of an antibody pulldown or similar procedures.\n[GPX2, H2BK12ac, IgG]"
                   value: null
