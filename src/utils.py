@@ -39,6 +39,7 @@ def parse_config(config_file):
     except KeyError:
         whitelist_path = 'FRED_whitelists'
         missing_keys.append('whitelist_path')
+    whitelist_path = os.path.abspath(whitelist_path)
     try:
         update_whitelists = config['update_whitelists']
     except KeyError:

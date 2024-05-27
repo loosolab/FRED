@@ -317,7 +317,22 @@ def get_conditions(factors, organism_name, key_yaml):
 
         elif factor_infos[0]['list']:
 
-            factors[i]['values'] = utils.get_combis(factors[i]['values'],
+            new_values = []
+            for j in range(len(factors[i]['values'])):
+                single_val = factors[i]['values'][j]
+                single_val_key = None
+                if 'whitelist_keys' in factors[i]:
+                    for w_key in factors[i]['whitelist_keys']:
+                        if single_val.endswith(f'({w_key})'):
+                            single_val = single_val.rstrip(f'({w_key})').strip()
+                            single_val_key = w_key
+                            break
+                if 'headers' in factors[i]:
+                    str_value = wi_utils.parse_headers(
+                        factors[i]['headers'] if single_val_key is None else factors[i]['headers'][single_val_key], single_val, mode='dict')
+                    single_val = str_value
+                new_values.append(single_val)
+            factors[i]['values'] = utils.get_combis(new_values,
                                                     factors[i]['factor'], {
                                                         'organism':
                                                             organism_name.split(
