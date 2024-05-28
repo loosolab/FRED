@@ -328,16 +328,16 @@ def get_conditions(factors, organism_name, key_yaml):
                             single_val_key = w_key
                             break
                 if 'headers' in factors[i]:
-                    if single_val_key is not None:
-                        if single_val_key in factors[i]['headers']:
-                            str_value = wi_utils.parse_headers(
-                                factors[i]['headers'][single_val_key],
-                                single_val, mode='dict')
+                    if isinstance(factors[i]['headers'], dict):
+                        if single_val_key is not None:
+                            if single_val_key in factors[i]['headers']:
+                                single_val = wi_utils.parse_headers(
+                                    factors[i]['headers'][single_val_key],
+                                    single_val, mode='dict')
                     else:
-                        str_value = wi_utils.parse_headers(
+                        single_val = wi_utils.parse_headers(
                             factors[i]['headers'],
                             single_val, mode='dict')
-                    single_val = str_value
                 new_values.append(single_val)
             factors[i]['values'] = utils.get_combis(new_values,
                                                     factors[i]['factor'], {
