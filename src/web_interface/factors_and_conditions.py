@@ -319,7 +319,7 @@ def get_conditions(factors, organism_name, key_yaml):
 
             new_values = []
             for j in range(len(factors[i]['values'])):
-                single_val = factors[i]['values'][j]
+                single_val = copy.deepcopy(factors[i]['values'][j])
                 single_val_key = None
                 if 'whitelist_keys' in factors[i]:
                     for w_key in factors[i]['whitelist_keys']:
@@ -338,6 +338,10 @@ def get_conditions(factors, organism_name, key_yaml):
                         single_val = wi_utils.parse_headers(
                             factors[i]['headers'],
                             single_val, mode='dict')
+                if isinstance(single_val, dict):
+                    val = "|".join([f'{key}:"{single_val[key]}"' for key in single_val])
+                    val = f'{factors[i]["factor"]}:{"{"}{val}{"}"}'
+                    real_val[val] = factors[i]['values'][j]
                 new_values.append(single_val)
             factors[i]['values'] = utils.get_combis(new_values,
                                                     factors[i]['factor'], {
@@ -375,7 +379,8 @@ def get_conditions(factors, organism_name, key_yaml):
                                               f'{factors[i]["values"][j]}{"}"}'
 
                 # save the original value in real_val with the new value as key
-                real_val[factors[i]['values'][j]] = full_value
+                if factors[i]['values'][j] not in real_val:
+                    real_val[factors[i]['values'][j]] = full_value
 
             # factor contains headers but not whitelist keys
             elif 'headers' in factors[i]:
@@ -393,7 +398,8 @@ def get_conditions(factors, organism_name, key_yaml):
                                           f'{str_value}{"}"}'
 
                 # save the original value in real_val with the new value as key
-                real_val[factors[i]['values'][j]] = full_value
+                if factors[i]['values'][j] not in real_val:
+                    real_val[factors[i]['values'][j]] = full_value
 
     # generate the conditions
     conditions = utils.get_condition_combinations(factors)
@@ -591,7 +597,6 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
     :param sample: the empty structure of the sample
     :return: sample: the pre-filled sample
     """
-
     # save all factors in a list
     factors = [cond[0] for cond in split_condition]
 
@@ -656,7 +661,6 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                             val = "|".join(
                                 [f'{key}:"{c[1][key]}"' for key in c[1]])
                             val = f'{c[0]}:{"{"}{val}{"}"}'
-
                             # save the value from the dictionary real_val if
                             # real_val contains the current value as key
 
