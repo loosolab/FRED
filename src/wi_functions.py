@@ -102,7 +102,7 @@ def find_metadata(pgm_object, path, search_string):
     return searching.find_metadata(pgm_object['structure'], path, search_string)
 
 
-def edit_wi_object(pgm_object, path):
+def edit_wi_object(path, pgm_object):
     fetch_whitelists(pgm_object)
     return editing.edit_wi_object(path, pgm_object['structure'])
 
