@@ -212,8 +212,29 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                 # if list element is str/int/bool
                 else:
 
+                    new_val = copy.deepcopy(wi_object['list_value'][i])
+                    parse_w_key = None
+                    if 'whitelist_keys' in wi_object:
+                        for w_key in wi_object['whitelist_keys']:
+                            if new_val.endswith(f'({w_key})'):
+                                new_val = new_val.rstrip(
+                                    f'({w_key})').strip()
+                                parse_w_key = w_key
+                                break
+
+                    if 'headers' in wi_object:
+                        if isinstance(wi_object['headers'], dict):
+                            if parse_w_key is not None:
+                                if parse_w_key in wi_object['headers']:
+                                    new_val = wi_utils.parse_headers(
+                                        wi_object['headers'][parse_w_key],
+                                        new_val, mode='dict')
+                        else:
+                            new_val = wi_utils.parse_headers(
+                                wi_object['headers'],
+                                new_val, mode='dict')
                     # add list element to list
-                    val.append(wi_object['list_value'][i])
+                    val.append(new_val)
 
             # set the converted value to None if it is an empty list
             if len(val) == 0:
