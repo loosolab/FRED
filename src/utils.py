@@ -716,6 +716,7 @@ def get_combis(values, key, result_dict, key_yaml):
                     value = [f'{start}:"{elem}"']
             if start == ident_key:
                 depend += value
+            value = value + control_values
 
             for val_key in values:
                 val_info = [x for x in
@@ -726,52 +727,57 @@ def get_combis(values, key, result_dict, key_yaml):
                 if val_key != start:
                     for x in value:
                         val = x
-                        for v in values[val_key]:
-                            if isinstance(v,
-                                          dict) and 'value' in v and 'unit' in v:
-                                v = f'{v["value"]}{v["unit"]}'
-                            if control and val_key in control and \
-                                    control[val_key] == v:
-                                control_values.append(f'{val_key}:\"{v}\"')
-                            elif len(val_info) > 0 and 'special_case' in \
-                                    val_info[0] and 'merge' in val_info[0][
-                                'special_case']:
-                                value2.append(f'{val}|{val_key}:{v}')
-                            elif whitelist and val_key == whitelist_key:
-                                g_key = None
-                                for group_key in whitelist[
-                                    'whitelist']:
-                                    if v in whitelist['whitelist'][
-                                        group_key]:
-                                        g_key = group_key
-                                        break
-                                if g_key == 'all' or f'{depend_key}:"{g_key}"' in val:
-                                    if v.startswith(
-                                            f'{val_key}:{"{"}'):
-                                        if v not in val:
-                                            value2.append(f'{val}|{v}')
+                        if val not in control_values:
+                            for v in values[val_key]:
+                                if isinstance(v,
+                                              dict) and 'value' in v and 'unit' in v:
+                                    v = f'{v["value"]}{v["unit"]}'
+                                if control and val_key in control and \
+                                        control[val_key] == v:
+                                    control_values.append(f'{val_key}:\"{v}\"')
+                                elif len(val_info) > 0 and 'special_case' in \
+                                        val_info[0] and 'merge' in val_info[0][
+                                    'special_case']:
+                                    value2.append(f'{val}|{val_key}:{v}')
+                                elif whitelist and val_key == whitelist_key:
+                                    g_key = None
+                                    for group_key in whitelist[
+                                        'whitelist']:
+                                        if v in whitelist['whitelist'][
+                                            group_key]:
+                                            g_key = group_key
+                                            break
+                                    if g_key == 'all' or f'{depend_key}:"{g_key}"' in val:
+                                        if v.startswith(
+                                                f'{val_key}:{"{"}'):
+                                            if v not in val:
+                                                value2.append(f'{val}|{v}')
+                                        else:
+                                            if f'{val_key}:\"{v}\"' not in val:
+                                                value2.append(
+                                                    f'{val}|{val_key}:\"{v}\"')
                                     else:
-                                        if f'{val_key}:\"{v}\"' not in val:
-                                            value2.append(
-                                                f'{val}|{val_key}:\"{v}\"')
+                                        value2.append(val)
+                                elif v.startswith(f'{val_key}:{"{"}'):
+                                    if v not in val:
+                                        value2.append(f'{val}|{v}')
                                 else:
-                                    value2.append(val)
-                            elif v.startswith(f'{val_key}:{"{"}'):
-                                if v not in val:
-                                    value2.append(f'{val}|{v}')
-                            else:
-                                if f'{val_key}:\"{v}\"' not in val:
-                                    value2.append(
-                                        f'{val}|{val_key}:\"{v}\"')
-                            if len(control_values) > 0 and len(val_info) > 0 and 'special_case' in \
+                                    if f'{val_key}:\"{v}\"' not in val:
+                                        value2.append(
+                                            f'{val}|{val_key}:\"{v}\"')
+                        else:
+                            value2.append(val)
+                            if len(val_info) > 0 and 'special_case' in \
                                     val_info[0] and 'insert_control' in \
                                     val_info[0]['special_case']:
+                                print(val_key)
                                 for c_val in control_values:
-                                    if 'special_case' in val_info[0] and 'merge' in val_info[0]['special_case']:
-                                        new_controls.append(
-                                            f'{c_val}|{val_key}:{v}')
-                                    else:
-                                        new_controls.append(f'{c_val}|{val_key}:\"{v}\"')
+                                    for v in values[val_key]:
+                                        if 'special_case' in val_info[0] and 'merge' in val_info[0]['special_case']:
+                                            new_controls.append(
+                                                f'{c_val}|{val_key}:{v}')
+                                        else:
+                                            new_controls.append(f'{c_val}|{val_key}:\"{v}\"')
                     value = value2
                 control_values += new_controls
 
