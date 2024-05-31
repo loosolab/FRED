@@ -12,6 +12,7 @@ import src.web_interface.html_output as html_output
 import src.web_interface.file_io as file_io
 import src.web_interface.editing as editing
 import src.web_interface.searching as searching
+import src.web_interface.git_whitelists as gwi
 import os
 import git
 
@@ -33,15 +34,10 @@ class Webinterface:
 
 
 def fetch_whitelists(pgm_object):
-    if not os.path.exists(pgm_object['whitelist_path']) or pgm_object['update_whitelists']:
-        print('Fetching whitelists...\n')
-        if not os.path.exists(pgm_object['whitelist_path']):
-            repo = git.Repo.clone_from(pgm_object['whitelist_repo'],
-                                   pgm_object['whitelist_path'],
-                                   branch=pgm_object['whitelist_branch'])
-        else:
-            repo = git.Git(pgm_object['whitelist_path'])
-            repo.pull('origin', pgm_object['whitelist_branch'])
+    gwi.get_whitelists(pgm_object['whitelist_path'],
+                       pgm_object['whitelist_repo'],
+                       pgm_object['whitelist_branch'],
+                       pgm_object['update_whitelists'])
 
 
 def get_empty_wi_object(pgm_object):

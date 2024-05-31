@@ -1,33 +1,38 @@
 import os
 import git
+import re
 
 
-def get_whitelists():
+def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whitelist):
     """
     This function clones the whitelist repository. If the repository already
     exists then it pulls the most recent changes
     """
 
-    # metadata whitelist folder does not exist
-    if not os.path.exists(os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), '..', '..', 'metadata_whitelists')):
+    if not os.path.exists(whitelist_path) or update_whitelist:
 
-        # clone the repository
-        git.Repo.clone_from(
-            'https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.'
-            'git/', os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 '..', '..', 'metadata_whitelists'),
-            branch='cleanup')
+        print('Fetching whitelists...\n')
 
-    # repository was already cloned
-    else:
+        if not os.path.exists(whitelist_path):
+            repo = git.Repo.clone_from(whitelist_repo,
+                                   whitelist_path)
+            whitelist_branch = get_branch(repo, whitelist_branch)
+            repo.git.checkout(whitelist_branch)
+        else:
+            repo = git.Repo(whitelist_path)
+            repo.remotes.origin.fetch()
+            whitelist_branch = get_branch(repo, whitelist_branch)
+            repo.git.checkout(whitelist_branch)
+            repo.remotes.origin.pull(whitelist_branch)
+            
+        print(f'Fetched branch {whitelist_branch}.\n')
 
-        # set repo to the repository
-        repo = git.Repo(os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), '..', '..', 'metadata_whitelists'))
 
-        # set o to origin of the repository
-        o = repo.remotes.origin
-
-        # git pull
-        o.pull()
+def get_branch(repo, whitelist_branch):
+    if '*' in whitelist_branch:
+        regex_branch = whitelist_branch.replace(".", "\.").replace("$", "\$").replace("+", "\+").replace("*", ".")
+        branch_list = [a.name.replace('origin/', '') for a in repo.tags + repo.remote().refs if a.name != 'origin/HEAD']
+        matching_branches = [x for x in branch_list if re.search(f'^{regex_branch}$', x) is not None]
+        matching_branches.sort(reverse=True)
+        whitelist_branch = matching_branches[0]
+    return whitelist_branch
