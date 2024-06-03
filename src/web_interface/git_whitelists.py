@@ -20,11 +20,11 @@ def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whit
             repo.git.checkout(whitelist_branch)
         else:
             repo = git.Repo(whitelist_path)
-            repo.remotes.origin.fetch()
+            repo.remotes.origin.fetch(prune=True, prune_tags=True)
             whitelist_branch = get_branch(repo, whitelist_branch)
             repo.git.checkout(whitelist_branch)
             repo.remotes.origin.pull(whitelist_branch)
-            
+
         print(f'Fetched branch {whitelist_branch}.\n')
 
 
