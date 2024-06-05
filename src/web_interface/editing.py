@@ -177,33 +177,34 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                                 split_cond, copy.deepcopy(sample), real_val,
                                 key_yaml, sample_name, organism)
 
-                            for s in cond['biological_replicates']['samples']:
-                                filled_keys = []
-                                for k in s:
-                                    if s[k] is not None:
-                                        # TODO: dict (disease usw.)
-                                        # TODO: real_val
-                                        if isinstance(s[k], list):
-                                            for elem in s[k]:
-                                                if (k, elem) not in \
-                                                        filled_keys and \
-                                                        (k, elem) not in \
-                                                        split_cond:
-                                                    filled_keys.append(
-                                                        (k, elem))
-                                        elif (k, s[k]) not in split_cond:
-                                            filled_keys.append((k, s[k]))
-                                sample_index = int(s["sample_name"].split(
-                                    "_")[-1].replace("b", ""))
-                                cond_sample_name = f'{sample_name}_' \
-                                                   f'{sample_index}'
-                                filled_sample = copy.deepcopy(input_fields)
-                                filled_sample = fac_cond.get_samples(
-                                        filled_keys,
-                                        filled_sample, real_val,
-                                        key_yaml, cond_sample_name, organism,
-                                        is_factor=False)
-                                samples.append(copy.deepcopy(filled_sample))
+                            if 'samples' in cond['biological_replicates']:
+                                for s in cond['biological_replicates']['samples']:
+                                    filled_keys = []
+                                    for k in s:
+                                        if s[k] is not None:
+                                            # TODO: dict (disease usw.)
+                                            # TODO: real_val
+                                            if isinstance(s[k], list):
+                                                for elem in s[k]:
+                                                    if (k, elem) not in \
+                                                            filled_keys and \
+                                                            (k, elem) not in \
+                                                            split_cond:
+                                                        filled_keys.append(
+                                                            (k, elem))
+                                            elif (k, s[k]) not in split_cond:
+                                                filled_keys.append((k, s[k]))
+                                    sample_index = int(s["sample_name"].split(
+                                        "_")[-1].replace("b", ""))
+                                    cond_sample_name = f'{sample_name}_' \
+                                                       f'{sample_index}'
+                                    filled_sample = copy.deepcopy(input_fields)
+                                    filled_sample = fac_cond.get_samples(
+                                            filled_keys,
+                                            filled_sample, real_val,
+                                            key_yaml, cond_sample_name, organism,
+                                            is_factor=False)
+                                    samples.append(copy.deepcopy(filled_sample))
                             title, readd = fac_cond.get_condition_title(
                                 split_cond)
                             d = {'correct_value': cond['condition_name'],
