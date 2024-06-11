@@ -770,21 +770,22 @@ def get_combis(values, key, result_dict, key_yaml):
                             if len(val_info) > 0 and 'special_case' in \
                                     val_info[0] and 'insert_control' in \
                                     val_info[0]['special_case']:
-                                print(val_key)
                                 for c_val in control_values:
-                                    for v in values[val_key]:
-                                        if 'special_case' in val_info[0] and 'merge' in val_info[0]['special_case']:
-                                            new_controls.append(
-                                                f'{c_val}|{val_key}:{v}')
-                                        else:
-                                            new_controls.append(f'{c_val}|{val_key}:\"{v}\"')
+                                    if val_key not in c_val:
+                                        for v in values[val_key]:
+                                            if 'special_case' in val_info[0] and 'merge' in val_info[0]['special_case']:
+                                                new_controls.append(
+                                                    f'{c_val}|{val_key}:{v}')
+                                            else:
+                                                new_controls.append(f'{c_val}|{val_key}:\"{v}\"')
                     value = value2
                 control_values += new_controls
-
             possible_values[elem] = value
-            for z in possible_values:
-                for x in possible_values[z]:
-                    part_values = []
+
+        for z in possible_values:
+            for x in possible_values[z]:
+                part_values = []
+                if x not in control_values:
                     disease_values.append(f'{key}:{"{"}{x}{"}"}')
                     for d in disease_values:
                         if f'{key}:{"{"}{x}{"}"}' not in d and f'{d}-{key}:{"{"}{x}{"}"}' not in disease_values and f'{key}:{"{"}{x}{"}"}-{d}' not in disease_values:
@@ -792,7 +793,7 @@ def get_combis(values, key, result_dict, key_yaml):
                                 f'{d}-{key}:{"{"}{x}{"}"}')
                     disease_values += part_values
 
-        disease_values += [f'{key}:{"{"}{x}{"}"}' for x in control_values]
+        disease_values += [f'{key}:{"{"}{x}{"}"}' for x in list(set(control_values))]
 
         return list(set(disease_values))
 
