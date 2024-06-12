@@ -415,13 +415,13 @@ experimental_setting:
                       list: False
                       display_name: "Modification"
                       desc: "Short label for extent of enrichment (max 6 char.). [Sigma = Antibody manufacturer Sigma]"
-                        special_case:
-                          restriction:
-                            regex: '[^a-zA-Z0-9]'
-                            max_length: 6
-                        value: null
-                        whitelist: False
-                        input_type: restricted_short_text
+                      special_case:
+                        restriction:
+                          regex: '[^a-zA-Z0-9]'
+                          max_length: 6
+                      value: null
+                      whitelist: False
+                      input_type: restricted_short_text
                 injury:
                   mandatory: False
                   list: True
