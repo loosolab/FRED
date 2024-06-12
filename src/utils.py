@@ -664,6 +664,11 @@ def get_combis(values, key, result_dict, key_yaml):
 
     control_values = []
 
+    key_info = list(find_keys(key_yaml, key))
+    if len(key_info) > 0:
+        key_info = key_info[0]
+    else:
+        key_info = None
     if isinstance(values, list):
         possible_values = []
         for i in range(len(values)):
@@ -712,6 +717,8 @@ def get_combis(values, key, result_dict, key_yaml):
             else:
                 if elem.startswith(f'{start}:{"{"}'):
                     value = [elem]
+                elif '\"' in elem:
+                    value = [f'{start}:{elem}']
                 else:
                     value = [f'{start}:"{elem}"']
             if start == ident_key:
@@ -782,16 +789,22 @@ def get_combis(values, key, result_dict, key_yaml):
                 control_values += new_controls
             possible_values[elem] = value
 
+        if key_info and key_info['list']:
+            group = None
+            if 'special_case' in key_info and 'group' in key_info['special_case']:
+                group = key_info['special_case']['group']
+
         for z in possible_values:
             for x in possible_values[z]:
                 part_values = []
                 if x not in control_values:
                     disease_values.append(f'{key}:{"{"}{x}{"}"}')
-                    for d in disease_values:
-                        if f'{key}:{"{"}{x}{"}"}' not in d and f'{d}-{key}:{"{"}{x}{"}"}' not in disease_values and f'{key}:{"{"}{x}{"}"}-{d}' not in disease_values:
-                            part_values.append(
-                                f'{d}-{key}:{"{"}{x}{"}"}')
-                    disease_values += part_values
+                    if key_info and key_info['list'] and (group is None or group != z):
+                        for d in disease_values:
+                            if f'{key}:{"{"}{x}{"}"}' not in d and f'{d}-{key}:{"{"}{x}{"}"}' not in disease_values and f'{key}:{"{"}{x}{"}"}-{d}' not in disease_values:
+                                part_values.append(
+                                    f'{d}-{key}:{"{"}{x}{"}"}')
+                disease_values += part_values
 
         disease_values += [f'{key}:{"{"}{x}{"}"}' for x in list(set(control_values))]
 
