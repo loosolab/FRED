@@ -398,12 +398,30 @@ experimental_setting:
                   input_type: select
                 enrichment:
                   mandatory: False
-                  list: True
+                  list: False
                   display_name: "Enrichment / Histone-Mark / Pull-Down"
                   desc: "Enrichment for bound proteins or histone marks as a result of an antibody pulldown or similar procedures.\n[GPX2, H2BK12ac, IgG]"
-                  value: null
-                  whitelist: True
-                  input_type: select
+                  value:
+                    enrichment_type:
+                      mandatory: True
+                      list: False
+                      display_name: "Enrichment type"
+                      desc: "Type of enrichment.\n[GPX2, H2BK12ac, IgG]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    modification:
+                      mandatory: False
+                      list: False
+                      display_name: "Modification"
+                      desc: "Short label for extent of enrichment (max 6 char.). [Sigma = Antibody manufacturer Sigma]"
+                        special_case:
+                          restriction:
+                            regex: '[^a-zA-Z0-9]'
+                            max_length: 6
+                        value: null
+                        whitelist: False
+                        input_type: restricted_short_text
                 injury:
                   mandatory: False
                   list: True
