@@ -310,7 +310,7 @@ def get_conditions(factors, organism_name, key_yaml):
                                             factors[i]['nested_infos'][val_key][
                                                 'headers'][whitelist_key], val[val_key][v],
                                             mode='str')
-                                        val[val_key][v] = f'{"{"}' \
+                                            val[val_key][v] = f'{"{"}' \
                                                           f'{str_value}{"}"}'
                                     else:
                                         str_value = wi_utils.parse_headers(
