@@ -290,6 +290,7 @@ def get_conditions(factors, organism_name, key_yaml):
                         if val_key in val:
                             for v in range(len(val[val_key])):
                                 full_value = copy.deepcopy(val[val_key][v])
+                                whitelist_key = None
                                 if 'whitelist_keys' in factors[i]['nested_infos'][
                                     val_key]:
                                     for w_key in \
@@ -298,15 +299,26 @@ def get_conditions(factors, organism_name, key_yaml):
                                         if val[val_key][v].endswith(f'({w_key})'):
                                             val[val_key][v] = val[val_key][
                                                 v].rstrip(f'({w_key})').strip()
+                                            whitelist_key = w_key
                                             break
                                 if 'headers' in factors[i]['nested_infos'][
                                     val_key]:
-                                    str_value = wi_utils.parse_headers(
-                                        factors[i]['nested_infos'][val_key][
-                                            'headers'], val[val_key][v],
-                                        mode='str')
-                                    val[val_key][v] = f'{"{"}' \
-                                                      f'{str_value}{"}"}'
+                                    if isinstance(factors[i]['nested_infos'][val_key][
+                                            'headers'], dict):
+                                        if whitelist_key is not None and whitelist_key in factors[i]['nested_infos'][val_key]['headers']:
+                                            str_value = wi_utils.parse_headers(
+                                            factors[i]['nested_infos'][val_key][
+                                                'headers'][whitelist_key], val[val_key][v],
+                                            mode='str')
+                                        val[val_key][v] = f'{"{"}' \
+                                                          f'{str_value}{"}"}'
+                                    else:
+                                        str_value = wi_utils.parse_headers(
+                                            factors[i]['nested_infos'][val_key][
+                                                'headers'], val[val_key][v],
+                                            mode='str')
+                                        val[val_key][v] = f'{"{"}' \
+                                                          f'{str_value}{"}"}'
                                 real_val[val[val_key][v]] = full_value
 
                 # generate combinations of the values of the dictionary for the
