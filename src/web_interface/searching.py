@@ -63,7 +63,8 @@ def get_meta_info(key_yaml, path, project_ids):
                                            value = l_elem[key]
                                            break
                                 else:
-                                    value = value[key]
+                                    if key in value:
+                                        value = value[key]
                             html_str += f'<li>{elem}: {value}</li>'
                             correct_file = wi_utils.pop_key(correct_file,
                                                             elem.split(':'), value)

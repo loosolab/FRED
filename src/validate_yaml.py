@@ -182,13 +182,25 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                     #TODO: enrichment
                     if new_yaml[0]['value'] is not None:
                         if key not in new_yaml[0]['value']:
-                            invalid_keys.append(f'{key_name}:{key}')
+                            if key_name.split(':')[-1] == 'enrichment_type' and key in ('gene_name', 'ensembl_id'):
+                                pass
+                            else:
+                                invalid_keys.append(f'{key_name}:{key}')
                         elif isinstance(metafile[key], list) != new_yaml[0]['list']:
-                            invalid_keys.append(f'{key_name}:{key}')
+                            if (key_name.split(':')[-1] == 'enrichment_type' and key in ('gene_name', 'ensembl_id')) or (key_name.split(':')[-1] == 'values' and key == 'enrichment_type'):
+                                pass
+                            else:
+                                invalid_keys.append(f'{key_name}:{key}')
+                else:
+                    if key_name.split(':')[-1] == 'enrichment_type' and key in ('gene_name', 'ensembl_id'):
+                        pass
+                    else:
+                        invalid_keys.append(f'{key_name}:{key}')
+            elif not key_yaml or (key_yaml and key not in key_yaml):
+                if key_name.split(':')[-1] == 'enrichment_type' and key in ('gene_name', 'ensembl_id'):
+                    pass
                 else:
                     invalid_keys.append(f'{key_name}:{key}')
-            elif not key_yaml or (key_yaml and key not in key_yaml):
-                invalid_keys.append(f'{key_name}:{key}')
             else:
                 if isinstance(key_yaml, dict) and key in key_yaml and isinstance(key_yaml[key], dict):
                     if key == 'factor':
@@ -203,7 +215,10 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                             if 'input_type' in node:
                                 input_type = node['input_type']
                     elif 'list' in key_yaml[key] and isinstance(metafile, dict) and key in metafile and isinstance(metafile[key], list) != key_yaml[key]['list']:
-                        invalid_keys.append(f'{key_name}:{key}')
+                        if key_name.split(':')[-1] == 'enrichment_type' and key in ('gene_name', 'ensembl_id'):
+                            pass
+                        else:
+                            invalid_keys.append(f'{key_name}:{key}')
                     elif 'input_type' in key_yaml[key]:
                         input_type = key_yaml[key]['input_type']
                     res_keys, res_entries, res_values = new_test(
