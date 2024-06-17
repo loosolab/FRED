@@ -187,7 +187,7 @@ def new_test(metafile, key_yaml, sub_lists, key_name, invalid_keys,
                             else:
                                 invalid_keys.append(f'{key_name}:{key}')
                         elif isinstance(metafile[key], list) != new_yaml[0]['list']:
-                            if (key_name.split(':')[-1] == 'enrichment_type' and key in ('gene_name', 'ensembl_id')) or (key_name.split(':')[-1] == 'values' and key == 'enrichment_type'):
+                            if (key_name.split(':')[-1] == 'enrichment_type' and key in ('gene_name', 'ensembl_id')) or (key_name.split(':')[-1] == 'values' and key in ['enrichment_type', 'modification']):
                                 pass
                             else:
                                 invalid_keys.append(f'{key_name}:{key}')
