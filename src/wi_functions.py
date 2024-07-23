@@ -50,7 +50,7 @@ def is_empty(pgm_object, wi_object):
     if wi_object == emtpy_object:
         empty = True
     else:
-        emtpy = False
+        empty = False
     return {'empty': empty, 'object': emtpy_object}
 
 
