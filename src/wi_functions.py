@@ -45,6 +45,15 @@ def get_empty_wi_object(pgm_object):
     return yto.get_empty_wi_object(pgm_object['structure'])
 
 
+def is_empty(pgm_object, wi_object):
+    emtpy_object = yto.get_empty_wi_object(pgm_object['structure'])
+    if wi_object == emtpy_object:
+        empty = True
+    else:
+        emtpy = False
+    return {'empty': empty, 'object': emtpy_object}
+
+
 def get_single_whitelist(ob):
 
     return whitelist_parsing.get_single_whitelist(ob)
