@@ -2,7 +2,6 @@ import os
 import git
 import re
 
-
 def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whitelist):
     """
     This function clones the whitelist repository. If the repository already
@@ -30,9 +29,15 @@ def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whit
 
 def get_branch(repo, whitelist_branch):
     if '*' in whitelist_branch:
-        regex_branch = whitelist_branch.replace(".", "\.").replace("$", "\$").replace("+", "\+").replace("*", ".")
+        regex_branch = whitelist_branch.replace(".", "\.").replace("$", "\$").replace("+", "\+").replace("*", ".*")
         branch_list = [a.name.replace('origin/', '') for a in repo.tags + repo.remote().refs if a.name != 'origin/HEAD']
-        matching_branches = [x for x in branch_list if re.search(f'^{regex_branch}$', x) is not None]
-        matching_branches.sort(reverse=True)
-        whitelist_branch = matching_branches[0]
+        matching_branches = [x.lstrip('v').split('.') for x in branch_list if re.search(f'^{regex_branch}$', x) is not None]
+        splitted_branches = []
+        for branch in matching_branches:
+            try:
+                splitted_branches.append([int(x) for x in branch])
+            except ValueError:
+                pass
+        splitted_branches.sort(reverse=True)
+        whitelist_branch = f'v{".".join([str(s) for s in splitted_branches[0]])}'
     return whitelist_branch
