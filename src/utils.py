@@ -491,7 +491,11 @@ def create_filenames(metafile, double, position, old_filenames={}):
     all_filenames = list(find_keys(metafile, 'filenames'))
     if len(all_filenames) > 0:
         for elem in all_filenames:
-            global_index += [int(x.split('__')[1]) for x in elem]
+            for x in elem:
+                try:
+                    global_index.append(int(x.split('__')[1]))
+                except ValueError:
+                    pass
 
     for k in old_filenames:
         global_index += [int(x.split('__')[1]) for x in old_filenames[k]]
@@ -507,7 +511,11 @@ def create_filenames(metafile, double, position, old_filenames={}):
     cond_filenames = list(find_keys(find_position(metafile, position[:sample_index+1]), 'filenames'))
     if len(cond_filenames) > 0:
         for elem in cond_filenames:
-            local_index += [int(x.split('__')[-1]) for x in elem]
+            for x in elem:
+                try:
+                    local_index.append(int(x.split('__')[-1]))
+                except ValueError:
+                    pass
 
     project_id = list(find_keys(metafile, 'id'))
     techniques = list(find_keys(metafile, 'techniques'))
