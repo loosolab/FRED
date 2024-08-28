@@ -498,7 +498,11 @@ def create_filenames(metafile, double, position, old_filenames={}):
                     pass
 
     for k in old_filenames:
-        global_index += [int(x.split('__')[1]) for x in old_filenames[k]]
+        for x in old_filenames[k]:
+            try:
+                global_index.append(int(x.split('__')[1]))
+            except ValueError:
+                pass
 
     if len(global_index) > 0:
         global_index = max(global_index) + 1
