@@ -2,7 +2,10 @@ import copy
 import os
 from src.utils import read_in_yaml
 from src import validate_yaml
+import multiprocessing
+from functools import partial
 
+monkey.patch_all()
 # The following functions were inspired by Mampok and slightly customized
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/
 # file_reading.py
@@ -30,9 +33,22 @@ def iterate_dir_metafiles(key_yaml, path_metafiles, filename='_metadata', logica
     for path_metafile in path_metafiles:
         items += [os.path.join(subdir, file) for subdir, dirs, files in os.walk(path_metafile) for file in files if file.lower().endswith(f'{filename}.yaml') or file.lower().endswith(f'{filename}.yml')]
 
-    results = []
+    queue = multiprocessing.Queue()
+    processes = []
+
     for item in items:
-        results.append(validate(item, filename, key_yaml, logical_validation, whitelist_path, copy.deepcopy(key_yaml)))
+        p = multiprocessing.Process(target=validate, args=(
+        item, filename, key_yaml, logical_validation, whitelist_path,
+        copy.deepcopy(key_yaml), queue))
+        processes.append(p)
+        p.start()
+
+    for p in processes:
+        p.join()
+
+    results = []
+    while not queue.empty():
+        results.append(queue.get())
 
     for result in results:
         if result[3] == 0 or return_false:
