@@ -11,6 +11,9 @@ monkey.patch_all()
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/
 # file_reading.py
 
+def worker(item, filename, key_yaml, logical_validation, whitelist_path, yaml, queue):
+    result = validate(item, filename, key_yaml, logical_validation, whitelist_path, yaml)
+    queue.put(result)
 
 def iterate_dir_metafiles(key_yaml, path_metafiles, filename='_metadata', logical_validation=True, yaml=None, whitelist_path=None, return_false=False):
     """
@@ -38,7 +41,7 @@ def iterate_dir_metafiles(key_yaml, path_metafiles, filename='_metadata', logica
     processes = []
 
     for item in items:
-        p = multiprocessing.Process(target=validate, args=(
+        p = multiprocessing.Process(target=worker, args=(
         item, filename, key_yaml, logical_validation, whitelist_path,
         copy.deepcopy(key_yaml), queue))
         processes.append(p)
