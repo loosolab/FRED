@@ -33,9 +33,23 @@ def iterate_dir_metafiles(key_yaml, path_metafiles, filename='_metadata', logica
     items = []
     for path_metafile in path_metafiles:
         items += [os.path.join(subdir, file) for subdir, dirs, files in os.walk(path_metafile) for file in files if file.lower().endswith(f'{filename}.yaml') or file.lower().endswith(f'{filename}.yml')]
-    pool = multiprocessing.Pool()
-    results = pool.map(partial(validate, filename=filename, key_yaml=key_yaml, logical_validation=logical_validation, whitelist_path=whitelist_path, yaml=copy.deepcopy(key_yaml)), items)
-    pool.close()
+
+    manager = multiprocessing.Manager()
+    return_list = manager.list()
+    processes = []
+
+    for item in items:
+        p = multiprocessing.Process(target=validate, args=(
+        item, filename, key_yaml, logical_validation, whitelist_path,
+        copy.deepcopy(key_yaml), return_list))
+        processes.append(p)
+        p.start()
+
+    for p in processes:
+        p.join()
+
+    results = list(return_list)
+    
     for result in results:
         if result[3] == 0 or return_false:
             metafile_list.append(result[0])
