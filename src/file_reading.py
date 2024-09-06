@@ -4,7 +4,9 @@ from src.utils import read_in_yaml
 from src import validate_yaml
 import multiprocessing
 from functools import partial
+from gevent import monkey
 
+monkey.patch_all()
 # The following functions were inspired by Mampok and slightly customized
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/
 # file_reading.py
