@@ -8,7 +8,7 @@ import src.utils as utils
 # TODO: example of format in wi_object (Keys)
 
 
-def get_empty_wi_object(key_yaml):
+def get_empty_wi_object(key_yaml, read_in_whitelists):
     """
     This function parses the keys.yaml and returns an empty object for the web
     interface.
@@ -24,7 +24,7 @@ def get_empty_wi_object(key_yaml):
 
         # parse information of a key into wi_object format
         wi_object[key], whitelist_object = parse_empty(key_yaml[key], key,
-                                                       key_yaml, {})
+                                                       key_yaml, {}, read_in_whitelists)
 
     # add a key 'all_factors' with an empty list as value to the object
     # the experimental factors will be saved here after input on the website
@@ -33,7 +33,7 @@ def get_empty_wi_object(key_yaml):
     return wi_object
 
 
-def parse_empty(node, pos, key_yaml, filled_object,
+def parse_empty(node, pos, key_yaml, filled_object, read_in_whitelists,
                 get_whitelist_object=False):
     """
     This function parses a part of the key.yaml into an object readable by the
@@ -73,7 +73,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
             # read and parse whitelist
             whitelist, whitelist_type, input_type, headers, whitelist_keys, double = \
                 whitelist_parsing.parse_whitelist(pos.split(':')[-1], node,
-                                                  filled_object)
+                                                  filled_object, whitelist_object=read_in_whitelists)
 
             # set input type of field organism to 'organism' -> special case
             # (used to display button to confirm organism on the website)
@@ -150,7 +150,8 @@ def parse_empty(node, pos, key_yaml, filled_object,
                 # storing their necessary information
                 field_infos, w_object = parse_empty(
                     node['value'][key], pos + ':' + key, key_yaml,
-                    filled_object, get_whitelist_object=get_whitelist_object)
+                    filled_object, read_in_whitelists,
+                    get_whitelist_object=get_whitelist_object)
 
                 # add the parsed input fields to the list
                 input_fields.append(field_infos)
@@ -186,7 +187,7 @@ def parse_empty(node, pos, key_yaml, filled_object,
         # read and parse whitelist
         whitelist, whitelist_type, input_type, headers, whitelist_keys, double = \
             whitelist_parsing.parse_whitelist(pos.split(':')[-1], node,
-                                              filled_object)
+                                              filled_object, whitelist_object=read_in_whitelists)
 
         # test if whitelists are defined and should be stored in a separate
         # object

@@ -1,7 +1,31 @@
+import os
+
 import src.utils as utils
+import src.web_interface.git_whitelists as git_whitelists
+
+def get_whitelist_object(pgm_object):
+    key_yaml = pgm_object['structure']
+    whitelist_object = read_in_whitelists(pgm_object['whitelist_path'])
+    return whitelist_object
 
 
-def get_single_whitelist(ob):
+def read_in_whitelists(path):
+    files = os.listdir(os.path.join(path, 'misc', 'json'))
+    whitelists_object=test(files, {}, path)
+    return whitelists_object
+
+
+def test(files, whitelist_object, path):
+    for file in files:
+        if os.path.isfile(os.path.join(path, 'misc', 'json', file)) and not '.' in file:
+            whitelist_object[file] = utils.read_whitelist(file, whitelist_path=path)
+        elif os.path.isdir(os.path.join(path, 'misc', 'json', file)):
+            new_files = [os.path.join(file, f) for f in os.listdir(os.path.join(path, 'misc', 'json', file))]
+            whitelist_object = test(new_files, whitelist_object, path)
+    return whitelist_object
+
+
+def get_single_whitelist(ob, whitelist_object):
     """
     This functions returns a single whitelist of type 'plain' for a key that is
     specified within a given dictionary. If the organism is specified as well,
@@ -34,7 +58,7 @@ def get_single_whitelist(ob):
         all_plain = True
 
     # read in the whitelist
-    whitelist = utils.get_whitelist(ob['key_name'], infos, all_plain)
+    whitelist = utils.get_whitelist(ob['key_name'], infos, whitelist_object=whitelist_object, all_plain=all_plain)
 
     # test if the whitelist was found and read in correctly and return the list
     # of whitelist values
@@ -46,7 +70,7 @@ def get_single_whitelist(ob):
         return None
 
 
-def parse_whitelist(key_name, node, filled_object):
+def parse_whitelist(key_name, node, filled_object, whitelist_object):
     """
     This function read in a whitelist and parses it according to type, headers
     and whitelist keys
@@ -74,7 +98,7 @@ def parse_whitelist(key_name, node, filled_object):
             'special_case' in node and 'merge' in node['special_case']):
 
         # read in whitelist
-        whitelist = utils.get_whitelist(key_name, filled_object)
+        whitelist = utils.get_whitelist(key_name, filled_object, whitelist_object=whitelist_object)
 
         if whitelist is not None:
 
@@ -138,7 +162,7 @@ def parse_whitelist(key_name, node, filled_object):
     elif 'special_case' in node and 'value_unit' in node['special_case']:
 
         # read in unit whitelist and set input type to value_unit
-        whitelist = utils.get_whitelist('unit', filled_object)
+        whitelist = utils.get_whitelist('unit', filled_object, whitelist_object=whitelist_object)
         if whitelist and 'whitelist' in whitelist:
             whitelist = whitelist['whitelist']
         input_type = 'value_unit'

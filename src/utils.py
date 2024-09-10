@@ -161,6 +161,7 @@ def read_whitelist(key, whitelist_path=None):
     :param key: the key that contains a whitelist
     :return: whitelist: the read in whitelist
     """
+    print(key, 'ICH LESE EINE WHITELIST EIN!')
     if whitelist_path is None:
         whitelist_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'FRED_whitelists')
     try:
@@ -174,7 +175,7 @@ def read_whitelist(key, whitelist_path=None):
     return whitelist
 
 
-def read_grouped_whitelist(whitelist, filled_object, all_plain=False, whitelist_path=None):
+def read_grouped_whitelist(whitelist, filled_object, whitelist_object=None, all_plain=False, whitelist_path=None):
     """
     This function parses a whitelist of type 'group'. If there are more than 30
     values it is formed into a plain whitelist.
@@ -188,28 +189,34 @@ def read_grouped_whitelist(whitelist, filled_object, all_plain=False, whitelist_
             'metadata_whitelists')
     headers = {}
     for key in whitelist['whitelist']:
-        if not isinstance(whitelist['whitelist'][key], list) and \
-                os.path.isfile(
-                os.path.join(whitelist_path, 'whitelists',
-                             whitelist['whitelist'][key])):
-            whitelist['whitelist'][key] = \
-                get_whitelist(whitelist['whitelist'][key], filled_object, all_plain=all_plain, whitelist_path=whitelist_path)
-            if isinstance(whitelist['whitelist'][key], dict):
-                if whitelist['whitelist'][key]['whitelist_type'] == 'depend':
-                    if whitelist['whitelist'] and 'whitelist' in \
-                            whitelist['whitelist']:
-                        whitelist['whitelist'][key] = whitelist['whitelist']
-                    else:
-                        whitelist['whitelist'][key] = None
-                elif whitelist['whitelist'][key]['whitelist_type'] == 'group':
-                    whitelist['whitelist'][key] = \
-                        [x for xs in list(whitelist['whitelist'][key].values())
-                         for x in xs]
-                elif whitelist['whitelist'][key]['whitelist_type'] == 'plain':
-                    if 'headers' in whitelist['whitelist'][key]:
-                        headers[key] = whitelist['whitelist'][key]['headers']
-                    whitelist['whitelist'][key] = \
-                        whitelist['whitelist'][key]['whitelist']
+        if not isinstance(whitelist['whitelist'][key], list):
+            new_whitelist = False
+            if whitelist_object is not None and whitelist['whitelist'][key] in whitelist_object:
+                whitelist['whitelist'][key] = whitelist_object[whitelist['whitelist'][key]]
+                new_whitelist = True
+            elif os.path.isfile(os.path.join(whitelist_path, 'whitelists', whitelist['whitelist'][key])):
+                whitelist['whitelist'][key] = get_whitelist(
+                    whitelist['whitelist'][key], filled_object,
+                    whitelist_object=whitelist_object, all_plain=all_plain,
+                    whitelist_path=whitelist_path)
+                new_whitelist = True
+            if new_whitelist:
+                if isinstance(whitelist['whitelist'][key], dict):
+                    if whitelist['whitelist'][key]['whitelist_type'] == 'depend':
+                        if whitelist['whitelist'] and 'whitelist' in \
+                                whitelist['whitelist']:
+                            whitelist['whitelist'][key] = whitelist['whitelist']
+                        else:
+                            whitelist['whitelist'][key] = None
+                    elif whitelist['whitelist'][key]['whitelist_type'] == 'group':
+                        whitelist['whitelist'][key] = \
+                            [x for xs in list(whitelist['whitelist'][key].values())
+                             for x in xs]
+                    elif whitelist['whitelist'][key]['whitelist_type'] == 'plain':
+                        if 'headers' in whitelist['whitelist'][key]:
+                            headers[key] = whitelist['whitelist'][key]['headers']
+                        whitelist['whitelist'][key] = \
+                            whitelist['whitelist'][key]['whitelist']
     if all_plain:
         w = [f'{x}' for xs in list(whitelist['whitelist'].keys()) if
              whitelist['whitelist'][xs] is not None for x in
@@ -230,7 +237,7 @@ def read_grouped_whitelist(whitelist, filled_object, all_plain=False, whitelist_
     return whitelist
 
 
-def read_depend_whitelist(whitelist, depend, whitelist_path=None):
+def read_depend_whitelist(whitelist, depend, whitelist_object=None, whitelist_path=None):
     """
     This function parses a whitelist of type 'depend' in order to get the
     values fitting the dependency.
@@ -244,18 +251,22 @@ def read_depend_whitelist(whitelist, depend, whitelist_path=None):
             'metadata_whitelists')
     if depend in whitelist:
         whitelist = whitelist[depend]
-    elif os.path.isfile(os.path.join(whitelist_path,
+    else:
+        if whitelist_object is not None and depend in whitelist_object:
+            whitelist = whitelist_object[depend]
+        elif os.path.isfile(os.path.join(whitelist_path,
             'whitelists', depend)):
-        whitelist = read_whitelist(depend, whitelist_path=whitelist_path)
-    if not isinstance(whitelist, list) and not isinstance(whitelist, dict) \
-            and os.path.isfile(os.path.join(
-            whitelist_path, 'whitelists',
-            whitelist)):
-        whitelist = read_whitelist(whitelist, whitelist_path=whitelist_path)
+            whitelist = read_whitelist(depend, whitelist_path=whitelist_path)
+
+    if not isinstance(whitelist, list) and not isinstance(whitelist, dict):
+        if whitelist_object is not None and whitelist in whitelist_object:
+            whitelist = whitelist_object[whitelist]
+        elif os.path.isfile(os.path.join(whitelist_path, 'whitelists', whitelist)):
+            whitelist = read_whitelist(whitelist, whitelist_path=whitelist_path)
     return whitelist
 
 
-def get_whitelist(key, filled_object, all_plain=False, whitelist_path=None):
+def get_whitelist(key, filled_object, whitelist_object=None, all_plain=False, whitelist_path=None):
     """
     This function reads in a whitelist and parses it depending on its type.
     :param key: the key that contains a whitelist
@@ -266,17 +277,25 @@ def get_whitelist(key, filled_object, all_plain=False, whitelist_path=None):
     stay_depend = False
     plain = False
     abbrev = False
-    whitelist = read_whitelist(key, whitelist_path=whitelist_path)
+
     if whitelist_path is None:
         whitelist_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), '..',
             'FRED_whitelists')
 
+    if whitelist_object is not None:
+        if key in whitelist_object:
+            whitelist = whitelist_object[key]
+        else:
+            whitelist = None
+    else:
+        whitelist = read_whitelist(key, whitelist_path=whitelist_path)
+
     while isinstance(whitelist,
                      dict) and not group and not stay_depend and not \
             plain and not abbrev:
         if whitelist['whitelist_type'] == 'group':
-            whitelist = read_grouped_whitelist(whitelist, filled_object, all_plain=all_plain, whitelist_path=whitelist_path)
+            whitelist = read_grouped_whitelist(whitelist, filled_object, whitelist_object=whitelist_object, all_plain=all_plain, whitelist_path=whitelist_path)
             group = True
         elif whitelist['whitelist_type'] == 'plain':
             plain = True
@@ -289,7 +308,7 @@ def get_whitelist(key, filled_object, all_plain=False, whitelist_path=None):
                     depend = list(find_keys(filled_object, 'organism'))
             if len(depend) > 0:
                 whitelist = read_depend_whitelist(whitelist['whitelist'],
-                                                  depend[0].split(' ')[0], whitelist_path=whitelist_path)
+                                                  depend[0].split(' ')[0], whitelist_object=whitelist_object, whitelist_path=whitelist_path)
             else:
                 if all_plain:
                     new_whitelist = []
@@ -300,7 +319,7 @@ def get_whitelist(key, filled_object, all_plain=False, whitelist_path=None):
                         else:
                             new_whitelist += whitelist['whitelist'][key]
                     for elem in paths:
-                        w_list = get_whitelist(elem, {}, True)
+                        w_list = get_whitelist(elem, {}, whitelist_object=whitelist_object, all_plain=True)
                         new_whitelist += w_list['whitelist']
                     whitelist['whitelist'] = new_whitelist
 
@@ -384,12 +403,12 @@ def fill_key(position, value, fill_dict):
         print('NO POSITION')
 
 
-def create_sample_names(metafile, old_sample_names, position):
+def create_sample_names(metafile, old_sample_names, position, read_in_whitelists=None):
     sample_names =  []
     project_id = list(find_keys(metafile, 'id'))
     techniques = list(find_keys(metafile, 'techniques'))
     organisms = get_whitelist(os.path.join('abbrev', 'organism_name'),
-                              metafile)['whitelist']
+                              metafile, whitelist_object=read_in_whitelists)['whitelist']
     if len(project_id) > 0 and len(techniques) > 0:
         project_id = project_id[0]
         setting_index = position.index('experimental_setting')+1
@@ -407,7 +426,7 @@ def create_sample_names(metafile, old_sample_names, position):
             if used_techs is not None:
                 abbrev_techniques = get_whitelist(
                     os.path.join('abbrev', 'technique'),
-                    metafile)['whitelist']
+                    metafile, whitelist_object=read_in_whitelists)['whitelist']
                 abbrev_tech = None
                 for u_t in used_techs:
                     abbrev_tech = abbrev_techniques[
@@ -485,7 +504,7 @@ def add_value_at_pos(key_yaml, metafile, keys, value, overwrite=False, position=
     return metafile
 
 
-def create_filenames(metafile, double, position, old_filenames={}):
+def create_filenames(metafile, double, position, old_filenames={}, read_in_whitelists=None):
     filenames = []
     global_index = []
     all_filenames = list(find_keys(metafile, 'filenames'))
@@ -550,7 +569,7 @@ def create_filenames(metafile, double, position, old_filenames={}):
             if used_techs is not None:
                 abbrev_techniques = get_whitelist(
                     os.path.join('abbrev', 'technique'),
-                    metafile)['whitelist']
+                    metafile, whitelist_object=read_in_whitelists)['whitelist']
                 abbrev_tech = None
                 for u_t in used_techs:
                     tech_local_index = local_index
@@ -655,7 +674,7 @@ def print_desc(desc, format='plain', size=70):
     return new_desc
 
 
-def get_combis(values, key, result_dict, key_yaml):
+def get_combis(values, key, result_dict, key_yaml, read_in_whitelists=None):
     """
     This function creates all combinations for one experimental factor that can
     occur multiple tims in one conditions.
@@ -668,7 +687,7 @@ def get_combis(values, key, result_dict, key_yaml):
     if key == 'gene_editing':
         whitelist_key = 'editing_method'
         depend_key = 'editing_type'
-        whitelist = get_whitelist(whitelist_key, result_dict)
+        whitelist = get_whitelist(whitelist_key, result_dict, whitelist_object=read_in_whitelists)
     else:
         whitelist_key = None
         depend_key = None
@@ -880,7 +899,7 @@ def get_condition_combinations(factors):
     return list(set(combinations))
 
 
-def get_short_name(condition, result_dict, key_yaml):
+def get_short_name(condition, result_dict, key_yaml, read_in_whitelists=None):
     """
     This function creates an abbreviated version of a condition.
     :param condition: the condition that should be abbreviated
@@ -889,7 +908,7 @@ def get_short_name(condition, result_dict, key_yaml):
     """
     conds = split_cond(condition)
     whitelist = get_whitelist(os.path.join('abbrev', 'factor'),
-                              result_dict)['whitelist']
+                              result_dict, whitelist_object=read_in_whitelists)['whitelist']
     short_cond = []
     for c in conds:
         if c[0] in whitelist:
@@ -898,17 +917,17 @@ def get_short_name(condition, result_dict, key_yaml):
             k = c[0]
 
         short_cond.append(
-            get_short_value(c[0], k, c[1], '', result_dict, key_yaml))
+            get_short_value(c[0], k, c[1], '', result_dict, key_yaml, read_in_whitelists=read_in_whitelists))
 
     short_condition = '-'.join(short_cond).replace('/', '')
     return short_condition
 
 
-def get_short_value(factor, short_factor, value, short_cond, result_dict, key_yaml):
+def get_short_value(factor, short_factor, value, short_cond, result_dict, key_yaml,read_in_whitelists=None):
     if isinstance(value, dict):
         cond_whitelist = get_whitelist(
             os.path.join('abbrev', factor),
-            result_dict)
+            result_dict, whitelist_object=read_in_whitelists)
         new_vals = {}
         for v in value:
             new_v = cond_whitelist['whitelist'][
@@ -916,7 +935,7 @@ def get_short_value(factor, short_factor, value, short_cond, result_dict, key_ya
                 'whitelist'] else v
             new_vals[new_v] = get_short_value(v, new_v, value[v],
                                               short_cond, result_dict,
-                                              key_yaml)
+                                              key_yaml, read_in_whitelists=read_in_whitelists)
 
         val = '+'.join([f'{new_vals[x].replace(" ", "")}' for x in
                         list(new_vals.keys())])
@@ -927,7 +946,7 @@ def get_short_value(factor, short_factor, value, short_cond, result_dict, key_ya
                 info[0]['special_case']:
             short_units = \
                 get_whitelist(os.path.join('abbrev', 'unit'),
-                              result_dict)[
+                              result_dict, whitelist_object=read_in_whitelists)[
                     'whitelist']
             value_unit = split_value_unit(value)
             short_cond += f'{short_factor}.{value_unit["value"]}' \
@@ -935,7 +954,7 @@ def get_short_value(factor, short_factor, value, short_cond, result_dict, key_ya
         else:
             val_whitelist = get_whitelist(
                 os.path.join('abbrev', factor),
-                result_dict)
+                result_dict, whitelist_object=read_in_whitelists)
             if val_whitelist and value.lower() in val_whitelist[
                 'whitelist']:
                 short_cond += f'{short_factor}.' \

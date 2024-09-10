@@ -6,7 +6,7 @@ import copy
 import re
 
 
-def get_factors(organism, key_yaml):
+def get_factors(organism, key_yaml, read_in_whitelists):
     """
     This function returns all experimental factors with a whitelist of their
     values
@@ -21,7 +21,7 @@ def get_factors(organism, key_yaml):
     # initialize dictionary with all factors
     factor_list, whitelist_type, input_type, headers, whitelist_keys, double = \
         whitelist_parsing.parse_whitelist(
-            'factor', f_node, {'organism': organism})
+            'factor', f_node, {'organism': organism}, whitelist_object=read_in_whitelists)
 
     factor_value = {'factor': factor_list, 'desc': factor_desc}
     plain_factors = []
@@ -42,7 +42,7 @@ def get_factors(organism, key_yaml):
 
             # call function 'get_factor_values' to get whitelist information
             whitelist, whitelist_type, input_type, headers, w_keys, double, nested_infos = \
-                get_factor_values(factor, node[0], {'organism': organism})
+                get_factor_values(factor, node[0], {'organism': organism}, read_in_whitelists)
 
             # change single_autofill to multi_autofill because all factors can
             # have multiple values
@@ -96,7 +96,7 @@ def get_factors(organism, key_yaml):
     return factor_value
 
 
-def get_factor_values(key, node, filled_object, nested_infos=None):
+def get_factor_values(key, node, filled_object, read_in_whitelists, nested_infos=None):
     """
     This function is used to get the whitelists of experimental factors
     including the whitelist type, input type, headers and whitelist keys
@@ -145,7 +145,7 @@ def get_factor_values(key, node, filled_object, nested_infos=None):
             k_val['whitelist'], k_val['whitelist_type'], k_val['input_type'], \
             header, whitelist_keys, doubled, nested_infos = get_factor_values(
                 k, node['value'][k],
-                filled_object, nested_infos=nested_infos)
+                filled_object, read_in_whitelists, nested_infos=nested_infos)
 
             # add header and whitelist keys to dictionary if they are defined
             if header is not None:
@@ -214,7 +214,7 @@ def get_factor_values(key, node, filled_object, nested_infos=None):
         # read and parse whitelist
         whitelist, whitelist_type, input_type, headers, w_keys, double = \
             whitelist_parsing.parse_whitelist(key, node,
-                                              filled_object)
+                                              filled_object, whitelist_object=read_in_whitelists)
 
     # factor takes a list as value -> can occur multiple times in one condition
     if node['list']:
@@ -230,7 +230,7 @@ def get_factor_values(key, node, filled_object, nested_infos=None):
     return whitelist, whitelist_type, input_type, headers, w_keys, double, nested_infos
 
 
-def get_conditions(factors, organism_name, key_yaml):
+def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
     """
     This function creates all combinations of selected experimental factors and
     their values
@@ -325,7 +325,7 @@ def get_conditions(factors, organism_name, key_yaml):
                 # conditions and overwrite the values with them
                 factors[i]['values'] = utils.get_combis(
                     val, factors[i]['factor'],
-                    {'organism': organism_name.split(' ')[0]}, key_yaml)
+                    {'organism': organism_name.split(' ')[0]}, key_yaml, read_in_whitelists=read_in_whitelists)
 
         elif factor_infos[0]['list']:
 
@@ -360,7 +360,7 @@ def get_conditions(factors, organism_name, key_yaml):
                                                         'organism':
                                                             organism_name.split(
                                                                 ' ')[0]},
-                                                    key_yaml)
+                                                    key_yaml, read_in_whitelists=read_in_whitelists)
 
         # iterate over all values
         for j in range(len(factors[i]['values'])):
@@ -431,7 +431,7 @@ def get_conditions(factors, organism_name, key_yaml):
         sample, whitelist_object = yto.parse_empty(
             sample[0],
             'experimental_setting:conditions:biological_replicates:samples',
-            key_yaml, {'organism': organism_name}, get_whitelist_object=True)
+            key_yaml, {'organism': organism_name}, read_in_whitelists, get_whitelist_object=True)
 
         # overwrite sample with its input fields
         sample_desc = sample['desc']
@@ -443,7 +443,7 @@ def get_conditions(factors, organism_name, key_yaml):
             # generate a sample name from the condition
             sample_name = utils.get_short_name(cond,
                                                {'organism': organism_name},
-                                               key_yaml)
+                                               key_yaml, read_in_whitelists=read_in_whitelists)
 
             # split the condition into key-value pairs
             split_condition = utils.split_cond(cond)
@@ -485,7 +485,7 @@ def get_conditions(factors, organism_name, key_yaml):
             # condition
             filled_sample = get_samples(split_condition, copy.deepcopy(sample),
                                         real_val, key_yaml, sample_name,
-                                        organism_name)
+                                        organism_name, read_in_whitelists)
 
             # rewrite condition into title and string to readd deleted
             # conditions
@@ -594,7 +594,7 @@ def get_title_value(cond_value, readd):
 
 
 def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
-                organism_name, is_factor=True):
+                organism_name, read_in_whitelists, is_factor=True):
     """
     This function created a pre-filled object with the structure of the samples
     to be displayed in the web interface
@@ -650,6 +650,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                     # sanity check -> factor was found in general structure
                     if len(info) > 0:
 
+                        filled_value = ''
                         # special case value_unit
                         if 'special_case' in info[0] and 'value_unit' \
                                 in info[0]['special_case']:
@@ -695,7 +696,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                         copy.deepcopy(
                                             sample[i]['input_fields']),
                                         info, key_yaml, sample_name,
-                                        organism_name, is_factor=is_factor)
+                                        organism_name, read_in_whitelists, is_factor=is_factor)
                                 # TODO: als real_val?
                                 elif 'headers' in sample[i]:
                                     headers = [x for x in c[1]]
@@ -760,7 +761,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                         in sample[i]:
                                     w = utils.get_whitelist(
                                         sample[i]['position'].split(':')[-1],
-                                        {'organism': organism_name})
+                                        {'organism': organism_name}, whitelist_object=read_in_whitelists)
 
                                     for key in sample[i]['whitelist_keys']:
                                         filled_value = c[1]
