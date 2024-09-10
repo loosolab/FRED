@@ -41,7 +41,9 @@ def fetch_whitelists(pgm_object):
 
 
 def get_whitelist_object(pgm_object):
-    return whitelist_parsing.get_whitelist_object(pgm_object)
+    whitelist_object = {'whitelists': whitelist_parsing.get_whitelist_object(pgm_object),
+                        'version': pgm_object['whitelist_version']}
+    return whitelist_object
 
 
 def get_empty_wi_object(pgm_object, read_in_whitelists):
