@@ -1,6 +1,7 @@
 import copy
 import multiprocessing
 import os
+import threading
 from functools import partial
 
 from src import validate_yaml
@@ -49,17 +50,28 @@ def iterate_dir_metafiles(
 
     # test push
     results = []
-    for item in items:
-        results.append(
-            validate(
-                item,
-                filename,
-                key_yaml,
-                logical_validation,
-                whitelist_path,
-                copy.deepcopy(key_yaml),
-            )
+    threads = []
+    results_lock = threading.Lock()
+
+    def thread_target(item):
+        result = validate(
+            item,
+            filename,
+            key_yaml,
+            logical_validation,
+            whitelist_path,
+            copy.deepcopy(key_yaml),
         )
+        with results_lock:
+            results.append(result)
+
+    for item in items:
+        thread = threading.Thread(target=thread_target, args=(item,))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
 
     for result in results:
         if result[3] == 0 or return_false:
