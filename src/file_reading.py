@@ -65,18 +65,13 @@ def iterate_dir_metafiles(
         with results_lock:
             results.append(result)
 
-    cnt = 0
     for item in items:
         thread = threading.Thread(target=thread_target, args=(item,))
         threads.append(thread)
         thread.start()
-        cnt += 1
-        print("added thread")
-    print(str(cnt), " threads")
 
-    for i, thread in enumerate(threads):
+    for thread in threads:
         thread.join()
-        print("finished thread", i)
 
     for result in results:
         if result[3] == 0 or return_false:
