@@ -1,3 +1,8 @@
+import gevent
+from gevent import monkey
+
+# Patch all to make standard library cooperative
+monkey.patch_all()
 import copy
 import multiprocessing
 import os
@@ -51,7 +56,6 @@ def iterate_dir_metafiles(
     # test push
     results = []
     threads = []
-    results_lock = threading.Lock()
 
     def thread_target(item):
         result = validate(
@@ -62,16 +66,10 @@ def iterate_dir_metafiles(
             whitelist_path,
             copy.deepcopy(key_yaml),
         )
-        with results_lock:
-            results.append(result)
+        results.append(result)
 
-    for item in items:
-        thread = threading.Thread(target=thread_target, args=(item,))
-        threads.append(thread)
-        thread.start()
-
-    for thread in threads:
-        thread.join()
+    greenlets = [gevent.spawn(thread_target, item) for item in items]
+    gevent.joinall(greenlets)
 
     for result in results:
         if result[3] == 0 or return_false:
