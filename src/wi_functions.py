@@ -72,9 +72,9 @@ def get_conditions(pgm_object, factors, organism_name, read_in_whitelists):
                                    pgm_object['structure'], read_in_whitelists)
 
 
-def validate_object(pgm_object, wi_object, finish=False):
+def validate_object(pgm_object, wi_object, read_in_whitelists, finish=False):
     new_object = copy.deepcopy(wi_object)
-    return validation.validate_object(new_object, pgm_object['structure'], finish)
+    return validation.validate_object(new_object, pgm_object['structure'], read_in_whitelists, finish)
 
 
 def get_summary(pgm_object, wi_object, read_in_whitelists):
