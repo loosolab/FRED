@@ -77,8 +77,8 @@ def validate_object(pgm_object, wi_object, finish=False):
     return validation.validate_object(new_object, pgm_object['structure'], finish)
 
 
-def get_summary(pgm_object, wi_object):
-    return html_output.get_summary(wi_object, pgm_object['structure'])
+def get_summary(pgm_object, wi_object, read_in_whitelists):
+    return html_output.get_summary(wi_object, pgm_object['structure'], read_in_whitelists)
 
 
 def save_object(dictionary, path, filename, edit_state):
