@@ -1,10 +1,15 @@
 import argparse
+import importlib.util as ilu
 import json
 import os
 
 print("my exec path", os.path.abspath(os.path.join(os.path.dirname(__file__))))
-import file_reading
 
+spec = ilu.spec_from_file_location(
+    "wi_functions", "metadata-organizer/src/file_reading.py"
+)
+file_reading = ilu.module_from_spec(spec)
+spec.loader.exec_module(file_reading)
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Process input and output file paths.")
 parser.add_argument("--input", required=True, help="Path to the input JSON file")
@@ -24,4 +29,4 @@ metafiles, validation_reports = file_reading.iterate_dir_metafiles(
 
 
 with open(args.output, "w") as f:
-    json.dumps({"metafiles": metafiles, "validation_reports": validation_reports})
+    json.dump({"metafiles": metafiles, "validation_reports": validation_reports}, f)

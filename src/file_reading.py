@@ -1,8 +1,3 @@
-import gevent
-from gevent import monkey
-
-# Patch all to make standard library cooperative
-monkey.patch_all()
 import copy
 import json
 import multiprocessing
@@ -97,10 +92,13 @@ def iterate_dir_metafiles(
             "output",
             os.path.abspath(os.path.join(os.path.dirname(__file__), output_file)),
         )
+        print(key_yaml)
+        print(path_metafiles)
+        print("writing file now")
         with open(
             os.path.abspath(os.path.join(os.path.dirname(__file__), input_file)), "w"
         ) as f:
-            json.dumps({"key_yaml": key_yaml, "path_metafiles": path_metafiles})
+            json.dump({"key_yaml": key_yaml, "path_metafiles": path_metafiles}, f)
         print("is this right", os.path.abspath(os.path.join(os.path.dirname(__file__))))
         process = subprocess.Popen(
             [
