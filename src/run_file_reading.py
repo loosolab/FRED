@@ -3,7 +3,7 @@ import json
 import os
 
 print("my exec path", os.path.abspath(os.path.join(os.path.dirname(__file__))))
-import src.file_reading as file_reading
+import file_reading
 
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Process input and output file paths.")
