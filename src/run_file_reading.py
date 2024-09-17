@@ -2,9 +2,7 @@ import argparse
 import importlib.util as ilu
 import json
 import os
-import sys
 
-sys.path.append("metadata-organizer")
 print("my exec path", os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
 spec = ilu.spec_from_file_location("file_reading", "file_reading.py")
