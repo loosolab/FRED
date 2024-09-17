@@ -27,7 +27,6 @@ def iterate_dir_metafiles(
     whitelist_path=None,
     return_false=False,
     run_as_sub=False,
-
 ):
     """
     iterate through a list of paths to find all _metadata.yaml(yml) files
@@ -90,8 +89,8 @@ def iterate_dir_metafiles(
         print("try running subprocess")
         import subprocess
 
-        input_file = "func_params" + str(time.time_ns) + ".json"
-        output_file = "workaround" + str(time.time_ns) + ".json"
+        input_file = "func_params" + str(time.time_ns()) + ".json"
+        output_file = "workaround" + str(time.time_ns()) + ".json"
         print(
             "input",
             os.path.abspath(os.path.join(os.path.dirname(__file__), input_file)),
@@ -102,6 +101,7 @@ def iterate_dir_metafiles(
             os.path.abspath(os.path.join(os.path.dirname(__file__), input_file)), "w"
         ) as f:
             json.dumps({"key_yaml": key_yaml, "path_metafiles": path_metafiles})
+        print("is this right", os.path.abspath(os.path.join(os.path.dirname(__file__))))
         process = subprocess.Popen(
             [
                 "python",
