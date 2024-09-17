@@ -106,9 +106,10 @@ def iterate_dir_metafiles(
             with open(output_file, "r") as f:
                 output_dict = json.loads(f.read())
             print("Script ran successfully")
+            return output_dict
         else:
             print(f"Error: {stderr.decode()}")
-        return output_dict
+            return
 
 
 def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml):
