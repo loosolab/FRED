@@ -5,7 +5,7 @@ import src.web_interface.wi_utils as wi_utils
 import os
 
 
-def parse_object(wi_object, key_yaml):
+def parse_object(wi_object, key_yaml, read_in_whitelists):
     """
     This function parses a wi object back into a yaml
     :param key_yaml: the read in general structure
@@ -42,7 +42,7 @@ def parse_object(wi_object, key_yaml):
             # parse every part into yaml format
             result[key], organism, sample_name, nom, global_count, local_count, double = parse_part(
                 wi_object[key], key_yaml, copy.deepcopy(wi_object['all_factors']), project_id,
-                organism, sample_name, nom, global_count, local_count, double)
+                organism, sample_name, nom, global_count, local_count, double, read_in_whitelists)
 
     # remove keys with value None
     result = {k: v for k, v in result.items() if v is not None}
@@ -51,13 +51,13 @@ def parse_object(wi_object, key_yaml):
     for sample_pos in sample_name_positions:
         utils.fill_key(sample_pos, utils.create_sample_names(
             result, wi_object['old_sample_names'] if
-            'old_sample_names' in wi_object else {}, sample_pos), result)
+            'old_sample_names' in wi_object else {}, sample_pos, read_in_whitelists=read_in_whitelists), result)
 
     filename_positions = get_filename_positions(result)
     for file_pos in filename_positions:
         utils.fill_key(file_pos, utils.create_filenames(
             result, double, file_pos, wi_object['old_filenames'] if
-            'old_filenames' in wi_object else {}), result)
+            'old_filenames' in wi_object else {}, read_in_whitelists=read_in_whitelists), result)
 
     return result
 
@@ -101,7 +101,7 @@ def split_name(elem, double, gene=True):
 
 
 def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
-               nom, global_count, local_count, double):
+               nom, global_count, local_count, double, read_in_whitelists):
     """
     This function parses a part of the wi object to create the yaml structure
     :param key_yaml: the read in general structure
@@ -156,7 +156,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                             sample, organism, sample_name, nom, global_count, local_count, double = \
                                 parse_list_part(sub_elem, key_yaml, factors,
                                                 project_id, organism,
-                                                sample_name, nom, global_count, local_count, double)
+                                                sample_name, nom, global_count, local_count, double, read_in_whitelists)
 
                             # remove empty keys
                             sample = {k: v for k, v in sample.items() if v is
@@ -192,7 +192,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                         c_val, organism, sample_name, nom, global_count, local_count, double = \
                             parse_list_part(wi_object['list_value'][i],
                                             key_yaml, factors[i], project_id,
-                                            organism, sample_name, nom, global_count, local_count, double)
+                                            organism, sample_name, nom, global_count, local_count, double, read_in_whitelists)
 
                         # add the converted value to the list
                         val.append(c_val)
@@ -204,7 +204,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                         c_val, organism, sample_name, nom, global_count, local_count, double = \
                             parse_list_part(wi_object['list_value'][i],
                                             key_yaml, factors, project_id,
-                                            organism, sample_name, nom, global_count, local_count, double)
+                                            organism, sample_name, nom, global_count, local_count, double, read_in_whitelists)
 
                         # add the converted value to the list
                         val.append(c_val)
@@ -282,7 +282,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     val, organism, sample_name, nom, global_count, local_count, double = \
                         parse_part(wi_object['input_fields'], key_yaml,
                                    factors, project_id, organism, sample_name,
-                                   nom, global_count, local_count, double)
+                                   nom, global_count, local_count, double, read_in_whitelists)
 
             # no input fields
             else:
@@ -382,13 +382,13 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
         # call parse list function
         val, organism, sample_name, nom, global_count, local_count, double = parse_list_part(
             wi_object, key_yaml, factors, project_id, organism, sample_name,
-            nom, global_count, local_count, double)
+            nom, global_count, local_count, double, read_in_whitelists)
 
     return val, organism, sample_name, nom, global_count, local_count, double
 
 
 def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
-                    sample_name, nom, global_count, local_count, double):
+                    sample_name, nom, global_count, local_count, double, read_in_whitelists):
     """
     This function parses a part of the wi object of type list into the yaml
     structure
@@ -422,7 +422,7 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
             # read in the abbrev whitelist for organisms
             short = utils.get_whitelist(os.path.join(
                 'abbrev', 'organism_name'),
-                {'organism': organism})['whitelist']
+                {'organism': organism}, whitelist_object=read_in_whitelists)['whitelist']
 
             # save the shortened version of the organism
             organism = short[organism]
@@ -444,7 +444,7 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
             # call parse part function
             val, organism, sample_name, nom, global_count, local_count, double = parse_part(
                 wi_object[i], key_yaml, factors, project_id, organism,
-                sample_name, nom, global_count, local_count, double)
+                sample_name, nom, global_count, local_count, double, read_in_whitelists)
 
         # test if the value is not empty
         if val is not None and (

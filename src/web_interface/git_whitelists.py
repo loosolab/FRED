@@ -2,6 +2,7 @@ import os
 import git
 import re
 
+#TODO: username, pw
 def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whitelist):
     """
     This function clones the whitelist repository. If the repository already
@@ -25,6 +26,11 @@ def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whit
             repo.remotes.origin.pull(whitelist_branch)
 
         print(f'Fetched branch {whitelist_branch}.\n')
+    else:
+        repo = git.Repo(whitelist_path)
+        repo.remotes.origin.fetch(prune=True, prune_tags=True)
+        whitelist_branch = get_branch(repo, whitelist_branch)
+    return whitelist_branch
 
 
 def get_branch(repo, whitelist_branch):

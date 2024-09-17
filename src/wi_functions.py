@@ -36,7 +36,7 @@ class Webinterface:
             self.filename,
         ) = utils.parse_config(config)
         self.structure = utils.read_in_yaml(structure)
-        fetch_whitelists(self.__dict__)
+        self.whitelist_version = fetch_whitelists(self.__dict__)
 
     def to_dict(self):
         return self.__dict__
@@ -51,13 +51,18 @@ def fetch_whitelists(pgm_object):
     )
 
 
-def get_empty_wi_object(pgm_object):
-    fetch_whitelists(pgm_object)
-    return yto.get_empty_wi_object(pgm_object["structure"])
+def get_whitelist_object(pgm_object):
+    whitelist_object = {'whitelists': whitelist_parsing.get_whitelist_object(pgm_object),
+                        'version': pgm_object['whitelist_version']}
+    return whitelist_object
 
 
-def is_empty(pgm_object, wi_object):
-    emtpy_object = yto.get_empty_wi_object(pgm_object["structure"])
+def get_empty_wi_object(pgm_object, read_in_whitelists):
+    return yto.get_empty_wi_object(pgm_object['structure'], read_in_whitelists)
+
+
+def is_empty(pgm_object, wi_object, read_in_whitelsits):
+    emtpy_object = yto.get_empty_wi_object(pgm_object['structure'], read_in_whitelsits)
     if wi_object == emtpy_object:
         empty = True
     else:
@@ -65,29 +70,26 @@ def is_empty(pgm_object, wi_object):
     return {"empty": empty, "object": emtpy_object}
 
 
-def get_single_whitelist(ob):
-
-    return whitelist_parsing.get_single_whitelist(ob)
-
-
-def get_factors(pgm_object, organism):
-
-    return fac_cond.get_factors(organism, pgm_object["structure"])
+def get_single_whitelist(ob, read_in_whitelists):
+    return whitelist_parsing.get_single_whitelist(ob, read_in_whitelists)
 
 
-def get_conditions(pgm_object, factors, organism_name):
+def get_factors(pgm_object, organism, read_in_whitelists):
+    return fac_cond.get_factors(organism, pgm_object['structure'], read_in_whitelists)
 
-    return fac_cond.get_conditions(factors, organism_name, pgm_object["structure"])
+
+def get_conditions(pgm_object, factors, organism_name, read_in_whitelists):
+    return fac_cond.get_conditions(factors, organism_name,
+                                   pgm_object['structure'], read_in_whitelists)
 
 
-def validate_object(pgm_object, wi_object, finish=False):
+def validate_object(pgm_object, wi_object, read_in_whitelists, finish=False):
     new_object = copy.deepcopy(wi_object)
-    return validation.validate_object(new_object, pgm_object["structure"], finish)
+    return validation.validate_object(new_object, pgm_object['structure'], read_in_whitelists, finish)
 
 
-def get_summary(pgm_object, wi_object):
-
-    return html_output.get_summary(wi_object, pgm_object["structure"])
+def get_summary(pgm_object, wi_object, read_in_whitelists):
+    return html_output.get_summary(wi_object, pgm_object['structure'], read_in_whitelists)
 
 
 def save_object(dictionary, path, filename, edit_state):
@@ -96,7 +98,6 @@ def save_object(dictionary, path, filename, edit_state):
 
 
 def save_filenames(file_str, path):
-
     return file_io.save_filenames(file_str, path)
 
 
@@ -110,8 +111,7 @@ def get_meta_info(pgm_object, path, project_ids):
 
 
 def get_search_mask(pgm_object):
-    fetch_whitelists(pgm_object)
-    return searching.get_search_mask(pgm_object["structure"])
+    return searching.get_search_mask(pgm_object['structure'])
 
 
 def find_metadata(pgm_object, path, search_string):
@@ -120,13 +120,11 @@ def find_metadata(pgm_object, path, search_string):
     )
 
 
-def edit_wi_object(path, pgm_object):
-    fetch_whitelists(pgm_object)
-    return editing.edit_wi_object(path, pgm_object["structure"])
+def edit_wi_object(path, pgm_object, read_in_whitelists):
+    return editing.edit_wi_object(path, pgm_object['structure'], read_in_whitelists)
 
 
 # TODO: not needed -> in summary
-def parse_object(pgm_object, wi_object):
-
+def parse_object(pgm_object, wi_object, read_in_whitelists):
     # read in general structure
-    return oty.parse_object(wi_object, pgm_object["structure"])
+    return oty.parse_object(wi_object, pgm_object['structure'], read_in_whitelists)

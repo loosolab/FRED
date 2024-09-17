@@ -1,3 +1,8 @@
+import gevent
+from gevent import monkey
+
+# Patch all to make standard library cooperative
+monkey.patch_all()
 import copy
 import json
 import multiprocessing
@@ -22,6 +27,7 @@ def iterate_dir_metafiles(
     whitelist_path=None,
     return_false=False,
     run_as_sub=False,
+
 ):
     """
     iterate through a list of paths to find all _metadata.yaml(yml) files
