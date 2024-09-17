@@ -5,7 +5,7 @@ import os
 
 print("my exec path", os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
-spec = ilu.spec_from_file_location("wi_functions", "src/file_reading.py")
+spec = ilu.spec_from_file_location("file_reading", "file_reading.py")
 file_reading = ilu.module_from_spec(spec)
 spec.loader.exec_module(file_reading)
 # Set up argument parser
