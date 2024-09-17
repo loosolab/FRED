@@ -81,11 +81,20 @@ def iterate_dir_metafiles(
             "warning_count": warning_count,
         }
     else:
+        print("try running subprocess")
         import subprocess
 
         input_file = "func_params" + str(time.time_ns) + ".json"
         output_file = "workaround" + str(time.time_ns) + ".json"
-        with open(input_file, "w") as f:
+        print(
+            "input",
+            os.path.abspath(os.path.join(os.path.dirname(__file__), input_file)),
+            "output",
+            os.path.abspath(os.path.join(os.path.dirname(__file__), output_file)),
+        )
+        with open(
+            os.path.abspath(os.path.join(os.path.dirname(__file__), input_file)), "w"
+        ) as f:
             json.dumps({"key_yaml": key_yaml, "path_metafiles": path_metafiles})
         process = subprocess.Popen(
             [
@@ -98,12 +107,16 @@ def iterate_dir_metafiles(
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            cwd=os.path.abspath(os.path.join(os.path.dirname(__file__))),
         )
 
         stdout, stderr = process.communicate()
 
         if process.returncode == 0:
-            with open(output_file, "r") as f:
+            with open(
+                os.path.abspath(os.path.join(os.path.dirname(__file__), output_file)),
+                "r",
+            ) as f:
                 output_dict = json.loads(f.read())
             print("Script ran successfully")
             return output_dict
