@@ -1,11 +1,11 @@
-import re
 import os
+import re
 from itertools import chain
-from tabulate import tabulate
+
+import src.file_reading as file_reading
 import src.utils as utils
 from src.generate import Generate
-import src.file_reading as file_reading
-
+from tabulate import tabulate
 
 # This scripts implements functions to find metadata files that contain values
 # specified in a search string
@@ -20,7 +20,7 @@ except OSError:
     size = 80
 
 
-def find_projects(key_yaml, dir_path, search, return_dict):
+def find_projects(key_yaml, dir_path, search, return_dict, run_as_sub=False):
     """
     This function iterates through the search string and evaluates all parts
     within round brackets from the inside to the outside. It calls the function
@@ -35,12 +35,14 @@ def find_projects(key_yaml, dir_path, search, return_dict):
              key=input_id, value=dictionary or path depending on return_dict
     """
     # split parameters linked via or into list
-
+    print("is function running as sub?", run_as_sub)
     # read in all *_metadata.yaml(yml) within the path
-    metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml, [dir_path], return_false=True)
+    metafiles, validation_reports = file_reading.iterate_dir_metafiles(
+        key_yaml, [dir_path], return_false=True, run_as_sub=run_as_sub
+    )
 
     # put round brackets around the search string
-    search = '(' + search + ')'
+    search = "(" + search + ")"
 
     # initialize parameter result with an empty list
     # it is used to store the matching metadata files
@@ -49,14 +51,14 @@ def find_projects(key_yaml, dir_path, search, return_dict):
     # iterate over the read in metadata files
     for metafile in metafiles:
 
-        if 'project' in metafile and 'id' in metafile['project']:
+        if "project" in metafile and "id" in metafile["project"]:
 
             # initialize parameter sub_list and sub with empty string
             # sub stores parts of the search string that is read in
             # whenever a bracket is reached, the string in sub is evaluated and
             # the result is added to sub_list
-            sub_list = ''
-            sub = ''
+            sub_list = ""
+            sub = ""
 
             # set brace_count to 0 meaning that there is currently no open
             # brace
@@ -68,13 +70,13 @@ def find_projects(key_yaml, dir_path, search, return_dict):
                 # if an opening bracket is reached, add 1 to brace_count, add
                 # the string within sub to the sub_list and set sub to an empty
                 # string
-                if letter == '(':
+                if letter == "(":
                     brace_count += 1
                     sub_list += sub
-                    sub = ''
+                    sub = ""
 
                 # if a closing bracket is reached, subtract 1 from brace_count
-                elif letter == ')':
+                elif letter == ")":
                     brace_count -= 1
 
                     # test if the closing bracket is the last bracket in the
@@ -91,12 +93,12 @@ def find_projects(key_yaml, dir_path, search, return_dict):
                         # is not an empty string then use the function
                         # parse_search_parameters to evaluate the string in sub
                         # and add the result to the sub_string
-                        if sub != '':
+                        if sub != "":
                             res = parse_search_parameters(metafile, sub)
                             sub_list += str(True) if res else str(False)
 
                     # set sub to an empty string again
-                    sub = ''
+                    sub = ""
 
                 else:
 
@@ -105,7 +107,7 @@ def find_projects(key_yaml, dir_path, search, return_dict):
 
             # evaluate the sub_list with parse_search_parameters if it does not
             # equal True or False
-            if sub_list != 'True' and sub_list != 'False':
+            if sub_list != "True" and sub_list != "False":
                 sub_list = str(parse_search_parameters(metafile, sub_list))
 
             # add a dictionary containing information about the metadata file
@@ -113,10 +115,14 @@ def find_projects(key_yaml, dir_path, search, return_dict):
             # key: project id
             # value: whole metafile or path to metafile depending on whether
             # result_dict is set to True or False
-            if sub_list == 'True':
+            if sub_list == "True":
                 result.append(
-                    {metafile['project']['id']: metafile['path']
-                        if return_dict == False else metafile})
+                    {
+                        metafile["project"]["id"]: (
+                            metafile["path"] if return_dict == False else metafile
+                        )
+                    }
+                )
 
     # return the list of matching metadata files
     return result
@@ -136,7 +142,7 @@ def print_summary(result):
 
     #  initialize res as a list and define the headers of the table as the
     #  first list element
-    res = [['ID', 'Path', 'Project name', 'Owner']]
+    res = [["ID", "Path", "Project name", "Owner"]]
 
     # iterate over dictionaries for matching metadata files
     for elem in result:
@@ -145,17 +151,17 @@ def print_summary(result):
         for key in elem:
 
             try:
-                project_name = elem[key]['project']['project_name']
+                project_name = elem[key]["project"]["project_name"]
             except KeyError:
-                project_name = 'Not found'
+                project_name = "Not found"
             try:
-                owner_name = elem[key]['project']['owner']['name']
+                owner_name = elem[key]["project"]["owner"]["name"]
             except KeyError:
-                owner_name = 'Not found'
+                owner_name = "Not found"
             try:
-                project_path = elem[key]['path']
+                project_path = elem[key]["path"]
             except KeyError:
-                project_path = 'Not found'
+                project_path = "Not found"
 
             # add the id, path, project_name and owner to res
             res.append([key, project_path, project_name, owner_name])
@@ -163,9 +169,17 @@ def print_summary(result):
     # convert res into a table using tabulate
     # set format to fancy_grid, define the headers as the first row and set the
     # column width to fit to the terminal size
-    res = tabulate(res, tablefmt='fancy_grid', headers='firstrow',
-                   maxcolwidths=[size.columns * 1 / 8, size.columns * 3 / 8,
-                                 size.columns * 3 / 8, size.columns * 1 / 8])
+    res = tabulate(
+        res,
+        tablefmt="fancy_grid",
+        headers="firstrow",
+        maxcolwidths=[
+            size.columns * 1 / 8,
+            size.columns * 3 / 8,
+            size.columns * 3 / 8,
+            size.columns * 1 / 8,
+        ],
+    )
 
     # return the table
     return res
@@ -184,25 +198,24 @@ def parse_search_parameters(metafile, search):
 
     # split the search string at 'or' and store the parts of the search string
     # in a list
-    search_parameters = search.split(' or ')
+    search_parameters = search.split(" or ")
 
     # iterate over the parts of the search string that were split at or
     for i in range(len(search_parameters)):
 
         # split parameters linked via 'and' within the 'or-list' -> nested list
-        search_parameters[i] = search_parameters[i].split(' and ')
+        search_parameters[i] = search_parameters[i].split(" and ")
 
         # iterate over the parts of the search string split at 'and'
         for j in range(len(search_parameters[i])):
 
             # test if the part is not equal to True or False
-            if search_parameters[i][j] != 'True' or 'False':
+            if search_parameters[i][j] != "True" or "False":
 
                 # call get_should_be_in to append True or False to the search
                 # parameter separated by ':' (depending on whether there is a
                 # 'not' in front of the search parameter)
-                search_parameters[i][j] = get_should_be_in(
-                    search_parameters[i][j])
+                search_parameters[i][j] = get_should_be_in(search_parameters[i][j])
 
     # call function get_matches to find matches in the nested list for 'or'
     # and 'and'
@@ -296,16 +309,16 @@ def calculate_match(metafile, search_parameters):
                 # the last element of the emerging list declares if the
                 # parameter should be found in the metafile and is saved in
                 # should_be_found and removed from the search parameter
-                should_be_found = and_param.split(':')[-1]
-                and_param = and_param.rstrip(f':{should_be_found}')
+                should_be_found = and_param.split(":")[-1]
+                and_param = and_param.rstrip(f":{should_be_found}")
 
                 # split the search parameter into keys and value
                 p = and_param.rstrip('"').split('"')
 
                 # if there is a value for the keys than split it at ':' to get
                 # a list of all chained metadata keys and save them in 'params'
-                if p[0] != '':
-                    params = p[0].rstrip(':').split(':')
+                if p[0] != "":
+                    params = p[0].rstrip(":").split(":")
 
                 # add the value to the 'params' list
                 params.append(p[1])
@@ -317,18 +330,18 @@ def calculate_match(metafile, search_parameters):
                 # if there is no double quote in the search parameter then
                 # split ist at ':' and save it into 'params'
                 # assign the value of the last element to 'should_be_found'
-                params = and_param.split(':')
+                params = and_param.split(":")
                 should_be_found = params[-1]
 
             # if there are no keys specified and the value was already
             # evaluated (e.g. as part of a sub search string within brackets)
             # then set the match to True if the value equals 'True' and to
             # False if it equals 'False'
-            if len(params) == 1 and params[0] in ['True', 'False']:
+            if len(params) == 1 and params[0] in ["True", "False"]:
                 match = bool(params[0])
-            elif len(params) == 2 and params[0] == 'True':
+            elif len(params) == 2 and params[0] == "True":
                 match = True
-            elif len(params) == 2 and params[0] == 'False':
+            elif len(params) == 2 and params[0] == "False":
                 match = False
 
             else:
@@ -339,8 +352,9 @@ def calculate_match(metafile, search_parameters):
             # set match to True if it was found while it was supposed to be
             # found or if it was not found while not being supposed to be found
             # otherwise set match to False
-            if (match and should_be_found == 'True') or \
-                    (not match and should_be_found == 'False'):
+            if (match and should_be_found == "True") or (
+                not match and should_be_found == "False"
+            ):
                 and_found.append(True)
             else:
                 and_found.append(False)
@@ -372,7 +386,7 @@ def get_should_be_in(param):
     # test if the given parameter is a list
     if isinstance(param, list):
 
-        #initialize a list to store results for every list element
+        # initialize a list to store results for every list element
         p = []
 
         # iterate over list elements
@@ -388,17 +402,17 @@ def get_should_be_in(param):
         should_be_in = True
 
         # test if 'not' is present in the parameter
-        if 'not ' in param:
+        if "not " in param:
 
             # set 'should_be_in' to False (if 'not' was found)
             should_be_in = False
 
             # replace 'not' with empty string
-            param = param.replace('not ', '')
+            param = param.replace("not ", "")
 
         # strip whitespaces from the parameter and append 'should_be_in' at the
         # end divided by ':'
-        p = param.strip() + (':' + str(should_be_in))
+        p = param.strip() + (":" + str(should_be_in))
 
     # return the parameter containing 'should_be_in'
     return p
@@ -451,15 +465,19 @@ def find_entry(metafile, targets, target_value):
 
         # test if the values match if they are of type int or boolean and
         # return True if that is the case
-        if (type(target_value) is int and type(value) is int) or \
-                (type(target_value) is bool and type(value) is bool):
+        if (type(target_value) is int and type(value) is int) or (
+            type(target_value) is bool and type(value) is bool
+        ):
             if target_value == value:
                 return True
 
         # test if the search value is a substring of the metadata value if they
         # are of type string and return True if that is the case
         else:
-            if all(elem in str(value).lower() for elem in str(target_value).lower().split(' ')):
+            if all(
+                elem in str(value).lower()
+                for elem in str(target_value).lower().split(" ")
+            ):
                 return True
 
     # return False if no match was found
