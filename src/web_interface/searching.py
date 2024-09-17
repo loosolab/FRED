@@ -1,8 +1,8 @@
+import src.file_reading as file_reading
 import src.find_metafiles as find_metafiles
 import src.utils as utils
 import src.web_interface.html_output as html_output
 import src.web_interface.wi_utils as wi_utils
-import src.file_reading as file_reading
 
 # TODO: refactor and comment
 
@@ -14,102 +14,114 @@ def get_meta_info(key_yaml, path, project_ids):
     :param project_id: the id of the project
     :return: html_str: the summary in HTML
     """
-    html_str = ''
+    html_str = ""
     for pr_id in project_ids:
         # TODO: own function
         # If file must be searched
-        metafiles, validation_reports = file_reading.iterate_dir_metafiles(key_yaml,
-            [path], return_false=True)
+        metafiles, validation_reports = file_reading.iterate_dir_metafiles(
+            key_yaml, [path], return_false=True
+        )
         correct_file = None
         for metafile in metafiles:
-            if 'project' in metafile and 'id' in metafile['project'] and \
-                    metafile['project']['id'] == pr_id:
+            if (
+                "project" in metafile
+                and "id" in metafile["project"]
+                and metafile["project"]["id"] == pr_id
+            ):
                 correct_file = metafile
                 break
 
         if correct_file is not None:
 
             html_str += f'<h2 style="text-align:center;">{pr_id}</h2><hr>'
-            if validation_reports['error_count'] > 0 or \
-                    validation_reports['warning_count'] > 0:
+            if (
+                validation_reports["error_count"] > 0
+                or validation_reports["warning_count"] > 0
+            ):
                 error = None
                 warning = None
 
-                for report in validation_reports['corrupt_files']['report']:
-                    if report['file']['path'] == correct_file['path']:
-                        error = report['error']
-                        warning = report['warning']
+                for report in validation_reports["corrupt_files"]["report"]:
+                    if report["file"]["path"] == correct_file["path"]:
+                        error = report["error"]
+                        warning = report["warning"]
                         break
 
                 # TODO: error Handling + Ausgabe
                 if error is not None:
                     html_str += f'<font color="red"><h3><b>ERROR:</b></h3>'
                     if len(error[0]) > 0:
-                        html_str += f'<b>Missing mandatory keys:</b><br>'
-                        html_str += '<ul>'
+                        html_str += f"<b>Missing mandatory keys:</b><br>"
+                        html_str += "<ul>"
                         for elem in error[0]:
-                            html_str += f'<li>{elem}</li>'
-                        html_str += '</ul>'
+                            html_str += f"<li>{elem}</li>"
+                        html_str += "</ul>"
                     if len(error[1]) > 0:
                         print(error[1])
-                        html_str += f'<b>Invalid keys:</b><br>'
-                        html_str += '<ul>'
+                        html_str += f"<b>Invalid keys:</b><br>"
+                        html_str += "<ul>"
                         for elem in error[1]:
                             value = correct_file
-                            for key in elem.split(':'):
+                            for key in elem.split(":"):
                                 if isinstance(value, list):
                                     for l_elem in value:
-                                       if key in l_elem:
-                                           value = l_elem[key]
-                                           break
+                                        if key in l_elem:
+                                            value = l_elem[key]
+                                            break
                                 else:
                                     if key in value:
                                         value = value[key]
-                            html_str += f'<li>{elem}: {value}</li>'
-                            correct_file = wi_utils.pop_key(correct_file,
-                                                            elem.split(':'), value)
-                        html_str += '</ul>'
+                            html_str += f"<li>{elem}: {value}</li>"
+                            correct_file = wi_utils.pop_key(
+                                correct_file, elem.split(":"), value
+                            )
+                        html_str += "</ul>"
 
                     if len(error[2]) > 0:
-                        html_str += f'<b>Invalid entries:</b><br>'
-                        html_str += '<ul>'
+                        html_str += f"<b>Invalid entries:</b><br>"
+                        html_str += "<ul>"
                         for elem in error[2]:
-                            html_str += f'<li>{elem.split(":")[-1]} in ' \
-                                        f'{":".join(elem.split(":")[:-1])}</li>'
+                            html_str += (
+                                f'<li>{elem.split(":")[-1]} in '
+                                f'{":".join(elem.split(":")[:-1])}</li>'
+                            )
                             correct_file = wi_utils.pop_value(
-                                correct_file, elem.split(":")[:-1],
-                                elem.split(":")[-1])
-                        html_str += '</ul>'
+                                correct_file, elem.split(":")[:-1], elem.split(":")[-1]
+                            )
+                        html_str += "</ul>"
 
                     if len(error[3]) > 0:
-                        html_str += f'<b>Invalid values:</b><br>'
-                        html_str += '<ul>'
+                        html_str += f"<b>Invalid values:</b><br>"
+                        html_str += "<ul>"
                         for elem in error[3]:
-                            html_str += f'<li>{elem[0]}: {elem[1]} -> ' \
-                                        f'{elem[2]}</li>'
-                        html_str += '</ul>'
+                            html_str += (
+                                f"<li>{elem[0]}: {elem[1]} -> " f"{elem[2]}</li>"
+                            )
+                        html_str += "</ul>"
 
                     html_str += '</font><hr style="border-top: dotted 1px; background-color: transparent;" />'
 
                 if warning is not None:
                     html_str += f'<font color="orange"><h3><b>WARNING:</b></h3>'
-                    html_str += '<ul>'
+                    html_str += "<ul>"
                     for elem in warning:
-                        message = elem[0].replace("\'", "")
-                        html_str += f'<li>{message}: {elem[1]}</li>'
-                    html_str += '</ul>'
+                        message = elem[0].replace("'", "")
+                        html_str += f"<li>{message}: {elem[1]}</li>"
+                    html_str += "</ul>"
                     html_str += '</font><hr style="border-top: dotted 1px; background-color: transparent;" />'
 
-            if 'path' in correct_file:
-                correct_file.pop('path')
+            if "path" in correct_file:
+                correct_file.pop("path")
             for elem in correct_file:
                 end = f'{"<hr><br>" if elem != list(correct_file.keys())[-1] else ""}'
-                html_str = f'{html_str}<h3>{elem}</h3>' \
-                           f'{html_output.object_to_html(correct_file[elem], 0, False)}<br>'\
-                           f'{end}'
+                html_str = (
+                    f"{html_str}<h3>{elem}</h3>"
+                    f"{html_output.object_to_html(correct_file[elem], 0, False)}<br>"
+                    f"{end}"
+                )
 
         else:
-            html_str = 'No metadata found.<br>'
+            html_str = "No metadata found.<br>"
     return html_str, correct_file
 
 
@@ -120,13 +132,19 @@ def get_search_mask(key_yaml):
              whitelist object
     """
     keys = [
-        {'key_name': 'All keys', 'display_name': 'All Fields', 'nested': [],
-         'whitelist': False, 'chained_keys': ''}]
-    keys += get_search_keys(key_yaml, '')
-    return {'keys': keys}
+        {
+            "key_name": "All keys",
+            "display_name": "All Fields",
+            "nested": [],
+            "whitelist": False,
+            "chained_keys": "",
+        }
+    ]
+    keys += get_search_keys(key_yaml, "")
+    return {"keys": keys}
 
 
-def find_metadata(key_yaml, path, search_string):
+def find_metadata(key_yaml, path, search_string, run_as_sub=False):
     """
     This function searches for metadata files that match a search string in a
     given directory
@@ -134,46 +152,47 @@ def find_metadata(key_yaml, path, search_string):
     :param search_string: the search string
     :return: new_files: a list containing all matching files
     """
-    files = find_metafiles.find_projects(key_yaml, path, search_string, True)
+    files = find_metafiles.find_projects(
+        key_yaml, path, search_string, True, run_as_sub=run_as_sub
+    )
     new_files = []
     for i in range(len(files)):
         for key in files[i]:
-            res = {'id': key,
-                   'path': files[i][key]['path']}
+            res = {"id": key, "path": files[i][key]["path"]}
             try:
-                res['project_name'] = files[i][key]['project']['project_name']
+                res["project_name"] = files[i][key]["project"]["project_name"]
             except KeyError:
-                res['project_name'] = None
-
-            try:
-                res['owner'] = files[i][key]['project']['owner']['name']
-            except KeyError:
-                res['owner'] = None
+                res["project_name"] = None
 
             try:
-                res['email'] = files[i][key]['project']['owner']['email']
+                res["owner"] = files[i][key]["project"]["owner"]["name"]
             except KeyError:
-                res['email'] = None
-
-            res['organisms'] = list(utils.find_keys(files[i][key], 'organism_name'))
+                res["owner"] = None
 
             try:
-                res['description'] = files[i][key]['project']['description']
+                res["email"] = files[i][key]["project"]["owner"]["email"]
             except KeyError:
-                res['description'] = None
+                res["email"] = None
+
+            res["organisms"] = list(utils.find_keys(files[i][key], "organism_name"))
 
             try:
-                res['date'] =  files[i][key]['project']['date']
+                res["description"] = files[i][key]["project"]["description"]
             except KeyError:
-                res['date'] = None
+                res["description"] = None
 
-            if 'nerd' in files[i][key]['project']:
+            try:
+                res["date"] = files[i][key]["project"]["date"]
+            except KeyError:
+                res["date"] = None
+
+            if "nerd" in files[i][key]["project"]:
                 nerds = []
-                for nerd in files[i][key]['project']['nerd']:
-                    nerds.append(nerd['name'])
-                res['nerd'] = nerds
+                for nerd in files[i][key]["project"]["nerd"]:
+                    nerds.append(nerd["name"])
+                res["nerd"] = nerds
             else:
-                res['nerd'] = None
+                res["nerd"] = None
             new_files.append(res)
     return new_files
 
@@ -187,30 +206,37 @@ def get_search_keys(key_yaml, chained):
     """
     res = []
     for key in key_yaml:
-        d = {'key_name': key,
-             'display_name': list(utils.find_keys(
-                 key_yaml, key))[0]['display_name']}
-        if isinstance(key_yaml[key]['value'], dict) and not \
-                set(['mandatory', 'list', 'desc', 'display_name', 'value']) \
-                <= set(key_yaml[key]['value'].keys()) and not (
-                'special_case' in key_yaml[key] and 'merge' in
-                key_yaml[key]['special_case']):
-            d['nested'] = get_search_keys(key_yaml[key]['value'],
-                                          f'{chained}{key}:'
-                                          if chained != '' else f'{key}:')
+        d = {
+            "key_name": key,
+            "display_name": list(utils.find_keys(key_yaml, key))[0]["display_name"],
+        }
+        if (
+            isinstance(key_yaml[key]["value"], dict)
+            and not set(["mandatory", "list", "desc", "display_name", "value"])
+            <= set(key_yaml[key]["value"].keys())
+            and not (
+                "special_case" in key_yaml[key]
+                and "merge" in key_yaml[key]["special_case"]
+            )
+        ):
+            d["nested"] = get_search_keys(
+                key_yaml[key]["value"],
+                f"{chained}{key}:" if chained != "" else f"{key}:",
+            )
         else:
-            d['chained_keys'] = f'{chained}{key}:' \
-                if chained != '' else f'{key}:'
-            d['nested'] = []
+            d["chained_keys"] = f"{chained}{key}:" if chained != "" else f"{key}:"
+            d["nested"] = []
 
-        if 'whitelist' in key_yaml[key]:
-            d['whitelist'] = key_yaml[key]['whitelist']
-        elif 'special_case' in key_yaml[key] and 'merge' in \
-                key_yaml[key]['special_case']:
-            d['whitelist'] = key_yaml[key]['value'][key_yaml[key][
-                'special_case']['merge']]['whitelist']
+        if "whitelist" in key_yaml[key]:
+            d["whitelist"] = key_yaml[key]["whitelist"]
+        elif (
+            "special_case" in key_yaml[key] and "merge" in key_yaml[key]["special_case"]
+        ):
+            d["whitelist"] = key_yaml[key]["value"][
+                key_yaml[key]["special_case"]["merge"]
+            ]["whitelist"]
 
-        if 'whitelist' in d and d['whitelist']:
-            d['search_info'] = {'key_name': key}
+        if "whitelist" in d and d["whitelist"]:
+            d["search_info"] = {"key_name": key}
         res.append(d)
     return res
