@@ -1,9 +1,9 @@
 import copy
 import json
-import multiprocessing
 import os
 import time
 from functools import partial
+from multiprocessing.pool import ThreadPool as Pool
 
 from src import validate_yaml
 from src.utils import read_in_yaml
@@ -106,7 +106,7 @@ def iterate_dir_metafiles(
                 if file.lower().endswith(f"{filename}.yaml")
                 or file.lower().endswith(f"{filename}.yml")
             ]
-        pool = multiprocessing.Pool()
+        pool = Pool()
         results = pool.map(
             partial(
                 validate,
