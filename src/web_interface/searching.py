@@ -144,7 +144,7 @@ def get_search_mask(key_yaml):
     return {"keys": keys}
 
 
-def find_metadata(key_yaml, path, search_string, run_as_sub=False):
+def find_metadata(key_yaml, path, search_string):
     """
     This function searches for metadata files that match a search string in a
     given directory
@@ -152,9 +152,7 @@ def find_metadata(key_yaml, path, search_string, run_as_sub=False):
     :param search_string: the search string
     :return: new_files: a list containing all matching files
     """
-    files = find_metafiles.find_projects(
-        key_yaml, path, search_string, True, run_as_sub=run_as_sub
-    )
+    files = find_metafiles.find_projects(key_yaml, path, search_string, True)
     new_files = []
     for i in range(len(files)):
         for key in files[i]:
