@@ -40,7 +40,6 @@ def main():
             {
                 "metafiles": metafiles,
                 "validation_reports": validation_reports,
-                "paths_test": get_func_params["path_metafiles"],
             },
             f,
         )
