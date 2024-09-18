@@ -7,7 +7,6 @@ import sys
 # Add the directory containing the 'src' module to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-print("my exec path", os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
 spec = ilu.spec_from_file_location("file_reading", "file_reading.py")
 file_reading = ilu.module_from_spec(spec)
@@ -31,4 +30,11 @@ metafiles, validation_reports = file_reading.iterate_dir_metafiles(
 )
 
 with open(args.output, "w") as f:
-    json.dump({"metafiles": metafiles, "validation_reports": validation_reports}, f)
+    json.dump(
+        {
+            "metafiles": metafiles,
+            "validation_reports": validation_reports,
+            "paths_test": get_func_params["path_metafiles"],
+        },
+        f,
+    )

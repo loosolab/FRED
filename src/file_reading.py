@@ -89,9 +89,13 @@ def iterate_dir_metafiles(
         output_file = "workaround" + str(time.time_ns()) + ".json"
         print(
             "input",
-            os.path.abspath(os.path.join(os.path.dirname(__file__), input_file)),
+            os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..", "..", input_file)
+            ),
             "output",
-            os.path.abspath(os.path.join(os.path.dirname(__file__), output_file)),
+            os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..", "..", output_file)
+            ),
         )
         print(key_yaml)
         print(path_metafiles)
@@ -104,7 +108,7 @@ def iterate_dir_metafiles(
         process = subprocess.Popen(
             [
                 "python",
-                "run_file_reading.py",
+                "metadata-organizer/src/run_file_reading.py",
                 "--input",
                 input_file,
                 "--output",
@@ -112,7 +116,7 @@ def iterate_dir_metafiles(
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=os.path.abspath(os.path.join(os.path.dirname(__file__))),
+            cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")),
         )
 
         stdout, stderr = process.communicate()
@@ -124,6 +128,7 @@ def iterate_dir_metafiles(
             ) as f:
                 output_dict = json.loads(f.read())
             print("Script ran successfully")
+            print(output_dict)
             return output_dict
         else:
             print(f"Error: {stderr.decode()}")
