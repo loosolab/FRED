@@ -8,8 +8,11 @@ print("exec path", os.path.abspath(os.path.join(os.path.dirname(__file__))))
 # Add the directory containing the 'src' module to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-
-spec = ilu.spec_from_file_location("file_reading", "file_reading.py")
+# Provide the absolute path to file_reading.py
+file_reading_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "file_reading.py")
+)
+spec = ilu.spec_from_file_location("file_reading", file_reading_path)
 file_reading = ilu.module_from_spec(spec)
 spec.loader.exec_module(file_reading)
 

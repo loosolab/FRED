@@ -102,8 +102,6 @@ def iterate_dir_metafiles(
             )
         )
         print("input", input_file, "output", output_file)
-        print(key_yaml)
-        print(path_metafiles)
         print("writing file now")
         with open(input_file, "w") as f:
             json.dump({"key_yaml": key_yaml, "path_metafiles": path_metafiles}, f)
