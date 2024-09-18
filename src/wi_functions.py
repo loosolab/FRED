@@ -122,9 +122,7 @@ def get_search_mask(pgm_object):
 
 
 def find_metadata(pgm_object, path, search_string):
-    return searching.find_metadata(
-        pgm_object["structure"], path, search_string, run_as_sub=False
-    )
+    return searching.find_metadata(pgm_object["structure"], path, search_string)
 
 
 def edit_wi_object(path, pgm_object, read_in_whitelists):
