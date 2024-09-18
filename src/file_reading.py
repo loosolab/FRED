@@ -14,6 +14,63 @@ from src.utils import read_in_yaml
 # file_reading.py
 
 
+def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml):
+    error_reports = None
+    warning_reports = None
+    warning_count = False
+    error_count = 0
+    corrupted = False
+    report = {}
+    # add files with suffix '_metadata.y(a)ml'
+    metafile = read_in_yaml(ypath)
+    # test if metafile is valid
+    (
+        valid,
+        missing_mandatory_keys,
+        invalid_keys,
+        invalid_entries,
+        invalid_values,
+        logical_warn,
+    ) = validate_yaml.validate_file(
+        metafile,
+        key_yaml,
+        filename,
+        logical_validation=logical_validation,
+        yaml=yaml,
+        whitelist_path=whitelist_path,
+    )
+    # add path to dic
+    metafile["path"] = ypath
+    if not valid:
+        error_reports = (
+            missing_mandatory_keys,
+            invalid_keys,
+            invalid_entries,
+            invalid_values,
+        )
+        corrupted = True
+        error_count += (
+            len(missing_mandatory_keys)
+            + len(invalid_keys)
+            + len(invalid_entries)
+            + len(invalid_values)
+        )
+
+    if len(logical_warn) > 0:
+        corrupted = True
+        warning_count += len(logical_warn)
+        warning_reports = logical_warn
+    print(f"validated file {ypath}")
+    return (
+        metafile,
+        corrupted,
+        error_reports,
+        error_count,
+        warning_reports,
+        warning_count,
+    )
+
+
 def iterate_dir_metafiles(
     key_yaml,
     path_metafiles,
@@ -138,60 +195,3 @@ def iterate_dir_metafiles(
         else:
             print(f"Error: {stderr.decode()}")
             return
-
-
-def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml):
-    error_reports = None
-    warning_reports = None
-    warning_count = False
-    error_count = 0
-    corrupted = False
-    report = {}
-    # add files with suffix '_metadata.y(a)ml'
-    metafile = read_in_yaml(ypath)
-    # test if metafile is valid
-    (
-        valid,
-        missing_mandatory_keys,
-        invalid_keys,
-        invalid_entries,
-        invalid_values,
-        logical_warn,
-    ) = validate_yaml.validate_file(
-        metafile,
-        key_yaml,
-        filename,
-        logical_validation=logical_validation,
-        yaml=yaml,
-        whitelist_path=whitelist_path,
-    )
-    # add path to dic
-    metafile["path"] = ypath
-    if not valid:
-        error_reports = (
-            missing_mandatory_keys,
-            invalid_keys,
-            invalid_entries,
-            invalid_values,
-        )
-        corrupted = True
-        error_count += (
-            len(missing_mandatory_keys)
-            + len(invalid_keys)
-            + len(invalid_entries)
-            + len(invalid_values)
-        )
-
-    if len(logical_warn) > 0:
-        corrupted = True
-        warning_count += len(logical_warn)
-        warning_reports = logical_warn
-    print(f"validated file {ypath}")
-    return (
-        metafile,
-        corrupted,
-        error_reports,
-        error_count,
-        warning_reports,
-        warning_count,
-    )
