@@ -190,7 +190,7 @@ def iterate_dir_metafiles(
                 output_dict = json.loads(f.read())
             print("Script ran successfully")
             print(output_dict)
-            return output_dict
+            return output_dict["metafiles"], output_dict["validation_reports"]
         else:
             print(f"Error: {stderr.decode()}")
             return
