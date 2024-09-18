@@ -2,7 +2,6 @@ import copy
 import json
 import multiprocessing
 import os
-import sys
 import time
 from functools import partial
 
