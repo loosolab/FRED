@@ -2,12 +2,17 @@ import argparse
 import importlib.util as ilu
 import json
 import os
+import sys
+
+# Add the directory containing the 'src' module to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 print("my exec path", os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
 spec = ilu.spec_from_file_location("file_reading", "file_reading.py")
 file_reading = ilu.module_from_spec(spec)
 spec.loader.exec_module(file_reading)
+
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Process input and output file paths.")
 parser.add_argument("--input", required=True, help="Path to the input JSON file")
@@ -24,7 +29,6 @@ metafiles, validation_reports = file_reading.iterate_dir_metafiles(
     return_false=True,
     run_as_sub=False,
 )
-
 
 with open(args.output, "w") as f:
     json.dump({"metafiles": metafiles, "validation_reports": validation_reports}, f)

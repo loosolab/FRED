@@ -6,7 +6,6 @@ import sys
 import time
 from functools import partial
 
-sys.path.append("metadata-organizer")
 from src import validate_yaml
 from src.utils import read_in_yaml
 
