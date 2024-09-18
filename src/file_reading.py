@@ -85,26 +85,33 @@ def iterate_dir_metafiles(
         print("try running subprocess")
         import subprocess
 
-        input_file = "func_params" + str(time.time_ns()) + ".json"
-        output_file = "workaround" + str(time.time_ns()) + ".json"
-        print(
-            "input",
-            os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "..", input_file)
-            ),
-            "output",
-            os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "..", output_file)
-            ),
+        input_file = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "..",
+                "func_params" + str(time.time_ns()) + ".json",
+            )
         )
+        output_file = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "..",
+                "workaround" + str(time.time_ns()) + ".json",
+            )
+        )
+        print("input", input_file, "output", output_file)
         print(key_yaml)
         print(path_metafiles)
         print("writing file now")
-        with open(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), input_file)), "w"
-        ) as f:
+        with open(input_file, "w") as f:
             json.dump({"key_yaml": key_yaml, "path_metafiles": path_metafiles}, f)
-        print("is this right", os.path.abspath(os.path.join(os.path.dirname(__file__))))
+        print(
+            "is this right",
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")),
+        )
+        cwd_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         process = subprocess.Popen(
             [
                 "python",
@@ -116,14 +123,14 @@ def iterate_dir_metafiles(
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")),
+            cwd=cwd_path,
         )
 
         stdout, stderr = process.communicate()
 
         if process.returncode == 0:
             with open(
-                os.path.abspath(os.path.join(os.path.dirname(__file__), output_file)),
+                output_file,
                 "r",
             ) as f:
                 output_dict = json.loads(f.read())
