@@ -222,9 +222,7 @@ def read_grouped_whitelist(
                 whitelist_object is not None
                 and whitelist["whitelist"][key] in whitelist_object
             ):
-                whitelist["whitelist"][key] = whitelist_object[
-                    whitelist["whitelist"][key]
-                ]
+                whitelist["whitelist"][key] = get_whitelist(whitelist['whitelist'][key], filled_object, whitelist_object=whitelist_object, all_plain=all_plain, whitelist_path=whitelist_path)
                 new_whitelist = True
             elif os.path.isfile(
                 os.path.join(whitelist_path, "whitelists", whitelist["whitelist"][key])
