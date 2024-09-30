@@ -7,36 +7,28 @@ import src.web_interface.wi_utils as wi_utils
 # TODO: refactor and comment
 
 
-def get_meta_info(key_yaml, path, project_ids):
+def get_meta_info(html_str, metafiles, project_id, validation_reports):
     """
     This file creates an HTML summary for a project containing metadata
     :param path: the path of a folder to be searched for a project
     :param project_id: the id of the project
     :return: html_str: the summary in HTML
     """
-    html_str = ""
-    for pr_id in project_ids:
-        # TODO: own function
-        # If file must be searched
-        metafiles, validation_reports = file_reading.iterate_dir_metafiles(
-            key_yaml, [path], return_false=True
-        )
-        correct_file = None
-        for metafile in metafiles:
-            if (
-                "project" in metafile
-                and "id" in metafile["project"]
-                and metafile["project"]["id"] == pr_id
-            ):
-                correct_file = metafile
-                break
+    correct_file = None
+    for metafile in metafiles:
+        if (
+                "id" in metafile
+                and metafile["id"] == project_id
+        ):
+            correct_file = utils.read_in_yaml(metafile['project_path'])
+            break
 
-        if correct_file is not None:
-
-            html_str += f'<h2 style="text-align:center;">{pr_id}</h2><hr>'
+    if correct_file is not None:
+        html_str += f'<h2 style="text-align:center;">{project_id}</h2><hr>'
+        if validation_reports is not None:
             if (
-                validation_reports["error_count"] > 0
-                or validation_reports["warning_count"] > 0
+                    validation_reports["error_count"] > 0
+                    or validation_reports["warning_count"] > 0
             ):
                 error = None
                 warning = None
@@ -86,7 +78,8 @@ def get_meta_info(key_yaml, path, project_ids):
                                 f'{":".join(elem.split(":")[:-1])}</li>'
                             )
                             correct_file = wi_utils.pop_value(
-                                correct_file, elem.split(":")[:-1], elem.split(":")[-1]
+                                correct_file, elem.split(":")[:-1],
+                                elem.split(":")[-1]
                             )
                         html_str += "</ul>"
 
@@ -110,18 +103,16 @@ def get_meta_info(key_yaml, path, project_ids):
                     html_str += "</ul>"
                     html_str += '</font><hr style="border-top: dotted 1px; background-color: transparent;" />'
 
-            if "path" in correct_file:
-                correct_file.pop("path")
-            for elem in correct_file:
-                end = f'{"<hr><br>" if elem != list(correct_file.keys())[-1] else ""}'
-                html_str = (
-                    f"{html_str}<h3>{elem}</h3>"
-                    f"{html_output.object_to_html(correct_file[elem], 0, False)}<br>"
-                    f"{end}"
-                )
+        if "path" in correct_file:
+            correct_file.pop("path")
+        for elem in correct_file:
+            end = f'{"<hr><br>" if elem != list(correct_file.keys())[-1] else ""}'
+            html_str = (
+                f"{html_str}<h3>{elem}</h3>"
+                f"{html_output.object_to_html(correct_file[elem], 0, False)}<br>"
+                f"{end}"
+            )
 
-        else:
-            html_str = "No metadata found.<br>"
     return html_str, correct_file
 
 

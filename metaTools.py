@@ -17,10 +17,12 @@ import time
 
 class FRED:
 
-    def __init__(self, config):
+    def __init__(self, config, no_update_whitelists=False):
         self.whitelist_repo, self.whitelist_branch, self.whitelist_path, \
         self.username, self.password, structure, self.update_whitelists, \
         self.output_path, self.filename = utils.parse_config(config)
+        if no_update_whitelists == True:
+            self.update_whitelists = False
         self.fetch_whitelists()
         self.structure = utils.read_in_yaml(structure)
 
@@ -223,7 +225,7 @@ def find(args):
                 and 'not'
     """
 
-    finding = FRED(args.config)
+    finding = FRED(args.config, args.no_update_whitelists)
     finding.find(args.path, args.search, args.output, args.filename)
 
 
@@ -267,6 +269,7 @@ def main():
                               help='Config file', default='config.yaml')
     find_group.add_argument('-o', '--output', default='print', choices=['json', 'print'])
     find_group.add_argument('-f', '--filename', default=None)
+    find_group.add_argument('-nu', '--no_update_whitelists', default=False, action='store_true')
     find_function.set_defaults(func=find)
 
     create_function = subparsers.add_parser('generate',

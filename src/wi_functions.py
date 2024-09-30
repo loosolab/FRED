@@ -19,6 +19,8 @@ import src.web_interface.yaml_to_wi_object as yto
 import os
 import time
 import subprocess
+import random
+import string
 
 # This script contains all functions for generation of objects for the web
 # interface
@@ -110,13 +112,34 @@ def save_object(dictionary, path, filename, edit_state):
 def save_filenames(file_str, path):
     return file_io.save_filenames(file_str, path)
 
+# TODO: fix path
+def get_meta_info(config, path, project_ids):
 
-def get_meta_info(pgm_object, path, project_ids):
     if not isinstance(project_ids, list):
         project_ids = [project_ids]
-    html_str, metafile = searching.get_meta_info(
-        pgm_object["structure"], path, project_ids
+
+    html_str = ""
+    for project_id in project_ids:
+        uuid = ''.join(
+            random.choice(string.ascii_uppercase + string.digits) for _ in
+            range(5))
+        filename = f'{uuid}_{time.time()}'
+        working_path = os.path.join(os.path.dirname(__file__), '..')
+        proc = subprocess.Popen(
+            ['python3', 'metaTools.py', 'find', '-p', path, '-s',
+             f'project:id:"{project_id}', '-c', config, '-o', 'json', '-f', filename, '-nu'],
+            cwd=working_path)
+        proc.wait()
+        res = utils.read_in_json(
+            os.path.join(working_path, f'{filename}.json'))
+        os.remove(os.path.join(working_path, f'{filename}.json'))
+
+        html_str, metafile = searching.get_meta_info(
+            html_str, res['data'], project_id, res['validation_reports'] if 'validation_reports' in res else None
     )
+
+    if html_str == "":
+        html_str = "No metadata found.<br>"
     return html_str
 
 
@@ -124,11 +147,15 @@ def get_search_mask(pgm_object):
     return searching.get_search_mask(pgm_object["structure"])
 
 
-def find_metadata(pgm_object, path, search_string):
-    filename = f'result_{time.time()}'
-    working_path = '/mnt/workspace2/jwalter/metadata-organizer'
-    subprocess.run(['python3', 'metaTools.py', 'find', '-p', path, '-s', search_string, '-c', 'config.yaml', '-o', 'json', '-f', filename], cwd=working_path)
+#TODO: fix path
+def find_metadata(config, path, search_string):
+    uuid = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+    filename = f'{uuid}_{time.time()}'
+    working_path = os.path.join(os.path.dirname(__file__), '..')
+    proc = subprocess.Popen(['python3', 'metaTools.py', 'find', '-p', path, '-s', search_string, '-c', config, '-o', 'json', '-f', filename, '-nu'], cwd=working_path)
+    proc.wait()
     res = utils.read_in_json(os.path.join(working_path, f'{filename}.json'))
+    os.remove(os.path.join(working_path, f'{filename}.json'))
     return res['data']
 
 
