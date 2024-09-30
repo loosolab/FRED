@@ -1,7 +1,7 @@
 import copy
 import os
 from functools import partial
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool as Pool
 import time
 from src import validate_yaml
 from src.utils import read_in_yaml
