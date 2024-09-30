@@ -5,7 +5,9 @@ from multiprocessing.pool import ThreadPool as Pool
 import time
 from src import validate_yaml
 from src.utils import read_in_yaml
+from gevent import monkey
 
+monkey.patch_all(thread=False, socket=False)
 # The following functions were inspired by Mampok and slightly customized
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/
 # file_reading.py
