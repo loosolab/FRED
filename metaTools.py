@@ -12,6 +12,8 @@ from src import file_reading
 from src import edit_file
 from src import utils
 import urllib.parse as parse
+from src.web_interface import git_whitelists
+import time
 
 
 class FRED:
@@ -20,32 +22,31 @@ class FRED:
         self.whitelist_repo, self.whitelist_branch, self.whitelist_path, \
         self.username, self.password, structure, self.update_whitelists, \
         self.output_path, self.filename = utils.parse_config(config)
-        if not os.path.exists(self.whitelist_path) or self.update_whitelists:
-            self.fetch_whitelists()
+        self.fetch_whitelists()
         self.structure = utils.read_in_yaml(structure)
 
     def fetch_whitelists(self):
-        print('Fetching whitelists...\n')
-        if not os.path.exists(self.whitelist_path):
-            repo = git.Repo.clone_from(self.whitelist_repo,
-                                       self.whitelist_path,
-                                       branch=self.whitelist_branch)
-        else:
-            repo = git.Git(self.whitelist_path)
-            repo.pull('origin', self.whitelist_branch)
+        git_whitelists.get_whitelists(self.whitelist_path, self.whitelist_repo, self.whitelist_branch, self.update_whitelists)
 
-    def find(self, search_path, search):
+    def find(self, search_path, search, output):
         result = find_metafiles.find_projects(self.structure, search_path,
                                               search, True)
-        if len(result) > 0:
+        if output == 'print':
+            if len(result) > 0:
 
-            # print summary of matching files
-            print(find_metafiles.print_summary(result))
+                # print summary of matching files
+                print(find_metafiles.print_summary(result, output))
 
-        else:
+            else:
 
-            # print information that there are no matching files
-            print('No matches found')
+                # print information that there are no matching files
+                print('No matches found')
+        elif output == 'json':
+            output_filename = 'search_result'
+            json_filename = f'{output_filename}.json'
+            utils.save_as_json(find_metafiles.print_summary(result, output), json_filename)
+            print(
+                f'The report was saved to the file \'{json_filename}\'.')
 
     def generate(self, path, id, mandatory_only):
         gen = Generate(path, id, mandatory_only, self.filename, self.structure)
@@ -187,14 +188,14 @@ class FRED:
                 if 'print report' in res:
                     print(rep)
 
-    def edit(self, path, mandatory_only):
-        try:
-            size = os.get_terminal_size()
-            size = size.columns
-        except OSError:
-            size = 80
+    #def edit(self, path, mandatory_only):
+    #    try:
+    #        size = os.get_terminal_size()
+    #        size = size.columns
+    #    except OSError:
+    #        size = 80
 
-        edit_file.edit_file(path, self.filename, mandatory_only, size)
+    #    edit_file.edit_file(path, self.filename, mandatory_only, size)
 
     def add_value(self, path, position, value, edit_existing):
         files, errors = file_reading.iterate_dir_metafiles(self.structure,
@@ -223,7 +224,7 @@ def find(args):
     """
 
     finding = FRED(args.config)
-    finding.find(args.path, args.search)
+    finding.find(args.path, args.search, args.output)
 
 
 def generate(args):
@@ -240,9 +241,9 @@ def validate(args):
     validating.validate(not args.skip_logic, args.path, args.output, args.filename)
 
 
-def edit(args):
-    editing = FRED(args.config)
-    editing.edit(args.path, args.mandatory_only)
+#def edit(args):
+#    editing = FRED(args.config)
+#    editing.edit(args.path, args.mandatory_only)
 
 def add_value(args):
     adding = FRED(args.config)
@@ -264,6 +265,7 @@ def main():
                                help='The search parameters')
     find_group.add_argument('-c', '--config', type=pathlib.Path,
                               help='Config file', default='config.yaml')
+    find_group.add_argument('-o', '--output', default='print', choices=['json', 'print'])
     find_function.set_defaults(func=find)
 
     create_function = subparsers.add_parser('generate',
@@ -298,17 +300,17 @@ def main():
                               help='Config file', default='config.yaml')
     validate_function.set_defaults(func=validate)
 
-    edit_function = subparsers.add_parser('edit', help='')
-    edit_group = edit_function.add_argument_group('mandatory_arguments')
-    edit_group.add_argument('-p', '--path', type=pathlib.Path, required=True)
-    edit_function.add_argument('-mo', '--mandatory_only', default=False,
-                                 action='store_true',
-                                 help='If True, only mandatory keys will '
-                                      'be filled out')
-    edit_function.add_argument('-c', '--config', type=pathlib.Path,
-                              help='Config file', default='config.yaml')
-    edit_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
-    edit_function.set_defaults(func=edit)
+    #edit_function = subparsers.add_parser('edit', help='')
+    #edit_group = edit_function.add_argument_group('mandatory_arguments')
+    #edit_group.add_argument('-p', '--path', type=pathlib.Path, required=True)
+    #edit_function.add_argument('-mo', '--mandatory_only', default=False,
+    #                             action='store_true',
+    #                             help='If True, only mandatory keys will '
+    #                                  'be filled out')
+    #edit_function.add_argument('-c', '--config', type=pathlib.Path,
+    #                          help='Config file', default='config.yaml')
+    #edit_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
+    #edit_function.set_defaults(func=edit)
 
     add_value_function = subparsers.add_parser('add_value', help='')
     add_value_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])

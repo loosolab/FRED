@@ -127,7 +127,7 @@ def find_projects(key_yaml, dir_path, search, return_dict):
     return result
 
 
-def print_summary(result):
+def print_summary(result, output):
     """
     This function prints information about the metadata files that match the
     search string in a table. The information includes the project id, path to
@@ -142,44 +142,77 @@ def print_summary(result):
     #  initialize res as a list and define the headers of the table as the
     #  first list element
     res = [["ID", "Path", "Project name", "Owner"]]
-
+    save_res = []
     # iterate over dictionaries for matching metadata files
     for elem in result:
-
         # iterate over metadata IDs
         for key in elem:
-
-            try:
-                project_name = elem[key]["project"]["project_name"]
-            except KeyError:
-                project_name = "Not found"
-            try:
-                owner_name = elem[key]["project"]["owner"]["name"]
-            except KeyError:
-                owner_name = "Not found"
+            project_res = {'id': key}
             try:
                 project_path = elem[key]["path"]
+                project_res['project_path'] = project_path
             except KeyError:
                 project_path = "Not found"
+                project_res['project_path'] = None
+            try:
+                project_name = elem[key]["project"]["project_name"]
+                project_res['project_name'] = project_name
+            except KeyError:
+                project_name = "Not found"
+                project_res['project_name'] = None
+            try:
+                owner_name = elem[key]["project"]["owner"]["name"]
+                project_res['owner'] = owner_name
+            except KeyError:
+                owner_name = "Not found"
+                project_res['owner'] = None
 
-            # add the id, path, project_name and owner to res
+            try:
+                project_res['email'] = elem[key]['project']['owner']['email']
+            except KeyError:
+                project_res['email'] = None
+
+            project_res["organisms"] = list(utils.find_keys(elem[key], "organism_name"))
+
+            try:
+                project_res["description"] = elem[key]["project"]["description"]
+            except KeyError:
+                project_res["description"] = None
+
+            try:
+                project_res["date"] = elem[key]["project"]["date"]
+            except KeyError:
+                project_res["date"] = None
+
+            if "nerd" in elem[key]["project"]:
+                nerds = []
+                for nerd in elem[key]["project"]["nerd"]:
+                    nerds.append(nerd["name"])
+                project_res["nerd"] = nerds
+            else:
+                project_res["nerd"] = None
+
+                # add the id, path, project_name and owner to res
             res.append([key, project_path, project_name, owner_name])
+            save_res.append(project_res)
 
-    # convert res into a table using tabulate
-    # set format to fancy_grid, define the headers as the first row and set the
-    # column width to fit to the terminal size
-    res = tabulate(
-        res,
-        tablefmt="fancy_grid",
-        headers="firstrow",
-        maxcolwidths=[
-            size.columns * 1 / 8,
-            size.columns * 3 / 8,
-            size.columns * 3 / 8,
-            size.columns * 1 / 8,
-        ],
-    )
-
+    if output == 'print':
+        # convert res into a table using tabulate
+        # set format to fancy_grid, define the headers as the first row and set the
+        # column width to fit to the terminal size
+        res = tabulate(
+            res,
+            tablefmt="fancy_grid",
+            headers="firstrow",
+            maxcolwidths=[
+                size.columns * 1 / 8,
+                size.columns * 3 / 8,
+                size.columns * 3 / 8,
+                size.columns * 1 / 8,
+            ],
+        )
+    elif output == 'json':
+        res = save_res
     # return the table
     return res
 
