@@ -124,9 +124,9 @@ def get_meta_info(config, path, project_ids):
             random.choice(string.ascii_uppercase + string.digits) for _ in
             range(5))
         filename = f'{uuid}_{time.time()}'
-        working_path = os.path.join(os.path.dirname(__file__), '..')
+        working_path = os.path.join(os.path.dirname(__file__), '..', '..')
         proc = subprocess.Popen(
-            ['python3', 'metaTools.py', 'find', '-p', path, '-s',
+            ['python3', 'metadata-organizer/metaTools.py', 'find', '-p', path, '-s',
              f'project:id:"{project_id}', '-c', config, '-o', 'json', '-f', filename, '-nu'],
             cwd=working_path)
         proc.wait()
@@ -151,8 +151,8 @@ def get_search_mask(pgm_object):
 def find_metadata(config, path, search_string):
     uuid = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     filename = f'{uuid}_{time.time()}'
-    working_path = os.path.join(os.path.dirname(__file__), '..')
-    proc = subprocess.Popen(['python3', 'metaTools.py', 'find', '-p', path, '-s', search_string, '-c', config, '-o', 'json', '-f', filename, '-nu'], cwd=working_path)
+    working_path = os.path.join(os.path.dirname(__file__), '..', '..')
+    proc = subprocess.Popen(['python3', 'metadata-organizer/metaTools.py', 'find', '-p', path, '-s', search_string, '-c', config, '-o', 'json', '-f', filename, '-nu'], cwd=working_path)
     proc.wait()
     res = utils.read_in_json(os.path.join(working_path, f'{filename}.json'))
     os.remove(os.path.join(working_path, f'{filename}.json'))
