@@ -2,7 +2,7 @@ import copy
 import os
 from functools import partial
 from multiprocessing.pool import ThreadPool as Pool
-
+import time
 from src import validate_yaml
 from src.utils import read_in_yaml
 
@@ -26,7 +26,7 @@ def iterate_dir_metafiles(
     :return: metafile_list: list of dictionaries containing information from
              found metadata files
     """
-
+    start = time.time()
     # turn string into list
     if isinstance(path_metafiles, str):
         path_metafiles = [path_metafiles]
@@ -46,6 +46,8 @@ def iterate_dir_metafiles(
             if file.lower().endswith(f"{filename}.yaml")
             or file.lower().endswith(f"{filename}.yml")
         ]
+    end_listing = time.time()
+    print(f'File listing took {"%.2f" % (end_listing-start)} seconds.')
     pool = Pool()
     results = pool.map(
         partial(
@@ -59,6 +61,8 @@ def iterate_dir_metafiles(
         items,
     )
     pool.close()
+    end_reading = time.time()
+    print(f'File reading and validation took {"%.2f" % (end_reading-end_listing)} seconds.')
     for result in results:
         if result[3] == 0 or return_false:
             metafile_list.append(result[0])
@@ -71,6 +75,9 @@ def iterate_dir_metafiles(
 
         error_count += result[3]
         warning_count += result[5]
+    end_result = time.time()
+    print(f'Parsing the results took {"%.2f" % (end_result-end_reading)} seconds.')
+
     return metafile_list, {
         "all_files": len(results),
         "corrupt_files": {"count": corrupt_count, "report": file_reports},
@@ -87,7 +94,10 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
     corrupted = False
     report = {}
     # add files with suffix '_metadata.y(a)ml'
+    start = time.time()
     metafile = read_in_yaml(ypath)
+    end_read = time.time()
+    print(f'The reading of ONE file took {"%.2f" % (end_read-start)} seconds.')
     # test if metafile is valid
     (
         valid,
@@ -104,6 +114,8 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
         yaml=yaml,
         whitelist_path=whitelist_path,
     )
+    end_val = time.time()
+    print(f'The validation of ONE file took {"%.2f" % (end_val-end_read)} seconds.')
     # add path to dic
     metafile["path"] = ypath
     if not valid:
