@@ -28,7 +28,7 @@ class FRED:
     def fetch_whitelists(self):
         git_whitelists.get_whitelists(self.whitelist_path, self.whitelist_repo, self.whitelist_branch, self.update_whitelists)
 
-    def find(self, search_path, search, output):
+    def find(self, search_path, search, output, output_filename):
         result = find_metafiles.find_projects(self.structure, search_path,
                                               search, True)
         if output == 'print':
@@ -42,7 +42,8 @@ class FRED:
                 # print information that there are no matching files
                 print('No matches found')
         elif output == 'json':
-            output_filename = 'search_result'
+            if not output_filename:
+                output_filename = 'search_result'
             json_filename = f'{output_filename}.json'
             utils.save_as_json(find_metafiles.print_summary(result, output), json_filename)
             print(
@@ -224,7 +225,7 @@ def find(args):
     """
 
     finding = FRED(args.config)
-    finding.find(args.path, args.search, args.output)
+    finding.find(args.path, args.search, args.output, args.filename)
 
 
 def generate(args):
@@ -266,6 +267,7 @@ def main():
     find_group.add_argument('-c', '--config', type=pathlib.Path,
                               help='Config file', default='config.yaml')
     find_group.add_argument('-o', '--output', default='print', choices=['json', 'print'])
+    find_group.add_argument('-f', '--filename', default=None)
     find_function.set_defaults(func=find)
 
     create_function = subparsers.add_parser('generate',
