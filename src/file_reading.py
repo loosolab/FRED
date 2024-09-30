@@ -1,13 +1,12 @@
 import copy
 import os
 from functools import partial
-from multiprocessing.pool import ThreadPool as Pool
+from multiprocessing.pool import Pool
 import time
 from src import validate_yaml
 from src.utils import read_in_yaml
-from gevent import monkey
 
-monkey.patch_all(thread=False)
+
 # The following functions were inspired by Mampok and slightly customized
 # https://gitlab.gwdg.de/loosolab/software/mampok/-/blob/master/mampok/
 # file_reading.py
@@ -99,7 +98,7 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
     start = time.time()
     metafile = read_in_yaml(ypath)
     end_read = time.time()
-    print(f'The reading of ONE file took {"%.2f" % (end_read-start)} seconds.')
+    #print(f'The reading of ONE file took {"%.2f" % (end_read-start)} seconds.')
     # test if metafile is valid
     (
         valid,
@@ -117,7 +116,7 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
         whitelist_path=whitelist_path,
     )
     end_val = time.time()
-    print(f'The validation of ONE file took {"%.2f" % (end_val-end_read)} seconds.')
+    #print(f'The validation of ONE file took {"%.2f" % (end_val-end_read)} seconds.')
     # add path to dic
     metafile["path"] = ypath
     if not valid:
@@ -139,7 +138,7 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
         corrupted = True
         warning_count += len(logical_warn)
         warning_reports = logical_warn
-    print(f"validated file {ypath}")
+    #print(f"validated file {ypath}")
     return (
         metafile,
         corrupted,

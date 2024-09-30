@@ -16,6 +16,9 @@ import src.web_interface.validation as validation
 import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.wi_object_to_yaml as oty
 import src.web_interface.yaml_to_wi_object as yto
+import os
+import time
+import subprocess
 
 # This script contains all functions for generation of objects for the web
 # interface
@@ -122,7 +125,11 @@ def get_search_mask(pgm_object):
 
 
 def find_metadata(pgm_object, path, search_string):
-    return searching.find_metadata(pgm_object["structure"], path, search_string)
+    filename = f'result_{time.time()}'
+    working_path = '/mnt/workspace2/jwalter/metadata-organizer'
+    subprocess.run(['python3', 'metaTools.py', 'find', '-p', path, '-s', search_string, '-c', 'config.yaml', '-o', 'json', '-f', filename], cwd=working_path)
+    res = utils.read_in_json(os.path.join(working_path, f'{filename}.json'))
+    return res['data']
 
 
 def edit_wi_object(path, pgm_object, read_in_whitelists):

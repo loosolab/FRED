@@ -9,7 +9,6 @@ import os
 from src import find_metafiles
 from src import validate_yaml
 from src import file_reading
-from src import edit_file
 from src import utils
 import urllib.parse as parse
 from src.web_interface import git_whitelists
@@ -45,7 +44,7 @@ class FRED:
             if not output_filename:
                 output_filename = 'search_result'
             json_filename = f'{output_filename}.json'
-            utils.save_as_json(find_metafiles.print_summary(result, output), json_filename)
+            utils.save_as_json({'data': find_metafiles.print_summary(result, output)}, json_filename)
             print(
                 f'The report was saved to the file \'{json_filename}\'.')
 
