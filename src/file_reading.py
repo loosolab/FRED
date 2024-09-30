@@ -40,17 +40,26 @@ def iterate_dir_metafiles(
     items = []
     for path_metafile in path_metafiles:
         items += [
-            [filename, key_yaml, logical_validation, whitelist_path, copy.deepcopy(key_yaml), os.path.join(subdir, file)]
+            os.path.join(subdir, file)
             for subdir, dirs, files in os.walk(path_metafile)
             for file in files
             if file.lower().endswith(f"{filename}.yaml")
             or file.lower().endswith(f"{filename}.yml")
         ]
-
     end_listing = time.time()
     print(f'File listing took {"%.2f" % (end_listing-start)} seconds.')
     pool = Pool()
-    results = pool.map(validate, items)
+    results = pool.map(
+        partial(
+            validate,
+            filename=filename,
+            key_yaml=key_yaml,
+            logical_validation=logical_validation,
+            whitelist_path=whitelist_path,
+            yaml=copy.deepcopy(key_yaml),
+        ),
+        items,
+    )
     pool.close()
     end_reading = time.time()
     print(f'File reading and validation took {"%.2f" % (end_reading-end_listing)} seconds.')
