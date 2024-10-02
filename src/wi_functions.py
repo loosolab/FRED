@@ -149,12 +149,14 @@ def get_search_mask(pgm_object):
 
 #TODO: fix path
 def find_metadata(config, path, search_string):
+    print('SEARCH_STRING', search_string)
     uuid = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     filename = f'{uuid}_{time.time()}'
     working_path = os.path.join(os.path.dirname(__file__), '..', '..')
     proc = subprocess.Popen(['python3', 'metadata-organizer/metaTools.py', 'find', '-p', path, '-s', search_string, '-c', config, '-o', 'json', '-f', filename, '-nu'], cwd=working_path)
     proc.wait()
     res = utils.read_in_json(os.path.join(working_path, f'{filename}.json'))
+    print('RES', res)
     os.remove(os.path.join(working_path, f'{filename}.json'))
     return res['data']
 
