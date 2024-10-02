@@ -1,4 +1,5 @@
 import copy
+import multiprocessing
 import os
 from functools import partial
 from multiprocessing.pool import Pool
@@ -49,7 +50,8 @@ def iterate_dir_metafiles(
         ]
     end_listing = time.time()
     print(f'File listing took {"%.2f" % (end_listing-start)} seconds.')
-    pool = Pool()
+    cpu_count = multiprocessing.cpu_count()
+    pool = Pool(cpu_count)
     results = pool.map(
         partial(
             validate,
@@ -63,7 +65,7 @@ def iterate_dir_metafiles(
     )
     pool.close()
     end_reading = time.time()
-    print(f'File reading and validation took {"%.2f" % (end_reading-end_listing)} seconds.')
+    print(f'File reading and validation took {"%.2f" % (end_reading-end_listing)} seconds with {cpu_count} CPUs.')
     for result in results:
         if result[3] == 0 or return_false:
             metafile_list.append(result[0])
