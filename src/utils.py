@@ -875,7 +875,10 @@ def get_combis(values, key, result_dict, key_yaml, read_in_whitelists=None):
         whitelist = None
 
     control_values = []
-
+    control = values["control"] if "control" in values else None
+    if "control" in values:
+        values.pop("control")
+        
     key_info = list(find_keys(key_yaml, key))
     if len(key_info) > 0:
         key_info = key_info[0]
@@ -925,9 +928,6 @@ def get_combis(values, key, result_dict, key_yaml, read_in_whitelists=None):
 
         possible_values = {}
         disease_values = []
-        control = values["control"] if "control" in values else None
-        if "control" in values:
-            values.pop("control")
 
         depend = []
         for elem in values[start]:
