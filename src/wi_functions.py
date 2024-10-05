@@ -48,12 +48,13 @@ class Webinterface:
 
 
 def fetch_whitelists(pgm_object):
-    gwi.get_whitelists(
+    whitelist_version = gwi.get_whitelists(
         pgm_object["whitelist_path"],
         pgm_object["whitelist_repo"],
         pgm_object["whitelist_branch"],
         pgm_object["update_whitelists"],
     )
+    return whitelist_version
 
 
 def get_whitelist_object(pgm_object):
