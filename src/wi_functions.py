@@ -3,6 +3,10 @@ import sys
 
 sys.path.append("metadata-organizer")
 import os
+import random
+import string
+import subprocess
+import time
 
 import git
 import src.utils as utils
@@ -16,11 +20,6 @@ import src.web_interface.validation as validation
 import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.wi_object_to_yaml as oty
 import src.web_interface.yaml_to_wi_object as yto
-import os
-import time
-import subprocess
-import random
-import string
 
 # This script contains all functions for generation of objects for the web
 # interface
@@ -113,6 +112,7 @@ def save_object(dictionary, path, filename, edit_state):
 def save_filenames(file_str, path):
     return file_io.save_filenames(file_str, path)
 
+
 # TODO: fix path
 def get_meta_info(config, path, project_ids):
 
@@ -121,45 +121,82 @@ def get_meta_info(config, path, project_ids):
 
     html_str = ""
     for project_id in project_ids:
-        uuid = ''.join(
-            random.choice(string.ascii_uppercase + string.digits) for _ in
-            range(5))
-        filename = f'{uuid}_{time.time()}'
-        working_path = os.path.join(os.path.dirname(__file__), '..', '..')
+        uuid = "".join(
+            random.choice(string.ascii_uppercase + string.digits) for _ in range(5)
+        )
+        filename = f"{uuid}_{time.time()}"
+        working_path = os.path.join(os.path.dirname(__file__), "..", "..")
         proc = subprocess.Popen(
-            ['python3', 'metadata-organizer/metaTools.py', 'find', '-p', path, '-s',
-             f'project:id:"{project_id}', '-c', config, '-o', 'json', '-f', filename, '-nu'],
-            cwd=working_path)
+            [
+                "python3",
+                "metadata-organizer/metaTools.py",
+                "find",
+                "-p",
+                path,
+                "-s",
+                f'project:id:"{project_id}',
+                "-c",
+                config,
+                "-o",
+                "json",
+                "-f",
+                filename,
+                "-nu",
+            ],
+            cwd=working_path,
+        )
         proc.wait()
-        res = utils.read_in_json(
-            os.path.join(working_path, f'{filename}.json'))
-        os.remove(os.path.join(working_path, f'{filename}.json'))
+        res = utils.read_in_json(os.path.join(working_path, f"{filename}.json"))
+        os.remove(os.path.join(working_path, f"{filename}.json"))
 
         html_str, metafile = searching.get_meta_info(
-            html_str, res['data'], project_id, res['validation_reports'] if 'validation_reports' in res else None
-    )
+            html_str,
+            res["data"],
+            project_id,
+            res["validation_reports"] if "validation_reports" in res else None,
+        )
 
     if html_str == "":
         html_str = "No metadata found.<br>"
-    return html_str
+    return html_str, metafile
 
 
 def get_search_mask(pgm_object):
     return searching.get_search_mask(pgm_object["structure"])
 
 
-#TODO: fix path
+# TODO: fix path
 def find_metadata(config, path, search_string):
-    print('SEARCH_STRING', search_string)
-    uuid = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
-    filename = f'{uuid}_{time.time()}'
-    working_path = os.path.join(os.path.dirname(__file__), '..', '..')
-    proc = subprocess.Popen(['python3', 'metadata-organizer/metaTools.py', 'find', '-p', path, '-s', search_string, '-c', config, '-o', 'json', '-f', filename, '-nu'], cwd=working_path)
+    print("SEARCH_STRING", search_string)
+    uuid = "".join(
+        random.choice(string.ascii_uppercase + string.digits) for _ in range(5)
+    )
+    filename = f"{uuid}_{time.time()}"
+    working_path = os.path.join(os.path.dirname(__file__), "..", "..")
+    proc = subprocess.Popen(
+        [
+            "python3",
+            "metadata-organizer/metaTools.py",
+            "find",
+            "-p",
+            path,
+            "-s",
+            search_string,
+            "-c",
+            config,
+            "-o",
+            "json",
+            "-f",
+            filename,
+            "-nu",
+        ],
+        cwd=working_path,
+    )
     proc.wait()
-    res = utils.read_in_json(os.path.join(working_path, f'{filename}.json'))
-    print('RES', res)
-    os.remove(os.path.join(working_path, f'{filename}.json'))
-    return res['data']
+    res = utils.read_in_json(os.path.join(working_path, f"{filename}.json"))
+    print("RES", res)
+    os.remove(os.path.join(working_path, f"{filename}.json"))
+    return res["data"]
 
 
 def edit_wi_object(path, pgm_object, read_in_whitelists):
