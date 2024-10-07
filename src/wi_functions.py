@@ -119,6 +119,7 @@ def get_meta_info(config, path, project_ids):
     if not isinstance(project_ids, list):
         project_ids = [project_ids]
 
+    metafile = {}
     html_str = ""
     for project_id in project_ids:
         uuid = "".join(
