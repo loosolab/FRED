@@ -95,7 +95,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val, read_in
                                 ':')[-1]],
                             filled_value[i], key_yaml['value'][filled_value[i]['position'].split(
                                 ':')[-1]], whitelist_object,
-                            real_val)
+                            real_val, read_in_whitelists)
 
     elif isinstance(meta_yaml, list):
         fill_key = 'list_value'
