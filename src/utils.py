@@ -224,7 +224,7 @@ def read_grouped_whitelist(
             ):
                 whitelist["whitelist"][key] = get_whitelist(whitelist['whitelist'][key], filled_object, whitelist_object=whitelist_object, all_plain=all_plain, whitelist_path=whitelist_path)
                 new_whitelist = True
-            elif os.path.isfile(
+            elif whitelist['whitelist'][key] is not None and os.path.isfile(
                 os.path.join(whitelist_path, "whitelists", whitelist["whitelist"][key])
             ):
                 whitelist["whitelist"][key] = get_whitelist(
@@ -306,7 +306,6 @@ def read_depend_whitelist(
             whitelist = whitelist_object[depend]
         elif os.path.isfile(os.path.join(whitelist_path, "whitelists", depend)):
             whitelist = read_whitelist(depend, whitelist_path=whitelist_path)
-
     if not isinstance(whitelist, list) and not isinstance(whitelist, dict):
         if whitelist_object is not None and whitelist in whitelist_object:
             whitelist = whitelist_object[whitelist]
