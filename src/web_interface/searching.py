@@ -20,7 +20,7 @@ def get_meta_info(html_str, metafiles, project_id, validation_reports):
                 "id" in metafile
                 and metafile["id"] == project_id
         ):
-            correct_file = utils.read_in_yaml(metafile['project_path'])
+            correct_file = utils.read_in_yaml(metafile['path'])
             break
 
     if correct_file is not None:
