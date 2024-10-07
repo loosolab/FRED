@@ -150,7 +150,7 @@ def print_summary(result, output):
             project_res = {'id': key}
             try:
                 project_path = elem[key]["path"]
-                project_res['project_path'] = project_path
+                project_res['path'] = project_path
             except KeyError:
                 project_path = "Not found"
                 project_res['path'] = None
