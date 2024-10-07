@@ -1,7 +1,6 @@
 import src.utils as utils
 import src.web_interface.yaml_to_wi_object as yto
 import src.web_interface.factors_and_conditions as fac_cond
-import src.web_interface.searching as searching
 import src.web_interface.wi_utils as wi_utils
 import copy
 
@@ -16,7 +15,6 @@ def edit_wi_object(path, key_yaml, read_in_whitelists):
     file
     :param key_yaml:
     :param path: the path containing the metadata file
-    :param project_id: the id of the  project
     :return: wi_object: the filled wi object
     """
     # TODO: as Parameter at get_info
@@ -103,7 +101,7 @@ def new_fill(meta_yaml, wi_object, key_yaml, whitelist_object, real_val, read_in
         for i in range(len(meta_yaml)):
             f_val, whitelist_object = new_fill(
                 meta_yaml[i], copy.deepcopy(wi_object), key_yaml,
-                whitelist_object, real_val)
+                whitelist_object, real_val, read_in_whitelists)
 
             # TODO: WTF?
             if 'input_fields' in f_val:
@@ -202,7 +200,8 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                                     filled_sample = fac_cond.get_samples(
                                             filled_keys,
                                             filled_sample, real_val,
-                                            key_yaml, cond_sample_name, organism,
+                                            key_yaml, cond_sample_name,
+                                            organism, read_in_whitelists,
                                             is_factor=False)
                                     samples.append(copy.deepcopy(filled_sample))
                             title, readd = fac_cond.get_condition_title(
