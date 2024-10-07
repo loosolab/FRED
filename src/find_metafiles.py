@@ -153,7 +153,7 @@ def print_summary(result, output):
                 project_res['project_path'] = project_path
             except KeyError:
                 project_path = "Not found"
-                project_res['project_path'] = None
+                project_res['path'] = None
             try:
                 project_name = elem[key]["project"]["project_name"]
                 project_res['project_name'] = project_name
