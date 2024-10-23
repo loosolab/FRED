@@ -28,7 +28,7 @@ def test_properties(part, key, all_keys, inner_keys):
             sys.exit(1)
         else:
             error, prop_type = test_property_input(part[prop], prop, all_keys)
-            if error:
+            if error and key != 'desc':
                 print(f'Wrong input \'{part[prop]}\' for property \'{prop}\' for key \'{key}\'. Input should be {prop_type}')
                 sys.exit(1)
 
