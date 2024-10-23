@@ -28,7 +28,7 @@ def test_properties(part, key, all_keys, inner_keys):
             sys.exit(1)
         else:
             error, prop_type = test_property_input(part[prop], prop, all_keys)
-            if error and key != 'desc':
+            if error:
                 print(f'Wrong input \'{part[prop]}\' for property \'{prop}\' for key \'{key}\'. Input should be {prop_type}')
                 sys.exit(1)
 
@@ -58,7 +58,8 @@ def test_property_input(prop_input, prop, keys):
             return True, 'of type \'bool\''
     elif keys[prop] == 'str':
         if type(prop_input) != str:
-            return True, 'of type \'str\''
+            if prop != 'desc':
+                return True, 'of type \'str\''
     elif keys[prop] == 'int':
         if type(prop_input) != int:
             return True, 'of type \'int\''
