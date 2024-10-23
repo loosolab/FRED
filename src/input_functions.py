@@ -34,7 +34,7 @@ class Input:
         self.conditions = {}
         self.generate_end = []
 
-    def parse_input_value(self, key, structure):
+    def parse_input_value(self, key, structure, allow_float=False):
         """
         This function lets the user enter an input and tests if the input is
         valid.
@@ -165,16 +165,23 @@ class Input:
                 # no user input -> repeat
                 if input_value == '':
                     print(f'Please enter something.')
-                    input_value = self.parse_input_value(key, structure)
+                    input_value = self.parse_input_value(key, structure, allow_float=allow_float)
 
-                # input tye number
+                # input type number
                 # TODO: allow float
                 if structure['input_type'] == 'number':
                     try:
                         input_value = int(input_value)
                     except ValueError:
-                        print(f'Input must be of type int. Try again.')
-                        input_value = self.parse_input_value(key, structure)
+                        if allow_float:
+                            try:
+                                input_value = float(input_value)
+                            except ValueError:
+                                print(f'Input must be of type int or float. Try again.')
+                                input_value = self.parse_input_value(key, structure, allow_float=allow_float)
+                        else:
+                            print(f'Input must be of type int. Try again.')
+                            input_value = self.parse_input_value(key, structure, allow_float=allow_float)
 
                 # input type date (format dd.mm.yyyy)
                 elif structure['input_type'] == 'date':
@@ -190,7 +197,7 @@ class Input:
                         input_value = input_value.strftime("%d.%m.%Y")
                     except (IndexError, ValueError, SyntaxError) as e:
                         print(f'Input must be of type \'DD.MM.YYYY\'.')
-                        input_value = self.parse_input_value(key, structure)
+                        input_value = self.parse_input_value(key, structure, allow_float=allow_float)
 
                 else:
 
@@ -199,27 +206,27 @@ class Input:
                         if 'special_case' in structure and 'restriction' in structure['special_case']:
                             if 'max_length' in structure['special_case']['restriction'] and len(input_value) > structure['special_case']['restriction']['max_length']:
                                 print(f'Input must not exceed {structure["special_case"]["restriction"]["max_length"]} characters. Please try again.')
-                                input_value = self.parse_input_value(key, structure)
+                                input_value = self.parse_input_value(key, structure, allow_float=allow_float)
                             elif 'regex' in structure['special_case']['restriction']:
                                 pattern = re.compile(structure['special_case']['restriction']['regex'])
                                 if pattern.match(input_value):
                                     print(f'Input does not conform to defined pattern. Please try again.')
                                     input_value = self.parse_input_value(key,
-                                                                         structure)
+                                                                         structure, allow_float=allow_float)
 
                     # invalid character
                     if '\"' in input_value:
                         print(f'Invalid symbol \'\"\'. Please try again.')
-                        input_value = self.parse_input_value(key, structure)
+                        input_value = self.parse_input_value(key, structure, allow_float=allow_float)
                     elif '{' in input_value:
                         print(f'Invalid symbol \'{"{"}\'. Please try again.')
-                        input_value = self.parse_input_value(key, structure)
+                        input_value = self.parse_input_value(key, structure, allow_float=allow_float)
                     elif '}' in input_value:
                         print(f'Invalid symbol \'{"}"}\'. Please try again.')
-                        input_value = self.parse_input_value(key, structure)
+                        input_value = self.parse_input_value(key, structure, allow_float=allow_float)
                     elif '|' in input_value:
                         print(f'Invalid symbol \'|\'. Please try again.')
-                        input_value = self.parse_input_value(key, structure)
+                        input_value = self.parse_input_value(key, structure, allow_float=allow_float)
 
         # return the user input
         return input_value
@@ -566,7 +573,7 @@ class Input:
                            maxcolwidths=[self.size * 1 / 8,
                                          self.size * 7 / 8]))
 
-    def parse_input_list(self, options, terminable):
+    def parse_input_list(self, options, terminable, allow_float=False):
         """
         This function parses the user input for a list.
         :param options: possible input options as a list or 'number' for
@@ -598,7 +605,7 @@ class Input:
                     # Call this function to redo the input if it does not match the
                     # option list
                     print(f'Invalid entry, try again:')
-                    input_list = self.parse_input_list(options, terminable)
+                    input_list = self.parse_input_list(options, terminable, allow_float=allow_float)
 
             else:
 
@@ -610,15 +617,32 @@ class Input:
                     # 'number'
                     if options == 'number':
                         for i in range(len(input_list)):
-                            input_list[i] = int(input_list[i])
+                            try:
+                                input_list[i] = int(input_list[i])
+                            except ValueError:
+                                if allow_float:
+                                    try:
+                                        input_list[i] = float(input_list[i])
+                                    except ValueError:
+                                        print(
+                                            f'Invalid entry. Please enter numbers divided '
+                                            f'by comma.')
+                                        input_list = self.parse_input_list(
+                                            options, terminable, allow_float=allow_float)
+                                else:
+                                    print(
+                                        f'Invalid entry. Please enter integers divided '
+                                        f'by comma.')
+                                    input_list = self.parse_input_list(options,
+                                                                       terminable, allow_float=allow_float)
 
-                except (ValueError, IndexError):
+                except IndexError:
 
                     # Call this function to redo the input if the split or
                     # conversion does not work
-                    print(f'Invalid entry. Please enter integers divided '
+                    print(f'Invalid entry. Please enter numbers divided '
                           f'by comma.')
-                    input_list = self.parse_input_list(options, terminable)
+                    input_list = self.parse_input_list(options, terminable, allow_float=allow_float)
 
         return input_list
 
@@ -655,7 +679,7 @@ class Input:
         # create a dictionary containing 'unit' and 'value' and call the
         # 'parse_input_value' function to request those information from the user
         val_un = {'unit': self.parse_input_value('unit', structure['value']['unit']),
-                  'value': self.parse_input_value('value', structure['value']['value'])}
+                  'value': self.parse_input_value('value', structure['value']['value'], allow_float=True)}
 
         return val_un
 
@@ -681,7 +705,7 @@ class Input:
               f'divided by comma:')
 
         # call function to input values
-        value = self.parse_input_list('number', False)
+        value = self.parse_input_list('number', False, allow_float=True)
 
         # iterate through the input values and add a dictionary containing a value
         # and its unit to the 'val_un' list
