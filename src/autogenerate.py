@@ -180,7 +180,7 @@ class Autogenerate:
         self.gen.parse_lists(sample_structure, self.position, 2, self.gen.result_dict, is_factor=False)
         return utils.find_position(self.gen.result_dict, self.position)
 
-    def get_sample_name(self):
+    def get_sample_name(self, read_in_whitelists=None):
         if self.position[-2] == 'technical_replicates':
             '''count = utils.find_position(self.gen.result_dict, self.position[:-1] + ['count'])
             nom = utils.find_position(self.gen.result_dict, self.position[:-2] + ['number_of_measurements'])
@@ -199,7 +199,7 @@ class Autogenerate:
             return utils.create_sample_names(self.gen.result_dict, {}, self.position)
         else:
             condition = utils.find_position(self.gen.result_dict, self.position[:-4]+['condition_name'])
-            return f'{utils.get_short_name(condition, self.gen.result_dict, self.gen.key_yaml)}_b{"{:02d}".format(self.position[-2] + 1)}'
+            return f'{utils.get_short_name(condition, self.gen.result_dict, self.gen.key_yaml, read_in_whitelists=read_in_whitelists)}_b{"{:02d}".format(self.position[-2] + 1)}'
 
     def get_filenames(self):
         setting_index = self.position.index('experimental_setting') + 1

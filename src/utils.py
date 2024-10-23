@@ -1187,7 +1187,7 @@ def get_short_value(
             )["whitelist"]
             value_unit = split_value_unit(value)
             short_cond += (
-                f'{short_factor}.{value_unit["value"]}'
+                f'{short_factor}.{str(value_unit["value"]).replace(".","p")}'
                 f'{short_units[value_unit["unit"]] if value_unit["unit"] in short_units else value_unit["unit"]}'
             )
         else:
