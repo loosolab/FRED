@@ -80,7 +80,7 @@ if __name__ == "__main__":
                 'value': 'value'}
 
     inner_keys = {'whitelist': 'bool',
-                  'input_type': ['short_text', 'long_text', 'select', 'number', 'bool', 'date']}
+                  'input_type': ['short_text', 'long_text', 'select', 'number', 'bool', 'date', 'restricted_short_text']}
 
     test_key_yaml(all_keys, inner_keys)
 
