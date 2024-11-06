@@ -20,14 +20,6 @@ project:
       value: null
       whitelist: False
       input_type: short_text
-    tool:
-      mandatory: True
-      list:  False
-      display_name: 'Tool'
-      desc: ''
-      value: null
-      whitelist: False
-      input_type: short_text
     init_container: 
       mandatory: False
       list:  False
@@ -37,13 +29,21 @@ project:
       whitelist: True
       input_type: short_text
     supress_s3:
-      mandatory: True
+      mandatory: False
       list:  False
       display_name: 'S3 Supression'
       desc: ''
       value: null
       whitelist: False
       input_type: bool
+    tool:
+      mandatory: True
+      list:  False
+      display_name: 'Tool'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text    
 
 deployment:
   mandatory: True
@@ -52,13 +52,22 @@ deployment:
   desc: ''
   value:
     active:
-      mandatory: True
+      mandatory: False
       list:  False
       display_name: 'Active'
       desc: ''
       value: null
       whitelist: False
       input_type: bool
+    auth:
+      mandatory: False
+      list: False
+      display_name: 'Authorization'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
+    # remove?
     autoscaling:
       mandatory: False
       list: False
@@ -67,8 +76,9 @@ deployment:
       value: null
       whitelist: False
       input_type: bool
+    #
     bucket: 
-      mandatory: True
+      mandatory: False
       list:  False
       display_name: 'Bucket'
       desc: ''
@@ -92,7 +102,7 @@ deployment:
       whitelist: False
       input_type: bool
     icinga:
-      mandatory: True
+      mandatory: False
       list:  False
       display_name: 'Icinga'
       desc: ''
@@ -116,7 +126,7 @@ deployment:
       whitelist: False
       input_type: bool
     replicas:
-      mandatory: True
+      mandatory: False
       list:  False
       display_name: 'Replicas'
       desc: ''
@@ -124,7 +134,7 @@ deployment:
       whitelist: False
       input_type: number
     url: 
-      mandatory: True
+      mandatory: False
       list:  False
       display_name: 'URL'
       desc: ''
@@ -138,21 +148,13 @@ tags:
   display_name: 'Tags'
   desc: ''
   value:
-    metadata:
-      mandatory: False
-      list: False
-      display_name: 'Metadata'
-      desc: ''
-      value: null
-      whitelist: False
-      input_type: bool
     analyst:
       mandatory: False
       list:  True
       display_name: 'Analyst'
       desc: ''
       value: null
-      whitelist: True
+      whitelist: False
       input_type: short_text
     citation:
       mandatory: False
@@ -179,9 +181,17 @@ tags:
       whitelist: False
       input_type: short_text
     datatype:
-      mandatory: False
+      mandatory: True
       list:  False
       display_name: 'Datatype'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+    metadata:
+      mandatory: False
+      list: True
+      display_name: 'Metadata'
       desc: ''
       value: null
       whitelist: False
@@ -202,14 +212,6 @@ tags:
       value: null
       whitelist: True
       input_type: short_text
-    user:
-      mandatory: False
-      list: True
-      display_name: 'User'
-      desc: ''
-      value: null
-      whitelist: True
-      input_type: short_text
     pubmedid:
       mandatory: False
       list:  False
@@ -217,7 +219,23 @@ tags:
       desc: ''
       value: null
       whitelist: False
-      input_type: number
+      input_type: number  
+    total_project_size:
+      mandatory: False
+      list:  False
+      display_name: 'Project Size'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: number  
+    user:
+      mandatory: False
+      list: True
+      display_name: 'User'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: short_text   
 
 container:
   mandatory: False
@@ -231,6 +249,7 @@ container:
       display_name: 'Main'
       desc: ''
       value:
+        # remocve?
         flexVolume:
           mandatory: False
           list: False
@@ -303,6 +322,8 @@ container:
                       value: null
                       whitelist: False
                       input_type: short_text
+        #
+        # remove?
         image:
           mandatory: False
           list: False
@@ -311,6 +332,7 @@ container:
           value: null
           whitelist: False
           input_type: short_text
+        #
         resources:
           mandatory: False
           list:  False
