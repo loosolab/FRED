@@ -266,72 +266,69 @@ def new_test_for_whitelist(entry_key, entry_value, sublists, whitelist_path=None
                       value
     :return: True if the entry does not match the whitelist else False
     """
-    is_plain_group = False
-    whitelist_keys = None
-
     if entry_value == None:
         entry_value = 'None'
     if whitelist_path == None:
         whitelist_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), '..',
-            'metadata_whitelists')
+            'FRED_whitelists')
 
     whitelist = utils.read_whitelist(entry_key, whitelist_path=whitelist_path)
-    if whitelist and whitelist['whitelist_type'] == 'plain':
+    if whitelist:
+        whitelist = parse_whitelist(whitelist, sublists, whitelist_path)
+    if whitelist:
+        if entry_value not in whitelist:
+            return True
+    return False
+
+
+def parse_whitelist(whitelist, sublists, whitelist_path):
+    if whitelist['whitelist_type'] == 'plain':
         whitelist = whitelist['whitelist']
-    if isinstance(whitelist, dict):
-        while isinstance(whitelist, dict) and whitelist[
-                'whitelist_type'] == 'depend':
-            whitelist_key = whitelist['ident_key']
-            for i in reversed(range(len(sublists))):
-
-                value = list(utils.find_keys(sublists[i], whitelist_key))
-
-                if len(value) > 0:
-                    if len(value) == 1:
-                        break
-                    else:
-                        print("ERROR: multiple values")
-                        break
-
-            if value[0] in whitelist:
-                whitelist = whitelist[value[0]]
-            else:
-                whitelist = utils.read_whitelist(value[0], whitelist_path=whitelist_path)
-                if whitelist and whitelist['whitelist_type'] == 'plain':
-                    whitelist = whitelist['whitelist']
-        if isinstance(whitelist, dict) and whitelist[
-                'whitelist_type'] == 'group':
-            #TODO: linked whitelists
-            whitelist = utils.read_grouped_whitelist(whitelist, {})
-            if 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'plain_group':
-                is_plain_group = True
-                whitelist_keys = whitelist['whitelist_keys'] if 'whitelist_keys' in whitelist else None
-            if 'whitelist' in whitelist:
-                if not isinstance(whitelist['whitelist'], list):
-                    whitelist = [x for xs in list(whitelist['whitelist'].values())
-                                if xs is not None for x in xs]
+    elif whitelist['whitelist_type'] == 'depend':
+        whitelist_key = whitelist['ident_key']
+        value = None
+        for i in reversed(range(len(sublists))):
+            value = list(utils.find_keys(sublists[i], whitelist_key))
+            if len(value) > 0:
+                if len(value) == 1:
+                    break
                 else:
-                    whitelist = whitelist['whitelist']
+                    print("ERROR: multiple values")
+                    break
+        if value and value[0] in whitelist:
+            whitelist = whitelist[value[0]]
+        else:
+            whitelist = utils.read_whitelist(value[0], whitelist_path=whitelist_path)
+            if whitelist and whitelist['whitelist_type'] == 'plain':
+                whitelist = whitelist['whitelist']
+    elif whitelist['whitelist_type'] == 'group':
+        whitelist = utils.read_grouped_whitelist(whitelist, {})
+        if 'whitelist_type' in whitelist and whitelist['whitelist_type'] == 'plain_group':
+            if whitelist['whitelist_keys']:
+                for key in whitelist['whitelist_keys']:
+                    whitelist['whitelist'] = [x.replace(f'({key})', '').strip() for x in whitelist['whitelist']]
+        if 'whitelist' in whitelist:
+            if not isinstance(whitelist['whitelist'], list):
+                plain_whitelist = []
+                for key in whitelist['whitelist']:
+                    if isinstance(whitelist['whitelist'][key], list):
+                        plain_whitelist += whitelist['whitelist'][key]
+                    elif os.path.isfile(os.path.join(whitelist_path, 'whitelists', whitelist['whitelist'][key])):
+                        sub_whitelist = utils.read_whitelist(whitelist['whitelist'][key], whitelist_path=whitelist_path)
+                        parsed_sub_whitelist = parse_whitelist(sub_whitelist, sublists, whitelist_path)
+                        plain_whitelist += parsed_sub_whitelist
+                whitelist = plain_whitelist
+            else:
+                whitelist = whitelist['whitelist']
     if whitelist and not isinstance(whitelist, list) and not isinstance(
             whitelist, dict) \
             and os.path.isfile(os.path.join(
             whitelist_path, 'whitelists', whitelist)):
         whitelist = utils.read_whitelist(whitelist, whitelist_path=whitelist_path)
         if whitelist:
-            whitelist = whitelist['whitelist']
-    if whitelist:
-        if is_plain_group and whitelist_keys is not None:
-            found = False
-            for key in whitelist_keys:
-                if f'{entry_value} ({key})' in whitelist:
-                    found = True
-            if not found:
-                return True
-        elif entry_value not in whitelist:
-            return True
-    return False
-
+            whitelist = parse_whitelist(whitelist, sublists, whitelist_path)
+    return whitelist
 
 def test_for_mandatory(metafile, key_yaml, invalid_keys, generated):
     """

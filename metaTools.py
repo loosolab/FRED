@@ -61,14 +61,16 @@ class FRED:
         if os.path.isdir(path):
             metafiles, validation_reports = file_reading.iterate_dir_metafiles(
                 self.structure, [path], filename=self.filename,
-                logical_validation=logical_validation, yaml=copy.deepcopy(self.structure))
+                logical_validation=logical_validation, yaml=copy.deepcopy(self.structure),
+                whitelist_path=self.whitelist_path)
         else:
             metafile = utils.read_in_yaml(path)
             file_reports = {'file': metafile, 'error': None, 'warning': None}
             valid, missing_mandatory_keys, invalid_keys, \
             invalid_entries, invalid_values, logical_warn = validate_yaml.validate_file(
                 metafile, self.structure, self.filename,
-                logical_validation=logical_validation, yaml=copy.deepcopy(self.structure))
+                logical_validation=logical_validation, yaml=copy.deepcopy(self.structure),
+                whitelist_path=self.whitelist_path)
             metafile['path'] = path
             if not valid:
                 validation_reports['corrupt_files']['count'] = 1
@@ -234,12 +236,12 @@ def generate(args):
     calls script generate_metafile to start dialog
     :param args:
     """
-    generating = FRED(args.config)
+    generating = FRED(args.config, args.no_update_whitelists)
     generating.generate(args.path, args.id, args.mandatory_only)
 
 
 def validate(args):
-    validating = FRED(args.config)
+    validating = FRED(args.config, args.no_update_whitelists)
     validating.validate(not args.skip_logic, args.path, args.output, args.filename)
 
 
@@ -302,6 +304,7 @@ def main():
     validate_function.add_argument('-f', '--filename', default=None)
     validate_function.add_argument('-c', '--config', type=pathlib.Path,
                               help='Config file', default='config.yaml')
+    validate_function.add_argument('-nu', '--no_update_whitelists', default=False, action='store_true')
     validate_function.set_defaults(func=validate)
 
     #edit_function = subparsers.add_parser('edit', help='')
