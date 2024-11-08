@@ -431,6 +431,9 @@ def validate_value(input_value, value_type, key, filename='_metadata'):
                 elif filename == '_mamplan':
                     input_date = input_value.split('/')
                     date_message = f'Input must be of type \'DD/MM/YYYY\'.'
+                else:
+                    input_date = input_value
+                    date_message = f'Invalid date.'
                 if len(input_date) != 3 or len(input_date[0]) != 2 or len(
                         input_date[1]) != 2 or not ((filename == '_mamplan' and len(input_date[2]) == 2) or len(input_date[2]) == 4):
                     raise SyntaxError
