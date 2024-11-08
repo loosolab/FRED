@@ -428,7 +428,7 @@ def validate_value(input_value, value_type, key, filename='_metadata'):
                 if filename == '_metadata':
                     input_date = input_value.split('.')
                     date_message = f'Input must be of type \'DD.MM.YYYY\'.'
-                elif filename == '_mamplan':
+                elif filename in ['_mamplan', 'mamplan']:
                     input_date = input_value.split('/')
                     date_message = f'Input must be of type \'DD/MM/YYYY\'.'
                 else:
