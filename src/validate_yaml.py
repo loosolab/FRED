@@ -430,12 +430,12 @@ def validate_value(input_value, value_type, key, filename='_metadata'):
                     date_message = f'Input must be of type \'DD.MM.YYYY\'.'
                 elif filename in ['_mamplan', 'mamplan']:
                     input_date = input_value.split('/')
-                    date_message = f'Input must be of type \'DD/MM/YYYY\'.'
+                    date_message = f'Input must be of type \'DD/MM/YYYY\' or \'DD/MM/YY\'.'
                 else:
                     input_date = input_value
                     date_message = f'Invalid date.'
                 if len(input_date) != 3 or len(input_date[0]) != 2 or len(
-                        input_date[1]) != 2 or not ((filename == '_mamplan' and len(input_date[2]) == 2) or len(input_date[2]) == 4):
+                        input_date[1]) != 2 or not ((filename in ['_mamplan', 'mamplan'] and len(input_date[2]) == 2) or (len(input_date[2]) == 4 or len(input_date[2]) == 2)):
                     raise SyntaxError
                 input_value = datetime.date(int(input_date[2]),
                                             int(input_date[1]),
@@ -445,7 +445,7 @@ def validate_value(input_value, value_type, key, filename='_metadata'):
                 message = date_message
         elif type(input_value) == str and ('\"' in input_value or '{' in input_value or '}' in
                  input_value or '|' in input_value) and key not in generated:
-            if filename != '_mamplan':
+            if filename not in ['_mamplan', 'mamplan']:
                 valid = False
                 message = 'The value contains an invalid character ' \
                           '(\", {, } or |).'
@@ -490,7 +490,7 @@ def validate_logic(metafile, filename='_metadata'):
                         organisms, run['reference_genome'])
                     if warning:
                         logical_warn.append((f'Run from {run["date"]}', warn_message))
-    elif filename == '_mamplan':
+    elif filename in ['_mamplan', 'mamplan']:
         if 'tags' in metafile and 'organization' in metafile['tags'] and metafile['tags']['organization'] is not None:
             if 'public' in metafile['tags']['organization']:
                 if 'pubmedid' not in metafile['tags'] or metafile['tags']['pubmedid'] is None:
