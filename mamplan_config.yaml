@@ -7,4 +7,4 @@ branch: v1.1.*
 whitelist_path: FRED_whitelists
 update_whitelists: True
 output_path: .
-filename: '_mamplan' # example_metadata.yaml
+filename: 'mamplan' # example_metadata.yaml
