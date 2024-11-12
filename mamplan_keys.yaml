@@ -182,7 +182,7 @@ tags:
       input_type: short_text
     datatype:
       mandatory: True
-      list:  False
+      list:  True
       display_name: 'Datatype'
       desc: ''
       value: null
