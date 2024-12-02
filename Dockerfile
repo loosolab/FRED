@@ -17,4 +17,6 @@ RUN pip3 install GitPython>=3.1.18
 
 RUN pip3 install tabulate
 
+RUN pip3 install pytz
+
 ENTRYPOINT ["python", "metadata-organizer/metaTools.py"]
