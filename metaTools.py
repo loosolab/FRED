@@ -11,7 +11,7 @@ from src import validate_yaml
 from src import file_reading
 from src import utils
 import urllib.parse as parse
-from src.web_interface import git_whitelists
+from src import git_whitelists
 import time
 
 
