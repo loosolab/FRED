@@ -13,7 +13,7 @@ import src.utils as utils
 import src.web_interface.editing as editing
 import src.web_interface.factors_and_conditions as fac_cond
 import src.web_interface.file_io as file_io
-import src.web_interface.git_whitelists as gwi
+import src.git_whitelists as gwi
 import src.web_interface.html_output as html_output
 import src.web_interface.searching as searching
 import src.web_interface.validation as validation
