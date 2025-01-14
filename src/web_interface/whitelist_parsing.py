@@ -1,7 +1,6 @@
 import os
 
 import src.utils as utils
-import src.web_interface.git_whitelists as git_whitelists
 
 def get_whitelist_object(pgm_object):
     key_yaml = pgm_object['structure']
