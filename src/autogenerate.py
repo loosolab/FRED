@@ -224,7 +224,10 @@ class Autogenerate:
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return [str(x) for x in self.gen.publications[pubmed_id]['AuthorList']]
+
+        return [str(x) for x in self.gen.publications[pubmed_id]['AuthorList']] \
+            if len(self.gen.publications[pubmed_id]['AuthorList']) > 3 \
+            else [str(x) for x in self.gen.publications[pubmed_id]['AuthorList']]
 
     def get_title(self):
         self.get_publications()
