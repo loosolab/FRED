@@ -50,6 +50,7 @@ def parse_empty(node, pos, key_yaml, filled_object, read_in_whitelists,
                                only filled if 'get_whitelist_object' is set to
                                True
     """
+
     # disable input for the keys condition_name and sample_name because they
     # are generated
     input_disabled = True if 'special_case' in node and 'generated' in \
@@ -146,19 +147,23 @@ def parse_empty(node, pos, key_yaml, filled_object, read_in_whitelists,
             # iterate over all keys in value
             for key in node['value']:
 
-                # call this function to create a dictionary object for all keys
-                # storing their necessary information
-                field_infos, w_object = parse_empty(
-                    node['value'][key], pos + ':' + key, key_yaml,
-                    filled_object, read_in_whitelists,
-                    get_whitelist_object=get_whitelist_object)
+                if not ('special_case' in node['value'][key] and 'invisible' in
+                        node['value'][key]['special_case'] and
+                        node['value'][key]['special_case']['invisible']):
 
-                # add the parsed input fields to the list
-                input_fields.append(field_infos)
+                    # call this function to create a dictionary object for all keys
+                    # storing their necessary information
+                    field_infos, w_object = parse_empty(
+                        node['value'][key], pos + ':' + key, key_yaml,
+                        filled_object, read_in_whitelists,
+                        get_whitelist_object=get_whitelist_object)
 
-                # merge the whitelist object with the object from the input
-                # field
-                whitelist_object = {**whitelist_object, **w_object}
+                    # add the parsed input fields to the list
+                    input_fields.append(field_infos)
+
+                    # merge the whitelist object with the object from the input
+                    # field
+                    whitelist_object = {**whitelist_object, **w_object}
 
             # creation and filling of dictionary containing all necessary
             # information for one expandable with its input fields
