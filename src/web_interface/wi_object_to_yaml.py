@@ -450,16 +450,15 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
                     pubmed_entry = utils.get_publication_object(pubmed_id)
                     publications.append(
                         {'pubmed_id': pubmed_id,
-                         'title': pubmed_entry['Title'],
+                         'title': str(pubmed_entry['Title']),
                          'year': int(pubmed_entry['PubDate'].split(' ')[0]),
-                         'author': pubmed_entry['AuthorList'],
-                         'journal': pubmed_entry['Source'],
+                         'author': [str(x) for x in pubmed_entry['AuthorList']],
+                         'journal': str(pubmed_entry['Source']),
                          'volume': int(pubmed_entry['Volume']),
                          'issue': int(pubmed_entry['Issue']),
-                         'pages': pubmed_entry['Pages'],
-                         'doi': pubmed_entry['DOI']}
+                         'pages': str(pubmed_entry['Pages']),
+                         'doi': str(pubmed_entry['DOI'])}
                     )
-                    print(pubmed_id)
             if len(publications) > 0:
                 val = publications
         # no special case

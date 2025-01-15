@@ -224,19 +224,19 @@ class Autogenerate:
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return self.gen.publications[pubmed_id]['AuthorList']
+        return [str(x) for x in self.gen.publications[pubmed_id]['AuthorList']]
 
     def get_title(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return self.gen.publications[pubmed_id]['Title']
+        return str(self.gen.publications[pubmed_id]['Title'])
 
     def get_journal(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return self.gen.publications[pubmed_id]['Source']
+        return str(self.gen.publications[pubmed_id]['Source'])
 
     def get_volume(self):
         self.get_publications()
@@ -254,19 +254,19 @@ class Autogenerate:
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return self.gen.publications[pubmed_id]['Issue']
+        return int(self.gen.publications[pubmed_id]['Issue'])
 
     def get_pages(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return self.gen.publications[pubmed_id]['Pages']
+        return str(self.gen.publications[pubmed_id]['Pages'])
 
     def get_doi(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return self.gen.publications[pubmed_id]['DOI']
+        return str(self.gen.publications[pubmed_id]['DOI'])
 
 
 
