@@ -438,6 +438,30 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
             # set val to factors
             val = factors
 
+        elif wi_object[i]['position'].split(':')[-1] == 'publication':
+            publications = []
+            for elem in wi_object[i]['list_value']:
+                pubmed_id = None
+                for sub_elem in elem:
+                    if sub_elem['position'].split(':')[-1] == 'pubmed_id':
+                        pubmed_id = sub_elem['value']
+                        break
+                if pubmed_id is not None:
+                    pubmed_entry = utils.get_publication_object(pubmed_id)
+                    publications.append(
+                        {'pubmed_id': pubmed_id,
+                         'title': pubmed_entry['Title'],
+                         'year': int(pubmed_entry['PubDate'].split(' ')[0]),
+                         'author': pubmed_entry['AuthorList'],
+                         'journal': pubmed_entry['Source'],
+                         'volume': int(pubmed_entry['Volume']),
+                         'issue': int(pubmed_entry['Issue']),
+                         'pages': pubmed_entry['Pages'],
+                         'doi': pubmed_entry['DOI']}
+                    )
+                    print(pubmed_id)
+            if len(publications) > 0:
+                val = publications
         # no special case
         else:
 
