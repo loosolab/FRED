@@ -229,9 +229,9 @@ class Generate(Input):
                             self.fill_key(position + [key], func(
                                     Autogenerate(self, position + [key])
                                     ), return_dict)
-                            #if not isinstance(structure[key]['value'], dict):
-                            #    print(f'\n---\n{structure[key]["desc"]}\n')
-                            #    print(f'{key}: {utils.find_position(self.result_dict, position + [key])}')
+                            if not isinstance(structure[key]['value'], dict):
+                                print(f'\n---\n{structure[key]["desc"]}\n')
+                                print(f'{key}: {utils.find_position(self.result_dict, position + [key])}')
                         elif structure[key]['special_case']['generated'] == \
                                 'end':
                             self.generate_end.append(position + [key])

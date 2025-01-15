@@ -69,21 +69,9 @@ project:
           list: False
           display_name: "Pubmed-ID"
           desc: "The pubmed ID of the paper.\n[32214235]"
-          special_case:
-            generated: now
           value: null
           whitelist: False
           input_type: number
-        author:
-          mandatory: False
-          list: True
-          display_name: "Author"
-          desc: "The author of the paper. Format: Last name, First name.\n[Mustermann, Max]"
-          special_case:
-            generated: end
-          value: null
-          whitelist: False
-          input_type: short_text
         title:
           mandatory: False
           list: False
@@ -104,6 +92,16 @@ project:
           value: null
           whitelist: False
           input_type: number
+        author:
+          mandatory: False
+          list: True
+          display_name: "Author"
+          desc: "The author of the paper. Format: Last name, First name.\n[Mustermann, Max]"
+          special_case:
+            generated: end
+          value: null
+          whitelist: False
+          input_type: short_text
         journal:
           mandatory: False
           list: False
