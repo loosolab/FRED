@@ -64,27 +64,41 @@ project:
       display_name: "Publication"
       desc: ""
       value:
-        author:
+        pubmed_id:
           mandatory: True
+          list: False
+          display_name: "Pubmed-ID"
+          desc: "The pubmed ID of the paper.\n[32214235]"
+          value: null
+          whitelist: False
+          input_type: number
+        author:
+          mandatory: False
           list: True
           display_name: "Author"
           desc: "The author of the paper. Format: Last name, First name.\n[Mustermann, Max]"
+          special_case:
+            generated: end
           value: null
           whitelist: False
           input_type: short_text
         title:
-          mandatory: True
+          mandatory: False
           list: False
           display_name: "Title"
           desc: "The title of the paper.\n[Construction of a human cell landscape at single-cell level]"
+          special_case:
+            generated: end
           value: null
           whitelist: False
           input_type: short_text
         year:
-          mandatory: True
+          mandatory: False
           list: False
           display_name: "Year"
           desc: "The year it was published.\n[2020]"
+          special_case:
+            generated: end
           value: null
           whitelist: False
           input_type: number
@@ -93,6 +107,8 @@ project:
           list: False
           display_name: "Journal"
           desc: "The journal it was published in.\n[Nature]"
+          special_case:
+            generated: end
           value: null
           whitelist: False
           input_type: short_text
@@ -101,6 +117,8 @@ project:
           list: False
           display_name: "Volume"
           desc: "The volume it was published in.\n[581]"
+          special_case:
+            generated: end
           value: null
           whitelist: False
           input_type: number
@@ -109,6 +127,8 @@ project:
           list: False
           display_name: "Issue"
           desc: "The issue it was published in.\n[7808]"
+          special_case:
+            generated: end
           value: null
           whitelist: False
           input_type: number
@@ -117,6 +137,8 @@ project:
           list: False
           display_name: "Pages"
           desc: "The pages it was published on in the journal.\n[303-309]"
+          special_case:
+            generated: end
           value: null
           whitelist: False
           input_type: short_text
@@ -125,25 +147,19 @@ project:
           list: False
           display_name: 'DOI'
           desc: "The digital object identifier of the paper.\n[10.1038/s41586-020-2157-4]"
+          special_case:
+            generated: end
           value: null
           whitelist: False
           input_type: short_text
-        pubmed_id:
-          mandatory: False
-          list: False
-          display_name: "Pubmed-ID"
-          desc: "The pubmed ID of the paper.\n[32214235]"
-          value: null
-          whitelist: False
-          input_type: number
-        sample_submission_number:
-          mandatory: False
-          list: True
-          display_name: "Sample submission Number"
-          desc: "The identifier of the samples from a data submission portal like GEO or ArrayExpress.\n[E-MTAB-9816, GSE134355]"
-          value: null
-          whitelist: False
-          input_type: short_text
+        #sample_submission_number:
+        #  mandatory: False
+        #  list: True
+        #  display_name: "Sample submission Number"
+        #  desc: "The identifier of the samples from a data submission portal like GEO or ArrayExpress.\n[E-MTAB-9816, GSE134355]"
+        #  value: null
+        #  whitelist: False
+        #  input_type: short_text
     owner:
       mandatory: True
       list: False
