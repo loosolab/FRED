@@ -32,6 +32,7 @@ class Input:
         self.result_dict = {}
         self.size = os.get_terminal_size().columns
         self.conditions = {}
+        self.publications = {}
         self.generate_end = []
 
     def parse_input_value(self, key, structure, allow_float=False):

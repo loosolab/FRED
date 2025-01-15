@@ -216,8 +216,7 @@ class Generate(Input):
         for key in structure:
             if structure[key]['mandatory'] or \
                     ('special_case' in structure[key] and 'generated' in
-                     structure[key]['special_case'] and
-                     structure[key]['special_case']['generated'] == 'fill'):
+                     structure[key]['special_case']):
                 if 'special_case' in structure[key]:
                     if 'factor' in structure[key]['special_case'] and \
                             structure['special_case']['factor']:
@@ -230,9 +229,9 @@ class Generate(Input):
                             self.fill_key(position + [key], func(
                                     Autogenerate(self, position + [key])
                                     ), return_dict)
-                            if not isinstance(structure[key]['value'], dict):
-                                print(f'\n---\n{structure[key]["desc"]}\n')
-                                print(f'{key}: {utils.find_position(self.result_dict, position + [key])}')
+                            #if not isinstance(structure[key]['value'], dict):
+                            #    print(f'\n---\n{structure[key]["desc"]}\n')
+                            #    print(f'{key}: {utils.find_position(self.result_dict, position + [key])}')
                         elif structure[key]['special_case']['generated'] == \
                                 'end':
                             self.generate_end.append(position + [key])

@@ -69,6 +69,8 @@ project:
           list: False
           display_name: "Pubmed-ID"
           desc: "The pubmed ID of the paper.\n[32214235]"
+          special_case:
+            generated: now
           value: null
           whitelist: False
           input_type: number
@@ -105,10 +107,10 @@ project:
         journal:
           mandatory: False
           list: False
-          display_name: "Journal"
-          desc: "The journal it was published in.\n[Nature]"
           special_case:
             generated: end
+          display_name: "Journal"
+          desc: "The journal it was published in.\n[Nature]"
           value: null
           whitelist: False
           input_type: short_text

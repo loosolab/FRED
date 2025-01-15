@@ -212,3 +212,52 @@ class Autogenerate:
 
     def get_count(self):
         return len(utils.find_position(self.gen.result_dict, self.position[:-1] + ['samples']))
+
+    def get_pubmed_id(self):
+        print('Please enter the Pubmed-ID of the publication.')
+        pubmed_id = self.gen.parse_input_value(self.position[-1], list(utils.find_keys(self.gen.key_yaml, self.position[-1]))[0])
+        self.gen.publications[pubmed_id] = utils.get_publication_object(pubmed_id)
+        return pubmed_id
+
+    def get_author(self):
+        pubmed_id = utils.find_position(self.gen.result_dict,
+                                        self.position[:-1] + ['pubmed_id'])
+        return self.gen.publications[pubmed_id]['AuthorList']
+
+    def get_title(self):
+        pubmed_id = utils.find_position(self.gen.result_dict,
+                                        self.position[:-1] + ['pubmed_id'])
+        return self.gen.publications[pubmed_id]['Title']
+
+    def get_journal(self):
+        pubmed_id = utils.find_position(self.gen.result_dict,
+                                        self.position[:-1] + ['pubmed_id'])
+        return self.gen.publications[pubmed_id]['Source']
+
+    def get_volume(self):
+        pubmed_id = utils.find_position(self.gen.result_dict,
+                                        self.position[:-1] + ['pubmed_id'])
+        return int(self.gen.publications[pubmed_id]['Volume'])
+
+    def get_year(self):
+        pubmed_id = utils.find_position(self.gen.result_dict,
+                                        self.position[:-1] + ['pubmed_id'])
+        return int(self.gen.publications[pubmed_id]['PubDate'].split(' ')[0])
+
+    def get_issue(self):
+        pubmed_id = utils.find_position(self.gen.result_dict,
+                                        self.position[:-1] + ['pubmed_id'])
+        return self.gen.publications[pubmed_id]['Issue']
+
+    def get_pages(self):
+        pubmed_id = utils.find_position(self.gen.result_dict,
+                                        self.position[:-1] + ['pubmed_id'])
+        return self.gen.publications[pubmed_id]['Pages']
+
+    def get_doi(self):
+        pubmed_id = utils.find_position(self.gen.result_dict,
+                                        self.position[:-1] + ['pubmed_id'])
+        return self.gen.publications[pubmed_id]['DOI']
+
+
+

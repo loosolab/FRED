@@ -3,7 +3,7 @@ import json
 import math
 import os
 import textwrap
-
+from Bio import Entrez
 import yaml
 from tabulate import tabulate
 
@@ -1265,3 +1265,11 @@ def split_cond(condition):
         conditions[j] = (key, d[key])
 
     return conditions
+
+
+def get_publication_object(pubmed_id):
+    Entrez.email = "Jasmin.Walter@mpi-bn.mpg.de"
+    handle = Entrez.esummary(db="pubmed", id=pubmed_id,
+                             retmode="xml")
+    records = list(Entrez.parse(handle))[0]
+    return records

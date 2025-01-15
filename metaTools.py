@@ -1,28 +1,23 @@
 import argparse
 import copy
 import pathlib
-import time
 
 from src.generate import Generate
-import git
 import os
 from src import find_metafiles
 from src import validate_yaml
 from src import file_reading
 from src import utils
-import urllib.parse as parse
 from src import git_whitelists
 import time
 
 
 class FRED:
 
-    def __init__(self, config, no_update_whitelists=False):
+    def __init__(self, config):
         self.whitelist_repo, self.whitelist_branch, self.whitelist_path, \
         self.username, self.password, structure, self.update_whitelists, \
         self.output_path, self.filename = utils.parse_config(config)
-        if no_update_whitelists == True:
-            self.update_whitelists = False
         self.fetch_whitelists()
         self.structure = utils.read_in_yaml(structure)
 
@@ -50,8 +45,8 @@ class FRED:
             print(
                 f'The report was saved to the file \'{json_filename}\'.')
 
-    def generate(self, path, id, mandatory_only):
-        gen = Generate(path, id, mandatory_only, self.filename, self.structure)
+    def generate(self, path, project_id, mandatory_only):
+        gen = Generate(path, project_id, mandatory_only, self.filename, self.structure)
         gen.generate()
 
     def validate(self, logical_validation, path, output, output_filename):
@@ -227,7 +222,7 @@ def find(args):
                 and 'not'
     """
 
-    finding = FRED(args.config, args.no_update_whitelists)
+    finding = FRED(args.config)
     finding.find(args.path, args.search, args.output, args.filename)
 
 
@@ -236,12 +231,12 @@ def generate(args):
     calls script generate_metafile to start dialog
     :param args:
     """
-    generating = FRED(args.config, args.no_update_whitelists)
+    generating = FRED(args.config)
     generating.generate(args.path, args.id, args.mandatory_only)
 
 
 def validate(args):
-    validating = FRED(args.config, args.no_update_whitelists)
+    validating = FRED(args.config)
     validating.validate(not args.skip_logic, args.path, args.output, args.filename)
 
 
@@ -334,7 +329,8 @@ def main():
 
     try:
         args.func(args)
-    except AttributeError:
+    except AttributeError as e:
+        print(e)
         parser.print_help()
 
 
