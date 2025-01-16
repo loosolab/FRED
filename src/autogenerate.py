@@ -218,14 +218,14 @@ class Autogenerate:
             pubmed_ids = list(utils.find_keys(self.gen.result_dict, 'pubmed_id'))
             for pmid in pubmed_ids:
                 if pmid not in self.gen.publications:
-                    self.gen.publications[pmid] = utils.get_publication_object(pmid)
+                    self.gen.publications[pmid] = utils.get_publication_object(pmid, self.gen.email)
 
     def get_author(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
 
-        return [str(x) for x in self.gen.publications[pubmed_id]['AuthorList']] \
+        return [str(x) for x in self.gen.publications[pubmed_id]['AuthorList'][0:3]] + ['et. al'] \
             if len(self.gen.publications[pubmed_id]['AuthorList']) > 3 \
             else [str(x) for x in self.gen.publications[pubmed_id]['AuthorList']]
 

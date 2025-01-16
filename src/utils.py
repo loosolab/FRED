@@ -83,6 +83,7 @@ def parse_config(config_file):
         update_whitelists,
         output_path,
         filename,
+        email
     )
 
 

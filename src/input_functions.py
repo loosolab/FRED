@@ -23,7 +23,7 @@ class WhitelistCompleter:
 
 class Input:
 
-    def __init__(self, path, project_id, mandatory_only, filename, key_yaml):
+    def __init__(self, path, project_id, mandatory_only, filename, key_yaml, email):
         self.path = path
         self.project_id = project_id
         self.mandatory_only = mandatory_only
@@ -34,6 +34,7 @@ class Input:
         self.conditions = {}
         self.publications = {}
         self.generate_end = []
+        self.email = email
 
     def parse_input_value(self, key, structure, allow_float=False):
         """

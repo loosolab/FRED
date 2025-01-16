@@ -17,7 +17,7 @@ class FRED:
     def __init__(self, config):
         self.whitelist_repo, self.whitelist_branch, self.whitelist_path, \
         self.username, self.password, structure, self.update_whitelists, \
-        self.output_path, self.filename = utils.parse_config(config)
+        self.output_path, self.filename, self.email = utils.parse_config(config)
         self.fetch_whitelists()
         self.structure = utils.read_in_yaml(structure)
 
@@ -46,7 +46,7 @@ class FRED:
                 f'The report was saved to the file \'{json_filename}\'.')
 
     def generate(self, path, project_id, mandatory_only):
-        gen = Generate(path, project_id, mandatory_only, self.filename, self.structure)
+        gen = Generate(path, project_id, mandatory_only, self.filename, self.structure, self.email)
         gen.generate()
 
     def validate(self, logical_validation, path, output, output_filename):
