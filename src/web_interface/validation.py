@@ -6,7 +6,7 @@ import src.utils as utils
 # TODO: rewrite and documentation
 
 
-def validate_object(wi_object, key_yaml, read_in_whitelists, finish):
+def validate_object(wi_object, key_yaml, read_in_whitelists, finish, email):
     """
     This function performs a validation over the wi object
     :param wi_object: the filled wi object
@@ -36,7 +36,7 @@ def validate_object(wi_object, key_yaml, read_in_whitelists, finish):
                                              organisms, settings, [])
 
     if finish:
-        parsed = oty.parse_object(wi_object, key_yaml, read_in_whitelists)
+        parsed = oty.parse_object(wi_object, key_yaml, read_in_whitelists, email)
         for part in ['project', 'experimental_setting', 'technical_details']:
             if part not in parsed:
                 parsed[part] = {}

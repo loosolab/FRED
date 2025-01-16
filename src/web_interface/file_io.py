@@ -1,4 +1,3 @@
-import src.file_reading as file_reading
 import src.utils as utils
 import os
 

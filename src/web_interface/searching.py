@@ -1,4 +1,3 @@
-import src.file_reading as file_reading
 import src.find_metafiles as find_metafiles
 import src.utils as utils
 import src.web_interface.html_output as html_output
@@ -10,7 +9,6 @@ import src.web_interface.wi_utils as wi_utils
 def get_meta_info(html_str, metafiles, project_id, validation_reports):
     """
     This file creates an HTML summary for a project containing metadata
-    :param path: the path of a folder to be searched for a project
     :param project_id: the id of the project
     :return: html_str: the summary in HTML
     """

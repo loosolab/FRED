@@ -5,7 +5,7 @@ import src.web_interface.wi_utils as wi_utils
 import os
 
 
-def parse_object(wi_object, key_yaml, read_in_whitelists):
+def parse_object(wi_object, key_yaml, read_in_whitelists, email):
     """
     This function parses a wi object back into a yaml
     :param key_yaml: the read in general structure
@@ -42,7 +42,7 @@ def parse_object(wi_object, key_yaml, read_in_whitelists):
             # parse every part into yaml format
             result[key], organism, sample_name, nom, global_count, local_count, double = parse_part(
                 wi_object[key], key_yaml, copy.deepcopy(wi_object['all_factors']), project_id,
-                organism, sample_name, nom, global_count, local_count, double, read_in_whitelists)
+                organism, sample_name, nom, global_count, local_count, double, read_in_whitelists, email)
 
     # remove keys with value None
     result = {k: v for k, v in result.items() if v is not None}
@@ -101,7 +101,7 @@ def split_name(elem, double, gene=True):
 
 
 def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
-               nom, global_count, local_count, double, read_in_whitelists):
+               nom, global_count, local_count, double, read_in_whitelists, email):
     """
     This function parses a part of the wi object to create the yaml structure
     :param key_yaml: the read in general structure
@@ -156,7 +156,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                             sample, organism, sample_name, nom, global_count, local_count, double = \
                                 parse_list_part(sub_elem, key_yaml, factors,
                                                 project_id, organism,
-                                                sample_name, nom, global_count, local_count, double, read_in_whitelists)
+                                                sample_name, nom, global_count, local_count, double, read_in_whitelists, email)
 
                             # remove empty keys
                             sample = {k: v for k, v in sample.items() if v is
@@ -192,7 +192,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                         c_val, organism, sample_name, nom, global_count, local_count, double = \
                             parse_list_part(wi_object['list_value'][i],
                                             key_yaml, factors[i], project_id,
-                                            organism, sample_name, nom, global_count, local_count, double, read_in_whitelists)
+                                            organism, sample_name, nom, global_count, local_count, double, read_in_whitelists, email)
 
                         # add the converted value to the list
                         val.append(c_val)
@@ -204,7 +204,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                         c_val, organism, sample_name, nom, global_count, local_count, double = \
                             parse_list_part(wi_object['list_value'][i],
                                             key_yaml, factors, project_id,
-                                            organism, sample_name, nom, global_count, local_count, double, read_in_whitelists)
+                                            organism, sample_name, nom, global_count, local_count, double, read_in_whitelists, email)
 
                         # add the converted value to the list
                         val.append(c_val)
@@ -282,7 +282,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     val, organism, sample_name, nom, global_count, local_count, double = \
                         parse_part(wi_object['input_fields'], key_yaml,
                                    factors, project_id, organism, sample_name,
-                                   nom, global_count, local_count, double, read_in_whitelists)
+                                   nom, global_count, local_count, double, read_in_whitelists, email)
 
             # no input fields
             else:
@@ -382,13 +382,13 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
         # call parse list function
         val, organism, sample_name, nom, global_count, local_count, double = parse_list_part(
             wi_object, key_yaml, factors, project_id, organism, sample_name,
-            nom, global_count, local_count, double, read_in_whitelists)
+            nom, global_count, local_count, double, read_in_whitelists, email)
 
     return val, organism, sample_name, nom, global_count, local_count, double
 
 
 def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
-                    sample_name, nom, global_count, local_count, double, read_in_whitelists):
+                    sample_name, nom, global_count, local_count, double, read_in_whitelists, email):
     """
     This function parses a part of the wi object of type list into the yaml
     structure
@@ -447,18 +447,21 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
                         pubmed_id = sub_elem['value']
                         break
                 if pubmed_id is not None:
-                    pubmed_entry = utils.get_publication_object(pubmed_id)
-                    publications.append(
-                        {'pubmed_id': pubmed_id,
-                         'title': str(pubmed_entry['Title']),
-                         'year': int(pubmed_entry['PubDate'].split(' ')[0]),
-                         'author': [str(x) for x in pubmed_entry['AuthorList'][0:3]] + ['et. al'] if len(pubmed_entry['AuthorList']) > 3 else [str(x) for x in pubmed_entry['AuthorList']],
-                         'journal': str(pubmed_entry['Source']),
-                         'volume': int(pubmed_entry['Volume']),
-                         'issue': int(pubmed_entry['Issue']),
-                         'pages': str(pubmed_entry['Pages']),
-                         'doi': str(pubmed_entry['DOI'])}
-                    )
+                    pubmed_entry = utils.get_publication_object(pubmed_id, email)
+                    if pubmed_entry is None:
+                        publications.append({'pubmed_id': pubmed_id})
+                    else:
+                        publications.append(
+                            {'pubmed_id': pubmed_id,
+                             'title': str(pubmed_entry['Title']),
+                             'year': int(pubmed_entry['PubDate'].split(' ')[0]),
+                             'author': [str(x) for x in pubmed_entry['AuthorList'][0:3]] + ['et. al'] if len(pubmed_entry['AuthorList']) > 3 else [str(x) for x in pubmed_entry['AuthorList']],
+                             'journal': str(pubmed_entry['Source']),
+                             'volume': int(pubmed_entry['Volume']),
+                             'issue': int(pubmed_entry['Issue']),
+                             'pages': str(pubmed_entry['Pages']),
+                             'doi': str(pubmed_entry['DOI'])}
+                        )
             if len(publications) > 0:
                 val = publications
         # no special case
@@ -467,7 +470,7 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
             # call parse part function
             val, organism, sample_name, nom, global_count, local_count, double = parse_part(
                 wi_object[i], key_yaml, factors, project_id, organism,
-                sample_name, nom, global_count, local_count, double, read_in_whitelists)
+                sample_name, nom, global_count, local_count, double, read_in_whitelists, email)
 
         # test if the value is not empty
         if val is not None and (

@@ -8,7 +8,6 @@ import string
 import subprocess
 import time
 
-import git
 import src.utils as utils
 import src.web_interface.editing as editing
 import src.web_interface.factors_and_conditions as fac_cond
@@ -38,6 +37,7 @@ class Webinterface:
             self.update_whitelists,
             self.output_path,
             self.filename,
+            self.email,
         ) = utils.parse_config(config)
         self.structure = utils.read_in_yaml(structure)
         self.whitelist_version = fetch_whitelists(self.__dict__)
@@ -94,13 +94,15 @@ def get_conditions(pgm_object, factors, organism_name, read_in_whitelists):
 def validate_object(pgm_object, wi_object, read_in_whitelists, finish=False):
     new_object = copy.deepcopy(wi_object)
     return validation.validate_object(
-        new_object, pgm_object["structure"], read_in_whitelists, finish
+        new_object, pgm_object["structure"], read_in_whitelists, finish,
+        pgm_object['email']
     )
 
 
 def get_summary(pgm_object, wi_object, read_in_whitelists):
     return html_output.get_summary(
-        wi_object, pgm_object["structure"], read_in_whitelists
+        wi_object, pgm_object["structure"], read_in_whitelists,
+        pgm_object['email']
     )
 
 
@@ -207,4 +209,5 @@ def edit_wi_object(path, pgm_object, read_in_whitelists):
 # TODO: not needed -> in summary
 def parse_object(pgm_object, wi_object, read_in_whitelists):
     # read in general structure
-    return oty.parse_object(wi_object, pgm_object["structure"], read_in_whitelists)
+    return oty.parse_object(wi_object, pgm_object["structure"],
+                            read_in_whitelists, pgm_object['email'])

@@ -54,14 +54,18 @@ def parse_config(config_file):
         update_whitelists = True
     try:
         output_path = config["output_path"]
-    except:
+    except KeyError:
         output_path = "."
         missing_keys.append("output_path")
     try:
         filename = config["filename"]
-    except:
+    except KeyError:
         filename = "_metadata"
         missing_keys.append("filename")
+    try:
+        email = config["email"]
+    except KeyError:
+        email = "Your.Name.Here@example.org"
 
     if len(missing_keys) > 0:
         print(
@@ -1267,9 +1271,11 @@ def split_cond(condition):
     return conditions
 
 
-def get_publication_object(pubmed_id):
-    Entrez.email = "Jasmin.Walter@mpi-bn.mpg.de"
-    handle = Entrez.esummary(db="pubmed", id=pubmed_id,
-                             retmode="xml")
-    records = list(Entrez.parse(handle))[0]
+def get_publication_object(pubmed_id, email):
+    Entrez.email = email
+    try:
+        handle = Entrez.esummary(db="pubmed", id=pubmed_id, retmode="xml")
+        records = list(Entrez.parse(handle))[0]
+    except RuntimeError:
+        records = None
     return records
