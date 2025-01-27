@@ -452,9 +452,12 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
                     if str(pubmed_id) not in publication_records:
                         publications.append({'pubmed_id': pubmed_id})
                     else:
-                        publications.append(
-                            publication_records[str(pubmed_id)]
-                        )
+                        pub_keys = list(utils.find_keys(key_yaml, 'publication'))[0]
+                        publication = {}
+                        for key in pub_keys['value']:
+                            if key in publication_records[str(pubmed_id)]:
+                                publication[key] = publication_records[str(pubmed_id)][key]
+                        publications.append(publication)
             if len(publications) > 0:
                 val = publications
         # no special case
