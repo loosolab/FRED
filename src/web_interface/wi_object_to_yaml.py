@@ -449,11 +449,11 @@ def parse_list_part(wi_object, key_yaml, factors, project_id, organism,
                         pubmed_id = sub_elem['value']
                         break
                 if pubmed_id is not None:
-                    if pubmed_id not in publication_records:
+                    if str(pubmed_id) not in publication_records:
                         publications.append({'pubmed_id': pubmed_id})
                     else:
                         publications.append(
-                            publication_records[pubmed_id]
+                            publication_records[str(pubmed_id)]
                         )
             if len(publications) > 0:
                 val = publications
