@@ -28,14 +28,15 @@ def validate_object(wi_object, key_yaml, read_in_whitelists, finish, email):
                 settings.append(elem['value'])
     warnings = {}
     errors = {}
+    pubmed_ids = []
 
     for part in ['project', 'experimental_setting', 'technical_details']:
 
         part, wi_object[part], pooled, organisms, warnings[part], \
-                errors[part] = validate_part(part, wi_object[part], [], pooled,
-                                             organisms, settings, [])
+                errors[part], pubmed_ids = validate_part(part, wi_object[part], [], pooled,
+                                             organisms, settings, [], pubmed_ids)
 
-    pubmed_ids = list(utils.find_keys(wi_object['project'], 'pubmed_id'))
+    pubmed_ids = list(set(pubmed_ids))
     if any(x not in wi_object['publication_records'] for x in pubmed_ids):
         wi_object['publication_records'] = get_publications(
             wi_object['publication_records'], pubmed_ids, email)
@@ -75,7 +76,8 @@ def get_publications(publications, pubmed_ids, email):
                 'doi': str(pubmed_entry['DOI'])}
     return publications
 
-def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors):
+
+def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors, pubmed_ids):
     """
     This function is used to validate a part of the WI object. If an error or a
     warning is found than it is added to the description of the key whose value
@@ -152,18 +154,20 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
                     f'{warning_desc}'
             else:
                 elem, wi_object[
-                    'list_value'], pooled, organisms, warnings, errors = \
+                    'list_value'], pooled, organisms, warnings, errors, pubmed_ids = \
                     validate_part(
                         elem, wi_object['list_value'], warnings, pooled,
-                        organisms, settings, errors)
+                        organisms, settings, errors, pubmed_ids)
         else:
             if 'input_fields' in wi_object:
                 elem, wi_object[
-                    'input_fields'], pooled, organisms, warnings, errors = \
+                    'input_fields'], pooled, organisms, warnings, errors, pubmed_ids = \
                     validate_part(
                         elem, wi_object['input_fields'], warnings, pooled,
-                        organisms, settings, errors)
+                        organisms, settings, errors, pubmed_ids)
             else:
+                if wi_object['position'].split(':')[-1] == 'pubmed_id' and wi_object['value'] is not None:
+                    pubmed_ids.append(wi_object['value'])
                 if wi_object['value'] is not None and wi_object['value'] != '':
                     if wi_object['input_type'] == 'date':
                         value = wi_utils.date_to_str(wi_object['value'])
@@ -215,6 +219,7 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
             elem, wi_object[
-                i], pooled, organisms, warnings, errors = validate_part(
-                elem, wi_object[i], warnings, pooled, organisms, settings, errors)
-    return elem, wi_object, pooled, organisms, warnings, errors
+                i], pooled, organisms, warnings, errors, pubmed_ids = validate_part(
+                elem, wi_object[i], warnings, pooled, organisms, settings,
+                errors, pubmed_ids)
+    return elem, wi_object, pooled, organisms, warnings, errors, pubmed_ids
