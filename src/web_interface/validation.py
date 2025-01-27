@@ -61,8 +61,8 @@ def validate_object(wi_object, key_yaml, read_in_whitelists, finish, email):
 def get_publications(publications, pubmed_ids, email):
     pubmed_entries = utils.get_publication_object(pubmed_ids, email)
     for pubmed_entry in pubmed_entries:
-        if int(pubmed_entry['Id']) not in publications:
-            publications[int(pubmed_entry['Id'])] = {
+        if pubmed_entry['Id'] not in publications:
+            publications[pubmed_entry['Id']] = {
                 'pubmed_id': int(pubmed_entry['Id']),
                 'title': str(pubmed_entry['Title']),
                 'year': int(pubmed_entry['PubDate'].split(' ')[0]),
