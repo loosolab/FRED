@@ -214,11 +214,12 @@ class Autogenerate:
         return len(utils.find_position(self.gen.result_dict, self.position[:-1] + ['samples']))
 
     def get_publications(self):
-        if self.gen.publications == {}:
-            pubmed_ids = list(utils.find_keys(self.gen.result_dict, 'pubmed_id'))
-            for pmid in pubmed_ids:
-                if pmid not in self.gen.publications:
-                    self.gen.publications[pmid] = utils.get_publication_object(pmid, self.gen.email)
+        pubmed_ids = list(utils.find_keys(self.gen.result_dict, 'pubmed_id'))
+        if any([x not in self.gen.publications for x in pubmed_ids]):
+            records = utils.get_publication_object(pubmed_ids, self.gen.email)
+            for record in records:
+                if 'Id' in record and int(record['Id']) not in self.gen.publications:
+                    self.gen.publications[int(record['Id'])] = record
 
     def get_author(self):
         self.get_publications()

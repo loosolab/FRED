@@ -2,7 +2,7 @@ import src.utils as utils
 import src.web_interface.wi_object_to_yaml as oty
 
 
-def get_summary(wi_object, key_yaml, read_in_whitelists, email):
+def get_summary(wi_object, key_yaml, read_in_whitelists):
     """
     This function parses the wi object into a yaml structure and then parses
     the yaml to HTML to be output in the web interface. It also returns a list
@@ -14,7 +14,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists, email):
     """
 
     # parse wi_object to yaml
-    yaml_object = oty.parse_object(wi_object, key_yaml, read_in_whitelists, email)
+    yaml_object = oty.parse_object(wi_object, key_yaml, read_in_whitelists)
 
     # save the project_id from the yaml file
     if 'project' in yaml_object and 'id' in yaml_object['project']:

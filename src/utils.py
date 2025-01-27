@@ -1276,7 +1276,7 @@ def get_publication_object(pubmed_id, email):
     Entrez.email = email
     try:
         handle = Entrez.esummary(db="pubmed", id=pubmed_id, retmode="xml")
-        records = list(Entrez.parse(handle))[0]
+        records = list(Entrez.parse(handle))
     except RuntimeError:
         records = None
     return records

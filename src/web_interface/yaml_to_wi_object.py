@@ -29,6 +29,7 @@ def get_empty_wi_object(key_yaml, read_in_whitelists):
     # add a key 'all_factors' with an empty list as value to the object
     # the experimental factors will be saved here after input on the website
     wi_object['all_factors'] = []
+    wi_object['publication_records'] = {}
 
     return wi_object
 

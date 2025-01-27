@@ -101,8 +101,7 @@ def validate_object(pgm_object, wi_object, read_in_whitelists, finish=False):
 
 def get_summary(pgm_object, wi_object, read_in_whitelists):
     return html_output.get_summary(
-        wi_object, pgm_object["structure"], read_in_whitelists,
-        pgm_object['email']
+        wi_object, pgm_object["structure"], read_in_whitelists
     )
 
 
@@ -210,4 +209,4 @@ def edit_wi_object(path, pgm_object, read_in_whitelists):
 def parse_object(pgm_object, wi_object, read_in_whitelists):
     # read in general structure
     return oty.parse_object(wi_object, pgm_object["structure"],
-                            read_in_whitelists, pgm_object['email'])
+                            read_in_whitelists)

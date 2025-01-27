@@ -35,8 +35,13 @@ def validate_object(wi_object, key_yaml, read_in_whitelists, finish, email):
                 errors[part] = validate_part(part, wi_object[part], [], pooled,
                                              organisms, settings, [])
 
+    pubmed_ids = list(utils.find_keys(wi_object['project'], 'pubmed_id'))
+    if any(x not in wi_object['publication_records'] for x in pubmed_ids):
+        wi_object['publication_records'] = get_publications(
+            wi_object['publication_records'], pubmed_ids, email)
+
     if finish:
-        parsed = oty.parse_object(wi_object, key_yaml, read_in_whitelists, email)
+        parsed = oty.parse_object(wi_object, key_yaml, read_in_whitelists)
         for part in ['project', 'experimental_setting', 'technical_details']:
             if part not in parsed:
                 parsed[part] = {}
@@ -51,6 +56,24 @@ def validate_object(wi_object, key_yaml, read_in_whitelists, finish, email):
                          'warnings': warnings}
     return validation_object
 
+
+def get_publications(publications, pubmed_ids, email):
+    pubmed_entries = utils.get_publication_object(pubmed_ids, email)
+    for pubmed_entry in pubmed_entries:
+        if int(pubmed_entry['Id']) not in publications:
+            publications[int(pubmed_entry['Id'])] = {
+                'pubmed_id': int(pubmed_entry['Id']),
+                'title': str(pubmed_entry['Title']),
+                'year': int(pubmed_entry['PubDate'].split(' ')[0]),
+                'author': [str(x) for x in pubmed_entry['AuthorList'][0:3]] + [
+                    'et. al'] if len(pubmed_entry['AuthorList']) > 3 else
+                [str(x) for x in pubmed_entry['AuthorList']],
+                'journal': str(pubmed_entry['Source']),
+                'volume': int(pubmed_entry['Volume']),
+                'issue': int(pubmed_entry['Issue']),
+                'pages': str(pubmed_entry['Pages']),
+                'doi': str(pubmed_entry['DOI'])}
+    return publications
 
 def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors):
     """

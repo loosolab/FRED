@@ -28,8 +28,9 @@ def edit_wi_object(path, key_yaml, read_in_whitelists):
         wi_object = {}
         wi_object['all_factors'], real_val = get_all_factors(meta_yaml,
                                                              key_yaml)
+        wi_object['publication_records'] = get_publication_records(meta_yaml)
         for part in empty_object:
-            if part != 'all_factors':
+            if part not in ['all_factors', 'publication_records']:
                 wi_object[part], whitelist_object = new_fill(
                     meta_yaml[part], empty_object[part], key_yaml[part],
                     whitelist_object, real_val, read_in_whitelists)
@@ -40,6 +41,16 @@ def edit_wi_object(path, key_yaml, read_in_whitelists):
     wi_object['whitelists'] = whitelist_object
     wi_object = get_filenames(wi_object, meta_yaml)
     return wi_object
+
+
+def get_publication_records(meta_yaml):
+    publications = list(utils.find_keys(meta_yaml, 'publication'))
+    publication_records = {}
+    for elem in publications:
+        for pub in elem:
+            if pub['pubmed_id'] not in publication_records:
+                publication_records[pub['pubmed_id']] = pub
+    return publication_records
 
 
 def get_filenames(wi_object, meta_yaml):
