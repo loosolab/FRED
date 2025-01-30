@@ -14,19 +14,20 @@ import time
 
 class FRED:
 
-    def __init__(self, config):
+    def __init__(self, config, skip_validation=False):
         self.whitelist_repo, self.whitelist_branch, self.whitelist_path, \
         self.username, self.password, structure, self.update_whitelists, \
         self.output_path, self.filename, self.email = utils.parse_config(config)
-        self.fetch_whitelists()
+        if not skip_validation:
+            self.fetch_whitelists()
         self.structure = utils.read_in_yaml(structure)
 
     def fetch_whitelists(self):
         git_whitelists.get_whitelists(self.whitelist_path, self.whitelist_repo, self.whitelist_branch, self.update_whitelists)
 
-    def find(self, search_path, search, output, output_filename):
+    def find(self, search_path, search, output, output_filename, skip_validation):
         result = find_metafiles.find_projects(self.structure, search_path,
-                                              search, True)
+                                              search, True, skip_validation)
         if output == 'print':
             if len(result) > 0:
 
@@ -221,9 +222,9 @@ def find(args):
         search: a string specifying search parameters linked via 'and', 'or'
                 and 'not'
     """
-
-    finding = FRED(args.config)
-    finding.find(args.path, args.search, args.output, args.filename)
+    finding = FRED(args.config, args.skip_validation)
+    finding.find(args.path, args.search, args.output, args.filename,
+                 args.skip_validation)
 
 
 def generate(args):
@@ -266,7 +267,8 @@ def main():
                               help='Config file', default='config.yaml')
     find_group.add_argument('-o', '--output', default='print', choices=['json', 'print'])
     find_group.add_argument('-f', '--filename', default=None)
-    find_group.add_argument('-nu', '--no_update_whitelists', default=False, action='store_true')
+    find_group.add_argument('-sv', '--skip_validation', default=False,
+                            action='store_true')
     find_function.set_defaults(func=find)
 
     create_function = subparsers.add_parser('generate',
@@ -299,7 +301,6 @@ def main():
     validate_function.add_argument('-f', '--filename', default=None)
     validate_function.add_argument('-c', '--config', type=pathlib.Path,
                               help='Config file', default='config.yaml')
-    validate_function.add_argument('-nu', '--no_update_whitelists', default=False, action='store_true')
     validate_function.set_defaults(func=validate)
 
     #edit_function = subparsers.add_parser('edit', help='')
