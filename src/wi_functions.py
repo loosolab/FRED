@@ -143,7 +143,7 @@ def get_meta_info(config, path, project_ids):
                 "json",
                 "-f",
                 filename,
-                "-nu",
+                "-sv",
             ],
             cwd=working_path,
         )
@@ -190,7 +190,7 @@ def find_metadata(config, path, search_string):
             "json",
             "-f",
             filename,
-            "-nu",
+            "-sv",
         ],
         cwd=working_path,
     )
