@@ -105,7 +105,7 @@ class FRED:
                            'save report to yaml file']
                 print(
                     f'Do you want to see a report? Choose from the following options (1,...,{len(options)} or n)')
-                ask = Generate('', '', False, self.filename, self.structure)
+                ask = Generate('', '', False, self.filename, self.structure, self.email)
                 ask.print_option_list(options, '')
                 res = ask.parse_input_list(options, True)
 
