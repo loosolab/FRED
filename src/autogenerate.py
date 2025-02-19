@@ -225,52 +225,83 @@ class Autogenerate:
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-
-        return [str(x) for x in self.gen.publications[pubmed_id]['AuthorList'][0:3]] + ['et. al'] \
+        try:
+            res = [str(x) for x in self.gen.publications[pubmed_id]['AuthorList'][0:3]] + ['et. al'] \
             if len(self.gen.publications[pubmed_id]['AuthorList']) > 3 \
             else [str(x) for x in self.gen.publications[pubmed_id]['AuthorList']]
+        except ValueError:
+            res = None
+        return res
 
     def get_title(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return str(self.gen.publications[pubmed_id]['Title'])
+        try:
+            res = str(self.gen.publications[pubmed_id]['Title'])
+        except ValueError:
+            res = None
+        return res
 
     def get_journal(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return str(self.gen.publications[pubmed_id]['Source'])
+        try:
+            res = str(self.gen.publications[pubmed_id]['Source'])
+        except ValueError:
+            res = None
+        return res
 
     def get_volume(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return int(self.gen.publications[pubmed_id]['Volume'])
+        try:
+            res = int(self.gen.publications[pubmed_id]['Volume'])
+        except ValueError:
+            res = None
+        return res
 
     def get_year(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return int(self.gen.publications[pubmed_id]['PubDate'].split(' ')[0])
+        try:
+            res = int(self.gen.publications[pubmed_id]['PubDate'].split(' ')[0])
+        except ValueError:
+            res = None
+        return res
 
     def get_issue(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return int(self.gen.publications[pubmed_id]['Issue'])
+        try:
+            res = int(self.gen.publications[pubmed_id]['Issue'])
+        except ValueError:
+            res = None
+        return res
 
     def get_pages(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return str(self.gen.publications[pubmed_id]['Pages'])
+        try:
+            res = str(self.gen.publications[pubmed_id]['Pages'])
+        except ValueError:
+            res = None
+        return res
 
     def get_doi(self):
         self.get_publications()
         pubmed_id = utils.find_position(self.gen.result_dict,
                                         self.position[:-1] + ['pubmed_id'])
-        return str(self.gen.publications[pubmed_id]['DOI'])
+        try:
+            res = str(self.gen.publications[pubmed_id]['DOI'])
+        except ValueError:
+            res = None
+        return res
 
 
 

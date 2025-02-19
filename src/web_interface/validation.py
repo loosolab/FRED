@@ -63,17 +63,56 @@ def get_publications(publications, pubmed_ids, email):
     for pubmed_entry in pubmed_entries:
         if pubmed_entry['Id'] not in publications:
             publications[pubmed_entry['Id']] = {
-                'pubmed_id': int(pubmed_entry['Id']),
-                'title': str(pubmed_entry['Title']),
-                'year': int(pubmed_entry['PubDate'].split(' ')[0]),
-                'author': [str(x) for x in pubmed_entry['AuthorList'][0:3]] + [
-                    'et. al'] if len(pubmed_entry['AuthorList']) > 3 else
-                [str(x) for x in pubmed_entry['AuthorList']],
-                'journal': str(pubmed_entry['Source']),
-                'volume': int(pubmed_entry['Volume']),
-                'issue': int(pubmed_entry['Issue']),
-                'pages': str(pubmed_entry['Pages']),
-                'doi': str(pubmed_entry['DOI'])}
+                'pubmed_id': int(pubmed_entry['Id'])}
+
+            try:
+                publications[pubmed_entry['Id']]['title'] = str(pubmed_entry['Title'])
+            except ValueError:
+                pass
+
+            try:
+                publications[pubmed_entry['Id']]['year'] = int(pubmed_entry['PubDate'].split(' ')[0])
+            except ValueError:
+                pass
+
+            try:
+                publications[pubmed_entry['Id']]['author'] = \
+                    [str(x) for x in pubmed_entry['AuthorList'][0:3]] + \
+                    ['et. al'] if len(pubmed_entry['AuthorList']) > 3 else \
+                        [str(x) for x in pubmed_entry['AuthorList']]
+            except ValueError:
+                pass
+
+            try:
+                publications[pubmed_entry['Id']]['journal'] = \
+                    str(pubmed_entry['Source'])
+            except ValueError:
+                pass
+
+            try:
+                publications[pubmed_entry['Id']]['volume'] = \
+                    int(pubmed_entry['Volume'])
+            except ValueError:
+                pass
+
+            try:
+                publications[pubmed_entry['Id']]['issue'] = \
+                    int(pubmed_entry['Issue'])
+            except ValueError:
+                pass
+
+            try:
+                publications[pubmed_entry['Id']]['pages'] = \
+                    str(pubmed_entry['Pages'])
+            except ValueError:
+                pass
+
+            try:
+                publications[pubmed_entry['Id']]['doi'] = \
+                    str(pubmed_entry['DOI'])
+            except ValueError:
+                pass
+
     return publications
 
 

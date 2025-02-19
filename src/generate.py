@@ -15,8 +15,10 @@ class Generate(Input):
             print(self.get_summary(self.result_dict[part]))
         for elem in self.generate_end:
             func = getattr(Autogenerate, f'get_{elem[-1]}')
-            self.fill_key(elem, func(
-                Autogenerate(self, elem)), self.result_dict)
+            fill_val = func(
+                Autogenerate(self, elem))
+            if fill_val is not None:
+                self.fill_key(elem, fill_val, self.result_dict)
 
         # print validation report
         #print(self.get_validation(self.result_dict))
@@ -226,12 +228,13 @@ class Generate(Input):
                         if structure[key]['special_case']['generated'] == \
                                 'now':
                             func = getattr(Autogenerate, f'get_{key}')
-                            self.fill_key(position + [key], func(
-                                    Autogenerate(self, position + [key])
-                                    ), return_dict)
-                            if not isinstance(structure[key]['value'], dict):
-                                print(f'\n---\n{structure[key]["desc"]}\n')
-                                print(f'{key}: {utils.find_position(self.result_dict, position + [key])}')
+                            fill_val = func(Autogenerate(self, position + [key]))
+                            if fill_val is not None:
+                                self.fill_key(position + [key], fill_val,
+                                              return_dict)
+                                if not isinstance(structure[key]['value'], dict):
+                                    print(f'\n---\n{structure[key]["desc"]}\n')
+                                    print(f'{key}: {utils.find_position(self.result_dict, position + [key])}')
                         elif structure[key]['special_case']['generated'] == \
                                 'end':
                             self.generate_end.append(position + [key])
@@ -288,9 +291,11 @@ class Generate(Input):
                         if structure[option]['special_case']['generated'] == \
                                 'now':
                             func = getattr(Autogenerate, f'get_{option}')
-                            self.fill_key(position + [option], func(
-                                Autogenerate(self, position + [option])),
-                                          return_dict)
+                            fill_val = func(
+                                Autogenerate(self, position + [option]))
+                            if fill_val is not None:
+                                self.fill_key(position + [option], fill_val,
+                                              return_dict)
                         elif structure[option]['special_case']['generated'] \
                                 == 'end':
                             self.generate_end.append(position + [option])
