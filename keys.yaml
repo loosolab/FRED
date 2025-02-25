@@ -645,6 +645,70 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
+                temperature_treatment:
+                  mandatory: False
+                  list: True
+                  display_name: "Temperature Treatment"
+                  desc: ""
+                  special_case:
+                    group: "treatment_type"
+                    control:
+                      treatment_status: "not treated"
+                  value:
+                    treatment_status:
+                      mandatory: True
+                      list: False
+                      display_name: "Status"
+                      desc: "Status of temperature treatment. [treated, not treated]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    temperature:
+                      mandatory: False
+                      list: False
+                      display_name: "Temperature"
+                      desc: ""
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: "Value"
+                          desc: ""
+                          value: null
+                          whitelist: False
+                          input_type: number
+                        unit:
+                          mandatory: False
+                          list: False
+                          display_name: "Unit"
+                          desc: "°C"
+                          value: null
+                          whitelist: True
+                          input_type: select
+                    treatment_duration:
+                      mandatory: False
+                      list: False
+                      display_name: "Duration"
+                      desc: "Duration of the administration. [2 weeks]"
+                      special_case:
+                        value_unit: time
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: "Value"
+                          desc: ""
+                          value: null
+                          whitelist: False
+                          input_type: number
+                        unit:
+                          mandatory: False
+                          list: False
+                          display_name: "Unit"
+                          desc: ""
+                          value: null
+                          whitelist: True
+                          input_type: select
                 age:
                   mandatory: False
                   list: False
