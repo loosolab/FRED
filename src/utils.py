@@ -935,6 +935,8 @@ def get_combis(values, key, result_dict, key_yaml, read_in_whitelists=None):
 
         depend = []
         for elem in values[start]:
+            if isinstance(elem, dict) and "value" in elem and "unit" in elem:
+                elem = f'{elem["value"]}{elem["unit"]}'
             value = []
             possible_values[elem] = []
             if control and start in control and control[start] == elem:
@@ -1180,6 +1182,7 @@ def get_short_value(
         short_cond += f"{short_factor}#{val}"
     else:
         info = list(find_keys(key_yaml, factor))
+        # TODO: if wird nicht durchlaufen
         if (
             len(info) > 0
             and "special_case" in info[0]

@@ -164,7 +164,7 @@ class Generate(Input):
                     if structure['list'] or is_factor:
                         self.fill_key(
                                 position,
-                                self.get_list_value_unit(position, structure),
+                                self.get_list_value_unit(position[-1], structure),
                                 return_dict)
                     else:
                         self.fill_key(

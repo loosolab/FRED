@@ -651,7 +651,7 @@ experimental_setting:
                   display_name: "Temperature Treatment"
                   desc: ""
                   special_case:
-                    group: "treatment_type"
+                    group: "temperature"
                     control:
                       treatment_status: "not treated"
                   value:
@@ -659,7 +659,7 @@ experimental_setting:
                       mandatory: True
                       list: False
                       display_name: "Status"
-                      desc: "Status of temperature treatment. [treated, not treated]"
+                      desc: "Status of administration. [treated, not treated]"
                       value: null
                       whitelist: True
                       input_type: select
@@ -668,6 +668,8 @@ experimental_setting:
                       list: False
                       display_name: "Temperature"
                       desc: ""
+                      special_case:
+                        value_unit: temperature
                       value:
                         value:
                           mandatory: True
@@ -678,10 +680,10 @@ experimental_setting:
                           whitelist: False
                           input_type: number
                         unit:
-                          mandatory: False
+                          mandatory: True
                           list: False
                           display_name: "Unit"
-                          desc: "°C"
+                          desc: ""
                           value: null
                           whitelist: True
                           input_type: select
