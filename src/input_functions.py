@@ -693,7 +693,6 @@ class Input:
         :param ex_factor: the experimental factor that contains the value_unit
         :return: a dictionary containing a unit and a list of values
         """
-        print('HIER')
         # print request for unit input
         print(f'\nPlease enter the unit for factor {ex_factor}:')
         # call function to input unit

@@ -511,9 +511,6 @@ experimental_setting:
                   list: False
                   display_name: "Enrichment / Histone-Mark / Pull-Down"
                   desc: "Enrichment for bound proteins or histone marks as a result of an antibody pulldown or similar procedures.\n[GPX2, H2BK12ac, IgG]"
-                  special_case:
-                    control:
-                      enrichment_type: "Input"
                   value:
                     enrichment_type:
                       mandatory: True
@@ -645,6 +642,72 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
+                temperature_treatment:
+                  mandatory: False
+                  list: True
+                  display_name: "Temperature Treatment"
+                  desc: ""
+                  special_case:
+                    group: "temperature"
+                    control:
+                      treatment_status: "not treated"
+                  value:
+                    treatment_status:
+                      mandatory: True
+                      list: False
+                      display_name: "Status"
+                      desc: "Status of administration. [treated, not treated]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    temperature:
+                      mandatory: False
+                      list: False
+                      display_name: "Temperature"
+                      desc: ""
+                      special_case:
+                        value_unit: temperature
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: "Value"
+                          desc: ""
+                          value: null
+                          whitelist: False
+                          input_type: number
+                        unit:
+                          mandatory: True
+                          list: False
+                          display_name: "Unit"
+                          desc: ""
+                          value: null
+                          whitelist: True
+                          input_type: select
+                    treatment_duration:
+                      mandatory: False
+                      list: False
+                      display_name: "Duration"
+                      desc: "Duration of the administration. [2 weeks]"
+                      special_case:
+                        value_unit: time
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: "Value"
+                          desc: ""
+                          value: null
+                          whitelist: False
+                          input_type: number
+                        unit:
+                          mandatory: False
+                          list: False
+                          display_name: "Unit"
+                          desc: ""
+                          value: null
+                          whitelist: True
+                          input_type: select
                 age:
                   mandatory: False
                   list: False

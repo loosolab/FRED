@@ -101,16 +101,19 @@ class Autogenerate:
                                  and 'value_unit' in
                                  factor_info['special_case'])):
                     for val in values:
-                        val_info = list(utils.find_keys(self.gen.key_yaml, val))[0]
-                        if 'special_case' in val_info:
-                            if 'merge' in val_info['special_case']:
-                                for j in range(len(values[val])):
-                                    new_val = []
-                                    for elem_key in values[val][j]:
-                                        new_val.append(
-                                            f'{elem_key}:"{values[val][j][elem_key]}"')
-                                    values[val][
-                                        j] = f'{"{"}{"|".join(new_val)}{"}"}'
+                        print(val, list(utils.find_keys(self.gen.key_yaml, val)))
+                        val_info = list(utils.find_keys(self.gen.key_yaml, val))
+                        if len(val_info) > 0:
+                            val_info = val_info[0]
+                            if 'special_case' in val_info:
+                                if 'merge' in val_info['special_case']:
+                                    for j in range(len(values[val])):
+                                        new_val = []
+                                        for elem_key in values[val][j]:
+                                            new_val.append(
+                                                f'{elem_key}:"{values[val][j][elem_key]}"')
+                                        values[val][
+                                            j] = f'{"{"}{"|".join(new_val)}{"}"}'
                     if 'special_case' in factor_info:
                         if 'group' in factor_info['special_case']:
                             values['ident_key'] = factor_info['special_case'][

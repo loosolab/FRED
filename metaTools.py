@@ -188,6 +188,8 @@ class FRED:
                 if 'print report' in res:
                     print(rep)
 
+        return validation_reports["error_count"], validation_reports["warning_count"]
+
     #def edit(self, path, mandatory_only):
     #    try:
     #        size = os.get_terminal_size()
@@ -238,7 +240,7 @@ def generate(args):
 
 def validate(args):
     validating = FRED(args.config)
-    validating.validate(not args.skip_logic, args.path, args.output, args.filename)
+    errors, warnings = validating.validate(not args.skip_logic, args.path, args.output, args.filename)
 
 
 #def edit(args):

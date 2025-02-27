@@ -467,6 +467,10 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
                                 if val in real_val:
                                     search_condition.append(
                                         f'{elem[0]}:"{real_val[val]}"'.lower())
+                                else:
+                                    # TODO: real/val or own function to get values from deeper dictionaries
+                                    for sub_key in elem[1][key]:
+                                        search_condition.append(f'{elem[0]}:"{elem[1][key][sub_key]}"'.lower())
                             else:
                                 search_condition.append(
                                     f'{elem[0]}:"{elem[1][key]}"'.lower())
@@ -480,7 +484,6 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
                     else:
                         search_condition.append(
                             f'{elem[0]}:"{elem[1]}"'.lower())
-
             # call functions to fill the samples with the values from the
             # condition
             filled_sample = get_samples(split_condition, copy.deepcopy(sample),
