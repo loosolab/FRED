@@ -197,6 +197,8 @@ def get_search_keys(key_yaml, chained):
             "key_name": key,
             "display_name": list(utils.find_keys(key_yaml, key))[0]["display_name"],
         }
+
+        exist = True
         if (
             isinstance(key_yaml[key]["value"], dict)
             and not set(["mandatory", "list", "desc", "display_name", "value"])
@@ -210,20 +212,29 @@ def get_search_keys(key_yaml, chained):
                 key_yaml[key]["value"],
                 f"{chained}{key}:" if chained != "" else f"{key}:",
             )
+
         else:
-            d["chained_keys"] = f"{chained}{key}:" if chained != "" else f"{key}:"
-            d["nested"] = []
+            if 'special_case' in key_yaml[key] and 'generated' in key_yaml[key]['special_case'] and key_yaml[key]['special_case']['generated'] in ['now', 'end'] and key != 'id':
+                exist = False
+            else:
+                d["chained_keys"] = f"{chained}{key}:" if chained != "" else f"{key}:"
+                d["nested"] = []
 
-        if "whitelist" in key_yaml[key]:
-            d["whitelist"] = key_yaml[key]["whitelist"]
-        elif (
-            "special_case" in key_yaml[key] and "merge" in key_yaml[key]["special_case"]
-        ):
-            d["whitelist"] = key_yaml[key]["value"][
-                key_yaml[key]["special_case"]["merge"]
-            ]["whitelist"]
+        if exist:
 
-        if "whitelist" in d and d["whitelist"]:
-            d["search_info"] = {"key_name": key}
-        res.append(d)
+            if len(d['nested']) == 1:
+                d['nested'] = d['nested'][0]['nested']
+
+            if "whitelist" in key_yaml[key]:
+                d["whitelist"] = key_yaml[key]["whitelist"]
+            elif (
+                "special_case" in key_yaml[key] and "merge" in key_yaml[key]["special_case"]
+            ):
+                d["whitelist"] = key_yaml[key]["value"][
+                    key_yaml[key]["special_case"]["merge"]
+                ]["whitelist"]
+
+            if "whitelist" in d and d["whitelist"]:
+                d["search_info"] = {"key_name": key}
+            res.append(d)
     return res
