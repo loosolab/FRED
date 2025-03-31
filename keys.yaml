@@ -979,7 +979,7 @@ technical_details:
       desc: "Enter the sequencing technique for each experimental setting."
       special_case:
         edit: "not removable"
-        generated: 'now'
+        generated: now
       value:
         setting:
           mandatory: True

@@ -208,13 +208,16 @@ def get_search_keys(key_yaml, chained):
                 and "merge" in key_yaml[key]["special_case"]
             )
         ):
-            d["nested"] = get_search_keys(
-                key_yaml[key]["value"],
-                f"{chained}{key}:" if chained != "" else f"{key}:",
-            )
+            if key == 'technical_replicates':
+                exist = False
+            else:
+                d["nested"] = get_search_keys(
+                    key_yaml[key]["value"],
+                    f"{chained}{key}:" if chained != "" else f"{key}:",
+                    )
 
         else:
-            if key == 'technical_replicates' or 'special_case' in key_yaml[key] and 'generated' in key_yaml[key]['special_case'] and key_yaml[key]['special_case']['generated'] in ['now', 'end'] and key != 'id':
+            if 'special_case' in key_yaml[key] and 'generated' in key_yaml[key]['special_case'] and key_yaml[key]['special_case']['generated'] in ['now', 'end'] and key != 'id':
                 exist = False
             else:
                 d["chained_keys"] = f"{chained}{key}:" if chained != "" else f"{key}:"
@@ -223,20 +226,18 @@ def get_search_keys(key_yaml, chained):
         if exist:
 
             if len(d['nested']) == 1:
-                d['key_name'] = d['nested'][0]['key_name']
-                d['display_name'] = d['nested'][0]['display_name']
-                d['nested'] = d['nested'][0]['nested']
+                d = d['nested'][0]
+            else:
+                if "whitelist" in key_yaml[key]:
+                    d["whitelist"] = key_yaml[key]["whitelist"]
+                elif (
+                    "special_case" in key_yaml[key] and "merge" in key_yaml[key]["special_case"]
+                ):
+                    d["whitelist"] = key_yaml[key]["value"][
+                        key_yaml[key]["special_case"]["merge"]
+                    ]["whitelist"]
 
-            if "whitelist" in key_yaml[key]:
-                d["whitelist"] = key_yaml[key]["whitelist"]
-            elif (
-                "special_case" in key_yaml[key] and "merge" in key_yaml[key]["special_case"]
-            ):
-                d["whitelist"] = key_yaml[key]["value"][
-                    key_yaml[key]["special_case"]["merge"]
-                ]["whitelist"]
-
-            if "whitelist" in d and d["whitelist"]:
-                d["search_info"] = {"key_name": key}
+                if "whitelist" in d and d["whitelist"]:
+                    d["search_info"] = {"key_name": key}
             res.append(d)
     return res
