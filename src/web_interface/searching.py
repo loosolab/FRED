@@ -215,7 +215,6 @@ def get_search_keys(key_yaml, chained):
                     key_yaml[key]["value"],
                     f"{chained}{key}:" if chained != "" else f"{key}:",
                     )
-
         else:
             if 'special_case' in key_yaml[key] and 'generated' in \
                     key_yaml[key]['special_case'] and \
@@ -224,14 +223,20 @@ def get_search_keys(key_yaml, chained):
                     ('invisible' in key_yaml[key]['special_case'] and
                      key_yaml[key]['special_case']['invisible']):
                 exist = False
+            elif chained.endswith('experimental_factors:') and key == 'values':
+                exist = False
             else:
                 d["chained_keys"] = f"{chained}{key}:" if chained != "" else f"{key}:"
                 d["nested"] = []
 
         if exist:
-
             if len(d['nested']) == 1:
-                d = d['nested'][0]
+                if key == 'experimental_factors':
+                    display_name = d['display_name']
+                    d = d['nested'][0]
+                    d['display_name'] = display_name
+                else:
+                    d = d['nested'][0]
             else:
                 if "whitelist" in key_yaml[key]:
                     d["whitelist"] = key_yaml[key]["whitelist"]
