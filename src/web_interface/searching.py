@@ -184,7 +184,7 @@ def find_metadata(key_yaml, path, search_string):
     return new_files
 
 
-def get_search_keys(key_yaml, chained):
+def get_search_keys(key_yaml, chained, is_factor= False):
     """
     This function returns all keys of the metadata structure in a nested way
     :param key_yaml: the read in keys.yaml
@@ -214,7 +214,7 @@ def get_search_keys(key_yaml, chained):
                 d["nested"] = get_search_keys(
                     key_yaml[key]["value"],
                     f"{chained}{key}:" if chained != "" else f"{key}:",
-                    )
+                    True if 'samples:' in chained else False)
         else:
             if 'special_case' in key_yaml[key] and 'generated' in \
                     key_yaml[key]['special_case'] and \
@@ -249,5 +249,8 @@ def get_search_keys(key_yaml, chained):
 
                 if "whitelist" in d and d["whitelist"]:
                     d["search_info"] = {"key_name": key}
+            if is_factor:
+                display_name = chained.rstrip(':').split(':')[-1].replace('_', ' ').title()
+                d['display_name'] = f'{display_name} {d["display_name"]}'
             res.append(d)
     return res

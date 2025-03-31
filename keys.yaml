@@ -515,7 +515,7 @@ experimental_setting:
                     enrichment_type:
                       mandatory: True
                       list: False
-                      display_name: "Enrichment type"
+                      display_name: "Type"
                       desc: "Type of enrichment.\n[GPX2, H2BK12ac, IgG]"
                       value: null
                       whitelist: True
