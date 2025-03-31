@@ -214,7 +214,7 @@ def get_search_keys(key_yaml, chained):
             )
 
         else:
-            if 'special_case' in key_yaml[key] and 'generated' in key_yaml[key]['special_case'] and key_yaml[key]['special_case']['generated'] in ['now', 'end'] and key != 'id':
+            if key == 'technical_replicates' or 'special_case' in key_yaml[key] and 'generated' in key_yaml[key]['special_case'] and key_yaml[key]['special_case']['generated'] in ['now', 'end'] and key != 'id':
                 exist = False
             else:
                 d["chained_keys"] = f"{chained}{key}:" if chained != "" else f"{key}:"

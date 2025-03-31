@@ -35,6 +35,7 @@ class Input:
         self.publications = {}
         self.generate_end = []
         self.email = email
+        self.setting_ids = []
 
     def parse_input_value(self, key, structure, allow_float=False):
         """

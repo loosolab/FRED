@@ -28,18 +28,20 @@ class Autogenerate:
         """
 
         # search for setting IDs in result_dict
-        setting_ids = list(utils.find_keys('setting_id', self.gen.result_dict))
+        setting_ids = self.gen.setting_ids
 
         # find the setting_id with the highest index and add 1
         if len(setting_ids) > 0:
             max_id = 0
-            for s_id in setting_ids[0]:
+            for s_id in setting_ids:
                 max_id = max(max_id, int(s_id.replace('exp', '')))
             setting_id = f'exp{max_id+1}'
 
         # set setting_id to exp1 if it is the first setting
         else:
             setting_id = 'exp1'
+
+        self.gen.setting_ids.append(setting_id)
 
         return setting_id
 
@@ -305,6 +307,18 @@ class Autogenerate:
         except ValueError:
             res = None
         return res
+
+    def get_techniques(self):
+        all_settings = self.gen.setting_ids
+        structure = list(utils.find_keys(self.gen.key_yaml, 'techniques'))[0]
+        structure['list'] = False
+        for i in range(len(all_settings)):
+            self.gen.parse_lists(structure, self.position + [i], 2, self.gen.result_dict)
+        return utils.find_position(self.gen.result_dict, self.position)
+
+    def get_setting(self):
+        print(self.position)
+        return self.gen.setting_ids[self.position[-2]]
 
 
 

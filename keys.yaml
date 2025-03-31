@@ -979,7 +979,8 @@ technical_details:
       desc: "Enter the sequencing technique for each experimental setting."
       special_case:
         edit: "not removable"
-      value: 
+        generated: 'now'
+      value:
         setting:
           mandatory: True
           list: False
@@ -992,6 +993,7 @@ technical_details:
               regex: '\b(?!e(x(p[0-9]*)?)?\b)\w+'
               max_length: 5
             edit: "not editable"
+            generated: now
           input_type: restricted_short_text
         technique:
           mandatory: True
