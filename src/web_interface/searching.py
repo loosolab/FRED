@@ -224,7 +224,7 @@ def get_search_keys(key_yaml, chained):
 
             if len(d['nested']) == 1:
                 d['nested'] = d['nested'][0]['nested']
-                d['key_name'] = d['nested'][0]['key']
+                d['key_name'] = d['nested'][0]['key_name']
                 d['display_name']= d['nested'][0]['display_name']
 
             if "whitelist" in key_yaml[key]:
