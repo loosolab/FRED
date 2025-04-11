@@ -69,6 +69,7 @@ def iterate_dir_metafiles(
     pool.close()
     end_reading = time.time()
     print(f'File reading and validation took {"%.2f" % (end_reading-end_listing)} seconds with {cpu_count} CPUs.')
+    reading_times = []
     for result in results:
         if result[0] is not None:
             if result[3] == 0 or return_false:
@@ -82,9 +83,10 @@ def iterate_dir_metafiles(
 
             error_count += result[3]
             warning_count += result[5]
+        reading_times.append(result[6])
     end_result = time.time()
     print(f'Parsing the results took {"%.2f" % (end_result-end_reading)} seconds.')
-
+    print(f'File reading per file took MIN {"%.2f" % (min(reading_times))}s | MEAN {"%.2f" % (sum(reading_times)/len(reading_times))}s | MAX {"%.2f" % (max(reading_times))}s')
     return metafile_list, {
         "all_files": len(results),
         "corrupt_files": {"count": corrupt_count, "report": file_reports},
@@ -107,7 +109,7 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
     except yml.scanner.ScannerError:
         metafile = None
     end_read = time.time()
-    #print(f'The reading of ONE file took {"%.2f" % (end_read-start)} seconds.')
+    read_time = end_read - start
     # test if metafile is valid
     if metafile is not None:
         if not skip_validation:
@@ -158,4 +160,5 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
         error_count,
         warning_reports,
         warning_count,
+        read_time
     )

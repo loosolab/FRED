@@ -169,7 +169,7 @@ def get_search_mask(pgm_object):
 
 # TODO: fix path
 def find_metadata(config, path, search_string):
-    print("SEARCH_STRING", search_string)
+    start = time.time()
     uuid = "".join(
         random.choice(string.ascii_uppercase + string.digits) for _ in range(5)
     )
@@ -195,9 +195,14 @@ def find_metadata(config, path, search_string):
         cwd=working_path,
     )
     proc.wait()
+    subprocess_end = time.time()
+    print(
+        f'Subprocess "FIND" took {"%.2f" % (subprocess_end - start)} seconds.')
     res = utils.read_in_json(os.path.join(working_path, f"{filename}.json"))
-    print("RES", res)
     os.remove(os.path.join(working_path, f"{filename}.json"))
+    read_end = time.time()
+    print(
+        f'Reading and removing the json file took {"%.2f" % (read_end - subprocess_end)} seconds.')
     return res["data"]
 
 
