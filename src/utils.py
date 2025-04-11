@@ -5,6 +5,7 @@ import os
 import textwrap
 from Bio import Entrez
 import yaml
+from yaml import CLoader as Loader, CDumper as Dumper
 from tabulate import tabulate
 
 # The following functions were copied from Mampok
@@ -94,7 +95,7 @@ def save_as_yaml(dictionary, file_path):
     :param file_path: the path of the yaml file to be created
     """
     with open(file_path, "w") as file:
-        yaml.dump(dictionary, file, sort_keys=False)
+        yaml.dump(dictionary, file, sort_keys=False, Dumper=Dumper)
 
 
 def read_in_yaml(yaml_file):
@@ -104,7 +105,7 @@ def read_in_yaml(yaml_file):
     :return: low_output: a dictionary containing the information of the yaml
     """
     with open(yaml_file) as file:
-        output = yaml.load(file, Loader=yaml.FullLoader)
+        output = yaml.load(file, Loader=Loader)
     low_output = {k.lower(): v for k, v in output.items()}
     return low_output
 
