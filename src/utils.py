@@ -105,8 +105,8 @@ def read_in_yaml(yaml_file):
     """
     with open(yaml_file) as file:
         output = yaml.load(file, Loader=yaml.FullLoader)
-    low_output = {k.lower(): v for k, v in output.items()}
-    return low_output
+    #low_output = {k.lower(): v for k, v in output.items()}
+    return output
 
 
 def read_in_json(json_file):
