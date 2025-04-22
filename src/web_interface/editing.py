@@ -185,7 +185,7 @@ def fill_experimental_setting(wi_object, meta_yaml, key_yaml, whitelist_object,
                             input_fields = fac_cond.get_samples(
                                 split_cond, copy.deepcopy(sample), real_val,
                                 key_yaml, sample_name, organism, read_in_whitelists)
-
+                            print(input_fields)
                             if 'samples' in cond['biological_replicates']:
                                 for s in cond['biological_replicates']['samples']:
                                     filled_keys = []
