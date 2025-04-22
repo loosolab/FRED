@@ -689,7 +689,6 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                 # TODO: rework with real_val
 
                                 if 'input_fields' in sample[i]:
-                                    print('HIER')
                                     # call this function on the keys of the
                                     # value in order to fill them
                                     filled_value = get_samples(
@@ -702,8 +701,9 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                         info, key_yaml, sample_name,
                                         organism_name, read_in_whitelists, is_factor=is_factor)
                                 # TODO: als real_val?
+                                elif c[0] == 'enrichment_type':
+                                    print(c[1])
                                 elif 'headers' in sample[i]:
-                                    print('DA')
                                     headers = [x for x in c[1]]
                                     w_key = None
                                     if isinstance(sample[i]['headers'], dict):
@@ -735,8 +735,6 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                             'plain_group':
                                         filled_value = f'{filled_value} ' \
                                                        f'({w_key})'
-                                else:
-                                    print('DORT')
 
                             # save the filled value in 'list_value' if the
                             # input field takes a list
