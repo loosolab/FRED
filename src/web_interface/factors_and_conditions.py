@@ -711,11 +711,11 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                     print(connected_value)
                                     if 'whitelist_keys' in sample[i] and c[0] in read_in_whitelists:
                                         for key in sample[i]['whitelist_keys']:
+                                            print(read_in_whitelists[c[0][0]])
                                             if f'{connected_value} ({key})' in read_in_whitelists[c[0]]:
-                                                filled_value = f'{connected_value} ({key})'
+                                                connected_value = f'{connected_value} ({key})'
                                                 break
-                                    else:
-                                        filled_value = connected_value
+                                    filled_value = connected_value
                                     print(filled_value)
                                 elif 'headers' in sample[i]:
                                     headers = [x for x in c[1]]
