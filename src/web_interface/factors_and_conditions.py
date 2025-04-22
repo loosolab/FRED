@@ -703,9 +703,12 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                 # TODO: als real_val?
                                 elif c[0] == 'enrichment_type':
                                     connected_value = []
+                                    print(c[1])
                                     for key in c[1]:
+                                        print('KEY', key)
                                         connected_value.append(c[1][key])
                                     connected_value = ' '.join(connected_value)
+                                    print(connected_value)
                                     if 'whitelist_keys' in sample[i] and c[0] in read_in_whitelists:
                                         for key in sample[i]['whitelist_keys']:
                                             if f'{connected_value} ({key})' in read_in_whitelists[c[0]]:
