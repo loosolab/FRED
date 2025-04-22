@@ -702,7 +702,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                         organism_name, read_in_whitelists, is_factor=is_factor)
                                 # TODO: als real_val?
                                 elif c[0] == 'enrichment_type':
-                                    print(c[1])
+                                    print(sample[i])
                                 elif 'headers' in sample[i]:
                                     headers = [x for x in c[1]]
                                     w_key = None
