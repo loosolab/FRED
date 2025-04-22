@@ -702,7 +702,18 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                         organism_name, read_in_whitelists, is_factor=is_factor)
                                 # TODO: als real_val?
                                 elif c[0] == 'enrichment_type':
-                                    print(sample[i])
+                                    connected_value = []
+                                    for key in c[1]:
+                                        connected_value.append(c[1][key])
+                                    connected_value = ' '.join(connected_value)
+                                    if 'whitelist_keys' in sample[i] and c[0] in read_in_whitelists:
+                                        for key in sample[i]['whitelist_keys']:
+                                            if f'{connected_value} ({key})' in read_in_whitelists[c[0]]:
+                                                filled_value = f'{connected_value} ({key})'
+                                                break
+                                    else:
+                                        filled_value = connected_value
+                                    print(filled_value)
                                 elif 'headers' in sample[i]:
                                     headers = [x for x in c[1]]
                                     w_key = None
