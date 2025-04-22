@@ -711,7 +711,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                     print(connected_value)
                                     if 'whitelist_keys' in sample[i] and c[0] in read_in_whitelists:
                                         for key in sample[i]['whitelist_keys']:
-                                            print(read_in_whitelists[c[0][0]])
+                                            print(read_in_whitelists[c[0].keys()])
                                             if f'{connected_value} ({key})' in read_in_whitelists[c[0]]:
                                                 connected_value = f'{connected_value} ({key})'
                                                 break
