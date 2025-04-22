@@ -644,6 +644,8 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
             # iterate over factors in condition
             for c in split_condition:
 
+                print(c)
+                
                 # input field of current factor
                 if sample[i]['position'].split(':')[-1] == c[0]:
                     # extract properties of the factor from the general
