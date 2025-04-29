@@ -741,7 +741,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                             'plain_group':
                                         filled_value = f'{filled_value} ' \
                                                        f'({w_key})'
-                            print(filled_value)
+                            print(c, '\n', filled_value)
                             # save the filled value in 'list_value' if the
                             # input field takes a list
                             if sample[i]['list']:
