@@ -681,7 +681,10 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                             # real_val contains the current value as key
 
                             if val in real_val:
+                                print('DA')
                                 filled_value = real_val[val]
+                                if c[0] == 'enrichment_type':
+                                    filled_value = f'{filled_value} (proteins)'
 
                             # value is not in real_val
                             else:
@@ -701,7 +704,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                         info, key_yaml, sample_name,
                                         organism_name, read_in_whitelists, is_factor=is_factor)
                                 # TODO: als real_val? automate
-                                elif c[0] == 'enrichment_type' and not is_factor:
+                                elif c[0] == 'enrichment_type':
                                     print('HERE')
                                     connected_value = []
                                     for key in c[1]:
