@@ -761,6 +761,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                             print('DA')
                             # save the value from the dictionary real_val if it
                             # contains the current value
+                            print(c[0], 'headers' in sample[i])
                             if c[0] == 'enrichment_type' and 'headers' in sample[i] and 'proteins' in sample[i]['headers']:
                                 if not c[1].endswith('(proteins)'):
                                     filled_value = f'{c[1]} (proteins)'
