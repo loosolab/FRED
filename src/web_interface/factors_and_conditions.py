@@ -710,7 +710,6 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                     filled_value = f'{connected_value} (proteins)'
                                     sample[i]['headers'] = {'proteins': 'gene_name ensembl_id'}
                                 elif 'headers' in sample[i]:
-                                    print('DA')
                                     headers = [x for x in c[1]]
                                     w_key = None
                                     if isinstance(sample[i]['headers'], dict):
@@ -759,7 +758,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
 
                         # value is not a dictionary
                         else:
-
+                            print('DA')
                             # save the value from the dictionary real_val if it
                             # contains the current value
                             if c[1] in real_val:
@@ -786,7 +785,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                         filled_value = int(c[1])
                                     else:
                                         filled_value = c[1]
-
+                            print('&&&&&&', filled_value)
                             # save the filled value in 'list_value' if the
                             # input field takes a list
                             if sample[i]['list']:
