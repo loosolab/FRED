@@ -706,7 +706,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                     for key in c[1]:
                                         connected_value.append(c[1][key])
                                     connected_value = ' '.join(connected_value)
-                                    filled_value = connected_value
+                                    filled_value = f'{connected_value} (proteins)'
                                     sample[i]['headers'] = {'proteins': 'gene_name ensembl_id'}
                                 elif 'headers' in sample[i]:
                                     headers = [x for x in c[1]]
