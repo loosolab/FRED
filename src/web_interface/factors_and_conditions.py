@@ -702,6 +702,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                         organism_name, read_in_whitelists, is_factor=is_factor)
                                 # TODO: als real_val? automate
                                 elif c[0] == 'enrichment_type':
+                                    print('HERE')
                                     connected_value = []
                                     for key in c[1]:
                                         connected_value.append(c[1][key])
@@ -740,7 +741,7 @@ def get_samples(split_condition, sample, real_val, key_yaml, sample_name,
                                             'plain_group':
                                         filled_value = f'{filled_value} ' \
                                                        f'({w_key})'
-
+                            print(filled_value)
                             # save the filled value in 'list_value' if the
                             # input field takes a list
                             if sample[i]['list']:
