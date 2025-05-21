@@ -31,8 +31,8 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     html_filenames, filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
-    html_str = ''
-    for elem in yaml_object:
+    html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)[0]
+    '''for elem in yaml_object:
         if elem == 'experimental_setting':
             end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
             plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
@@ -45,7 +45,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
             html_str = f'{html_str}<h3>{elem}</h3>' \
                     f'{object_to_html(yaml_object[elem], 0, False)}' \
                     f'<br>{end}'
-
+'''
     return {'summary': html_str, 'file_names': html_filenames,
             'file_string': (project_id, '\n'.join(filenames)) if
             project_id is not None else None}
