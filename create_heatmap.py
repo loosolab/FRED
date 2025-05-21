@@ -1,11 +1,6 @@
-import plotly.express as px
 import plotly.graph_objects as go
 import plotly as plt
-import pandas as pd
-import argparse
-import pathlib
 from src import utils
-import numpy as np
 from dash_utils import get_data
 
 def get_heatmap(path, keys_yaml):
