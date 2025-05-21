@@ -60,14 +60,14 @@ def get_heatmap(path, keys_yaml):
                 label_value = ''
                 for elem in splitted:
                     if isinstance(elem[1], dict):
-                        label_value += f'\u00b7 {elem[0].replace('_', ' ')}: {", ".join([elem[1][k] for k in elem[1]])}<br>'
+                        label_value += f'\u00b7 {elem[0].replace("_", " ")}: {", ".join([elem[1][k] for k in elem[1]])}<br>'
                     elif isinstance(elem[1], list):
                         if len(elem[1]>3):
-                            label_value += f'\u00b7 {elem[0].replace('_', ' ')}: {", ".join(elem[1][:3])}, ...<br>'
+                            label_value += f'\u00b7 {elem[0].replace("_", " ")}: {", ".join(elem[1][:3])}, ...<br>'
                         else:
-                            label_value += f'\u00b7 {elem[0].replace('_', ' ')}: {", ".join(elem[1])}<br>'
+                            label_value += f'\u00b7 {elem[0].replace("_", " ")}: {", ".join(elem[1])}<br>'
                     else:
-                        label_value += f'\u00b7 {elem[0].replace('_', ' ')}: {elem[1]}<br>'
+                        label_value += f'\u00b7 {elem[0].replace("_", " ")}: {elem[1]}<br>'
             condition_labels[settings[value]['condition_index'][i]]= label_value
 
         data_input = heatmap
