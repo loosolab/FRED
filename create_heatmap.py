@@ -8,8 +8,8 @@ from src import utils
 import numpy as np
 from dash_utils import get_data
 
-def get_heatmap(path):
-    settings, experimental_factors, organisms, max_vals = get_data(path)
+def get_heatmap(path, keys_yaml):
+    settings, experimental_factors, organisms, max_vals = get_data(path, keys_yaml)
 
     heatmaps=[]
 
@@ -29,7 +29,7 @@ def get_heatmap(path):
                 option_text.append(color("black", option))
         
 
-        show_factors = '<br>'.join([f'\u00b7 {x.replace('_', ' ')}' for x in experimental_factors[value]])
+        #show_factors = '<br>'.join([f'\u00b7 {x.replace('_', ' ')}' for x in experimental_factors[value]])
         
         colors = [[0, 'white']]
         print('HIER', max_vals[value])
