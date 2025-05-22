@@ -210,6 +210,7 @@ def parse_headers(headers, value, mode='dict'):
     # (depending on mode)
     new_val = {} if mode == 'dict' else ''
     # iterate over the keys in the header
+    print('HEADERS', headers)
     for key_index in range(len(headers.split(' '))):
 
         # return a dictionary
@@ -217,6 +218,7 @@ def parse_headers(headers, value, mode='dict'):
 
             # save the header and value at index 'key_index' in the dictionary
             # (header and value split at ' ' -> lists that are indexed)
+            print('VALUE', value, key_index)
             new_val[headers.split(' ')[key_index]] = \
                 value.split(' ')[key_index]
 
