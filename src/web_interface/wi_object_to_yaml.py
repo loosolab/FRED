@@ -299,7 +299,7 @@ def parse_part(wi_object, key_yaml, factors, project_id, organism, sample_name,
                     # wi object contains whitelist keys
                     if 'whitelist_keys' in wi_object:
                         
-                        if not isinstance(wi_object['value'], dict):
+                        if not isinstance(convert_value, dict):
                             # replace value with converted one
                             convert_value = wi_utils.parse_whitelist_keys(
                                 wi_object['whitelist_keys'], convert_value,
