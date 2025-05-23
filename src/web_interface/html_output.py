@@ -32,6 +32,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
 
     # rewrite yaml to html
     html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)[0]
+    print(html_str)
     '''for elem in yaml_object:
         if elem == 'experimental_setting':
             end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
