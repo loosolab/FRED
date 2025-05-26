@@ -2,6 +2,7 @@ import src.utils as utils
 import src.web_interface.wi_object_to_yaml as oty
 import create_heatmap
 from jinja2 import Template
+import os
 
 
 def get_summary(wi_object, key_yaml, read_in_whitelists):
@@ -32,7 +33,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     html_filenames, filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
-    input_template_path = r"template"
+    input_template_path = os.path.join(os.path.dirname('__file__'), 'template')
 
     html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
     plotly_jinja_data = {"fig":html_str[0]}
