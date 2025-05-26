@@ -33,16 +33,13 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     html_filenames, filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
-    input_template_path = os.path.join(os.path.dirname('__file__'), 'template')
+    template = '<!DOCTYPE html> <html> <head> <meta charset="utf-8" />   <!--It is necessary to use the UTF-8 encoding with plotly graphics to get e.g. negative signs to render correctly --> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> </head> <body> <h1>Here\'s a Plotly graph!</h1> {{ fig }} <p>And here\'s some text after the graph.</p> </body> </html>'
 
     html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
     plotly_jinja_data = {"fig":html_str[0]}
     
-
-    output = ''
-    with open(input_template_path) as template_file:
-        j2_template = Template(template_file.read())
-        output = j2_template.render(plotly_jinja_data)
+    j2_template = Template(template)
+    output = j2_template.render(plotly_jinja_data)
     print(output)
     '''for elem in yaml_object:
         if elem == 'experimental_setting':
