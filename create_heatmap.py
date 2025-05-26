@@ -88,7 +88,7 @@ def get_heatmap(path, keys_yaml):
         )
         
         fig.update_layout(legend_valign='top')
-        heatmaps.append(fig.to_html(full_html=True, include_plotlyjs=True))
+        heatmaps.append(fig.to_html(full_html=False))
     return heatmaps
 
 

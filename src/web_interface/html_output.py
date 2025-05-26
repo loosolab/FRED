@@ -1,6 +1,7 @@
 import src.utils as utils
 import src.web_interface.wi_object_to_yaml as oty
 import create_heatmap
+from jinja2 import Template
 
 
 def get_summary(wi_object, key_yaml, read_in_whitelists):
@@ -31,8 +32,17 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     html_filenames, filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
-    html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)[0]
-    print(html_str)
+    input_template_path = r"template"
+
+    html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
+    plotly_jinja_data = {"fig":html_str[0]}
+    
+
+    output = ''
+    with open(input_template_path) as template_file:
+        j2_template = Template(template_file.read())
+        output = j2_template.render(plotly_jinja_data)
+    print(output)
     '''for elem in yaml_object:
         if elem == 'experimental_setting':
             end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
@@ -47,7 +57,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                     f'{object_to_html(yaml_object[elem], 0, False)}' \
                     f'<br>{end}'
 '''
-    return {'summary': html_str, 'file_names': html_filenames,
+    return {'summary': output, 'file_names': html_filenames,
             'file_string': (project_id, '\n'.join(filenames)) if
             project_id is not None else None}
 

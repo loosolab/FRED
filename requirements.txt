@@ -12,3 +12,4 @@ seaborn~=0.13.2
 gevent~=24.2.1
 biopython
 plotly
+jinja2
