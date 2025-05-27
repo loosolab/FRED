@@ -20,8 +20,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     """
 
     # parse wi_object to yaml
-    #yaml_object = oty.parse_object(wi_object, key_yaml, read_in_whitelists)
-    yaml_object = wi_object
+    yaml_object = oty.parse_object(wi_object, key_yaml, read_in_whitelists)
     
     # save the project_id from the yaml file
     if 'project' in yaml_object and 'id' in yaml_object['project']:
@@ -37,33 +36,9 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     html_filenames, filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
-    template = Template('''
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Plotly Chart</title>
-            <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
-        </head>
-        <body>
-            <div class="plot-container plotly">
-                {{ plot_div|safe }}
-            </div>
-        </body>
-        </html>
-        ''')
-    #html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
-    fig = go.Figure(data=go.Bar(y=[2, 3, 1]))
-    #plotly_jinja_data = {"fig":html_str[0]}
-    plot_html = plt.offline.plot(fig, include_plotlyjs=False, output_type='div')
-    j2_template = template
-    rendered_html = j2_template.render(plot_div=plot_html)
-    #output = j2_template.render(plotly_jinja_data)
     
-    with open('Output.html', "w", encoding="utf-8") as output_file:
-        output_file.write(rendered_html)
-    print(rendered_html)
+    html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
+    
     '''for elem in yaml_object:
         if elem == 'experimental_setting':
             end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
@@ -78,7 +53,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                     f'{object_to_html(yaml_object[elem], 0, False)}' \
                     f'<br>{end}'
 '''
-    return {'summary': rendered_html, 'file_names': html_filenames,
+    return {'summary': html_str, 'file_names': html_filenames,
             'file_string': (project_id, '\n'.join(filenames)) if
             project_id is not None else None}
 
