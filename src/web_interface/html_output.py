@@ -39,6 +39,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     
     #html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)[0]
     html_str = '''
+                <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
                 <div id="myDiv" style="width: 480px; height: 400px;"></div>
                     <script>
                     var data = [{
