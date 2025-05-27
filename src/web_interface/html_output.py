@@ -5,6 +5,7 @@ from jinja2 import Template
 import os
 import plotly.graph_objects as go
 import plotly.io as pio
+import plotly as plt
 
 
 def get_summary(wi_object, key_yaml, read_in_whitelists):
@@ -36,18 +37,32 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     html_filenames, filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
-    template = '<!DOCTYPE html> <html> <head> <meta charset="utf-8" />   <!--It is necessary to use the UTF-8 encoding with plotly graphics to get e.g. negative signs to render correctly --> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> </head> <body> <h1>Here\'s a Plotly graph!</h1> {{ plot_div|safe }} <p>And here\'s some text after the graph.</p> </body> </html>'
-
+    template = Template('''
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Plotly Chart</title>
+            <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+        </head>
+        <body>
+            <div class="plot-container plotly">
+                {{ plot_div|safe }}
+            </div>
+        </body>
+        </html>
+        ''')
     #html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
     fig = go.Figure(data=go.Bar(y=[2, 3, 1]))
     #plotly_jinja_data = {"fig":html_str[0]}
-    plot_html = pio.to_html(fig, full_html=False)
-    j2_template = Template(template)
+    plot_html = plt.offline.plot(fig, include_plotlyjs=False, output_type='div')
+    j2_template = template
     rendered_html = j2_template.render(plot_div=plot_html)
     #output = j2_template.render(plotly_jinja_data)
     
-    #with open('Output.html', "w", encoding="utf-8") as output_file:
-    #    output_file.write(output)
+    with open('Output.html', "w", encoding="utf-8") as output_file:
+        output_file.write(rendered_html)
     print(rendered_html)
     '''for elem in yaml_object:
         if elem == 'experimental_setting':
