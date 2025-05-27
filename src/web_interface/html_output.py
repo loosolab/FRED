@@ -3,6 +3,8 @@ import src.web_interface.wi_object_to_yaml as oty
 import create_heatmap
 from jinja2 import Template
 import os
+import plotly.graph_objects as go
+import plotly.io as pio
 
 
 def get_summary(wi_object, key_yaml, read_in_whitelists):
@@ -17,8 +19,9 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     """
 
     # parse wi_object to yaml
-    yaml_object = oty.parse_object(wi_object, key_yaml, read_in_whitelists)
-
+    #yaml_object = oty.parse_object(wi_object, key_yaml, read_in_whitelists)
+    yaml_object = wi_object
+    
     # save the project_id from the yaml file
     if 'project' in yaml_object and 'id' in yaml_object['project']:
         project_id = yaml_object['project']['id']
@@ -35,12 +38,17 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     # rewrite yaml to html
     template = '<!DOCTYPE html> <html> <head> <meta charset="utf-8" />   <!--It is necessary to use the UTF-8 encoding with plotly graphics to get e.g. negative signs to render correctly --> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> </head> <body> <h1>Here\'s a Plotly graph!</h1> {{ fig }} <p>And here\'s some text after the graph.</p> </body> </html>'
 
-    html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
-    plotly_jinja_data = {"fig":html_str[0]}
-    
+    #html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
+    fig = go.Figure(data=go.Bar(y=[2, 3, 1]))
+    #plotly_jinja_data = {"fig":html_str[0]}
+    plot_html = pio.to_html(fig, full_html=False)
     j2_template = Template(template)
-    output = j2_template.render(plotly_jinja_data)
-    print(output)
+    rendered_html = j2_template.render(plot_div=plot_html)
+    #output = j2_template.render(plotly_jinja_data)
+    
+    #with open('Output.html', "w", encoding="utf-8") as output_file:
+    #    output_file.write(output)
+    print(rendered_html)
     '''for elem in yaml_object:
         if elem == 'experimental_setting':
             end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
@@ -55,7 +63,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                     f'{object_to_html(yaml_object[elem], 0, False)}' \
                     f'<br>{end}'
 '''
-    return {'summary': output, 'file_names': html_filenames,
+    return {'summary': rendered_html, 'file_names': html_filenames,
             'file_string': (project_id, '\n'.join(filenames)) if
             project_id is not None else None}
 
