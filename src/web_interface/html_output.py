@@ -36,7 +36,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     html_filenames, filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
-    template = '<!DOCTYPE html> <html> <head> <meta charset="utf-8" />   <!--It is necessary to use the UTF-8 encoding with plotly graphics to get e.g. negative signs to render correctly --> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> </head> <body> <h1>Here\'s a Plotly graph!</h1> {{ fig }} <p>And here\'s some text after the graph.</p> </body> </html>'
+    template = '<!DOCTYPE html> <html> <head> <meta charset="utf-8" />   <!--It is necessary to use the UTF-8 encoding with plotly graphics to get e.g. negative signs to render correctly --> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> </head> <body> <h1>Here\'s a Plotly graph!</h1> {{ plot_div|safe }} <p>And here\'s some text after the graph.</p> </body> </html>'
 
     #html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
     fig = go.Figure(data=go.Bar(y=[2, 3, 1]))
