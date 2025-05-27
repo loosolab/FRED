@@ -37,8 +37,18 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
 
     # rewrite yaml to html
     
-    html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)
-    
+    #html_str = create_heatmap.get_heatmap(yaml_object, key_yaml)[0]
+    html_str = '''
+                <div id="myDiv" style="width: 480px; height: 400px;"></div>
+                    <script>
+                    var data = [{
+                        x: [1, 2, 3, 4],
+                        y: [10, 15, 13, 17],
+                        type: 'scatter'
+                    }];
+                    Plotly.newPlot('myDiv', data);
+                    </script>
+                '''
     '''for elem in yaml_object:
         if elem == 'experimental_setting':
             end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
