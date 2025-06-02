@@ -31,7 +31,7 @@ def get_heatmap(path, keys_yaml):
                 option_text.append(color("black", option))
         
 
-        show_factors = '<br>'.join([f'\u00b7 {x.replace('_', ' ')}' for x in experimental_factors[value]])
+        #show_factors = '<br>'.join([f'\u00b7 {x.replace('_', ' ')}' for x in experimental_factors[value]])
         
         colors = [[0, 'white']]
         for i in range(1, max_vals[value]+1):
