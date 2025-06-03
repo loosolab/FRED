@@ -5,6 +5,8 @@ from dash_utils import get_data
 import os
 import base64
 import jinja2 
+import io
+from PIL import Image
 
 
 def get_heatmap(path, keys_yaml):
@@ -18,7 +20,7 @@ def get_heatmap(path, keys_yaml):
 
         df_empty = settings[value].dropna(axis=1, how='all')
         sorter = [x for x in sorter if x in df_empty.columns]
-
+        print('!!!', len(sorter))
         df = [settings[value][f'{key}_num'] for key in sorter]   
         annotated = [settings[value][key] for key in sorter if key in settings[value]]
         
@@ -31,7 +33,7 @@ def get_heatmap(path, keys_yaml):
                 option_text.append(color("black", option))
         
 
-        #show_factors = '<br>'.join([f'\u00b7 {x.replace('_', ' ')}' for x in experimental_factors[value]])
+        show_factors = '<br>'.join([f'\u00b7 {x.replace("_", " ")}' for x in experimental_factors[value]])
         
         colors = [[0, 'white']]
         for i in range(1, max_vals[value]+1):
@@ -52,7 +54,15 @@ def get_heatmap(path, keys_yaml):
                     hoverongaps = False,
                     colorscale = colors,
                     ),
-                    ]
+                    go.Scatter(
+                       x=[None],
+                       y=[None],
+                       mode="markers",
+                       name=f"<b>Experimental Factors</b><br>{show_factors}<br>",
+                       showlegend=True,
+                       marker=dict(size=10, color="red", symbol='square'),
+                   )
+                ]
         
         condition_labels = {}
         for i in range(len(settings[value]['condition_name'])):
@@ -74,38 +84,59 @@ def get_heatmap(path, keys_yaml):
 
         data_input = heatmap
         
+        top_margin = 150
+        bottom_margin = 100
+        left_margin = 200
+        right_margin = 200
+        my_height = 50*len(sorter)
+        my_width = 150*len(settings[value]["sample_index"])
+
         organism_path = os.path.join(os.path.dirname('__file__'), 'images', f'{organisms[value]}.png')
         images = None
         if os.path.isfile(organism_path):
             plotly_logo = base64.b64encode(open(organism_path, 'rb').read())
+            imgdata = base64.b64decode(plotly_logo)
+            im = Image.open(io.BytesIO(imgdata))
+            im_width, im_height = im.size
+            y_side = 100
+            my_ysize=y_side/my_height
+            x_side = y_side*im_width / im_height
+            my_xsize = x_side/my_width
+
+            left_margin = max(200, x_side)
+
+            print('WIDTH', im_width, my_width, x_side, my_xsize, 'HEIGHT', im_height, my_height, 150, my_ysize)
             images = [dict(
                 source='data:image/png;base64,{}'.format(plotly_logo.decode()),
                 xref="paper", yref="paper",
-                x=0.1, y=-0.5,
-                sizex=0.4, sizey=0.4,
-                xanchor="center", yanchor="bottom"
+                x=0, y=1,
+                sizey=my_ysize, sizex=my_xsize,
+                xanchor="right", yanchor="bottom"
         )]
+
 
         layout = go.Layout(
             images = images,
-            height=50*len(sorter)+300,
-            width=150*len(settings[value]["sample_index"])+50,
-            margin=dict(l=20, r=20, t=20, b=300),
+            height=my_height + top_margin + bottom_margin,
+            width=my_width + left_margin + right_margin,
+            margin=dict(l=left_margin, r=right_margin, t=top_margin, b=bottom_margin),
+            autosize=False,
             plot_bgcolor="white",
             xaxis=dict(
                 side="top",
                 showline=True,
-                gridcolor="lightgrey"
+                gridcolor="lightgrey",
+                automargin=False
             ),
             yaxis=dict(
                 tickmode="array",
                 ticktext=option_text, 
                 tickvals=sorter,
                 autorange="reversed",
-                #automargin="left+top",
                 tickson="boundaries",
                 showline=True,
-                gridcolor="lightgrey"
+                gridcolor="lightgrey",
+                automargin=False
             ),
             legend=dict(
                 title=f"Organism: {organisms[value]}",
@@ -118,6 +149,7 @@ def get_heatmap(path, keys_yaml):
             fig.add_hline(i, line_dash="dash", line_color='lightgrey',layer='below')   
         
         heatmaps.append(fig.to_html(full_html=False, include_plotlyjs='cdn'))
+        #heatmaps.append(fig)
 
     return heatmaps
 
