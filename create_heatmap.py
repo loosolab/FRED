@@ -91,7 +91,7 @@ def get_heatmap(path, keys_yaml):
         my_height = 50*len(sorter)
         my_width = 150*len(settings[value]["sample_index"])
 
-        organism_path = os.path.join(os.path.dirname('__file__'), 'images', f'{organisms[value]}.png')
+        organism_path = os.path.join(os.path.dirname(__file__), 'images', f'{organisms[value]}.png')
         images = None
         print('PATH', organism_path, os.path.isfile(organism_path))
         if os.path.isfile(organism_path):
