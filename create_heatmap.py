@@ -121,7 +121,8 @@ def get_heatmap(path, keys_yaml):
             width=my_width + left_margin + right_margin,
             margin=dict(l=left_margin, r=right_margin, t=top_margin, b=bottom_margin),
             autosize=False,
-            plot_bgcolor="white",
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
             xaxis=dict(
                 side="top",
                 showline=True,
