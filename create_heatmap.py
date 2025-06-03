@@ -93,6 +93,7 @@ def get_heatmap(path, keys_yaml):
 
         organism_path = os.path.join(os.path.dirname('__file__'), 'images', f'{organisms[value]}.png')
         images = None
+        print('PATH', organism_path, os.path.isfile(organism_path))
         if os.path.isfile(organism_path):
             plotly_logo = base64.b64encode(open(organism_path, 'rb').read())
             imgdata = base64.b64decode(plotly_logo)
