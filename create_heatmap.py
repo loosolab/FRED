@@ -54,14 +54,6 @@ def get_heatmap(path, keys_yaml):
                     hoverongaps = False,
                     colorscale = colors,
                     ),
-                    go.Scatter(
-                       x=[None],
-                       y=[None],
-                       mode="markers",
-                       name=f"<b>Experimental Factors</b><br>{show_factors}<br>",
-                       showlegend=True,
-                       marker=dict(size=10, color="red", symbol='square'),
-                   )
                 ]
         
         condition_labels = {}
@@ -69,23 +61,23 @@ def get_heatmap(path, keys_yaml):
             if settings[value]['condition_index'][i] not in condition_labels:
                 cond = settings[value]['condition_name'][i]
                 splitted = utils.split_cond(cond)
-                label_value = ''
+                cond_dict = {}
                 for elem in splitted:
                     if isinstance(elem[1], dict):
-                        label_value += f'\u00b7 {elem[0].replace("_", " ")}: {", ".join([elem[1][k] for k in elem[1]])}<br>'
-                    elif isinstance(elem[1], list):
-                        if len(elem[1]>3):
-                            label_value += f'\u00b7 {elem[0].replace("_", " ")}: {", ".join(elem[1][:3])}, ...<br>'
-                        else:
-                            label_value += f'\u00b7 {elem[0].replace("_", " ")}: {", ".join(elem[1])}<br>'
+                        vals = [elem[1][k] for k in elem[1]]
                     else:
-                        label_value += f'\u00b7 {elem[0].replace("_", " ")}: {elem[1]}<br>'
-            condition_labels[settings[value]['condition_index'][i]]= label_value
+                        vals =  [elem[1]]
+                    if elem[0] in cond_dict:
+                        cond_dict[elem[0]] += vals
+                    else:
+                        cond_dict[elem[0]] = vals
+                condition_labels[settings[value]['condition_index'][i]]= cond_dict
 
+        print(condition_labels)
         data_input = heatmap
         
         top_margin = 100
-        bottom_margin = 100
+        bottom_margin = 0
         left_margin = 200
         right_margin = 200
         my_height = 50*len(sorter)
@@ -122,6 +114,13 @@ def get_heatmap(path, keys_yaml):
             width=my_width + left_margin + right_margin,
             margin=dict(l=left_margin, r=right_margin, t=top_margin, b=bottom_margin),
             autosize=False,
+            title=dict(
+                text=f'<b>Setting {value}</b>', 
+                font=dict(size=15), 
+                automargin=True,
+                yref='container',
+                x=(left_margin+(0.25*150))/(my_width+left_margin+right_margin)
+                ),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             xaxis=dict(
@@ -157,11 +156,52 @@ def get_heatmap(path, keys_yaml):
         
         template = jinja2.Template(
             '''
-            <h1> Setting {{ setting }} </h1>
                 {{ plot }}
+                {{ table }}
             ''')
 
-        heatmaps.append(template.render(setting=value, plot=fig.to_html(full_html=False, include_plotlyjs='cdn')))
+        table_header = ['<b>Experimental Factors</b>'] + [f'<b>{k}</b>' for k in condition_labels]
+        table_values = [[f"<b>{x.replace('_', ' ').title()}</b>" for x in experimental_factors[value]]]
+
+        for lab in condition_labels:
+            cond_vals = []
+            for fac in experimental_factors[value]:
+                if fac in condition_labels[lab]:
+                    cond_vals.append('<br>'.join(list(set(condition_labels[lab][fac]))))
+                else:
+                    cond_vals.append('')
+            table_values.append(cond_vals)
+
+        table_layout = go.Layout(
+            width=my_width + left_margin + right_margin,
+            margin=dict(l=left_margin-150, r=right_margin, t=20, b=20),
+        )
+
+        table = go.Figure(
+            data=[
+                go.Table(
+                    header=dict(
+                        values=table_header,
+                        align='left',
+                        fill=dict(
+                            color='white'
+                        ),
+                        font_size=12,
+                        line_color='darkslategray',
+                        ), 
+
+                    cells=dict(
+                        values=table_values,
+                        align='left',
+                        font=dict(
+                            color=['red'] + ['black']*len(condition_labels)
+                        ),
+                        fill=dict(color='rgba(0,0,0,0)'),
+                        line_color='darkslategray',
+                        ))], 
+            layout=table_layout)
+
+        heatmaps.append(template.render(setting=value, plot=fig.to_html(full_html=False, include_plotlyjs='cdn'), table=table.to_html(full_html=False, include_plotlyjs='cdn')))
         #heatmaps.append(fig)
 
     return heatmaps
