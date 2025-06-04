@@ -17,13 +17,13 @@ def get_data(path, keys_yaml):
 
     options = [x for x in list(utils.find_keys(keys, 'samples'))[0]['value'].keys()if x not in ['sample_name', 'technical_replicates']]
     option_types = {}
+    option_pretty = {}
     max_vals = {}
     for setting in settings[0]:
         df_dict = {}
         setting_id = setting['setting_id']
         organisms[setting_id] = setting['organism']['organism_name']
         experimental_factors[setting_id] = [x['factor'] for x in setting['experimental_factors']]
-        print(experimental_factors)
 
         conditions = list(utils.find_keys(setting, 'conditions'))[0]
         condition_names = []
@@ -70,6 +70,8 @@ def get_data(path, keys_yaml):
         
         for option in option_dict:
             option_structure = list(utils.find_keys(keys, option))[0]
+            if option not in option_pretty:
+                option_pretty[option] = option_structure['display_name']
             if 'input_type' in option_structure:
                 option_types[option] = option_structure['input_type']
             elif 'special_case' in option_structure and 'value_unit' in option_structure['special_case']:
@@ -78,7 +80,7 @@ def get_data(path, keys_yaml):
                 option_types[option] = 'nested'
         
         max_options = max([len(set([str(y) for y in option_dict[x] if y is not None])) for x in option_dict.keys() if option_types[x] not in ['number']])#, 'value_unit']]) 
-        max_number = max([max([y for y in option_dict[x] if y is not None]) for x in option_dict.keys() if option_types[x] == 'number'])
+        max_number = max([max([y for y in option_dict[x] if y is not None] + [1]) for x in option_dict.keys() if option_types[x] == 'number'])
         vu_values = {}
         for option in option_dict:
             if option_types[option] == 'value_unit':
@@ -114,7 +116,6 @@ def get_data(path, keys_yaml):
                 if value is None:
                     option_num.append(value)
                 elif option_types[option] == 'value_unit':
-                    print(value['value'], value['unit'], normalize(value['value'], 0, max(vu_values[value['unit']]['vals']), vu_values[value['unit']]['min'], vu_values[value['unit']]['max']))
                     option_num.append(normalize(value['value'], 0, max(vu_values[value['unit']]['vals']), vu_values[value['unit']]['min'], vu_values[value['unit']]['max']))
                 else:
                     option_num.append(num_vals[option_values.index(str(value))])
@@ -131,7 +132,7 @@ def get_data(path, keys_yaml):
         df = pd.DataFrame(df_dict) 
         setting_dict[setting_id] = df
         max_vals[setting_id] = max_options
-    return setting_dict, experimental_factors, organisms, max_vals
+    return setting_dict, experimental_factors, organisms, max_vals, option_pretty
 
 
 def normalize(x, minIn, maxIn, minOut, maxOut):
