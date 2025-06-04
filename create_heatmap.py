@@ -28,7 +28,7 @@ def get_heatmap(path, keys_yaml):
 
         for option in sorter:
             if option in experimental_factors[value]:
-                option_text.append(color("red", options_pretty[option]))
+                option_text.append(color("red", f'<b>{options_pretty[option]}</b>'))
             else:
                 option_text.append(color("black", options_pretty[option]))
         
@@ -117,9 +117,15 @@ def get_heatmap(path, keys_yaml):
             title=dict(
                 text=f'<b>Setting {value}</b>', 
                 font=dict(size=15), 
-                automargin=True,
+                automargin=False,
                 yref='container',
-                x=(left_margin+(0.25*150))/(my_width+left_margin+right_margin)
+                x=(left_margin+(0.1*150))/(my_width+left_margin+right_margin),
+                y=1,
+                xanchor="left", yanchor="top",
+                subtitle=dict(
+                    text=f'Organism: {organisms[value]}',
+                    font=dict(size=14, lineposition='under'),
+                    ),
                 ),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
@@ -175,6 +181,8 @@ def get_heatmap(path, keys_yaml):
         table_layout = go.Layout(
             width=my_width + left_margin + right_margin,
             margin=dict(l=left_margin-150, r=right_margin, t=20, b=20),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
         )
 
         table = go.Figure(
@@ -184,7 +192,7 @@ def get_heatmap(path, keys_yaml):
                         values=table_header,
                         align='left',
                         fill=dict(
-                            color='white'
+                            color='rgba(0,0,0,0)'
                         ),
                         font_size=12,
                         line_color='darkslategray',
