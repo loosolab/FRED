@@ -37,17 +37,38 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
 
     # rewrite yaml to html
     
-    html_str = ''
-    
+    plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
+
+    input = {}
     for elem in yaml_object:
-        html_str = f'{html_str}<h3>{elem.replace("_", " ").title()}<h3>'
+        header =  elem.replace("_", " ").title()
         if elem == 'experimental_setting':
             plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
+            plot_list = []
             for plot in plots:
-                html_str += f'{html_str}{plot[0]}{plot[1]}'
+                plot_list.append({'plot': plot[0], 'table': plot[1]})
+            input[elem] = {'header': header, 'plots': plot_list}
         else:
-            end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
-            html_str += f'{object_to_html(yaml_object[elem], 0, False)}<br>{end}'
+            input[elem] = {'header': header, 'values': object_to_html(yaml_object[elem], 0, False)}
+
+            
+
+    html_str = ''
+    template = Template(
+        '''
+        {% for part in input %}
+            <h3>{{ part.header }}<h3>
+                {% if part.values %}
+                    <div>{{ part.values }}</div>
+                {% else %}
+                   {{ part.plot }}
+                   {{ part.table }} 
+                {% endif %}
+        {% endfor %}
+        '''
+        )
+   
+    html_str =  template.render(input=input)
 
     return {'summary': html_str, 'file_names': html_filenames,
             'file_string': (project_id, '\n'.join(filenames)) if
