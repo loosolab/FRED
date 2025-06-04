@@ -47,7 +47,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                 html_str = f'{html_str}{plot}<br>'
         else:
             end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
-            html_str = f'{object_to_html(yaml_object[elem], 0, False)}<br>{end}''''
+            html_str = f'{object_to_html(yaml_object[elem], 0, False)}<br>{end}'''
 
     return {'summary': html_str, 'file_names': html_filenames,
             'file_string': (project_id, '\n'.join(filenames)) if
