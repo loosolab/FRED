@@ -10,7 +10,7 @@ from PIL import Image
 
 
 def get_heatmap(path, keys_yaml):
-    settings, experimental_factors, organisms, max_vals = get_data(path, keys_yaml)
+    settings, experimental_factors, organisms, max_vals, options_pretty = get_data(path, keys_yaml)
 
     heatmaps=[]
 
@@ -28,9 +28,9 @@ def get_heatmap(path, keys_yaml):
 
         for option in sorter:
             if option in experimental_factors[value]:
-                option_text.append(color("red", option))
+                option_text.append(color("red", options_pretty[option]))
             else:
-                option_text.append(color("black", option))
+                option_text.append(color("black", options_pretty[option]))
         
 
         show_factors = '<br>'.join([f'\u00b7 {x.replace("_", " ")}' for x in experimental_factors[value]])
@@ -84,7 +84,7 @@ def get_heatmap(path, keys_yaml):
 
         data_input = heatmap
         
-        top_margin = 150
+        top_margin = 100
         bottom_margin = 100
         left_margin = 200
         right_margin = 200
@@ -99,7 +99,7 @@ def get_heatmap(path, keys_yaml):
             imgdata = base64.b64decode(plotly_logo)
             im = Image.open(io.BytesIO(imgdata))
             im_width, im_height = im.size
-            y_side = 100
+            y_side = top_margin
             my_ysize=y_side/my_height
             x_side = y_side*im_width / im_height
             my_xsize = x_side/my_width
@@ -141,16 +141,27 @@ def get_heatmap(path, keys_yaml):
                 automargin=False
             ),
             legend=dict(
-                title=f"Organism: {organisms[value]}",
-                #orientation="h",
-                #x=0.2, y=1.2
+                #title=f"Organism: {organisms[value]}",
+                orientation="h",
+                x=0, y=0
             )
         )    
         fig = go.Figure(data=data_input, layout=layout)      
         for i in range(len(sorter)):
-            fig.add_hline(i, line_dash="dash", line_color='lightgrey',layer='below')   
+            fig.add_hline(i, line_dash="dash", line_color='lightgrey',layer='below')
+            fig.add_hline(i-0.5, line_width=0.5) 
+        fig.add_hline(len(sorter)-0.5, line_width=0.5)     
+
+        for i in range(len(settings[value]['sample_index'])+1):
+            fig.add_vline(i-0.5, line_width=0.5)
         
-        heatmaps.append(fig.to_html(full_html=False, include_plotlyjs='cdn'))
+        template = jinja2.Template(
+            '''
+            <h1> Setting {{ setting }} </h1>
+                {{ plot }}
+            ''')
+
+        heatmaps.append(template.render(setting=value, plot=fig.to_html(full_html=False, include_plotlyjs='cdn')))
         #heatmaps.append(fig)
 
     return heatmaps
