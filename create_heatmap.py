@@ -76,12 +76,13 @@ def get_heatmap(path, keys_yaml):
         print(condition_labels)
         data_input = heatmap
         
+        my_cell_width = 150
         top_margin = 100
         bottom_margin = 0
         left_margin = 200
         right_margin = 200
         my_height = 50*len(sorter)
-        my_width = 150*len(settings[value]["sample_index"])
+        my_width = my_cell_width*len(settings[value]["sample_index"])
 
         organism_path = os.path.join(os.path.dirname(__file__), 'images', f'{organisms[value]}.png')
         images = None
@@ -178,13 +179,13 @@ def get_heatmap(path, keys_yaml):
         print(table_height)
         full_table_height = 20 * (len(list(table_height.keys()))+1) + 25 * ((sum([table_height[x] for x in table_height]) + 2))
 
-        print('rows', len(list(table_height.keys()))+1, 'lines', sum([table_height[x] for x in table_height]) + (2 if my_width+150 < 160 else 1), 'full_height', full_table_height)
+        print('rows', len(list(table_height.keys()))+1, 'lines', sum([table_height[x] for x in table_height]) + (2 if my_width+my_cell_width < 160 else 1), 'full_height', full_table_height)
         print(4*(25)+140)
-
+        table_width = my_cell_width * len(table_header)
         table_layout = go.Layout(
             width=my_width + left_margin + right_margin,
             height=full_table_height,
-            margin=dict(l=left_margin-150, r=right_margin, t=20, b=20),
+            margin=dict(l=left_margin-my_cell_width, r=right_margin + (my_width+my_cell_width-table_width), t=20, b=20),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
         )
