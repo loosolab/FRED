@@ -177,7 +177,7 @@ def get_heatmap(path, keys_yaml):
             table_values.append(cond_vals)
 
         print(table_height)
-        full_table_height = 20 * (len(list(table_height.keys()))+1) + 25 * ((sum([table_height[x] for x in table_height]) + 2))
+        full_table_height = 25 * (len(list(table_height.keys()))+1) + 25 * ((sum([table_height[x] for x in table_height]) + 2))
 
         print('rows', len(list(table_height.keys()))+1, 'lines', sum([table_height[x] for x in table_height]) + (2 if my_width+my_cell_width < 160 else 1), 'full_height', full_table_height)
         print(4*(25)+140)
