@@ -49,20 +49,21 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                 plot_list.append({'plot': plot[0], 'table': plot[1]})
             input[elem] = {'header': header, 'plots': plot_list}
         else:
-            input[elem] = {'header': header, 'values': object_to_html(yaml_object[elem], 0, False)}
+            input[elem] = {'header': header, 'html': object_to_html(yaml_object[elem], 0, False)}
 
             
 
     html_str = ''
     template = Template(
         '''
-        {% for part in input %}
-            <h3>{{ part.header }}<h3>
-                {% if part.values %}
-                    <div>{{ part.values }}</div>
+        {% for key, value in input.items() %}
+            <h3>{{ value.header }}<h3>
+                
+                {% if value.html %}
+                    {{ value.html }}
                 {% else %}
-                   {{ part.plot }}
-                   {{ part.table }} 
+                   {{ value.plot }}
+                   {{ value.table }} 
                 {% endif %}
         {% endfor %}
         '''

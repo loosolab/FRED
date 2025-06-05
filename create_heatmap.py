@@ -180,7 +180,7 @@ def get_heatmap(path, keys_yaml):
 
         table_layout = go.Layout(
             width=my_width + left_margin + right_margin,
-            margin=dict(l=left_margin-150, r=right_margin, t=20, b=20),
+            margin=dict(l=left_margin-150, r=right_margin, t=20, b=0),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
         )
@@ -209,7 +209,7 @@ def get_heatmap(path, keys_yaml):
                         ))], 
             layout=table_layout)
 
-        heatmaps.append(template.render(setting=value, plot=fig.to_html(full_html=False, include_plotlyjs='cdn'), table=table.to_html(full_html=False, include_plotlyjs='cdn')))
+        heatmaps.append((fig.to_html(full_html=False, include_plotlyjs='cdn'), table.to_html(full_html=False, include_plotlyjs='cdn')))
         #heatmaps.append(fig)
 
     return heatmaps
