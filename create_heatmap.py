@@ -173,7 +173,7 @@ def get_heatmap(path, keys_yaml):
             cond_vals = []
             for fac in experimental_factors[value]:
                 if fac in condition_labels[lab]:
-                    cond_vals.append('<br>'.join(list(set(condition_labels[lab][fac]))))
+                    cond_vals.append('<br>'.join(list(set(str(condition_labels[lab][fac])))))
                 else:
                     cond_vals.append('')
             table_values.append(cond_vals)
