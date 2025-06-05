@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 import plotly as plt
 from src import utils
-from dash_utils import get_data
+from dash_utils import *
 import os
 import base64
 import jinja2 
@@ -10,7 +10,7 @@ from PIL import Image
 
 
 def get_heatmap(path, keys_yaml):
-    settings, experimental_factors, organisms, max_vals, options_pretty = get_data(path, keys_yaml)
+    settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict = get_data(path, keys_yaml)
 
     heatmaps=[]
 
@@ -20,10 +20,9 @@ def get_heatmap(path, keys_yaml):
 
         df_empty = settings[value].dropna(axis=1, how='all')
         sorter = [x for x in sorter if x in df_empty.columns]
-        print('!!!', len(sorter))
         df = [settings[value][f'{key}_num'] for key in sorter]   
-        annotated = [settings[value][key] for key in sorter if key in settings[value]]
-        
+
+        annotated = [annotated_dict[value][key] for key in sorter if key in annotated_dict[value]]
         option_text = []
 
         for option in sorter:
@@ -37,7 +36,6 @@ def get_heatmap(path, keys_yaml):
         
         colors = [[0, 'white']]
         for i in range(1, max_vals[value]+1):
-            print(i, max_vals[value], 1/(max_vals[value]), i*1/(max_vals[value]))
             colors.append([i*1/(max_vals[value]), plt.colors.DEFAULT_PLOTLY_COLORS[i]])
             if i*1/(max_vals[value]) != 1:
                 colors.append([((i*1)/(max_vals[value]))+0.001, 'white'])
@@ -50,7 +48,9 @@ def get_heatmap(path, keys_yaml):
                     y=sorter,
                     showscale=False,
                     customdata=annotated,
-                    hovertemplate = "value: %{customdata}",
+                    text=annotated,
+                    #texttemplate="%{text}",
+                    hovertemplate = "%{customdata}",
                     hoverongaps = False,
                     colorscale = colors,
                     ),
@@ -73,7 +73,6 @@ def get_heatmap(path, keys_yaml):
                         cond_dict[elem[0]] = vals
                 condition_labels[settings[value]['condition_index'][i]]= cond_dict
 
-        print(condition_labels)
         data_input = heatmap
         
         my_cell_width = 150
@@ -171,16 +170,13 @@ def get_heatmap(path, keys_yaml):
                     table_height[fac] = 0
                 if fac in condition_labels[lab]:
                     table_height[fac] = max(table_height[fac], len(list(set([str(x) for x in condition_labels[lab][fac]]))))
-                    cond_vals.append('<br>'.join(list(set([str(x) for x in condition_labels[lab][fac]]))))
+                    cond_vals.append('<br>'.join(list(set(annotate(condition_labels[lab][fac])))))
                 else:
                     cond_vals.append('')
             table_values.append(cond_vals)
 
-        print(table_height)
         full_table_height = 25 * (len(list(table_height.keys()))+1) + 25 * ((sum([table_height[x] for x in table_height]) + 2))
 
-        print('rows', len(list(table_height.keys()))+1, 'lines', sum([table_height[x] for x in table_height]) + (2 if my_width+my_cell_width < 160 else 1), 'full_height', full_table_height)
-        print(4*(25)+140)
         table_width = my_cell_width * len(table_header)
         table_layout = go.Layout(
             width=my_width + left_margin + right_margin,

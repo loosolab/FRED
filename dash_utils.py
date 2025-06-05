@@ -6,12 +6,15 @@ import pathlib
 from src import utils
 import numpy as np
 import json
+import src.web_interface.factors_and_conditions as fc
+import re
 
 def get_data(path, keys_yaml):
     yaml = path
     keys = keys_yaml
     settings = list(utils.find_keys(yaml, 'experimental_setting'))
     setting_dict = {}
+    annotated_dict = {}
     experimental_factors = {}
     organisms = {}
 
@@ -32,6 +35,7 @@ def get_data(path, keys_yaml):
         sample_index = []
         idx = []
         option_dict = {}
+        annotated = {}
         c = 1
         j=1
         for cond in conditions:
@@ -54,13 +58,19 @@ def get_data(path, keys_yaml):
                 for key in options:
                     if key not in option_dict:
                         option_dict[key] = []
+                        annotated[key] = []
                     if key in sample:
-                        if isinstance(sample[key], int) or isinstance(sample[key], float) or (isinstance(sample[key], dict) and 'value' in sample[key] and 'unit' in sample[key]):
+                        if isinstance(sample[key], int) or isinstance(sample[key], float):
+                            option_dict[key].append(sample[key])
+                        elif (isinstance(sample[key], dict) and 'value' in sample[key] and 'unit' in sample[key]):
                             option_dict[key].append(sample[key])
                         else:
                             option_dict[key].append(str(sample[key]))
+                        annotated[key].append('<br>'.join(annotate(sample[key])))
                     else:
                         option_dict[key].append(None)
+                        annotated[key].append('')
+
             c+=1        
         df_dict = {'condition_name': condition_names,
                    'condition_index': condition_index,
@@ -131,10 +141,26 @@ def get_data(path, keys_yaml):
 
         df = pd.DataFrame(df_dict) 
         setting_dict[setting_id] = df
+        annotated_dict[setting_id] = annotated
         max_vals[setting_id] = max_options
-    return setting_dict, experimental_factors, organisms, max_vals, option_pretty
+    return setting_dict, experimental_factors, organisms, max_vals, option_pretty, annotated_dict
 
 
 def normalize(x, minIn, maxIn, minOut, maxOut):
     input = (x-minIn)/(maxIn-minIn)
     return minOut + input * (maxOut-minOut)
+
+def annotate(value):
+    annotated_value = []
+    if isinstance(value, list):
+        for elem in value:
+            annotated_value += annotate(elem)
+    elif isinstance(value, dict):
+        if 'value' in value and 'unit' in value:
+            annotated_value.append(f'{value["value"]}{value["unit"]}')
+        else:
+            for key in value:
+                annotated_value += annotate(value[key])
+    else:
+        annotated_value.append(re.sub("0000(0)*", "...", str(value)))
+    return list(set(annotated_value))
