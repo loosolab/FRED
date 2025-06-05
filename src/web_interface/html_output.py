@@ -72,7 +72,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                         <hr style="border-style: dotted;" />
                     {% endif %}
                                 
-                    <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap">
+                    <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:5">
                         {{ elem.plot }}
                         {{ elem.table }}
                     </div>
