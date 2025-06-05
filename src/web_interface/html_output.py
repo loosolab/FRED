@@ -62,8 +62,11 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                 {% if value.html %}
                     {{ value.html }}
                 {% else %}
-                   {{ value.plot }}
-                   {{ value.table }} 
+                    
+                    {% for elem in value.plots %}
+                        {{ elem.plot }}
+                        {{ elem.table }}
+                    {% endfor %} 
                 {% endif %}
         {% endfor %}
         '''
