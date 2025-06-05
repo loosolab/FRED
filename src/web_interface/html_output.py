@@ -57,17 +57,28 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     template = Template(
         '''
         {% for key, value in input.items() %}
-            <h3>{{ value.header }}<h3>
-                
-                {% if value.html %}
-                    {{ value.html }}
-                {% else %}
-                    
-                    {% for elem in value.plots %}
+            {% if loop.index0 != 0 %}
+                <hr/>
+            {% endif %}
+            <h3>{{ value.header }}</h3>
+                        
+            {% if value.html %}
+                {{ value.html }}
+            {% else %}
+                            
+                {% for elem in value.plots %}
+
+                    {% if loop.index0 != 0 %}
+                        <hr style="border-style: dotted;" />
+                    {% endif %}
+                                
+                    <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap">
                         {{ elem.plot }}
                         {{ elem.table }}
-                    {% endfor %} 
-                {% endif %}
+                    </div>
+                                
+                {% endfor %} 
+            {% endif %}
         {% endfor %}
         '''
         )

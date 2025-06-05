@@ -85,7 +85,7 @@ def get_heatmap(path, keys_yaml):
 
         organism_path = os.path.join(os.path.dirname(__file__), 'images', f'{organisms[value]}.png')
         images = None
-        print('PATH', organism_path, os.path.isfile(organism_path))
+
         if os.path.isfile(organism_path):
             plotly_logo = base64.b64encode(open(organism_path, 'rb').read())
             imgdata = base64.b64decode(plotly_logo)
@@ -98,7 +98,6 @@ def get_heatmap(path, keys_yaml):
 
             left_margin = max(200, x_side)
 
-            print('WIDTH', im_width, my_width, x_side, my_xsize, 'HEIGHT', im_height, my_height, 150, my_ysize)
             images = [dict(
                 source='data:image/png;base64,{}'.format(plotly_logo.decode()),
                 xref="paper", yref="paper",
@@ -160,27 +159,32 @@ def get_heatmap(path, keys_yaml):
         for i in range(len(settings[value]['sample_index'])+1):
             fig.add_vline(i-0.5, line_width=0.5)
         
-        template = jinja2.Template(
-            '''
-                {{ plot }}
-                {{ table }}
-            ''')
-
         table_header = ['<b>Experimental Factors</b>'] + [f'<b>{k}</b>' for k in condition_labels]
         table_values = [[f"<b>{x.replace('_', ' ').title()}</b>" for x in experimental_factors[value]]]
 
+        table_height = {}
         for lab in condition_labels:
             cond_vals = []
             for fac in experimental_factors[value]:
+                if fac not in table_height:
+                    table_height[fac] = 0
                 if fac in condition_labels[lab]:
-                    cond_vals.append('<br>'.join(list(set(str(condition_labels[lab][fac])))))
+                    table_height[fac] = max(table_height[fac], len(list(set([str(x) for x in condition_labels[lab][fac]]))))
+                    cond_vals.append('<br>'.join(list(set([str(x) for x in condition_labels[lab][fac]]))))
                 else:
                     cond_vals.append('')
             table_values.append(cond_vals)
 
+        print(table_height)
+        full_table_height = 20 * (len(list(table_height.keys()))+1) + 25 * ((sum([table_height[x] for x in table_height]) + 2))
+
+        print('rows', len(list(table_height.keys()))+1, 'lines', sum([table_height[x] for x in table_height]) + (2 if my_width+150 < 160 else 1), 'full_height', full_table_height)
+        print(4*(25)+140)
+
         table_layout = go.Layout(
             width=my_width + left_margin + right_margin,
-            margin=dict(l=left_margin-150, r=right_margin, t=20, b=0),
+            height=full_table_height,
+            margin=dict(l=left_margin-150, r=right_margin, t=20, b=20),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
         )
