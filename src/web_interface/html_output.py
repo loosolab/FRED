@@ -49,7 +49,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                 plot_list.append({'plot': plot[0], 'table': plot[1]})
             input[elem] = {'header': header, 'plots': plot_list}
         else:
-            input[elem] = {'header': header, 'html': object_to_html(yaml_object[elem], 0, False)}
+            input[elem] = {'header': header, 'html': get_html_object(yaml_object[elem])}
 
             
 
@@ -128,6 +128,13 @@ def get_html_filenames(filename_nest):
     return html_filenames, filenames
 
 
+def get_html_object(yaml_object):
+    html_str = '<table border-collapse: collapse;>'
+    for key in yaml_object:
+        html_str += f'<tr><td style="vertical-align: top; padding-right: 30px; padding-bottom: 10px; border-bottom: 1px solid #ddd; border-collapse: collapse;">{key}</td><td style="vertical-align: top; padding-bottom: 10px; border-bottom: 1px solid #ddd; border-collapse: collapse;">{object_to_html(yaml_object[key], 0, False)}</td></tr>'
+    html_str += '</table>'
+    return html_str
+
 def object_to_html(yaml_object, depth, is_list):
     """
     This function parses the yaml structure into HTML
@@ -139,63 +146,53 @@ def object_to_html(yaml_object, depth, is_list):
 
     # initialize html string
     html_str = ''
-
+    table_style = 'style="width: 150px; text-align: left; vertical-align: top; padding: 10px; border: 1px solid black; border-collapse: collapse;"'
     # yaml is a dictionary
     if isinstance(yaml_object, dict):
 
-        # iterate over keys in dictionary
-        for key in yaml_object:
+        if depth==0:
+            keys = list(yaml_object.keys())
 
-            # first key in a list -> bullet point
-            if key == list(yaml_object.keys())[0] and is_list:
+            html_str += '<table style="border: 1px solid black; border-collapse: collapse;">'
+            html_str += f'<tr><th {table_style}>{("</th><th "+table_style+">").join(keys)}</th></tr>'
 
-                # convert value of key to html
-                input_text = object_to_html(yaml_object[key], depth + 1,
-                                            is_list)
-
-                # call function get_color to select the color of the key and
-                # add key and html value to html string with a bullet point
-                html_str = f'{html_str}<ul class="list-style-type-circle">' \
-                           f'<li><p><font color={get_color(depth)}>{key}' \
-                           f'</font>: {input_text}</p></li></ul>'
-
-            # key without bullet point
-            else:
-
-                # convert value of key to html
-                input_text = object_to_html(yaml_object[key], depth + 1,
-                                            is_list)
-
-                # call function get_color to select the color of the key and
-                # add key and html value to html string
-                html_str = f'{html_str}<ul class="list-style-none"><li><p>' \
-                           f'<font color={get_color(depth)}>{key}</font>: ' \
-                           f'{input_text}</p></li></ul>'
-
-    # yaml is a list
+            vals = []
+            for key in keys:
+                vals.append(object_to_html(yaml_object[key], depth+1, False))
+            html_str += f'<tr><td {table_style}>{("</td><td "+table_style+">").join(vals)}</td></tr>'
+            html_str += '</table>'
+        else:
+            for key in yaml_object:
+                html_str += f'<p>{key}: {object_to_html(yaml_object[key], depth+1, False)}</p>'
+            pass
+    
     elif isinstance(yaml_object, list):
 
-        # iterate over list elements
-        for elem in yaml_object:
+        if depth == 0 and all([isinstance(x, dict) for x in yaml_object]):
+            key_list = []
+            for elem in yaml_object:
+                for key in elem:
+                    if key not in key_list:
+                        key_list.append(key)
+            html_str += '<table style="border: 1px solid black; border-collapse: collapse;">'
+            html_str += f'<tr><th {table_style}>{("</th><th "+table_style+">").join(key_list)}</th></tr>'
 
-            # list element is single value
-            if not isinstance(elem, list) and not isinstance(elem, dict):
-
-                # add value to html string with a bullet point
-                html_str = f'{html_str}<ul class="list-style-type-circle">' \
-                           f'<li><p>{elem}</p></li></ul>'
-
-            # list element is dict or list
-            else:
-
-                # call this function on list element and add it to html string
-                html_str = f'{html_str}{object_to_html(elem, depth, True)}'
-
-    # yaml is a single value
+            for elem in yaml_object:
+                print(elem)
+                vals = []
+                for key in key_list:
+                    if key in elem:
+                        vals.append(object_to_html(elem[key], depth+1, False))
+                    else:
+                        vals.append('')
+                html_str += f'<tr><td {table_style}>{("</td><td "+table_style+">").join(vals)}</td></tr>'
+            html_str += '</table>'
+        else:
+            for elem in yaml_object:
+                html_str += f'<p>- {object_to_html(elem, depth, False)}</p>'
+    
     else:
-
-        # add value to html string
-        html_str = f'{html_str}{yaml_object}'
+        html_str += str(yaml_object)
 
     return html_str
 
