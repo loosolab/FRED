@@ -24,19 +24,34 @@ def get_heatmap(path, keys_yaml):
 
         annotated = [annotated_dict[value][key] for key in sorter if key in annotated_dict[value]]
         option_text = []
+        label_text = []
+        for key in sorter:
+            if key in annotated_dict[value] and key in experimental_factors[value]:
+                label_vals = []
+                for elem in annotated_dict[value][key]:
+                    splitted = elem.split('<br>')
+                    new_val = []
+                    for val in splitted:
+                        if len(val) > 20:
+                            new_val.append(f'{val[:18]}...')
+                        else:
+                            new_val.append(val)
+                    label_vals.append('<br>'.join(new_val))
+                label_text.append(label_vals)
+            else:
+                label_text.append('')
 
         for option in sorter:
             if option in experimental_factors[value]:
                 option_text.append(color("red", f'<b>{options_pretty[option]}</b>'))
             else:
                 option_text.append(color("black", options_pretty[option]))
-        
+                
+        plotly_colors = [x for x in px.colors.qualitative.G10 if x != "#DC3912"]
 
-        show_factors = '<br>'.join([f'\u00b7 {x.replace("_", " ")}' for x in experimental_factors[value]])
-        
         colors = [[0, 'white']]
         for i in range(1, max_vals[value]+1):
-            colors.append([i*1/(max_vals[value]), plt.colors.DEFAULT_PLOTLY_COLORS[i]])
+            colors.append([i*1/(max_vals[value]), plotly_colors[i-1]])
             if i*1/(max_vals[value]) != 1:
                 colors.append([((i*1)/(max_vals[value]))+0.001, 'white'])
 
@@ -48,8 +63,8 @@ def get_heatmap(path, keys_yaml):
                     y=sorter,
                     showscale=False,
                     customdata=annotated,
-                    text=annotated,
-                    #texttemplate="%{text}",
+                    text=label_text,
+                    texttemplate="%{text}",
                     hovertemplate = "%{customdata}",
                     hoverongaps = False,
                     colorscale = colors,
@@ -159,10 +174,13 @@ def get_heatmap(path, keys_yaml):
         for i in range(len(settings[value]['sample_index'])+1):
             fig.add_vline(i-0.5, line_width=0.5)
         
+        fig.add_hrect(y0=-0.5, y1=len(experimental_factors[value])-0.5, line=dict(color="red", width=5), layer='above')
+        
         table_header = ['<b>Experimental Factors</b>'] + [f'<b>{k}</b>' for k in condition_labels]
         table_values = [[f"<b>{x.replace('_', ' ').title()}</b>" for x in experimental_factors[value]]]
 
         table_height = {}
+        max_value_len = 0
         for lab in condition_labels:
             cond_vals = []
             for fac in experimental_factors[value]:
@@ -171,17 +189,18 @@ def get_heatmap(path, keys_yaml):
                 if fac in condition_labels[lab]:
                     table_height[fac] = max(table_height[fac], len(list(set([str(x) for x in condition_labels[lab][fac]]))))
                     cond_vals.append('<br>'.join(list(set(annotate(condition_labels[lab][fac])))))
+                    max_value_len = max(max_value_len, max([len(x) for x in condition_labels[lab][fac]]))
                 else:
                     cond_vals.append('')
             table_values.append(cond_vals)
 
         full_table_height = 25 * (len(list(table_height.keys()))+1) + 25 * ((sum([table_height[x] for x in table_height]) + 2))
-
-        table_width = my_cell_width * len(table_header)
+        table_cell_with = max(my_cell_width, max_value_len*10)
+        table_width = table_cell_with * len(table_header)
         table_layout = go.Layout(
             width=my_width + left_margin + right_margin,
             height=full_table_height,
-            margin=dict(l=left_margin-my_cell_width, r=right_margin + (my_width+my_cell_width-table_width), t=20, b=20),
+            margin=dict(l=left_margin-my_cell_width, r=right_margin + (my_width+table_cell_with-table_width), t=20, b=20),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
         )

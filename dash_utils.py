@@ -89,7 +89,7 @@ def get_data(path, keys_yaml):
             else:
                 option_types[option] = 'nested'
         
-        max_options = max([len(set([str(y) for y in option_dict[x] if y is not None])) for x in option_dict.keys() if option_types[x] not in ['number']])#, 'value_unit']]) 
+        max_options = max([len(set([str(y) for y in option_dict[x] if y is not None])) for x in option_dict.keys() if option_types[x] not in ['number', 'value_unit']])#, 'value_unit']]) 
         max_number = max([max([y for y in option_dict[x] if y is not None] + [1]) for x in option_dict.keys() if option_types[x] == 'number'])
         vu_values = {}
         for option in option_dict:

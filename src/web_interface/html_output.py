@@ -146,7 +146,7 @@ def object_to_html(yaml_object, depth, is_list):
 
     # initialize html string
     html_str = ''
-    table_style = 'style="width: 150px; text-align: left; vertical-align: top; padding: 10px; border: 1px solid black; border-collapse: collapse;"'
+    table_style = 'style="max-width: 150px; text-align: left; vertical-align: top; padding: 10px; border: 1px solid black; border-collapse: collapse;"'
     # yaml is a dictionary
     if isinstance(yaml_object, dict):
 
