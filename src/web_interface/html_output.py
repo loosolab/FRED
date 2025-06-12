@@ -131,7 +131,7 @@ def get_html_filenames(filename_nest):
 def get_html_object(yaml_object):
     html_str = '<table border-collapse: collapse;>'
     for key in yaml_object:
-        html_str += f'<tr><td style="vertical-align: top; padding-right: 30px; padding-bottom: 10px; border-bottom: 1px solid #ddd; border-collapse: collapse;">{key}</td><td style="vertical-align: top; padding-bottom: 10px; border-bottom: 1px solid #ddd; border-collapse: collapse;">{object_to_html(yaml_object[key], 0, False)}</td></tr>'
+        html_str += f'<tr><td max-width: 200px; style="vertical-align: top; padding-right: 30px; padding-bottom: 10px; border-bottom: 1px solid #ddd; border-collapse: collapse;">{key}</td><td style="max-width: 1000px; vertical-align: top; padding-bottom: 10px; border-bottom: 1px solid #ddd; border-collapse: collapse;">{object_to_html(yaml_object[key], 0, False)}</td></tr>'
     html_str += '</table>'
     return html_str
 
