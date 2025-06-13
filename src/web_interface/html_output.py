@@ -39,13 +39,13 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     
     template = Template(
         '''
-        <h3>{{ value.header }}</h3>
+        <h3>{{ input.header }}</h3>
                         
-        {% if value.html %}
-            {{ value.html }}
+        {% if input.html %}
+            {{ input.html }}
         {% else %}            
             <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
-                    {{ elem.plot }}
+                    {{ input.plot }}
             </div>
         '''
         )
@@ -57,13 +57,14 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
             plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
             plot_list = []
             for plot in plots:
-                plot_list.append({'plot': plot[0], 'table': plot[1]})
-            summary[elem] = template.render(input={'header': header, 'plots': plot_list})
+                plot_list.append(template.render({'header': header, 'plot': plot[0]}))
+            summary[elem] = plot_list
         else:
             summary[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
 
     summary['file_names'] = html_filenames
     summary['file_string'] = (project_id, '\n'.join(filenames)) if project_id is not None else None
+    summary['summary'] = summary['experimental_setting'][0]
     return summary
 
 
