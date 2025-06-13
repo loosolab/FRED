@@ -47,6 +47,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
             <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
                     {{ input.plot }}
             </div>
+        {% endif %}
         '''
         )
     
