@@ -58,7 +58,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
             plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
             plot_list = []
             for plot in plots:
-                plot_list.append(template.render({'header': header, 'plot': plot[0]}))
+                plot_list.append(template.render(input={'header': header, 'plot': plot[0]}))
             summary[elem] = plot_list
         else:
             summary[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
