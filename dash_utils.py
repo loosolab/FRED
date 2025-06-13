@@ -81,7 +81,7 @@ def get_data(path, keys_yaml):
         for option in option_dict:
             option_structure = list(utils.find_keys(keys, option))[0]
             if option not in option_pretty:
-                option_pretty[option] = option_structure['display_name']
+                option_pretty[option] = option.replace('_', ' ').title()
             if 'input_type' in option_structure:
                 option_types[option] = option_structure['input_type']
             elif 'special_case' in option_structure and 'value_unit' in option_structure['special_case']:

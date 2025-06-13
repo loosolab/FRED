@@ -30,16 +30,27 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
 
     # fetch all filenames from the yaml via a generator -> nested lists
     filename_nested = list(utils.find_list_key(
-        yaml_object, 'technical_replicates:sample_name'))
+        yaml_object, 'technical_replicates:filename'))
 
     # save filenames in html and string format
     html_filenames, filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
     
-    plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
-
-    input = {}
+    template = Template(
+        '''
+        <h3>{{ value.header }}</h3>
+                        
+        {% if value.html %}
+            {{ value.html }}
+        {% else %}            
+            <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
+                    {{ elem.plot }}
+            </div>
+        '''
+        )
+    
+    summary = {}
     for elem in yaml_object:
         header =  elem.replace("_", " ").title()
         if elem == 'experimental_setting':
@@ -47,47 +58,13 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
             plot_list = []
             for plot in plots:
                 plot_list.append({'plot': plot[0], 'table': plot[1]})
-            input[elem] = {'header': header, 'plots': plot_list}
+            summary[elem] = template.render(input={'header': header, 'plots': plot_list})
         else:
-            input[elem] = {'header': header, 'html': get_html_object(yaml_object[elem])}
+            summary[elem] = template.render(input={'header': header, 'html': get_html_object(yaml_object[elem])})
 
-            
-
-    html_str = ''
-    template = Template(
-        '''
-        {% for key, value in input.items() %}
-            {% if loop.index0 != 0 %}
-                <hr/>
-            {% endif %}
-            <h3>{{ value.header }}</h3>
-                        
-            {% if value.html %}
-                {{ value.html }}
-            {% else %}
-                            
-                {% for elem in value.plots %}
-
-                    {% if loop.index0 != 0 %}
-                        <hr style="border-style: dotted;" />
-                    {% endif %}
-                                
-                    <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
-                        {{ elem.plot }}
-                        {{ elem.table }}
-                    </div>
-                                
-                {% endfor %} 
-            {% endif %}
-        {% endfor %}
-        '''
-        )
-   
-    html_str =  template.render(input=input)
-
-    return {'summary': html_str, 'file_names': html_filenames,
-            'file_string': (project_id, '\n'.join(filenames)) if
-            project_id is not None else None}
+    summary['file_names'] = html_filenames
+    summary['file_string'] = (project_id, '\n'.join(filenames)) if project_id is not None else None
+    return summary
 
 
 def get_html_filenames(filename_nest):
