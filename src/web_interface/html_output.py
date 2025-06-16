@@ -1,5 +1,11 @@
 import src.utils as utils
 import src.web_interface.wi_object_to_yaml as oty
+import create_heatmap
+from jinja2 import Template
+import os
+import plotly.graph_objects as go
+import plotly.io as pio
+import plotly as plt
 
 
 def get_summary(wi_object, key_yaml, read_in_whitelists):
@@ -15,7 +21,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
 
     # parse wi_object to yaml
     yaml_object = oty.parse_object(wi_object, key_yaml, read_in_whitelists)
-
+    
     # save the project_id from the yaml file
     if 'project' in yaml_object and 'id' in yaml_object['project']:
         project_id = yaml_object['project']['id']
@@ -24,22 +30,44 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
 
     # fetch all filenames from the yaml via a generator -> nested lists
     filename_nested = list(utils.find_list_key(
-        yaml_object, 'technical_replicates:sample_name'))
+        yaml_object, 'technical_replicates:filename'))
 
     # save filenames in html and string format
     html_filenames, filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
-    html_str = ''
+    
+    template = Template(
+        '''
+        <h3>{{ input.header }}</h3>
+                        
+        {% if input.html %}
+            {{ input.html }}
+        {% else %}            
+            <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
+                    {{ input.plot }}
+            </div>
+        {% endif %}
+        '''
+        )
+    
+    summary = {}
+    setting_dict = {}
     for elem in yaml_object:
-        end = f'{"<hr><br>" if elem != list(yaml_object.keys())[-1] else ""}'
-        html_str = f'{html_str}<h3>{elem}</h3>' \
-                   f'{object_to_html(yaml_object[elem], 0, False)}' \
-                   f'<br>{end}'
+        header =  elem.replace("_", " ").title()
+        if elem == 'experimental_setting':
+            plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
+            plot_list = []
+            for plot in plots:
+                plot_list.append(template.render(input={'header': header, 'plot': plot[0]}))
+            setting_dict[elem] = plot_list
+        else:
+            setting_dict[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
 
-    return {'summary': html_str, 'file_names': html_filenames,
-            'file_string': (project_id, '\n'.join(filenames)) if
-            project_id is not None else None}
+    summary['file_names'] = html_filenames
+    summary['file_string'] = (project_id, '\n'.join(filenames)) if project_id is not None else None
+    summary['summary'] = setting_dict
+    return summary
 
 
 def get_html_filenames(filename_nest):
