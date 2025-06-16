@@ -52,6 +52,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
         )
     
     summary = {}
+    setting_dict = {}
     for elem in yaml_object:
         header =  elem.replace("_", " ").title()
         if elem == 'experimental_setting':
@@ -59,13 +60,13 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
             plot_list = []
             for plot in plots:
                 plot_list.append(template.render(input={'header': header, 'plot': plot[0]}))
-            summary[elem] = plot_list
+            setting_dict[elem] = plot_list
         else:
-            summary[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
+            setting_dict[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
 
     summary['file_names'] = html_filenames
     summary['file_string'] = (project_id, '\n'.join(filenames)) if project_id is not None else None
-    summary['summary'] = summary['experimental_setting'][0]
+    summary['summary'] = setting_dict
     return summary
 
 
