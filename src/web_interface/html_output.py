@@ -51,16 +51,18 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     
     summary = {}
     setting_dict = {}
-    for elem in yaml_object:
-        header =  elem.replace("_", " ").title()
-        if elem == 'experimental_setting':
-            plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
-            plot_list = []
-            for plot in plots:
-                plot_list.append({'title': plot[0], 'plot': template.render(input={'header': header, 'plot': plot[1]})})
-            setting_dict[elem] = plot_list
-        else:
-            setting_dict[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
+    for elem in ['project', 'experimental_setting', 'technical_details']:
+        setting_dict[elem] = ''
+        if elem in yaml_object:
+            header =  elem.replace("_", " ").title()
+            if elem == 'experimental_setting':
+                plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
+                plot_list = []
+                for plot in plots:
+                    plot_list.append({'title': plot[0], 'plot': template.render(input={'header': header, 'plot': plot[1]})})
+                setting_dict[elem] = plot_list
+            else:
+                setting_dict[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
 
     summary['files'] = {'file_names': html_filenames,
                         'file_string': (project_id, '\n'.join(filenames)) if project_id is not None else None}
