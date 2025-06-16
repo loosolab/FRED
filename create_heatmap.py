@@ -9,7 +9,7 @@ import io
 from PIL import Image
 
 
-def get_heatmap(path, keys_yaml):
+def get_heatmap(path, keys_yaml, show_setting_id=True):
     settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict = get_data(path, keys_yaml)
 
     heatmaps=[]
@@ -129,7 +129,7 @@ def get_heatmap(path, keys_yaml):
             margin=dict(l=left_margin, r=right_margin, t=top_margin, b=bottom_margin),
             autosize=False,
             title=dict(
-                text=f'<b>Setting {value}</b>', 
+                text=f'<b>Setting {value}</b>' if show_setting_id else '', 
                 font=dict(size=15), 
                 automargin=False,
                 yref='container',

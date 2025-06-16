@@ -56,7 +56,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
         if elem in yaml_object:
             header =  elem.replace("_", " ").title()
             if elem == 'experimental_setting':
-                plots = create_heatmap.get_heatmap(yaml_object, key_yaml)
+                plots = create_heatmap.get_heatmap(yaml_object, key_yaml, show_setting_id=False)
                 plot_list = []
                 for plot in plots:
                     plot_list.append({'title': plot[0], 'plot': template.render(input={'header': header, 'plot': plot[1]})})
