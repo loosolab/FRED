@@ -42,7 +42,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
         {% if input.html %}
             {{ input.html }}
         {% else %}            
-            <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
+            <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:50">
                     {{ input.plot }}
             </div>
         {% endif %}
