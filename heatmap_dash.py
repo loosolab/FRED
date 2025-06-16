@@ -6,9 +6,13 @@ import pandas as pd
 import argparse
 import pathlib
 from src import utils
+from dash_utils import *
 import numpy as np
 from dash_utils import get_data
-
+import os
+import base64
+import io
+from PIL import Image
 
 parser = argparse.ArgumentParser('Metadata Heatmap')
 parser.add_argument('-p', '--path', type=pathlib.Path, required=True, help='The path of the metadata file')
@@ -17,20 +21,18 @@ args = parser.parse_args()
 input_file = utils.read_in_yaml(args.path)
 key_yaml = utils.read_in_yaml('keys.yaml')
 
-settings, experimental_factors, organisms, max_vals = get_data(input_file, key_yaml)
+settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict = get_data(input_file, key_yaml)
 
 
 app = Dash()
 
 # Requires Dash 2.17.0 or later
 app.layout = [
-    #dcc.Dropdown(list(settings.keys()), list(settings.keys())[0], id='dropdown-selection'),
-    dcc.Tabs(id="tabs-example-graph", value=f'tab-{list(settings.keys())[0]}', children=[
-        dcc.Tab(label=f'Setting {x}', value=f'tab-{x}') for x in settings
-    ]),
-    dcc.Checklist(['Remove Empty'],[], id='checklist-selection'),
-    dcc.Graph(id='graph-content')
-]
+    dcc.Tabs(id="tabs-example-graph", value=f'tab-{list(settings.keys())[0]}', 
+             children=[dcc.Tab(label=f'Setting {x}', value=f'tab-{x}') for x in settings]),
+                       dcc.Checklist(['Show Empty'],[], id='checklist-selection'),
+                       dcc.Graph(id='graph-content')
+                       ]
 
 @callback(
     Output('graph-content', 'figure'),
@@ -41,104 +43,158 @@ def update_graph(value, empty):
     value = value.replace('tab-','')
     options = [key.replace('_num', '') for key in settings[value] if key.endswith('_num')]
     sorter = experimental_factors[value] + [o for o in options if o not in experimental_factors[value]]
-    if len(empty) > 0:
+
+    if not empty:
         df_empty = settings[value].dropna(axis=1, how='all')
-        print(df_empty)
         sorter = [x for x in sorter if x in df_empty.columns]
-        
     df = [settings[value][f'{key}_num'] for key in sorter]   
-    annotated = [settings[value][key] for key in sorter if key in settings[value]]
-    
+
+    annotated = [annotated_dict[value][key] for key in sorter if key in annotated_dict[value]]
+    label_text = []
+    for key in sorter:
+        if key in annotated_dict[value] and key in experimental_factors[value]:
+            label_text.append(annotated_dict[value][key])
+        else:
+            label_text.append('')
+
     option_text = []
 
     for option in sorter:
         if option in experimental_factors[value]:
-            option_text.append(color("red", option))
+            option_text.append(color("red", f'<b>{options_pretty[option]}</b>'))
         else:
-            option_text.append(color("black", option))
-    
+            option_text.append(color("black", options_pretty[option]))
 
-    show_factors = '<br>'.join([f'\u00b7 {x.replace('_', ' ')}' for x in experimental_factors[value]])
-    
+    plotly_colors = [x for x in px.colors.qualitative.G10 if x != "#DC3912"]
+    print(plotly_colors)
     colors = [[0, 'white']]
-    print('HIER', max_vals[value])
     for i in range(1, max_vals[value]+1):
-        print(i, max_vals[value], 1/(max_vals[value]), i*1/(max_vals[value]))
-        colors.append([i*1/(max_vals[value]), plt.colors.DEFAULT_PLOTLY_COLORS[i]])
+        colors.append([i*1/(max_vals[value]), plotly_colors[i-1]])
         if i*1/(max_vals[value]) != 1:
             colors.append([((i*1)/(max_vals[value]))+0.001, 'white'])
-    print('COLORS', colors)
+
     heatmap = [go.Heatmap(
-                   z=df,
-                   zmin=0,
-                   zmax=max_vals[value],
-                   x=[settings[value]['condition_index'],settings[value]['sample_index']],
-                   y=sorter,
-                   #showscale=False,
-                   customdata=annotated,
-                   #hovertemplate = "value: %{customdata}",
-                   hoverongaps = False,
-                   colorscale = colors,
-                   ),
-                   go.Scatter(
-                       x=[None],
-                       y=[None],
-                       mode="markers",
-                       name=f"<b>Experimental Factors</b><br>{show_factors}<br>",
-                       showlegend=True,
-                       marker=dict(size=10, color="red", symbol='square'),
-                   )
-                   ]
-    
+                z=df,
+                zmin=0,
+                zmax=max_vals[value],
+                x=[settings[value]['condition_index'],settings[value]['sample_index']],
+                y=sorter,
+                showscale=False,
+                customdata=annotated,
+                text=label_text,
+                texttemplate="%{text}",
+                hovertemplate = "%{customdata}",
+                hoverongaps = False,
+                colorscale = colors,
+                ),
+            ]
+        
     condition_labels = {}
     for i in range(len(settings[value]['condition_name'])):
         if settings[value]['condition_index'][i] not in condition_labels:
             cond = settings[value]['condition_name'][i]
             splitted = utils.split_cond(cond)
-            label_value = ''
+            cond_dict = {}
             for elem in splitted:
                 if isinstance(elem[1], dict):
-                    label_value += f'\u00b7 {elem[0].replace('_', ' ')}: {", ".join([elem[1][k] for k in elem[1]])}<br>'
-                elif isinstance(elem[1], list):
-                    if len(elem[1]>3):
-                        label_value += f'\u00b7 {elem[0].replace('_', ' ')}: {", ".join(elem[1][:3])}, ...<br>'
-                    else:
-                        label_value += f'\u00b7 {elem[0].replace('_', ' ')}: {", ".join(elem[1])}<br>'
+                    vals = [elem[1][k] for k in elem[1]]
                 else:
-                    label_value += f'\u00b7 {elem[0].replace('_', ' ')}: {elem[1]}<br>'
-        condition_labels[settings[value]['condition_index'][i]]= label_value
+                    vals =  [elem[1]]
+                if elem[0] in cond_dict:
+                    cond_dict[elem[0]] += vals
+                else:
+                    cond_dict[elem[0]] = vals
+            condition_labels[settings[value]['condition_index'][i]]= cond_dict
 
-    #data_input += [go.Scatter(x=[None], y=[None], mode="markers", name=f"{idx}:<br>{condition_labels[idx]}", showlegend=True, marker=dict(size=10, symbol='square')) for idx in sorted(list(set(settings[value]['condition_index'])))]
     data_input = heatmap
-    fig = go.Figure(data=data_input)
-    #fig.add_trace(go.Bar(x=[settings[value]['condition_index'],settings[value]['sample_index']], y=[50]*len(sorter), marker_line=dict(width=5, color=plt.colors.DEFAULT_PLOTLY_COLORS), marker_color='rgba(158,202,225,0.0)'))
-    #for i in range(len(list(set(settings[value]['condition_index'])))):
-    #    y_vals = [-10]
-    #    x_vals = [settings[value]['index'][x] for x in range(len(settings[value]['index'])) if settings[value]['condition_index'][x] == list(set(settings[value]['condition_index']))[i]]
-    #    fig.add_trace(go.Bar(x=[sum(x_vals)/len(x_vals)], y=y_vals, name=list(set(settings[value]['condition_index']))[i], width=[len(x_vals)-0.05], marker_line=dict(width=5, color=plt.colors.DEFAULT_PLOTLY_COLORS[i]), marker_color='rgba(158,202,225,0.0)')) #name=list(set(settings[value]['condition_index']))[i], width=1*(len([x for x in settings[value]['condition_index'] if x == list(set(settings[value]['condition_index']))[i]]))))
-    #fig.update_layout(barmode='group', bargap=0.03)
-    fig.update_layout(yaxis=dict(tickmode='array', ticktext=option_text, tickvals=sorter))
-    #fig.update_layout(legend_title_text=f'Organism: {organisms[value]}')
-    fig.update_yaxes(autorange="reversed")
-    fig.update_xaxes(side="top")
-    fig.update_yaxes(tickson='boundaries')
-    fig.update_layout(height=50*len(sorter))
-    fig.update_layout(width=200*len(settings[value]['sample_index']))
-    fig.update_layout(
-        plot_bgcolor='white'
-    )
-    fig.update_xaxes(
-        showline=True,
-        gridcolor='lightgrey'
-    )
-    fig.update_yaxes(
-        showline=True,
-        gridcolor='lightgrey'
-    )
-    
-    fig.update_layout(legend_valign='top')
+        
+    my_cell_width = 150
+    top_margin = 100
+    bottom_margin = 0
+    left_margin = 200
+    right_margin = 200
+    my_height = 50*len(sorter)
+    my_width = my_cell_width*len(settings[value]["sample_index"])
+
+    organism_path = os.path.join(os.path.dirname(__file__), 'images', f'{organisms[value]}.png')
+    images = None
+
+    if os.path.isfile(organism_path):
+        plotly_logo = base64.b64encode(open(organism_path, 'rb').read())
+        imgdata = base64.b64decode(plotly_logo)
+        im = Image.open(io.BytesIO(imgdata))
+        im_width, im_height = im.size
+        y_side = top_margin
+        my_ysize=y_side/my_height
+        x_side = y_side*im_width / im_height
+        my_xsize = x_side/my_width
+
+        left_margin = max(200, x_side)
+
+        images = [dict(
+            source='data:image/png;base64,{}'.format(plotly_logo.decode()),
+            xref="paper", yref="paper",
+            x=0, y=1,
+            sizey=my_ysize, sizex=my_xsize,
+            xanchor="right", yanchor="bottom"
+        )]
+
+
+    layout = go.Layout(
+        images = images,
+        height=my_height + top_margin + bottom_margin,
+        width=my_width + left_margin + right_margin,
+        margin=dict(l=left_margin, r=right_margin, t=top_margin, b=bottom_margin),
+        autosize=False,
+        title=dict(
+            text=f'<b>Setting {value}</b>', 
+            font=dict(size=15), 
+            automargin=False,
+            yref='container',
+            x=(left_margin+(0.1*150))/(my_width+left_margin+right_margin),
+            y=1,
+            xanchor="left", yanchor="top",
+            subtitle=dict(
+                text=f'Organism: {organisms[value]}',
+                font=dict(size=14, lineposition='under'),
+                ),
+            ),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(
+            side="top",
+            showline=True,
+            gridcolor="lightgrey",
+            automargin=False
+        ),
+        yaxis=dict(
+            tickmode="array",
+            ticktext=option_text, 
+            tickvals=sorter,
+            autorange="reversed",
+            tickson="boundaries",
+            showline=True,
+            gridcolor="lightgrey",
+            automargin=False
+        ),
+        legend=dict(
+            #title=f"Organism: {organisms[value]}",
+            orientation="h",
+            x=0, y=0
+        )
+    )   
+    fig = go.Figure(data=data_input, layout=layout) 
+
     for i in range(len(sorter)):
         fig.add_hline(i, line_dash="dash", line_color='lightgrey',layer='below')
+        fig.add_hline(i-0.5, line_width=0.5) 
+    fig.add_hline(len(sorter)-0.5, line_width=0.5)     
+
+    for i in range(len(settings[value]['sample_index'])+1):
+        fig.add_vline(i-0.5, line_width=0.5)
+    
+    fig.add_hrect(y0=-0.5, y1=len(experimental_factors[value])-0.5, line=dict(color="red", width=5), layer='above')
+        
     return fig
 
 def color(color, text):
