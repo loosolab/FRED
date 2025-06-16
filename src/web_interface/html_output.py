@@ -62,8 +62,8 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
         else:
             setting_dict[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
 
-    summary['file_names'] = html_filenames
-    summary['file_string'] = (project_id, '\n'.join(filenames)) if project_id is not None else None
+    summary['files'] = {'file_names': html_filenames,
+                        'file_string': (project_id, '\n'.join(filenames)) if project_id is not None else None}
     summary['summary'] = setting_dict
     return summary
 
