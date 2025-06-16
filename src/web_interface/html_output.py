@@ -52,7 +52,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
     summary = {}
     setting_dict = {}
     for elem in ['project', 'experimental_setting', 'technical_details']:
-        setting_dict[elem] = ''
+        setting_dict[elem] = [] if elem == 'experimental_setting' else ''
         if elem in yaml_object:
             header =  elem.replace("_", " ").title()
             if elem == 'experimental_setting':
