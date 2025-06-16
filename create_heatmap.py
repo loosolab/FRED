@@ -229,7 +229,7 @@ def get_heatmap(path, keys_yaml):
                         ))], 
             layout=table_layout)
 
-        heatmaps.append(value, (fig.to_html(full_html=False, include_plotlyjs='cdn')))
+        heatmaps.append((value, (fig.to_html(full_html=False, include_plotlyjs='cdn'))))
         #heatmaps.append(fig)
 
     return heatmaps
