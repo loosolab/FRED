@@ -33,7 +33,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
         yaml_object, 'technical_replicates:filenames'))
 
     # save filenames in html and string format
-    html_filenames, filenames = get_html_filenames(filename_nested)
+    filenames = get_html_filenames(filename_nested)
 
     # rewrite yaml to html
     
@@ -64,7 +64,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
             else:
                 setting_dict[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
 
-    summary['files'] = {'file_names': html_filenames,
+    summary['files'] = {'file_names': filenames,
                         'file_string': (project_id, '\n'.join(filenames)) if project_id is not None else None}
     summary['summary'] = setting_dict
     return summary
@@ -82,30 +82,16 @@ def get_html_filenames(filename_nest):
     # define empty list to store filenames in string format
     filenames = []
 
-    # initialize html string
-    html_filenames = ''
-
     # iterate over nested filenames
     for file_list in filename_nest:
-
-        # initialize partial html string
-        part_html = ''
 
         # iterate over single filenames
         for filename in file_list:
 
             # add the filename to the html and to the list
-            part_html = f'{part_html}- {filename}<br>'
             filenames.append(filename)
 
-        # add a break between the filenames and a horizontal line after the
-        # last filename of the list
-        end = f'{"<br><hr><br>" if file_list != filename_nest[-1] else "<br>"}'
-
-        # add the converted file list to the html string
-        html_filenames = f'{html_filenames}{part_html}{end}'
-
-    return html_filenames, filenames
+    return filenames
 
 
 def object_to_html(yaml_object, depth, is_list):
