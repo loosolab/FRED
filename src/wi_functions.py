@@ -19,6 +19,7 @@ import src.web_interface.validation as validation
 import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.wi_object_to_yaml as oty
 import src.web_interface.yaml_to_wi_object as yto
+import create_heatmap
 
 # This script contains all functions for generation of objects for the web
 # interface
@@ -112,6 +113,42 @@ def save_object(dictionary, path, filename, edit_state):
 
 def save_filenames(file_str, path):
     return file_io.save_filenames(file_str, path)
+
+def get_plot(pgm_object, config, path, project_id):
+    uuid = "".join(
+            random.choice(string.ascii_uppercase + string.digits) for _ in range(5)
+        )
+    filename = f"{uuid}_{time.time()}"
+    working_path = os.path.join(os.path.dirname(__file__), "..", "..")
+    proc = subprocess.Popen(
+            [
+                "python3",
+                "metadata-organizer/metaTools.py",
+                "find",
+                "-p",
+                path,
+                "-s",
+                f'project:id:"{project_id}',
+                "-c",
+                config,
+                "-o",
+                "json",
+                "-f",
+                filename,
+                "-sv",
+            ],
+            cwd=working_path,
+        )
+    proc.wait()
+    res = utils.read_in_json(os.path.join(working_path, f"{filename}.json"))
+    os.remove(os.path.join(working_path, f"{filename}.json"))
+
+    yaml_file = res.data()
+    plots = create_heatmap.get_heatmap(yaml_file, pgm_object['structure'], show_setting_id=False)
+    plot_list = []
+    for elem in plots:
+        plot_list.append({'title': elem[0], 'plot': elem[1]})
+    return plot_list
 
 
 # TODO: fix path
