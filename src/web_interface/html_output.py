@@ -30,7 +30,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
 
     # fetch all filenames from the yaml via a generator -> nested lists
     filename_nested = list(utils.find_list_key(
-        yaml_object, 'technical_replicates:filename'))
+        yaml_object, 'technical_replicates:filenames'))
 
     # save filenames in html and string format
     html_filenames, filenames = get_html_filenames(filename_nested)
@@ -42,7 +42,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
         {% if input.html %}
             {{ input.html }}
         {% else %}            
-            <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:50">
+            <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
                     {{ input.plot }}
             </div>
         {% endif %}
