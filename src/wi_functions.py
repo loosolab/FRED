@@ -144,6 +144,7 @@ def get_plot(pgm_object, config, path, project_id):
     os.remove(os.path.join(working_path, f"{filename}.json"))
 
     yaml_file = res['data']
+    print(yaml_file)
     plots = create_heatmap.get_heatmap(yaml_file, pgm_object['structure'], show_setting_id=False)
     plot_list = []
     for elem in plots:
