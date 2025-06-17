@@ -9,14 +9,17 @@ import io
 from PIL import Image
 
 
-def get_heatmap(path, keys_yaml, show_setting_id=True):
+def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
     settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict = get_data(path, keys_yaml)
 
     heatmaps=[]
 
     for value in settings:
         options = [key.replace('_num', '') for key in settings[value] if key.endswith('_num')]
-        sorter = experimental_factors[value] + [o for o in options if o not in experimental_factors[value]]
+        if only_factors:
+            sorter = experimental_factors[value]
+        else:
+            sorter = experimental_factors[value] + [o for o in options if o not in experimental_factors[value]]
 
         df_empty = settings[value].dropna(axis=1, how='all')
         sorter = [x for x in sorter if x in df_empty.columns]

@@ -172,7 +172,7 @@ def print_summary(result, output):
             except KeyError:
                 project_res['email'] = None
 
-            project_res["organisms"] = list(utils.find_keys(elem[key], "organism_name"))
+            project_res["organisms"] = list(set(list(utils.find_keys(elem[key], "organism_name"))))
 
             try:
                 project_res["description"] = elem[key]["project"]["description"]
@@ -188,9 +188,18 @@ def print_summary(result, output):
                 nerds = []
                 for nerd in elem[key]["project"]["nerd"]:
                     nerds.append(nerd["name"])
-                project_res["nerd"] = nerds
+                project_res["nerd"] = list(set(nerds))
             else:
                 project_res["nerd"] = None
+
+            try:
+                techniques = elem[key]['technical_details']['techniques']
+                tech_list = []
+                for tech in techniques:
+                    tech_list += tech['technique']
+                project_res['technique'] = list(set(tech_list))
+            except:
+                project_res['technique'] = None
 
                 # add the id, path, project_name and owner to res
             res.append([key, project_path, project_name, owner_name])
