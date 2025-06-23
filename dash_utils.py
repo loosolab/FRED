@@ -256,7 +256,8 @@ def annotate(value, group_key=None):
             annotated_value += [x for x in [f'{value["value"]}{value["unit"]}'] if x not in annotated_value]
         else:
             for key in value:
-                annotated_value += [x for x in annotate(value[key]) if x not in annotated_value]
+                if key != 'ensembl_id':
+                    annotated_value += [x for x in annotate(value[key]) if x not in annotated_value]
     else:
         annotated_value += [x for x in [re.sub("0000(0)*", "...", str(value))] if x not in annotated_value]
     
