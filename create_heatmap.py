@@ -189,8 +189,9 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
             
             fig.add_hrect(y0=0, y1=val_sorter[len(experimental_factors[value])], line=dict(color="red", width=5), layer='above')
             
-            fig.update_layout(modebar={'remove':['zoom', 'pan', 'zoomIn', 'zoomOut']})
-
+            fig.update_layout(modebar={'remove':['zoom', 'pan', 'zoomIn', 'zoomOut', 'autoScale']})
+            fig.layout.yaxis.fixedrange = True
+            
             table_header = ['<b>Experimental Factors</b>'] + [f'<b>{k}</b>' for k in condition_labels]
             table_values = [[f"<b>{x.replace('_', ' ').title()}</b>" for x in experimental_factors[value]]]
 
@@ -244,7 +245,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
                             ))], 
                 layout=table_layout)
 
-            heatmaps.append((value, fig.to_html(full_html=False, include_plotlyjs='cdn')))
+        heatmaps.append((value, fig.to_html(config={'displaylogo': False}, full_html=False, include_plotlyjs='cdn')))
         #heatmaps.append(fig)
 
     return heatmaps
