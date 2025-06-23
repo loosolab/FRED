@@ -13,6 +13,7 @@ def get_data(path, keys_yaml):
     option_pretty = {}
     max_vals = {}
     max_anno = {}
+    no_samples = {}
 
     yaml = path
     keys = keys_yaml
@@ -53,13 +54,14 @@ def get_data(path, keys_yaml):
                 idx = []
                 option_dict = {}
                 annotated = {}
+                no_samples[setting_id] = {}
                 
                 j=1
                 
                 for cond_index, cond in enumerate(conditions):
                 
-                    # TODO: only table?
                     condition_name = cond['condition_name']
+                    c_index = f'Condition {cond_index+1}'
                     
                     samples = list(utils.find_keys(cond, 'samples'))
                     
@@ -69,7 +71,7 @@ def get_data(path, keys_yaml):
                         for samp_index, sample in enumerate(samples):
                             
                             condition_names.append(condition_name)
-                            condition_index.append(f'Condition {cond_index+1}')
+                            condition_index.append(c_index)
                             
                             sample_index.append(f'Sample {samp_index+1}')
                             idx.append(j)
@@ -118,7 +120,17 @@ def get_data(path, keys_yaml):
                                 else:
                                     option_dict[key].append(None)
                                     annotated[key].append('')
+                    else:
+                        splitted_condition = utils.split_cond(condition_name)
+                        missing_dict = {}
+                        for elem in splitted_condition:
+                            if elem[0] in missing_dict:
+                                missing_dict[elem[0]].append(elem[1])
+                            else:
+                                missing_dict[elem[0]] = [elem[1]]
 
+                        no_samples[setting_id][c_index] = missing_dict
+                    
                     df_dict = {'condition_name': condition_names,
                                'condition_index': condition_index,
                                'sample_index': sample_index,
@@ -220,7 +232,7 @@ def get_data(path, keys_yaml):
                 max_vals[setting_id] = max_options   
                 max_anno[setting_id] = max_annotation               
                     
-    return setting_dict, experimental_factors, organisms, max_vals, option_pretty, annotated_dict, max_anno
+    return setting_dict, experimental_factors, organisms, max_vals, option_pretty, annotated_dict, max_anno, no_samples
 
 
 def normalize(x, minIn, maxIn, minOut, maxOut):

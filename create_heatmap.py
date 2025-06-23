@@ -9,7 +9,7 @@ from PIL import Image
 
 
 def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
-    settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict, max_annotation = get_data(path, keys_yaml)
+    settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict, max_annotation, no_samples = get_data(path, keys_yaml)
 
     heatmaps=[]
 
@@ -87,29 +87,12 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
                         ),
                     ]
             
-            condition_labels = {}
-            for i in range(len(settings[value]['condition_name'])):
-                if settings[value]['condition_index'][i] not in condition_labels:
-                    cond = settings[value]['condition_name'][i]
-                    splitted = utils.split_cond(cond)
-                    cond_dict = {}
-                    for elem in splitted:
-                        if isinstance(elem[1], dict):
-                            vals = [elem[1][k] for k in elem[1]]
-                        else:
-                            vals =  [elem[1]]
-                        if elem[0] in cond_dict:
-                            cond_dict[elem[0]] += vals
-                        else:
-                            cond_dict[elem[0]] = vals
-                    condition_labels[settings[value]['condition_index'][i]]= cond_dict
-
             data_input = heatmap
             
             my_cell_width = 150
             #my_cell_height = max(50, (15*max_annotation[value])+20)
             top_margin = 100
-            bottom_margin = 0
+            bottom_margin = 20
             left_margin = 200
             right_margin = 200
             my_height = val_sorter[-1] #my_cell_height*len(sorter)
@@ -191,62 +174,8 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
             
             fig.update_layout(modebar={'remove':['zoom', 'pan', 'zoomIn', 'zoomOut', 'autoScale']})
             fig.layout.yaxis.fixedrange = True
-            
-            table_header = ['<b>Experimental Factors</b>'] + [f'<b>{k}</b>' for k in condition_labels]
-            table_values = [[f"<b>{x.replace('_', ' ').title()}</b>" for x in experimental_factors[value]]]
 
-            table_height = {}
-            max_value_len = 0
-            for lab in condition_labels:
-                cond_vals = []
-                for fac in experimental_factors[value]:
-                    if fac not in table_height:
-                        table_height[fac] = 0
-                    if fac in condition_labels[lab]:
-                        table_height[fac] = max(table_height[fac], len(list(set([str(x) for x in condition_labels[lab][fac]]))))
-                        cond_vals.append('<br>'.join(list(set(annotate(condition_labels[lab][fac])))))
-                        max_value_len = max(max_value_len, max([len(x) for x in condition_labels[lab][fac]]))
-                    else:
-                        cond_vals.append('')
-                table_values.append(cond_vals)
-
-            full_table_height = 25 * (len(list(table_height.keys()))+1) + 25 * ((sum([table_height[x] for x in table_height]) + 2))
-            table_cell_with = max(my_cell_width, max_value_len*10)
-            table_width = table_cell_with * len(table_header)
-            table_layout = go.Layout(
-                width=my_width + left_margin + right_margin,
-                height=full_table_height,
-                margin=dict(l=left_margin-my_cell_width, r=right_margin + (my_width+table_cell_with-table_width), t=20, b=20),
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-            )
-
-            table = go.Figure(
-                data=[
-                    go.Table(
-                        header=dict(
-                            values=table_header,
-                            align='left',
-                            fill=dict(
-                                color='rgba(0,0,0,0)'
-                            ),
-                            font_size=12,
-                            line_color='darkslategray',
-                            ), 
-
-                        cells=dict(
-                            values=table_values,
-                            align='left',
-                            font=dict(
-                                color=['red'] + ['black']*len(condition_labels)
-                            ),
-                            fill=dict(color='rgba(0,0,0,0)'),
-                            line_color='darkslategray',
-                            ))], 
-                layout=table_layout)
-
-        heatmaps.append((value, fig.to_html(full_html=False, include_plotlyjs='cdn')))
-        #heatmaps.append(fig)
+        heatmaps.append((value, fig.to_html(full_html=False, include_plotlyjs='cdn'), no_samples[value] if len(list(no_samples[value].keys())) > 0 else None))
 
     return heatmaps
 
