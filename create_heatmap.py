@@ -159,7 +159,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
                 )
             )    
 
-            fig = go.Figure(data=data_input, layout=layout)      
+            fig = go.Figure(data=data_input, layout=layout)     
             for i in val_sorter:
                 fig.add_hline(i, line_width=0.5)
 
@@ -175,7 +175,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
             fig.update_layout(modebar={'remove':['zoom', 'pan', 'zoomIn', 'zoomOut', 'autoScale']})
             fig.layout.yaxis.fixedrange = True
 
-        heatmaps.append((value, fig.to_html(full_html=False, include_plotlyjs='cdn'), no_samples[value] if len(list(no_samples[value].keys())) > 0 else None))
+            heatmaps.append((value, fig.to_html(full_html=False, include_plotlyjs='cdn'), no_samples[value] if len(list(no_samples[value].keys())) > 0 else None))
 
     return heatmaps
 
