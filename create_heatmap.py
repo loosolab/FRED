@@ -14,7 +14,9 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
     heatmaps=[]
 
     for value in settings:
+        fig = None
         if len(settings[value]) > 0:
+
             options = [key.replace('_num', '') for key in settings[value] if key.endswith('_num')]
             
             if only_factors:
@@ -175,8 +177,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False):
             fig.update_layout(modebar={'remove':['zoom', 'pan', 'zoomIn', 'zoomOut', 'autoScale']})
             fig.layout.yaxis.fixedrange = True
 
-            heatmaps.append((value, fig.to_html(full_html=False, include_plotlyjs='cdn'), no_samples[value] if len(list(no_samples[value].keys())) > 0 else None))
-
+        heatmaps.append((value, fig.to_html(full_html=False, include_plotlyjs='cdn') if fig is not None else fig, no_samples[value] if len(list(no_samples[value].keys())) > 0 else None))
     return heatmaps
 
 

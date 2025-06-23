@@ -25,7 +25,9 @@ print(filenames)
 input = {}
 plot_list = []
 for elem in fig:
-    add_plot = {'plot': elem[1], 'header': elem[0]}
+    add_plot = {'header': elem[0]}
+    if elem[1] is not None:
+        add_plot['plot'] = elem[1], 
     if elem[2] is not None:
         add_plot['missing_samples'] = ho.object_to_html(elem[2], 0, False)
     plot_list.append(add_plot)

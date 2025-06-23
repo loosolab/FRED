@@ -43,7 +43,9 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
             {{ input.html }}
         {% else %}            
             <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
-                    {{ input.plot }}
+                    {% if input.plot %}
+                        {{ input.plot }}
+                    {% endif %}
                     
                     {% if input.missing_samples %}
                         <i>Conditions without samples:</i>
@@ -64,7 +66,9 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                 plots = create_heatmap.get_heatmap(yaml_object, key_yaml, show_setting_id=False)
                 plot_list = []
                 for plot in plots:
-                    add_plot = {'header': header, 'plot': plot[1]}
+                    add_plot = {'header': header}
+                    if plot[1] is not None:
+                        add_plot['plot'] = plot[1]
                     if plot[2] is not None:
                         add_plot['missing_samples'] = object_to_html(plot[2], 0, False)
                     plot_list.append({'title': plot[0], 'plot': template.render(input=add_plot)})
