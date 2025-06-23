@@ -67,7 +67,7 @@ def get_summary(wi_object, key_yaml, read_in_whitelists):
                     add_plot = {'header': header, 'plot': plot[1]}
                     if elem[2] is not None:
                         add_plot['missing_samples'] = object_to_html(elem[2], 0, False)
-                plot_list.append({'title': plot[0], 'plot': template.render(input=add_plot)})
+                    plot_list.append({'title': plot[0], 'plot': template.render(input=add_plot)})
                 setting_dict[elem] = plot_list
             else:
                 setting_dict[elem] = template.render(input={'header': header, 'html': object_to_html(yaml_object[elem], 0, False)})
