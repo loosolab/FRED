@@ -20,6 +20,7 @@ import src.web_interface.whitelist_parsing as whitelist_parsing
 import src.web_interface.wi_object_to_yaml as oty
 import src.web_interface.yaml_to_wi_object as yto
 import create_heatmap
+from jinja2 import Template
 
 # This script contains all functions for generation of objects for the web
 # interface
@@ -145,10 +146,33 @@ def get_plot(pgm_object, config, path, project_id):
 
     try:
         yaml_file = utils.read_in_yaml(res['data'][0]['path'])
+        template = Template(
+        '''              
+        {% if input.html %}
+            {{ input.html }}
+        {% else %}            
+            <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
+                    {% if input.plot %}
+                        {{ input.plot }}
+                    {% endif %}
+                    
+                    {% if input.missing_samples %}
+                        <i>Conditions without samples:</i>
+                        {{ input.missing_samples }}
+                    {% endif %}
+            </div>
+        {% endif %}
+        '''
+        )
         plots = create_heatmap.get_heatmap(yaml_file, pgm_object['structure'], show_setting_id=False)
         plot_list = []
         for elem in plots:
-            plot_list.append({'title': elem[0], 'plot': elem[1]})
+            add_plot = {}
+            if elem[1] is not None:
+                add_plot['plot'] = elem[1]
+            if elem[2] is not None:
+                add_plot['missing_samples'] = html_output.object_to_html(elem[2], 0, False)
+            plot_list.append({'title': elem[0], 'plot': template.render(input=add_plot)})
     except:
         plot_list = []
     return plot_list
