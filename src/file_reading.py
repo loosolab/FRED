@@ -87,10 +87,12 @@ def iterate_dir_metafiles(
     end_result = time.time()
     print(f'Parsing the results took {"%.2f" % (end_result-end_reading)} seconds.')
     print(f'File reading per file took MIN {"%.2f" % (min(reading_times))}s | MEAN {"%.2f" % (sum(reading_times)/len(reading_times))}s | MAX {"%.2f" % (max(reading_times))}s')
-    largest_file = metafile_list[reading_times.index(max(reading_times))]
     try:
+        largest_file = metafile_list[reading_times.index(max(reading_times))]
         print(f'Reading took longest for file {largest_file["project"]["id"]}')
     except KeyError:
+        pass
+    except IndexError:
         pass
     return metafile_list, {
         "all_files": len(results),
