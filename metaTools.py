@@ -50,7 +50,7 @@ class FRED:
         gen = Generate(path, project_id, mandatory_only, self.filename, self.structure, self.email)
         gen.generate()
 
-    def validate(self, logical_validation, path, output, output_filename):
+    def validate(self, logical_validation, path, output, output_filename, save_empty=False):
         validation_reports = {'all_files': 1,
                               'corrupt_files': {'count': 0, 'report': []},
                               'error_count': 0, 'warning_count': 0}
@@ -87,7 +87,7 @@ class FRED:
         print(
             f'Found {validation_reports["error_count"]} errors and {validation_reports["warning_count"]} warnings in {validation_reports["corrupt_files"]["count"]} of those files.')
 
-        if validation_reports['corrupt_files']['count'] > 0:
+        if validation_reports['corrupt_files']['count'] > 0 or save_empty is True:
 
             res = None
             if output is not None:
@@ -109,9 +109,11 @@ class FRED:
                 ask.print_option_list(options, '')
                 res = ask.parse_input_list(options, True)
 
-            output_report = {
-                'report': copy.deepcopy(validation_reports)['corrupt_files'][
-                    'report']}
+            try:
+                output_report = {
+                    'report': copy.deepcopy(validation_reports)['corrupt_files']['report']}
+            except KeyError:
+                output_report = {'report': []}
             for elem in output_report['report']:
                 id = list(utils.find_keys(elem['file'], 'id'))
                 if len(id) > 0:
