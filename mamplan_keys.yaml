@@ -188,6 +188,14 @@ tags:
       value: null
       whitelist: False
       input_type: short_text
+    download_allowed:
+      mandatory: False
+      list: False
+      display_name: 'Download allowed'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
     metadata:
       mandatory: False
       list: True
