@@ -207,8 +207,8 @@ def print_summary(result, output):
             tissue = []
             
             tissues = list(utils.find_keys(elem[key], 'tissue'))
-            for elem in tissues:
-                tissue += elem
+            for tis in tissues:
+                tissue += tis
             tissue = list(set(tissue))
             project_res['tissue'] = tissue
 
