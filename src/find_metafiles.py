@@ -202,7 +202,7 @@ def print_summary(result, output):
                 project_res['technique'] = None
             
             cell_type = list(set(utils.find_keys(elem[key], 'cell_type')))
-            res['cell_type'] = cell_type
+            project_res['cell_type'] = cell_type
 
             tissue = []
             
@@ -210,7 +210,7 @@ def print_summary(result, output):
             for elem in tissues:
                 tissue += elem
             tissue = list(set(tissue))
-            res['tissue'] = tissue
+            project_res['tissue'] = tissue
 
             # treatment
             treatment = []
@@ -224,12 +224,12 @@ def print_summary(result, output):
             injury = list(utils.find_list_key(elem[key], 'injury:injury_type'))
             treatment += list(set(injury))
 
-            res['treatment'] = treatment
+            project_res['treatment'] = treatment
 
             # disease
 
             disease = list(utils.find_list_key(elem[key], 'disease:disease_type'))
-            res['disease'] = list(set(disease))
+            project_res['disease'] = list(set(disease))
 
                 # add the id, path, project_name and owner to res
             res.append([key, project_path, project_name, owner_name])
