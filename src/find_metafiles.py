@@ -200,6 +200,36 @@ def print_summary(result, output):
                 project_res['technique'] = list(set(tech_list))
             except:
                 project_res['technique'] = None
+            
+            cell_type = list(set(utils.find_keys(elem[key], 'cell_type')))
+            res['cell_type'] = cell_type
+
+            tissue = []
+            
+            tissues = list(utils.find_keys(elem[key], 'tissue'))
+            for elem in tissues:
+                tissue += elem
+            tissue = list(set(tissue))
+            res['tissue'] = tissue
+
+            # treatment
+            treatment = []
+            
+            medical = list(utils.find_list_key(elem[key], 'medical_treatment:treatment_type'))
+            treatment += list(set(medical))
+            
+            physical = list(utils.find_keys(elem[key], 'physical_treatment'))
+            treatment += list(set(physical))
+            
+            injury = list(utils.find_list_key(elem[key], 'injury:injury_type'))
+            treatment += list(set(injury))
+
+            res['treatment'] = treatment
+
+            # disease
+
+            disease = list(utils.find_list_key(elem[key], 'disease:disease_type'))
+            res['disease'] = list(set(disease))
 
                 # add the id, path, project_name and owner to res
             res.append([key, project_path, project_name, owner_name])
