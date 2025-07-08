@@ -210,9 +210,9 @@ def find_metadata(key_yaml, path, search_string):
 
             disease = list(utils.find_list_key(files[i][key], 'disease:disease_type'))
             res['disease'] = list(set(disease))
-
+            print('HIER!!!!!!!!!!', res)
             new_files.append(res)
-            
+
     return new_files
 
 
