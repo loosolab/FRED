@@ -180,7 +180,39 @@ def find_metadata(key_yaml, path, search_string):
                 res["nerd"] = nerds
             else:
                 res["nerd"] = None
+            
+            cell_type = list(set(utils.find_keys(files[i][key], 'cell_type')))
+            res['cell_type'] = cell_type
+
+            tissue = []
+            
+            tissues = list(utils.find_keys(files[i][key], 'tissue'))
+            for elem in tissues:
+                tissue += elem
+            tissue = list(set(tissue))
+            res['tissue'] = tissue
+
+            # treatment
+            treatment = []
+            
+            medical = list(utils.find_list_key(files[i][key], 'medical_treatment:treatment_type'))
+            treatment += list(set(medical))
+            
+            physical = list(utils.find_keys(files[i][key], 'physical_treatment'))
+            treatment += list(set(physical))
+            
+            injury = list(utils.find_list_key(files[i][key], 'injury:injury_type'))
+            treatment += list(set(injury))
+
+            res['treatment'] = treatment
+
+            # disease
+
+            disease = list(utils.find_list_key(files[i][key], 'disease:disease_type'))
+            res['disease'] = list(set(disease))
+
             new_files.append(res)
+            
     return new_files
 
 
