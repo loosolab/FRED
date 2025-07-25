@@ -5,6 +5,7 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+
 [project]
 name = "fred"
 version = "0.0.1"
@@ -19,7 +20,7 @@ dependencies = [
     "plotly",
     "jinja2",
     "gitpython",
-    "kaleido<1.0.0"
+    "kaleido<1.0.0",
 ]
 
 [project.scripts]
