@@ -5,10 +5,10 @@ import plotly as plt
 import pandas as pd
 import argparse
 import pathlib
-from fred.src import utils
-from fred.src.heatmap.dash_utils import *
+from src import utils
+from src.heatmap.dash_utils import *
 import numpy as np
-from fred.src.heatmap.dash_utils import get_data
+from src.heatmap.dash_utils import get_data
 import os
 import base64
 import io

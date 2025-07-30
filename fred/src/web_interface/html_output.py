@@ -1,6 +1,6 @@
-import fred.src.utils as utils
-import fred.src.web_interface.wi_object_to_yaml as oty
-import fred.src.heatmap.create_heatmap as create_heatmap
+import src.utils as utils
+import src.web_interface.wi_object_to_yaml as oty
+import src.heatmap.create_heatmap as create_heatmap
 from jinja2 import Template
 import os
 import plotly.graph_objects as go

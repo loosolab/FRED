@@ -4,8 +4,8 @@ import os
 from functools import partial
 from multiprocessing.pool import Pool
 import time
-from fred.src import validate_yaml
-from fred.src.utils import read_in_yaml
+from src import validate_yaml
+from src.utils import read_in_yaml
 import yaml as yml
 
 

@@ -2,14 +2,14 @@ import argparse
 import copy
 import pathlib
 
-from fred.src.generate import Generate
+from src.generate import Generate
 import os
-from fred.src import find_metafiles
-from fred.src import validate_yaml
-from fred.src import file_reading
-from fred.src import utils
-from fred.src import git_whitelists
-from fred.src.heatmap import create_heatmap
+from src import find_metafiles
+from src import validate_yaml
+from src import file_reading
+from src import utils
+from src import git_whitelists
+from src.heatmap import create_heatmap
 import time
 
 

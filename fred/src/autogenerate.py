@@ -1,6 +1,6 @@
 import copy
 
-from fred.src import utils
+from src import utils
 
 
 class Autogenerate:

@@ -1,7 +1,7 @@
-import fred.src.utils as utils
-import fred.src.web_interface.whitelist_parsing as whitelist_parsing
-import fred.src.web_interface.yaml_to_wi_object as yto
-import fred.src.web_interface.wi_utils as wi_utils
+import src.utils as utils
+import src.web_interface.whitelist_parsing as whitelist_parsing
+import src.web_interface.yaml_to_wi_object as yto
+import src.web_interface.wi_utils as wi_utils
 import copy
 import re
 

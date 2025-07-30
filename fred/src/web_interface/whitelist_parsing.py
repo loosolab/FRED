@@ -1,6 +1,6 @@
 import os
 
-import fred.src.utils as utils
+import src.utils as utils
 
 def get_whitelist_object(pgm_object):
     key_yaml = pgm_object['structure']

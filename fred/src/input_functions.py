@@ -1,12 +1,12 @@
 import os
-from fred.src import utils
+from src import utils
 import datetime
 from tabulate import tabulate
-import readline
+#import readline
 import copy
 import json
 import re
-from fred.src.web_interface import wi_utils
+from src.web_interface import wi_utils
 
 
 class WhitelistCompleter:
@@ -662,14 +662,14 @@ class Input:
         print(f'Press tab once for autofill if'
               f' possible or to get a list of up to'
               f' 30 possible input values.\n')
-        readline.parse_and_bind("tab: complete")
-        readline.parse_and_bind("set show-all-if-ambiguous On")
-        readline.parse_and_bind("set show-all-if-unmodified On")
+        #readline.parse_and_bind("tab: complete")
+        #readline.parse_and_bind("set show-all-if-ambiguous On")
+        #readline.parse_and_bind("set show-all-if-unmodified On")
         completer = WhitelistCompleter(whitelist)
-        readline.set_completer(completer.complete)
-        readline.set_completer_delims('')
+        #readline.set_completer(completer.complete)
+        #readline.set_completer_delims('')
         input_value = input(f'{key}: ')
-        readline.parse_and_bind('tab: self-insert')
+        #readline.parse_and_bind('tab: self-insert')
         return input_value
 
     def get_value_unit(self, structure):

@@ -1,7 +1,7 @@
-import fred.src.find_metafiles as find_metafiles
-import fred.src.utils as utils
-import fred.src.web_interface.html_output as html_output
-import fred.src.web_interface.wi_utils as wi_utils
+import src.find_metafiles as find_metafiles
+import src.utils as utils
+import src.web_interface.html_output as html_output
+import src.web_interface.wi_utils as wi_utils
 
 # TODO: refactor and comment
 

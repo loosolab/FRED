@@ -1,7 +1,7 @@
-from fred.src.input_functions import Input
-from fred.src.autogenerate import Autogenerate
-from fred.src import validate_yaml
-from fred.src import utils
+from src.input_functions import Input
+from src.autogenerate import Autogenerate
+from src import validate_yaml
+from src import utils
 import os
 
 

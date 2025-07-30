@@ -1,6 +1,6 @@
 import os.path
 import datetime
-from fred.src import utils
+from src import utils
 
 
 # This script includes functions for the validation of metadata yaml files
