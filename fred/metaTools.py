@@ -19,8 +19,12 @@ class FRED:
         self.whitelist_repo, self.whitelist_branch, self.whitelist_path, \
         self.username, self.password, structure, self.update_whitelists, \
         self.output_path, self.filename, self.email = utils.parse_config(config)
-        if not skip_validation:
-            self.fetch_whitelists()
+        if self.whitelist_path == 'fred':
+            print('INIT PATH', os.path.dirname(__file__))
+            self.whitelist_path = os.path.join(os.path.dirname(__file__), '..', 'FRED_whitelists')
+        else:
+            self.whitelist_path = os.path.join(self.whitelist_path, 'FRED_whitelists')
+        self.fetch_whitelists()
         self.structure = utils.read_in_yaml(structure)
 
     def fetch_whitelists(self):
@@ -237,6 +241,7 @@ def generate(args):
     calls script generate_metafile to start dialog
     :param args:
     """
+    print('METATOOLS PATH', os.path.dirname(__file__))
     generating = FRED(args.config)
     generating.generate(args.path, args.id, args.mandatory_only)
 
@@ -282,6 +287,7 @@ def add_value(args):
     adding.add_value(args.path, args.position, args.value, args.edit_existing)
 
 def main():
+    print('HIER')
     parser = argparse.ArgumentParser(prog='metaTools.py')
     subparsers = parser.add_subparsers(title='commands')
 

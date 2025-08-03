@@ -6,7 +6,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["fred"]
+package-dir = {"" = "fred"}
 
 [project]
 name = "fred"
@@ -21,7 +21,7 @@ dependencies = [
     "plotly",
     "jinja2",
     "gitpython",
-    "kaleido",
+    "kaleido"
 ]
 
 [project.scripts]

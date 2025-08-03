@@ -14,6 +14,7 @@ from tabulate import tabulate
 
 def parse_config(config_file):
     config = read_in_yaml(config_file)
+    print(config)
     missing_keys = []
     try:
         whitelist_repo = config["whitelist_repository"]
@@ -49,9 +50,9 @@ def parse_config(config_file):
     try:
         whitelist_path = config["whitelist_path"]
     except KeyError:
-        whitelist_path = "FRED_whitelists"
+        whitelist_path = os.path.join(os.path.dirname(__file__), '..', '..', "FRED_whitelists")
         missing_keys.append("whitelist_path")
-    whitelist_path = os.path.abspath(whitelist_path)
+
     try:
         update_whitelists = config["update_whitelists"]
     except KeyError:
@@ -192,10 +193,13 @@ def read_whitelist(key, whitelist_path=None):
     :param key: the key that contains a whitelist
     :return: whitelist: the read in whitelist
     """
+    print('UTILS PATH', os.path.dirname(__file__))
     if whitelist_path is None:
+        print('NO WHITELIST PATH', whitelist_path)
         whitelist_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "..", "FRED_whitelists"
+            os.path.dirname(os.path.abspath(__file__)), "..", "..", "FRED_whitelists"
         )
+    print('!!!', whitelist_path)
     try:
         whitelist = read_in_json(os.path.join(whitelist_path, "misc", "json", key))
     except (AttributeError, FileNotFoundError):
@@ -203,6 +207,7 @@ def read_whitelist(key, whitelist_path=None):
             whitelist = read_in_yaml(os.path.join(whitelist_path, "whitelists", key))
         except (AttributeError, FileNotFoundError):
             whitelist = None
+    print('WHITELIST IS', whitelist[0:3] if whitelist is not None else whitelist)
     return whitelist
 
 

@@ -4,8 +4,8 @@ private_access:
   name: # github: username for access token; gitlab: oauth2 for project access token
   token: # personal (github) or project (gitlab) access token
 branch: v1.2.*
-whitelist_path: FRED_whitelists
-update_whitelists: False
+whitelist_path: fred # fred or path to folder 
+update_whitelists: True
 output_path: .
 filename: '_metadata' # example_metadata.yaml
 email: bcu.support@mpi-bn.mpg.de
