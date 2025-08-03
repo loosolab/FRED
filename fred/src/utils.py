@@ -52,7 +52,6 @@ def parse_config(config_file):
     except KeyError:
         whitelist_path = os.path.join(os.path.dirname(__file__), '..', '..', "FRED_whitelists")
         missing_keys.append("whitelist_path")
-
     try:
         update_whitelists = config["update_whitelists"]
     except KeyError:
@@ -193,6 +192,7 @@ def read_whitelist(key, whitelist_path=None):
     :param key: the key that contains a whitelist
     :return: whitelist: the read in whitelist
     """
+
     print('UTILS PATH', os.path.dirname(__file__))
     if whitelist_path is None:
         print('NO WHITELIST PATH', whitelist_path)
