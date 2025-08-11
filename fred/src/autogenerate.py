@@ -76,7 +76,6 @@ class Autogenerate:
             self.gen.parse_lists(fac_node, [fac], 2, fac_dict, is_factor=True)
 
             experimental_factors.append({'factor': fac, 'values': fac_dict[fac]})
-
         return experimental_factors
 
     def get_condition_name(self):
@@ -103,7 +102,6 @@ class Autogenerate:
                                  and 'value_unit' in
                                  factor_info['special_case'])):
                     for val in values:
-                        print(val, list(utils.find_keys(self.gen.key_yaml, val)))
                         val_info = list(utils.find_keys(self.gen.key_yaml, val))
                         if len(val_info) > 0:
                             val_info = val_info[0]
@@ -116,6 +114,11 @@ class Autogenerate:
                                                 f'{elem_key}:"{values[val][j][elem_key]}"')
                                         values[val][
                                             j] = f'{"{"}{"|".join(new_val)}{"}"}'
+                        for j in range(len(values[val])):
+                            if isinstance(values[val][j], dict):
+                                new_val = "|".join([f'{key}:"{values[val][j][key]}"' for key in values[val][j]])
+                                values[val][j] = f'{"{"}{new_val}{"}"}'
+
                     if 'special_case' in factor_info:
                         if 'group' in factor_info['special_case']:
                             values['ident_key'] = factor_info['special_case'][
@@ -175,6 +178,7 @@ class Autogenerate:
     def get_samples(self):
         cond_name = utils.find_position(self.gen.result_dict, self.position[:-2] + ['condition_name'])
         test = utils.split_cond(cond_name)
+        print(test)
         sample_structure = list(utils.find_keys(self.gen.key_yaml, 'samples'))[0]
         for elem in test:
             sample_structure['value'][elem[0]]['value'] = elem[1]

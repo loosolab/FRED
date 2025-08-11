@@ -145,7 +145,6 @@ class Generate(Input):
                     is_factor=False):
 
         if isinstance(structure['value'], dict):
-
             elem_index = 0
             redo = True
 
@@ -173,7 +172,7 @@ class Generate(Input):
                 else:
                     self.input_keys(
                         structure['value'],
-                        position + [elem_index] if structure['list'] else position,
+                        position + [elem_index] if structure['list'] or is_factor else position,
                         indent, return_dict, is_factor=is_factor)
                 self.print_headline(indent)
                 if (structure['list'] and not is_factor) or (is_list and is_factor):
@@ -217,11 +216,12 @@ class Generate(Input):
         desc = []
         for key in structure:
             if structure[key]['mandatory'] or \
-                    ('special_case' in structure[key] and 'generated' in
-                     structure[key]['special_case']):
+                    ('special_case' in structure[key] and ('generated' in
+                     structure[key]['special_case'] or 'factor' in structure[key]['special_case'])):
                 if 'special_case' in structure[key]:
                     if 'factor' in structure[key]['special_case'] and \
-                            structure['special_case']['factor']:
+                            structure[key]['special_case']['factor']:
+                        print ('!!!!!', key, structure[key]['value'])
                         self.fill_key(position + [key],
                                       structure[key]['value'], return_dict)
                     elif 'generated' in structure[key]['special_case']:

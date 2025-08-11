@@ -158,14 +158,14 @@ class Input:
                     ['True ', 'False '], f'Is the sample {key}')
 
             else:
-
+                
                 # print the key, add a newline if a description was printed
                 if structure["desc"] == '':
                     input_value = input(f'\n{key}: ')
                 else:
                     input_value = input(f'{key}: ')
-
                 # no user input -> repeat
+                
                 if input_value == '':
                     print(f'Please enter something.')
                     input_value = self.parse_input_value(key, structure, allow_float=allow_float)
