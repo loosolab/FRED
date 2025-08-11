@@ -1,10 +1,10 @@
-structure: mamplan_keys.yaml
+structure: mampok
 whitelist_repository: https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git
 private_access:
   name: # github: username for access token; gitlab: oauth2 for project access token
   token: # personal (github) or project (gitlab) access token
 branch: v1.2.*
-whitelist_path: FRED_whitelists
+whitelist_path: fred
 update_whitelists: True
 output_path: .
 filename: 'mamplan' # example_metadata.yaml
