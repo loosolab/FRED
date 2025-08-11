@@ -18,7 +18,7 @@ from src.heatmap import create_heatmap
 
 class FRED:
 
-    def __init__(self, config, skip_validation=False):
+    def __init__(self, config):
         self.whitelist_repo, self.whitelist_branch, self.whitelist_path, \
         self.username, self.password, structure, self.update_whitelists, \
         self.output_path, self.filename, self.email = utils.parse_config(config)
@@ -233,7 +233,7 @@ def find(args):
         search: a string specifying search parameters linked via 'and', 'or'
                 and 'not'
     """
-    finding = FRED(args.config, args.skip_validation)
+    finding = FRED(args.config)
     finding.find(args.path, args.search, args.output, args.filename,
                  args.skip_validation)
 
