@@ -22,7 +22,8 @@ def iterate_dir_metafiles(
     yaml=None,
     whitelist_path=None,
     return_false=False,
-    skip_validation = False
+    skip_validation = False,
+    show_logs = False
 ):
     """
     iterate through a list of paths to find all _metadata.yaml(yml) files
@@ -51,7 +52,8 @@ def iterate_dir_metafiles(
             or file.lower().endswith(f"{filename}.yml")
         ]
     end_listing = time.time()
-    print(f'File listing took {"%.2f" % (end_listing-start)} seconds.')
+    if show_logs:
+        print(f'File listing took {"%.2f" % (end_listing-start)} seconds.')
     cpu_count = multiprocessing.cpu_count()
     pool = Pool(cpu_count)
     results = pool.map(
@@ -68,7 +70,8 @@ def iterate_dir_metafiles(
     )
     pool.close()
     end_reading = time.time()
-    print(f'File reading and validation took {"%.2f" % (end_reading-end_listing)} seconds with {cpu_count} CPUs.')
+    if show_logs:
+        print(f'File reading and validation took {"%.2f" % (end_reading-end_listing)} seconds with {cpu_count} CPUs.')
     reading_times = []
     for result in results:
         if result[0] is not None:
@@ -85,15 +88,16 @@ def iterate_dir_metafiles(
             warning_count += result[5]
         reading_times.append(result[6])
     end_result = time.time()
-    print(f'Parsing the results took {"%.2f" % (end_result-end_reading)} seconds.')
-    print(f'File reading per file took MIN {"%.2f" % (min(reading_times))}s | MEAN {"%.2f" % (sum(reading_times)/len(reading_times))}s | MAX {"%.2f" % (max(reading_times))}s')
-    try:
-        largest_file = metafile_list[reading_times.index(max(reading_times))]
-        print(f'Reading took longest for file {largest_file["project"]["id"]}')
-    except KeyError:
-        pass
-    except IndexError:
-        pass
+    if show_logs:
+        print(f'Parsing the results took {"%.2f" % (end_result-end_reading)} seconds.')
+        print(f'File reading per file took MIN {"%.2f" % (min(reading_times))}s | MEAN {"%.2f" % (sum(reading_times)/len(reading_times))}s | MAX {"%.2f" % (max(reading_times))}s')
+        try:
+            largest_file = metafile_list[reading_times.index(max(reading_times))]
+            print(f'Reading took longest for file {largest_file["project"]["id"]}')
+        except KeyError:
+            pass
+        except IndexError:
+            pass
     return metafile_list, {
         "all_files": len(results),
         "corrupt_files": {"count": corrupt_count, "report": file_reports},
