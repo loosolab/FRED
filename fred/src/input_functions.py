@@ -4,9 +4,7 @@ import datetime
 from tabulate import tabulate
 import readline
 import copy
-import json
 import re
-from src.web_interface import wi_utils
 
 
 class WhitelistCompleter:
