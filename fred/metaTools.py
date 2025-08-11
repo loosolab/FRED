@@ -1,16 +1,19 @@
 import argparse
 import copy
 import pathlib
-
-from src.generate import Generate
+import sys
 import os
+import time
+
+sys.path.append(os.path.dirname(__file__))
+from src.generate import Generate
 from src import find_metafiles
 from src import validate_yaml
 from src import file_reading
 from src import utils
 from src import git_whitelists
 from src.heatmap import create_heatmap
-import time
+
 
 
 class FRED:
@@ -20,8 +23,7 @@ class FRED:
         self.username, self.password, structure, self.update_whitelists, \
         self.output_path, self.filename, self.email = utils.parse_config(config)
         if self.whitelist_path == 'fred':
-            print('INIT PATH', os.path.dirname(__file__))
-            self.whitelist_path = os.path.join(os.path.dirname(__file__), '..', 'FRED_whitelists')
+            self.whitelist_path = os.path.join(os.path.dirname(__file__), 'FRED_whitelists')
         else:
             self.whitelist_path = os.path.join(self.whitelist_path, 'FRED_whitelists')
         self.fetch_whitelists()
@@ -287,7 +289,7 @@ def add_value(args):
     adding.add_value(args.path, args.position, args.value, args.edit_existing)
 
 def main():
-    print('HIER')
+
     parser = argparse.ArgumentParser(prog='metaTools.py')
     subparsers = parser.add_subparsers(title='commands')
 
@@ -379,8 +381,7 @@ def main():
 
     try:
         args.func(args)
-    except AttributeError as e:
-        print(e)
+    except AttributeError:
         parser.print_help()
 
 

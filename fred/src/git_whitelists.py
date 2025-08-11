@@ -8,7 +8,6 @@ def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whit
     This function clones the whitelist repository. If the repository already
     exists then it pulls the most recent changes
     """
-    print('!!!!', whitelist_path, update_whitelist)
     if not os.path.exists(whitelist_path) or update_whitelist:
 
         print('Fetching whitelists...\n')
