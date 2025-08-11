@@ -141,9 +141,7 @@ class Autogenerate:
             # call get_condition_combinations to create all conditions
             combinations = utils.get_condition_combinations(factor_dict)
             for key in factor_combis:
-                print(key, factor_combis[key])
                 factor_combis[key] = [x for x in factor_combis[key] if x.count(f'{key}:') <= 1]
-                print(key, factor_combis[key])
             self.gen.conditions[experimental_setting] = [factor_combis, combinations]
 
         i = 1
@@ -178,7 +176,6 @@ class Autogenerate:
     def get_samples(self):
         cond_name = utils.find_position(self.gen.result_dict, self.position[:-2] + ['condition_name'])
         test = utils.split_cond(cond_name)
-        print(test)
         sample_structure = list(utils.find_keys(self.gen.key_yaml, 'samples'))[0]
         for elem in test:
             sample_structure['value'][elem[0]]['value'] = elem[1]
@@ -321,7 +318,6 @@ class Autogenerate:
         return utils.find_position(self.gen.result_dict, self.position)
 
     def get_setting(self):
-        print(self.position)
         return self.gen.setting_ids[self.position[-2]]
 
 

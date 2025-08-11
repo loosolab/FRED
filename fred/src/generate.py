@@ -221,7 +221,6 @@ class Generate(Input):
                 if 'special_case' in structure[key]:
                     if 'factor' in structure[key]['special_case'] and \
                             structure[key]['special_case']['factor']:
-                        print ('!!!!!', key, structure[key]['value'])
                         self.fill_key(position + [key],
                                       structure[key]['value'], return_dict)
                     elif 'generated' in structure[key]['special_case']:
