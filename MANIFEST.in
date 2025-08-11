@@ -4,3 +4,4 @@ include fred/images/*
 include fred/src/*.py
 include fred/src/web_interface/*.py
 include fred/src/heatmap/*.py
+include fred/*
