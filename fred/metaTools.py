@@ -243,7 +243,6 @@ def generate(args):
     calls script generate_metafile to start dialog
     :param args:
     """
-    print('METATOOLS PATH', os.path.dirname(__file__))
     generating = FRED(args.config)
     generating.generate(args.path, args.id, args.mandatory_only)
 
