@@ -18,7 +18,8 @@ dependencies = [
     "plotly<=6.2.0",
     "jinja2",
     "gitpython",
-    "kaleido<1.0.0"
+    "kaleido<1.0.0",
+    "dash"
 ]
 
 [project.scripts]
