@@ -12,7 +12,7 @@ import utils
 
 def test_key_yaml(all_keys, inner_keys):
     try:
-        key_yaml = utils.read_in_yaml('keys.yaml')
+        key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(__file__), '..', 'fred', 'structure', 'keys.yaml'))
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
         print(f'The yaml file could not be parsed:\n{e}')
         sys.exit(1)
