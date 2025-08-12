@@ -2,8 +2,33 @@ from src.input_functions import Input
 from src.autogenerate import Autogenerate
 from src import validate_yaml
 from src import utils
+from src.heatmap import create_heatmap
 import os
+from jinja2 import Template
 
+template = Template(
+        '''
+        <h3>{{ header }}</h3>
+                        
+            {% for elem in plots %}
+
+                {% if loop.index0 != 0 %}
+                    <hr style="border-style: dotted;" />
+                {% endif %}
+                                
+                <div style="woverflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:5">
+                    {{ elem.plot }}
+
+                    {% if elem.missing_samples %}
+                        <i>Conditions without samples:</i>
+                        {{ elem.missing_samples }}
+                    {% endif %}
+                </div>
+                                
+            {% endfor %} 
+                
+        '''
+        )
 
 class Generate(Input):
 
@@ -12,7 +37,14 @@ class Generate(Input):
         for part in self.key_yaml:
             self.parse_lists(self.key_yaml[part], [part], indent,
                              self.result_dict)
-            print(self.get_summary(self.result_dict[part]))
+            if part == 'experimental_setting':
+                plot = create_heatmap.get_heatmap({part: self.result_dict[part]}, self.key_yaml)
+                plots = [{'plot': elem[1], 'missing_samples': elem[2]}]
+                for elem in plot:
+                    if elem[1] is not None:
+                        elem[1].show()
+            else:
+                print(self.get_summary(self.result_dict[part]))
         for elem in self.generate_end:
             func = getattr(Autogenerate, f'get_{elem[-1]}')
             fill_val = func(
