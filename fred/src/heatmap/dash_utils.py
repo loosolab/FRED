@@ -227,7 +227,6 @@ def get_data(path, keys_yaml, mode='samples'):
                         option_pretty[option] = option.replace('_', ' ').title()
                         option_types[option] = 'number'    
                         annotated[option] = [str(x) for x in option_dict[option]]
-                        print(annotated)
                 try:
                     max_options = max([len(set([str(y) for y in option_dict[x] if y is not None])) for x in option_dict.keys() if option_types[x] not in ['number', 'value_unit']])
                 except ValueError:
