@@ -34,10 +34,11 @@ fred plot -p PATH
 
 optional parameters:
 
-| --- | ---------- | ------------------------------------------------------------------------------------------------------ |
-| -c  | --config   | path to configuration file in YAML format                                                              |
-| -m  | --mode     | samples or conditions, default is samples                                                              |
-| -s  | --setting  | int, index of experimental setting, default is 1                                                       |
-| -l  | --labels   | factors, all or none, default is factors                                                               |
-| -o  | --output   | show, png or html, default is show                                                                     |
-| -f  | --filename | path including filename of the output file without file extension (e.g. output_folder/output_filename) |
+|    |            |                                                                                                        |
+|----|------------|--------------------------------------------------------------------------------------------------------|
+| -c | --config   | path to configuration file in YAML format                                                              |
+| -m | --mode     | samples or conditions, default is samples                                                              |
+| -s | --setting  | int, index of experimental setting, default is 1                                                       |
+| -l | --labels   | factors, all or none, default is factors                                                               |
+| -o | --output   | show, png or html, default is show                                                                     |
+| -f | --filename | path including filename of the output file without file extension (e.g. output_folder/output_filename) |
