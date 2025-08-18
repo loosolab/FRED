@@ -1,10 +1,10 @@
 # Adding a key to the structure
 
-To add a key to the data structure the file [keys.yaml](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/keys.yaml) must be edited. The key must then be added at the appropriate position with the appropriate indentation. The properties of the new key must be specified. For this purpose, the structure described in [General structure](structure.md) must be adopted. It is important to note that all seven properties should only be specified for keys that actually expect an input as a value. If the new key is only used to separate a section, i.e. it contains other keys as value, then only the first five properties are specified.
+To add a key to the data structure the file [keys.yaml](https://github.com/loosolab/FRED/blob/main/keys.yaml) must be edited. The key must then be added at the appropriate position with the appropriate indentation. The properties of the new key must be specified. For this purpose, the structure described in [General structure](structure.md) must be adopted. It is important to note that all seven properties should only be specified for keys that actually expect an input as a value. If the new key is only used to separate a section, i.e. it contains other keys as value, then only the first five properties are specified.
 
 ### Example
 
-The following code fragment shows a section of the '[keys.yaml](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/keys.yaml)'. You can see the 'project' part, which contains an 'id'. 
+The following code fragment shows a section of the '[keys.yaml](https://github.com/loosolab/FRED/blob/main/keys.yaml)'. You can see the 'project' part, which contains an 'id'. 
 In this example, first a key "owner" is added to the 'project' part to create a new subsection. Step-by-step instructions are given in [section A](#a---adding-a-key-as-section). Then, a key 'name' is added to the 'owner' section, which expects input from the user. The instructions for adding this key are described in [section B](#b---adding-a-key-with-value).
 
 ```yaml
@@ -26,7 +26,7 @@ project:
 
 #### A - Adding a key as section
 
-To add the key 'owner' to [keys.yaml](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/keys.yaml), you first have to find the place where you want to add it. In this example the 'owner' key should be on the same level as 'id' and is therefore added in the same list element as 'id' and with the same indentation.
+To add the key 'owner' to [keys.yaml](https://github.com/loosolab/FRED/blob/main/keys.yaml), you first have to find the place where you want to add it. In this example the 'owner' key should be on the same level as 'id' and is therefore added in the same list element as 'id' and with the same indentation.
 
 ```yaml
 project:
@@ -105,7 +105,7 @@ The last property to be specified is 'value'. For keys that act as section heade
 
 #### B - Adding a Key with value
 
-To add a key, you must first find the appropriate position and indentation for it in the [keys.yaml](https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/blob/main/keys.yaml). In this example we add a key 'name' to the 'owner' added in section A. It is placed inside the 'owner' under 'value'. 
+To add a key, you must first find the appropriate position and indentation for it in the [keys.yaml](https://github.com/loosolab/FRED/blob/main/keys.yaml). In this example we add a key 'name' to the 'owner' added in section A. It is placed inside the 'owner' under 'value'. 
 
 ```yaml
     owner:

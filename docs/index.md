@@ -24,7 +24,7 @@ conda create -n metadata
 2\. Install the requirements into the 'metadata' environment. Type 'y' when conda asks you to proceed.
 
 ```bash
-conda install -n metadata "pyyaml>=5.1" "tabulate>=0.8.10" "GitPython>=3.1.18"
+conda install -n metadata "pyyaml>=5.1" "tabulate>=0.9.0" "GitPython>=3.1.18" "pytz>=2022.2.1" "python-dateutil>=2.8.2"
 ```
 
 3\. Activate the 'metadata' environment to use the metadata tool.
@@ -46,12 +46,12 @@ To use the tool, the repository must first be cloned from git
 
 via HTTPS:
 ```bash
-git clone https://gitlab.gwdg.de/loosolab/software/metadata-organizer.git
+git clone https://github.com/loosolab/FRED.git
 ```
 
 or via SSH:
 ```bash
-git@gitlab.gwdg.de:loosolab/software/metadata-organizer.git
+git clone git@github.com:loosolab/FRED.git
 ```
 
 Then navigate to the metadata-organizer folder where the executable python file metaTools.py is located via:

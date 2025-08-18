@@ -4,7 +4,7 @@ import copy
 import os
 
 
-def edit_file(path, mode, mandatory_only, size=80):
+def edit_file(project_id, path, mode, mandatory_only, size=80):
 
     if mode == 'metadata':
         key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(
@@ -26,12 +26,12 @@ def edit_file(path, mode, mandatory_only, size=80):
     for key in edit_keys:
 
         if key in file:
-            file[key] = edit_item(key, file[key], key_yaml[key], key_yaml,
+            file[key] = edit_item(project_id, key, file[key], key_yaml[key], key_yaml,
                                   file, mandatory_only, mode)
 
         else:
 
-            file[key] = generate_metafile.get_redo_value(
+            file[key] = generate_metafile.get_redo_value(project_id,
                 key_yaml[key], key, True, mandatory_only, file, True, False,
                 True, mode, key_yaml)
 
@@ -47,7 +47,7 @@ def edit_file(path, mode, mandatory_only, size=80):
                 break
 
             else:
-                file[key] = edit_item(key, file[key], key_yaml[key], key_yaml,
+                file[key] = edit_item(project_id, key, file[key], key_yaml[key], key_yaml,
                                       file, mandatory_only, mode, size=size)
 
     utils.save_as_yaml(file, path)
@@ -55,7 +55,7 @@ def edit_file(path, mode, mandatory_only, size=80):
 
 
 # TODO: split into multiple functions
-def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
+def edit_item(project_id, key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
               mode, size=80, not_editable=None):
     """
     This function is used to edit a dictionary. Therefor it requests
@@ -86,7 +86,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
         if not isinstance(key_yaml['value'], dict):
 
             # call 'get_redo_value' function to repeat the input
-            item = generate_metafile.get_redo_value(
+            item = generate_metafile.get_redo_value(project_id,
                 key_yaml, key_name, not key_yaml['mandatory'], mandatory_mode,
                 result_dict, True, False, True, mode, key_yaml)
 
@@ -187,7 +187,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
 
                     # call this function to overwrite the list element with its
                     # edited version
-                    edit_options[key]['element'] = edit_item(
+                    edit_options[key]['element'] = edit_item(project_id,
                         key_name, edit_options[key]['element'], key_yaml,
                         full_yaml, result_dict, mandatory_mode, mode)
 
@@ -212,7 +212,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
                       f'{"".center(size, "-")}\n')
 
                 # get input for new element
-                item += generate_metafile.get_redo_value(
+                item += generate_metafile.get_redo_value(project_id,
                     key_yaml, key_name, not key_yaml['mandatory'],
                     mandatory_mode, result_dict, True, False, True, mode, key_yaml)
 
@@ -241,7 +241,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
         if 'all' in edit_index:
 
             # redo input for the whole dictionary
-            new_item = generate_metafile.get_redo_value(
+            new_item = generate_metafile.get_redo_value(project_id,
                 key_yaml, key_name, not key_yaml['mandatory'], mandatory_mode,
                 result_dict, True, False, False, mode, key_yaml)
 
@@ -269,7 +269,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
 
                     # redo the whole dictionary because the latter parts depend
                     # on the organism
-                    item = generate_metafile.get_redo_value(
+                    item = generate_metafile.get_redo_value(project_id,
                         key_yaml, 'experimental_setting',
                         not key_yaml['mandatory'], mandatory_mode, result_dict,
                         True, False, False, mode, key_yaml)[0]
@@ -286,7 +286,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
 
                     # redo all except 'organism' since all keys below the key
                     # 'experimental_factors' depend on its values
-                    item = generate_metafile.get_redo_value(
+                    item = generate_metafile.get_redo_value(project_id,
                         new_yaml, 'experimental_setting',
                         not key_yaml['mandatory'], mandatory_mode,
                         copy.deepcopy(item), True, False, False, mode, key_yaml)[0]
@@ -333,7 +333,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
                     new_yaml['value'].pop('experimental_factors')
 
                     # redo the conditions
-                    item = generate_metafile.get_redo_value(
+                    item = generate_metafile.get_redo_value(project_id,
                         new_yaml, 'experimental_setting',
                         not key_yaml['mandatory'], mandatory_mode,
                         copy.deepcopy(item), True, False, False, mode, key_yaml)[0]
@@ -345,7 +345,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
                     if key in item:
 
                         # call this function to edit the value of the key
-                        item[key] = edit_item(
+                        item[key] = edit_item(project_id,
                             key, item[key], key_yaml['value'][key], full_yaml,
                             result_dict, mandatory_mode, mode)
 
@@ -353,7 +353,7 @@ def edit_item(key_name, item, key_yaml, full_yaml, result_dict, mandatory_mode,
                     else:
 
                         # call function to input information
-                        item[key] = generate_metafile.get_redo_value(
+                        item[key] = generate_metafile.get_redo_value(project_id,
                             key_yaml['value'][key], key, True, mandatory_mode,
                             result_dict, True, False, True, mode, key_yaml)
 
