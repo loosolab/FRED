@@ -1,0 +1,26 @@
+[build-system]
+requires = [
+    "setuptools",
+    "pip"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fred"
+version = "0.0.3"
+dependencies = [
+    "PyYAML>=5.1",
+    "pytz",
+    "python-dateutil",
+    "tabulate",
+    "seaborn",
+    "biopython",
+    "plotly<=6.2.0",
+    "jinja2",
+    "gitpython",
+    "kaleido<1.0.0",
+    "dash"
+]
+
+[project.scripts]
+fred = "fred.metaTools:main"

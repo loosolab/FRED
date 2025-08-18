@@ -1,0 +1,401 @@
+project:
+  mandatory: True
+  list:  False
+  display_name: 'Project'
+  desc: ''
+  value:
+    files: 
+      mandatory: False
+      list:  True
+      display_name: 'Files'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+    id: 
+      mandatory: True
+      list:  False
+      display_name: 'ID'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+    init_container: 
+      mandatory: False
+      list:  False
+      display_name: 'Init Container'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: short_text
+    supress_s3:
+      mandatory: False
+      list:  False
+      display_name: 'S3 Supression'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
+    tool:
+      mandatory: True
+      list:  False
+      display_name: 'Tool'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text    
+
+deployment:
+  mandatory: True
+  list:  False
+  display_name: 'Deployment'
+  desc: ''
+  value:
+    active:
+      mandatory: False
+      list:  False
+      display_name: 'Active'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
+    auth:
+      mandatory: False
+      list: False
+      display_name: 'Authorization'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
+    # remove?
+    autoscaling:
+      mandatory: False
+      list: False
+      display_name: 'Autoscaling'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
+    #
+    bucket: 
+      mandatory: False
+      list:  False
+      display_name: 'Bucket'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+    cluster:
+      mandatory: True
+      list:  False
+      display_name: 'Cluster'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: short_text
+    mampok_url:
+      mandatory: False
+      list:  False
+      display_name: 'Mampok-URL'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
+    icinga:
+      mandatory: False
+      list:  False
+      display_name: 'Icinga'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
+    lifetime:
+      mandatory: False
+      list:  False
+      display_name: 'Lifetime'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: date
+    random:
+      mandatory: True
+      list:  False
+      display_name: 'Random'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
+    replicas:
+      mandatory: False
+      list:  False
+      display_name: 'Replicas'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: number
+    url: 
+      mandatory: False
+      list:  False
+      display_name: 'URL'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+
+tags:
+  mandatory: True
+  list:  False
+  display_name: 'Tags'
+  desc: ''
+  value:
+    analyst:
+      mandatory: False
+      list:  True
+      display_name: 'Analyst'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+    citation:
+      mandatory: False
+      list:  True
+      display_name: 'Citation'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+    creationdate:
+      mandatory: False
+      list:  False
+      display_name: 'Creation Date'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: date
+    gse:
+      mandatory: False
+      list: False
+      display_name: 'GSE'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+    datatype:
+      mandatory: True
+      list:  True
+      display_name: 'Datatype'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+    download_allowed:
+      mandatory: False
+      list: False
+      display_name: 'Download allowed'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
+    metadata:
+      mandatory: False
+      list: True
+      display_name: 'Metadata'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: short_text
+    organization:
+      mandatory: False
+      list:  True
+      display_name: 'Organization'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: short_text
+    owner:
+      mandatory: True
+      list:  False
+      display_name: 'Owner'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: short_text
+    pubmedid:
+      mandatory: False
+      list:  False
+      display_name: 'Pubmed-ID'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: number  
+    total_project_size:
+      mandatory: False
+      list:  False
+      display_name: 'Project Size'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: number  
+    user:
+      mandatory: False
+      list: True
+      display_name: 'User'
+      desc: ''
+      value: null
+      whitelist: True
+      input_type: short_text   
+
+container:
+  mandatory: False
+  list:  False
+  display_name: 'Container'
+  desc: ''
+  value:
+    main:
+      mandatory: False
+      list:  False
+      display_name: 'Main'
+      desc: ''
+      value:
+        # remocve?
+        flexVolume:
+          mandatory: False
+          list: False
+          display_name: 'flexVolume'
+          desc: ''
+          value: 
+            name:
+              mandatory: False
+              list: False
+              display_name: 'Name'
+              desc: ''
+              value: null
+              whitelist: False
+              input_type: short_text
+            flexVolume:
+              mandatory: False
+              list: False
+              display_name: 'flexVolume'
+              desc: ''
+              value:
+                driver:
+                  mandatory: False
+                  list: False
+                  display_name: ''
+                  desc: 'Driver'
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+                fsType:
+                  mandatory: False
+                  list: False
+                  display_name: 'fsType'
+                  desc: ''
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+                secretRef:
+                  mandatory: False
+                  list: False
+                  display_name: 'secretRef'
+                  desc: ''
+                  value:
+                    name: 
+                      mandatory: False
+                      list: False
+                      display_name: 'Name'
+                      desc: ''
+                      value: null
+                      whitelist: False
+                      input_type: short_text
+                options:
+                  mandatory: False
+                  list: False
+                  display_name: 'Options'
+                  desc: ''
+                  value:
+                    mountOptions:
+                      mandatory: False
+                      list: False
+                      display_name: 'mount Options'
+                      desc: ''
+                      value: null
+                      whitelist: False
+                      input_type: short_text
+                    networkPath:
+                      mandatory: False
+                      list: False
+                      display_name: 'network Path'
+                      desc: ''
+                      value: null
+                      whitelist: False
+                      input_type: short_text
+        #
+        # remove?
+        image:
+          mandatory: False
+          list: False
+          display_name: 'Image'
+          desc: ''
+          value: null
+          whitelist: False
+          input_type: short_text
+        #
+        resources:
+          mandatory: False
+          list:  False
+          display_name: 'Resources'
+          desc: ''
+          value:  
+            limits:
+              mandatory: False
+              list:  False
+              display_name: 'Limits'
+              desc: ''
+              value:
+                cpu: 
+                  mandatory: False
+                  list:  False
+                  display_name: 'CPU'
+                  desc: ''
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+                memory:
+                  mandatory: False
+                  list:  False
+                  display_name: 'Memory'
+                  desc: ''
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+            requests:
+              mandatory: False
+              list:  False
+              display_name: 'Requests'
+              desc: ''
+              value:
+                cpu:
+                  mandatory: False
+                  list:  False
+                  display_name: 'CPU'
+                  desc: ''
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+                memory:
+                  mandatory: False
+                  list:  False
+                  display_name: 'Memory'
+                  desc: ''
+                  value: null
+                  whitelist: False
+                  input_type: short_text
+        extra_args:
+          mandatory: False
+          list:  True
+          display_name: 'Extra Args'
+          desc: ''
+          value: null
+          whitelist: False
+          input_type: short_text

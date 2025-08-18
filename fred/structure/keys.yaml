@@ -1,0 +1,1061 @@
+project:
+  mandatory: True
+  list:  False
+  display_name: "Project"
+  desc: "General information about project setup and associated staff."
+  value:
+    id:
+      mandatory: True
+      list: False
+      display_name: "ID"
+      desc: "Project ID consisting of three lowercase letters followed by digits. Typically assigned by BCU.\n[dst123, dof54]"
+      special_case:
+        generated: now
+        restriction:
+          regex: '[^a-zA-Z0-9]'
+          max_length: 10
+        edit: "not editable"
+      value: null
+      whitelist: False
+      input_type: restricted_short_text
+    project_name:
+      mandatory: True
+      list: False
+      display_name: "Project Name"
+      desc: "Short descriptive title.\n[Heart regeneration in adult mice investigated by Cpt1b KO]"
+      value: null
+      whitelist: False
+      input_type: short_text
+    date:
+      mandatory: True
+      list: False
+      display_name: "Date"
+      desc: "Project start. Does not have to be exact.\n[18.10.2023]"
+      value: null
+      whitelist: False
+      input_type: date
+    description:
+      mandatory: True
+      list: False
+      display_name: "Description"
+      desc: "Detailed project description similar to a manuscript abstract. Please note aims, methods, and any data that does not fit elsewhere: e.g. exact data on KO/KD (exon/position), other projects connected to this one (ideally including project ids), etc."
+      value: null
+      whitelist: False
+      input_type: long_text
+    further_description:
+      mandatory: False
+      list: True
+      display_name: "Further Description / Additional Info"
+      desc: "URLs/path to files with additional information: e.g. link to google presentation, paper, or GEO record. Direct upload of files is currently not supported.\n[manuscript 1: https://academic.oup.com/bioinformatics/article/37/12/1691/6039116?login=true]"
+      value: null
+      whitelist: False
+      input_type: short_text
+    graphical_abstract:
+      mandatory: False
+      list: True
+      display_name: "Graphical Abstract"
+      desc: "Here you can insert links to graphical abstracts."
+      value: null
+      whitelist: False
+      input_type: short_text
+    publication:
+      mandatory: False
+      list: True
+      display_name: "Publication"
+      desc: ""
+      value:
+        pubmed_id:
+          mandatory: True
+          list: False
+          display_name: "Pubmed-ID"
+          desc: "The pubmed ID of the paper.\n[32214235]"
+          value: null
+          whitelist: False
+          input_type: number
+        title:
+          mandatory: False
+          list: False
+          display_name: "Title"
+          desc: "The title of the paper.\n[Construction of a human cell landscape at single-cell level]"
+          special_case:
+            generated: end
+            invisible: True
+          value: null
+          whitelist: False
+          input_type: short_text
+        year:
+          mandatory: False
+          list: False
+          display_name: "Year"
+          desc: "The year it was published.\n[2020]"
+          special_case:
+            generated: end
+            invisible: True
+          value: null
+          whitelist: False
+          input_type: number
+        author:
+          mandatory: False
+          list: True
+          display_name: "Author"
+          desc: "The author of the paper. Format: Last name, First name.\n[Mustermann, Max]"
+          special_case:
+            generated: end
+            invisible: True
+          value: null
+          whitelist: False
+          input_type: short_text
+        journal:
+          mandatory: False
+          list: False
+          special_case:
+            generated: end
+            invisible: True
+          display_name: "Journal"
+          desc: "The journal it was published in.\n[Nature]"
+          value: null
+          whitelist: False
+          input_type: short_text
+        volume:
+          mandatory: False
+          list: False
+          display_name: "Volume"
+          desc: "The volume it was published in.\n[581]"
+          special_case:
+            generated: end
+            invisible: True
+          value: null
+          whitelist: False
+          input_type: number
+        issue:
+          mandatory: False
+          list: False
+          display_name: "Issue"
+          desc: "The issue it was published in.\n[7808]"
+          special_case:
+            generated: end
+            invisible: True
+          value: null
+          whitelist: False
+          input_type: number
+        pages:
+          mandatory: False
+          list: False
+          display_name: "Pages"
+          desc: "The pages it was published on in the journal.\n[303-309]"
+          special_case:
+            generated: end
+            invisible: True
+          value: null
+          whitelist: False
+          input_type: short_text
+        doi:
+          mandatory: False
+          list: False
+          display_name: 'DOI'
+          desc: "The digital object identifier of the paper.\n[10.1038/s41586-020-2157-4]"
+          special_case:
+            generated: end
+            invisible: True
+          value: null
+          whitelist: False
+          input_type: short_text
+        #sample_submission_number:
+        #  mandatory: False
+        #  list: True
+        #  display_name: "Sample submission Number"
+        #  desc: "The identifier of the samples from a data submission portal like GEO or ArrayExpress.\n[E-MTAB-9816, GSE134355]"
+        #  value: null
+        #  whitelist: False
+        #  input_type: short_text
+    owner:
+      mandatory: True
+      list: False
+      display_name: "Owner"
+      desc: "Researcher that manages project access/sharing and acts as the first point of contact for questions."
+      value:
+        name:
+          mandatory: True
+          list: False
+          display_name: "Name"
+          desc: "Format: Last name, First name. For public projects enter 'public'.\n[Mustermann, Max]"
+          value: null
+          whitelist: False
+          input_type: short_text
+        ldap_name:
+          mandatory: True
+          list: False
+          display_name: "MPI Login Name"
+          desc: "Login/LDAP name: first letter of first name and six letters of last name. For public projects enter '---'.\n[mmuster]"
+          value: null
+          whitelist: False
+          input_type: short_text
+        department:
+          mandatory: True
+          list: False
+          display_name: "Department"
+          desc: "Department/workgroup. Select the most specific one if applicable (AG-Boettger, not Abt-B). For public projects enter 'public'.\n[Abt-K]"
+          value: null
+          whitelist: True
+          input_type: select
+        email:
+          mandatory: True
+          list: False
+          display_name: "E-Mail"
+          desc: "E-Mail. For public projects enter '---'.\n[max.mustermann@mpi-bn.mpg.de]"
+          value: null
+          whitelist: False
+          input_type: short_text
+        address:
+          mandatory: False
+          list: False
+          display_name: "Address"
+          desc: "Address.\n[Ludwigstraße 43, 61231 Bad Nauheim]"
+          value: null
+          whitelist: False
+          input_type: short_text
+        telephone:
+          mandatory: False
+          list: False
+          display_name: "Telephone"
+          desc: "Phone.\n[+49 6032 705 12]"
+          value: null
+          whitelist: False
+          input_type: short_text
+    nerd:
+      mandatory: False
+      list: True
+      display_name: "Nerd"
+      desc: "Bioinformatician(s) responsible for analysis."
+      value:
+        name:
+          mandatory: True
+          list: False
+          display_name: "Name"
+          desc: "Format: Last name, First name.\n[Mustermann, Max]"
+          value: null
+          whitelist: False
+          input_type: short_text
+        ldap_name:
+          mandatory: True
+          list: False
+          display_name: "MPI Login Name"
+          desc: "Login/LDAP name: first letter of first name and six letters of last name.\n[mmuster]"
+          value: null
+          whitelist: False
+          input_type: short_text
+        department:
+          mandatory: True
+          list: False
+          display_name: "Department"
+          desc: "Department/workgroup. Select the most specific one if applicable (AG-Boettger, not Abt-B).\n[Abt-K]"
+          value: null
+          whitelist: True
+          input_type: select
+        email:
+          mandatory: True
+          list: False
+          display_name: "E-Mail"
+          desc: "E-Mail.\n[max.mustermann@mpi-bn.mpg.de]"
+          value: null
+          whitelist: False
+          input_type: short_text
+        address:
+          mandatory: False
+          list: False
+          display_name: "Address"
+          desc: "Address.\n[Ludwigstraße 43, 61231 Bad Nauheim]"
+          value: null
+          whitelist: False
+          input_type: short_text
+        telephone:
+          mandatory: False
+          list: False
+          display_name: "Telephone"
+          desc: "Phone.\n[+49 6032 705 12]"
+          value: null
+          whitelist: False
+          input_type:
+            short_text
+
+experimental_setting:
+  mandatory: True
+  list: True
+  display_name: "Experimental setting"
+  special_case:
+    edit: "not removable"
+  desc:
+    - "Define experimental factors of interest and how they were combined to conditions that represent samples. You can specify multiple experimental settings for multiple sample submissions and/or multiple techniques that were applied (RNA/ATAC etc.).\n\n"
+    - [["\u001b[1mExperimental Factors:\u001b[22m", "\u001b[1mConditions:\u001b[22m", "\u001b[1mBiological Replicates:\u001b[22m", "\u001b[1mTechnical Replicates:\u001b[22m", "\u001b[1mMeasurements:\u001b[22m"], ["These correspond to properties studied in the experiment, NOT all possible data pertaining to a sample. A unique combination of these represents a condition. Experimental factors can be added using ‘Edit Factors and generate Conditions’, while additional metadata can be supplied at the ‘Samples’ stage below.", "These result from unique combinations of experimental factors.", "A biological replicate captures random biological variation and typically originates from an individual organism. Each unique experimental condition should be represented by 3+ biological replicates. Usually corresponds to the tube sent for measurement.", "Result of measuring one biological replicate including all technical noise induced by experimental/measurement protocols (typically just 1). Occurs when an experiment is repeated or a sequencing library is recreated based on the same biological replicate.", "A measurement represents one readout of a technical replicate. Occurs when the same sequencing library is sequenced again or when an MS sample is splitted and/or measured multiple times. Does not contain any technical noise apart from the measurement itself. For analysis, measurements are usually joined to the technical replicate level."], ["Example:\nfactor 1 = genetic background: Mut, WT\nfactor 2 = time point: 12h, 24h", "Example:\ncondition 1 = Mut-12h\ncondition 2 = Mut-24h\ncondition 3 = WT-12h\ncondition 4 = WT-24h", "Example:\nbiological replicate 1 = Mut-12h_1\nbiological replicate 2 = Mut-12h_2\nbiological replicate 3 = Mut-12h_3", "Example:\ntechnical replicate 1 = Mut-12h_1_1\ntechnical replicate 2 = Mut-12h_1_2", "Example:\nmeasurement 1 = Mut-12h_1_1_1\nmeasurement 2 = Mut-12h_1_1_2"]]
+  short_desc: "Added experimental settings."
+  value:
+    setting_id:
+      mandatory: True
+      list: False
+      display_name: "Setting ID"
+      desc: "Automatically assigned to uniquely identify one experimental setting. It can represent new batches of samples for existing conditions or sub-experiments belonging to the same project.\n[exp1, exp2]"
+      value: exp1
+      special_case:
+        generated: now
+        edit: "not editable"
+      whitelist: False
+      input_type: short_text
+    organism:
+      mandatory: True
+      list: False
+      display_name: "Organism"
+      desc: "Identifier composed of organism name and taxonomy ID.\n[human 9606]"
+      special_case:
+        merge: organism_name
+        edit: "not editable"
+      value:
+        organism_name:
+          mandatory: True
+          list: False
+          display_name: "Organism Name"
+          desc: ""
+          value: null
+          whitelist: True
+          input_type: select
+        taxonomy_id:
+          mandatory: True
+          list: False
+          display_name: "Taxonomy ID"
+          desc: ""
+          value: null
+          whitelist: True
+          input_type: select
+    experimental_factors:
+      mandatory: True
+      list: True
+      display_name: "Experimental Factors"
+      desc: "Select investigated factors and conditions."
+      factor_desc: "Define investigated factors (e.g. WT/KO, 3h/6h), which can be combined to conditions (e.g. WT-3h, WT-6h, ...). This should NOT include additional metadata that is identical for all samples, different for all replicates, or in general not supposed to be part of contrasts. These additional data can later be supplied at the ‘Samples’ stage."
+      special_case:
+        generated: now
+        edit: "not editable"
+      value:
+        factor:
+          mandatory: True
+          list: False
+          display_name: "Factor"
+          desc: ""
+          value: null
+          whitelist: True
+          input_type: select
+        values:
+          mandatory: True
+          list: False
+          display_name: "Values"
+          desc: ""
+          value: null
+          whitelist: True
+          input_type: select
+    conditions:
+      mandatory: True
+      list: True
+      display_name: "Conditions"
+      desc: "Add samples to conditions."
+      value:
+        condition_name:
+          mandatory: True
+          list: False
+          display_name: "Condition Name"
+          desc: "Unique name automatically assigned to each condition."
+          special_case:
+              generated: now
+              edit: "not editable"
+          value: null
+          whitelist: False
+          input_type: short_text
+        biological_replicates:
+          mandatory: True
+          list: False
+          display_name: "Biological Replicates"
+          desc: "A biological replicate is a sample extracted from a specific organism that corresponds to the condition."
+          value:
+            count:
+              mandatory: True
+              list: False
+              display_name: "Count"
+              desc: "Enter the number of biological replicates."
+              special_case:
+                generated: end
+              value: null
+              whitelist: False
+              input_type: number
+            samples:
+              mandatory: False
+              list: True
+              display_name: "Sample"
+              short_desc: "In this part, information on each biological replicate is entered."
+              desc: "Check conditions and add metadata that is not part of the primary investigation based on experimental factors. \u001b[1mPress ‘Save Sample’ for each biological replicate.\u001b[22m"
+              special_case:
+                generated: now
+                edit: "not removable"
+              value:
+                sample_name:
+                  mandatory: True
+                  list: False
+                  display_name: "Sample Name"
+                  desc: "Unique name automatically assigned to each sample."
+                  special_case:
+                    generated: now
+                    edit: "not editable"
+                  value: null
+                  whitelist: False
+                  input_type: long_text
+                pooled:
+                  mandatory: True
+                  list: False
+                  display_name: "Pooled"
+                  desc: "Collection of multiple individuals in a pool.\n[FALSE]"
+                  special_case:
+                    generated: fill
+                  value: False
+                  whitelist: False
+                  input_type: bool
+                donor_count:
+                  mandatory: True
+                  list: False
+                  display_name: "Pool Donor Count"
+                  desc: "If pooled is TRUE, how many individuals were pooled in this sample."
+                  special_case:
+                    generated: fill
+                  value: 1
+                  whitelist: False
+                  input_type: number
+                number_of_measurements:
+                  mandatory: False
+                  list: False
+                  display_name: "Number of Measurements"
+                  desc: "Measurements done for one biological/technical replicate (typically 1). Mostly used in combination with a specific technique such as gel slices in proteomics.\n[1]"
+                  special_case:
+                    generated: fill
+                  value: 1
+                  whitelist: False
+                  input_type: number
+                gene_editing:
+                  mandatory: False
+                  list: True
+                  display_name: "Gene editing"
+                  desc: "Define type and target of editing. [knockdown-siRNA-ADD1]"
+                  factor_desc: "Define type and target of editing. If no details are known please use field ‘genetic_background’ instead.\n[knockdown-siRNA-ADD1]"
+                  special_case:
+                    control:
+                      editing_type: "WT"
+                  value:
+                    editing_type:
+                      mandatory: True
+                      list: False
+                      display_name: "Type"
+                      desc: "Type of editing. [WT, knockdown]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    editing_method:
+                      mandatory: False
+                      list: False
+                      display_name: "Method"
+                      desc: "Method of editing.  [CRISPR, siRNA]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    gene:
+                      mandatory: False
+                      list: False
+                      display_name: "Gene"
+                      desc: "Target gene of editing. [GPX2 ENSG00000176153]"
+                      special_case:
+                        merge: gene_name
+                      value:
+                        gene_name:
+                          mandatory: True
+                          list: False
+                          display_name: "Gene Name"
+                          desc: ""
+                          value: null
+                          whitelist: True
+                          input_type: select
+                        ensembl_id:
+                          mandatory: True
+                          list: False
+                          display_name: "ENSEMBL-ID"
+                          desc: ""
+                          value: null
+                          whitelist: True
+                          input_type: select
+                    modification:
+                      mandatory: False
+                      list: False
+                      display_name: "Modification"
+                      desc: "Short label for extent of mutations (max 6 char.). Add exact locus to project description. [FLD = full locus deletion, PTC1 = premature termination codon]"
+                      special_case:
+                        restriction:
+                          regex: '[^a-zA-Z0-9]'
+                          max_length: 6
+                        insert_control: True
+                      value: null
+                      whitelist: False
+                      input_type: restricted_short_text
+                genetic_background:
+                  mandatory: False
+                  list: False
+                  display_name: "Genetic background"
+                  desc: "Denote mutations that were either natural or already part of the strain/animal = background genotype. Otherwise please use genetic_editing field.\n[WT, mdx]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                enrichment:
+                  mandatory: False
+                  list: False
+                  display_name: "Enrichment / Histone-Mark / Pull-Down"
+                  desc: "Enrichment for bound proteins or histone marks as a result of an antibody pulldown or similar procedures.\n[GPX2, H2BK12ac, IgG]"
+                  value:
+                    enrichment_type:
+                      mandatory: True
+                      list: False
+                      display_name: "Type"
+                      desc: "Type of enrichment.\n[GPX2, H2BK12ac, IgG]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    modification:
+                      mandatory: False
+                      list: False
+                      display_name: "Modification"
+                      desc: "Short label for extent of enrichment (max 6 char.). [Sigma = Antibody manufacturer Sigma]"
+                      special_case:
+                        restriction:
+                          regex: '[^a-zA-Z0-9]'
+                          max_length: 6
+                      value: null
+                      whitelist: False
+                      input_type: restricted_short_text
+                injury:
+                  mandatory: False
+                  list: True
+                  display_name: "Injury"
+                  desc: "Chemical or mechanical injuries. [cryoinjury, toxins]"
+                  factor_desc: "Chemical or mechanical injuries. This does not include stress conditions like e.g. hypoxia which can be conveyed via field ‘physical_treatment’.\n[cryoinjury, toxins]"
+                  special_case:
+                    group: "injury_type"
+                    control:
+                      injury_status: "non-injured"
+                  value:
+                    injury_status:
+                      mandatory: True
+                      list: False
+                      display_name: "Status"
+                      desc: "Status of injury. [injured, non-injured]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    injury_type:
+                      mandatory: False
+                      list: False
+                      display_name: "Type"
+                      desc: "Type of injury. [sham, amputation]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                medical_treatment:
+                  mandatory: False
+                  list: True
+                  display_name: "Medical Treatment"
+                  factor_desc: "Substances that were administered to sample donor.\n[cardiotoxin - 2mg/l - 12days]"
+                  desc: "Substances that were administered to sample donor. [cardiotoxin - 2mg/l - 12days]"
+                  special_case:
+                    group: "treatment_type"
+                    control:
+                      treatment_status: "not treated"
+                  value:
+                    treatment_type:
+                      mandatory: False
+                      list: False
+                      display_name: "Type"
+                      desc: "Type of substance administered to sample donor. [cardiotoxin]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    treatment_status:
+                      mandatory: True
+                      list: False
+                      display_name: "Status"
+                      desc: "Status of administration. [treated, not treated]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    treatment_duration:
+                      mandatory: False
+                      list: False
+                      display_name: "Duration"
+                      desc: "Duration of the administration. [2 weeks]"
+                      special_case:
+                        value_unit: time
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: "Value"
+                          desc: ""
+                          value: null
+                          whitelist: False
+                          input_type: number
+                        unit:
+                          mandatory: False
+                          list: False
+                          display_name: "Unit"
+                          desc: ""
+                          value: null
+                          whitelist: True
+                          input_type: select
+                    treatment_amount:
+                      mandatory: False
+                      list: False
+                      display_name: "Amount"
+                      desc: "Amount of substance administered. [20 μM]"
+                      special_case:
+                        value_unit: volume
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: "Value"
+                          desc: ""
+                          value: null
+                          whitelist: False
+                          input_type: number
+                        unit:
+                          mandatory: False
+                          list: False
+                          display_name: "Unit"
+                          desc: ""
+                          value: null
+                          whitelist: True
+                          input_type: select
+                physical_treatment:
+                  mandatory: False
+                  list: False
+                  display_name: "Physical Treatment"
+                  desc: "Physical treatments. This does not include injuries which can be conveyed via field ‘injury’.\n[hypoxia, shear stress]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                temperature_treatment:
+                  mandatory: False
+                  list: True
+                  display_name: "Temperature Treatment"
+                  desc: ""
+                  special_case:
+                    group: "temperature"
+                    control:
+                      treatment_status: "not treated"
+                  value:
+                    treatment_status:
+                      mandatory: True
+                      list: False
+                      display_name: "Status"
+                      desc: "Status of administration. [treated, not treated]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    temperature:
+                      mandatory: False
+                      list: False
+                      display_name: "Temperature"
+                      desc: ""
+                      special_case:
+                        value_unit: temperature
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: "Value"
+                          desc: ""
+                          value: null
+                          whitelist: False
+                          input_type: number
+                        unit:
+                          mandatory: True
+                          list: False
+                          display_name: "Unit"
+                          desc: ""
+                          value: null
+                          whitelist: True
+                          input_type: select
+                    treatment_duration:
+                      mandatory: False
+                      list: False
+                      display_name: "Duration"
+                      desc: "Duration of the administration. [2 weeks]"
+                      special_case:
+                        value_unit: time
+                      value:
+                        value:
+                          mandatory: True
+                          list: False
+                          display_name: "Value"
+                          desc: ""
+                          value: null
+                          whitelist: False
+                          input_type: number
+                        unit:
+                          mandatory: False
+                          list: False
+                          display_name: "Unit"
+                          desc: ""
+                          value: null
+                          whitelist: True
+                          input_type: select
+                age:
+                  mandatory: False
+                  list: False
+                  display_name: "Age"
+                  desc: "Age of sample donor.\n[2 years]"
+                  special_case:
+                    value_unit: time
+                  value:
+                    value:
+                      mandatory: True
+                      list: False
+                      display_name: "Value"
+                      desc: ""
+                      value: null
+                      whitelist: False
+                      input_type: number
+                    unit:
+                      mandatory: True
+                      list: False
+                      display_name: "Unit"
+                      desc: ""
+                      value: null
+                      whitelist: True
+                      input_type: select
+                body_type:
+                  mandatory: False
+                  list: False
+                  display_name: "Body Type"
+                  desc: "Body type of sample donor.\n[lean]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                body_mass_index:
+                  mandatory: False
+                  list: False
+                  display_name: "Body-Mass-Index"
+                  desc: "Body mass index of sample donor.\n[20 kg/m2]"
+                  special_case:
+                    value_unit: bmi
+                  value:
+                    value:
+                      mandatory: False
+                      list: False
+                      display_name: "Value"
+                      desc: ""
+                      value: null
+                      whitelist: False
+                      input_type: number
+                    unit:
+                      mandatory: False
+                      list: False
+                      display_name: "Unit"
+                      desc: ""
+                      value: "kg/m2"
+                      whitelist: True
+                      input_type: select
+                cell_line:
+                  mandatory: False
+                  list: False
+                  display_name: "Cell line"
+                  desc: "Cell line used for sample.\n[HUVEC]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                cell_type:
+                  mandatory: False
+                  list: False
+                  display_name: "Cell type"
+                  desc: "Cell type of sample.\n[cardiomyocytes]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                cellular_compartment:
+                  mandatory: False
+                  list: True
+                  display_name: "Cellular Component"
+                  desc: "Cellular compartment of sample.\n[mitochondrion]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                disease:
+                  mandatory: False
+                  list: True
+                  display_name: "Disease"
+                  desc: "State of health and known diseases of sample donor. [healthy, PAH-ill-late]"
+                  factor_desc: "State of health and known diseases of sample donor.\n[healthy, PAH-ill-late]"
+                  special_case:
+                    group: "disease_type"
+                    control:
+                      disease_status: "healthy"
+                  value:
+                    disease_type:
+                      mandatory: False
+                      list: False
+                      display_name: "Type"
+                      desc: "Name of disease. [Asthma, PAH]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    disease_status:
+                      mandatory: True
+                      list: False
+                      display_name: "Status"
+                      desc: "State of health. [healthy, ill]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    disease_stage:
+                      mandatory: False
+                      list: False
+                      display_name: "Stage"
+                      desc: "Stage of disease. [early, late]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    disease_risk:
+                      mandatory: False
+                      list: False
+                      display_name: "Risk"
+                      desc: "Risk of contracting disease. [moderate, severe]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                ethnicity:
+                  mandatory: False
+                  list: False
+                  display_name: "Ethnicity"
+                  desc: "Ethnicity of donor.\n[caucasian]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                gender:
+                  mandatory: False
+                  list: False
+                  display_name: "Gender"
+                  desc: "Gender of donor.\n[female]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                life_stage:
+                  mandatory: False
+                  list: False
+                  display_name: "Life stage"
+                  desc: "Life stage of donor.\n[embryo, adult]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                strain:
+                  mandatory: False
+                  list: False
+                  display_name: "Strain"
+                  desc: "Strain of organism.\n[C57BL/6]"
+                  factor_desc: "Strain of organism. Please only denote here, if different strains are to be compared.\n[C57BL/6]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                tissue:
+                  mandatory: False
+                  list: True
+                  display_name: "Tissue"
+                  desc: "Tissue of sample.\n[lung]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                concentration:
+                  mandatory: False
+                  list: False
+                  display_name: "Concentration"
+                  desc: "Concentration of sample\n[10 ng/μl]"
+                  special_case:
+                    value_unit: concentration
+                  value:
+                    value:
+                      mandatory: False
+                      list: False
+                      display_name: "Value"
+                      desc: ""
+                      value: null
+                      whitelist: False
+                      input_type: number
+                    unit:
+                      mandatory: False
+                      list: False
+                      display_name: "Unit"
+                      desc: ""
+                      value: "ng/μl"
+                      whitelist: True
+                      input_type: select
+                signal:
+                  mandatory: False
+                  list: False
+                  display_name: "Signal"
+                  factor_desc: "The strength with which a cell receives, processes, and transmits signals to its environment and to itself.\n['high']"
+                  desc: "The level of cell signaling.\n['high']"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                time_point:
+                  mandatory: False
+                  list: False
+                  display_name: "Time Point"
+                  desc: "Specify time points not represented via other fields, e.g. duration between sample collections. The meaning of this field should be explained in the project description.\n[12 hours, 24 hours]"
+                  special_case:
+                    value_unit: time
+                  value:
+                    value:
+                      mandatory: False
+                      list: False
+                      display_name: "Value"
+                      desc: ""
+                      value: null
+                      whitelist: False
+                      input_type: number
+                    unit:
+                      mandatory: False
+                      list: False
+                      display_name: "Unit"
+                      desc: ""
+                      value: null
+                      whitelist: True
+                      input_type: select
+                technical_replicates:
+                  mandatory: True
+                  list: False
+                  display_name: "Technical Replicates"
+                  desc: "A technical replicate is the result of the measurement of one biological replicate (e.g. if one biological replicate is sequenced twice then there are two technical replicates)."
+                  value:
+                    count:
+                      mandatory: True
+                      list: False
+                      display_name: "Count"
+                      desc: "The number of technical replicates."
+                      value: 1
+                      whitelist: False
+                      input_type: number
+                    sample_name:
+                      mandatory: True
+                      list: True
+                      display_name: "Samples"
+                      desc: "Unique sample names generated for every technical replicate."
+                      special_case:
+                        generated: end
+                        edit: "not removable"
+                      value: null
+                      whitelist: False
+                      input_type: short_text
+                    filenames:
+                      mandatory: True
+                      list: True
+                      display_name: "Filenames"
+                      desc: "Unique filenames generated for every technical replicate."
+                      special_case:
+                        generated: end
+                        edit: "not removable"
+                      value: null
+                      whitelist: False
+                      input_type: short_text
+
+technical_details:
+  mandatory: True
+  list: False
+  display_name: "Technical Details"
+  desc: "Technical details of the experiment including technique (e.g. RNA-Seq), and specific parameters for the bioinformatics analysis (e.g. use old assembly version mm10)."
+  value:
+    techniques:
+      mandatory: True
+      list: True
+      display_name: "Techniques"
+      desc: "Enter the sequencing technique for each experimental setting."
+      special_case:
+        edit: "not removable"
+        generated: now
+      value:
+        setting:
+          mandatory: True
+          list: False
+          display_name: "Setting"
+          desc: "ID of experimental setting for which you want to add a technique.\n[exp1]"
+          value: exp1
+          whitelist: False
+          special_case:
+            restriction:
+              regex: '\b(?!e(x(p[0-9]*)?)?\b)\w+'
+              max_length: 5
+            edit: "not editable"
+            generated: now
+          input_type: restricted_short_text
+        technique:
+          mandatory: True
+          list: True
+          display_name: "Technique"
+          special_case:
+            edit: "not removable"
+          desc: "Wet-Lab technique applied to generate samples.\n[bulk RNA-seq]"
+          value: null
+          whitelist: True
+          input_type: select
+    analysis_runs:
+      mandatory: False
+      list: True
+      display_name: "Analysis Runs"
+      desc: "Information about bioinformatics analyses to be performed. Only necessary for specific wishes differing from defaults."
+      value:
+        date:
+          mandatory: True
+          list: False
+          display_name: "Date"
+          desc: "Date when run was performed.\n[18.10.2023]"
+          value: null
+          whitelist: False
+          input_type: date
+        reference_genome:
+          mandatory: False
+          list: False
+          display_name: "Reference Genome"
+          desc: "Reference genome assembly.\n[hg38]"
+          value: null
+          whitelist: True
+          input_type: select
+        parameters:
+          mandatory: False
+          list: True
+          display_name: "Parameters"
+          desc: "URL/path to files that contain the parameters used for the run. Direct upload of files is currently not supported."
+          value: null
+          whitelist: False
+          input_type: short_text
+        output:
+          mandatory: False
+          list: True
+          display_name: "Output"
+          desc: "URL/path to output files of the run. Direct upload of files is currently not supported."
+          value: null
+          whitelist: False
+          input_type: short_text
+    sample_preparation:
+      mandatory: False
+      list: True
+      display_name: "Sample preparation"
+      desc: "Here you can insert a URL/path to files that contain information regarding the sample preparation. Direct upload of files is currently not supported."
+      value: null
+      whitelist: False
+      input_type: short_text
+    further_description:
+      mandatory: False
+      list: True
+      display_name: "Further description"
+      desc: "Here you can insert a URL/path to files that contain additional information (e.g. presentation or paper). Direct upload of files is currently not supported."
+      value: null
+      whitelist: False
+      input_type: short_text

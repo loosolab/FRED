@@ -1,0 +1,11 @@
+structure: fred # fred, mampok or path to yaml file
+whitelist_repository: https://gitlab.gwdg.de/loosolab/software/metadata_whitelists.git
+private_access:
+  name: # github: username for access token; gitlab: oauth2 for project access token
+  token: # personal (github) or project (gitlab) access token
+branch: v1.2.*
+whitelist_path: fred
+update_whitelists: True
+output_path: .
+filename: '_metadata' # example_metadata.yaml
+email: bcu.support@mpi-bn.mpg.de

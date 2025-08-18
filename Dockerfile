@@ -19,4 +19,4 @@ RUN pip3 install tabulate
 
 RUN pip3 install pytz
 
-ENTRYPOINT ["python", "metadata-organizer/metaTools.py"]
+ENTRYPOINT ["python", "metadata-organizer/fred/metaTools.py"]

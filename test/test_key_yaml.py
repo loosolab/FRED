@@ -5,14 +5,14 @@ import sys
 import yaml.parser
 import yaml.scanner
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'fred', 'src'))
 import utils
 
 #TODO: test special_case
 
 def test_key_yaml(all_keys, inner_keys):
     try:
-        key_yaml = utils.read_in_yaml('keys.yaml')
+        key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(__file__), '..', 'fred', 'structure', 'keys.yaml'))
     except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
         print(f'The yaml file could not be parsed:\n{e}')
         sys.exit(1)
@@ -58,7 +58,8 @@ def test_property_input(prop_input, prop, keys):
             return True, 'of type \'bool\''
     elif keys[prop] == 'str':
         if type(prop_input) != str:
-            return True, 'of type \'str\''
+            if prop != 'desc':
+                return True, 'of type \'str\''
     elif keys[prop] == 'int':
         if type(prop_input) != int:
             return True, 'of type \'int\''
@@ -80,7 +81,7 @@ if __name__ == "__main__":
                 'value': 'value'}
 
     inner_keys = {'whitelist': 'bool',
-                  'input_type': ['short_text', 'long_text', 'select', 'number', 'bool', 'date']}
+                  'input_type': ['short_text', 'long_text', 'select', 'number', 'bool', 'date', 'restricted_short_text']}
 
     test_key_yaml(all_keys, inner_keys)
 
