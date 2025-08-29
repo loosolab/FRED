@@ -51,6 +51,10 @@ def get_data(path, keys_yaml, mode='samples'):
                 condition_names = []
                 condition_index = []
                 sample_index = []
+                sample_label = []
+                sample_label_height = []
+                condition_label_height = []
+                condition_label = []
                 idx = []
                 option_dict = {}
                 annotated = {}
@@ -61,7 +65,7 @@ def get_data(path, keys_yaml, mode='samples'):
                 for cond_index, cond in enumerate(conditions):
                 
                     condition_name = cond['condition_name']
-                    c_index = f'Condition {cond_index+1}'
+                    c_index = f'<b>Condition {cond_index+1}</b>'
 
                     splitted_condition = utils.split_cond(condition_name)
                     missing_dict = {}
@@ -78,6 +82,7 @@ def get_data(path, keys_yaml, mode='samples'):
                                 condition_index.append(c_index)
                                 
                                 sample_index.append(f'Sample {samp_index+1}')
+
                                 idx.append(j)
                                 j+=1
 
@@ -96,6 +101,34 @@ def get_data(path, keys_yaml, mode='samples'):
                                                 option_dict[key].append(None)
                                                 annotated[key].append('')
                                             
+                                            try:
+                                                label=sample[key]["filenames"][0].split('__')[-2].replace("_", "-")
+                                                if len(label)+len(f'_{samp_index+1}')>=20:
+                                                    label_height = 1
+                                                    splitted = label.split('-')
+                                                    new_label = f'{splitted[0]}-'
+                                                    row_len = len(new_label)
+                                                    for i in range(1, len(splitted)):
+                                                        elem = splitted[i] + '-' if i<len(splitted)-1 else splitted[i] + f'_{samp_index+1}'
+                                                        if row_len+len(elem) >= 20:
+                                                            label_height += 1
+                                                            new_label += '<br>'
+                                                            row_len = len(elem)
+                                                        else:
+                                                            row_len += len(elem)
+                                                        new_label += f'{elem}'
+                                                    label = new_label
+                                                    sample_label_height.append(label_height)
+                                                    condition_label_height.append(label_height)
+                                                else:
+                                                    label = f'{label}_{samp_index+1}'
+                                                    sample_label_height.append(1)
+                                                    condition_label_height.append(1)
+                                                sample_label.append(label)
+                                                condition_label.append(f'<b>{label.replace(f"_{samp_index+1}", "")}</b>')
+                                            except (KeyError, IndexError):
+                                                sample_label.append(f'Sample {samp_index+1}')
+                                                condition_label.append(f'<b>Condition {cond_index+1}</b>')
                                         else:
 
                                             if isinstance(sample[key], int) or isinstance(sample[key], float):
@@ -134,7 +167,11 @@ def get_data(path, keys_yaml, mode='samples'):
                     
                         df_dict = {'condition_name': condition_names,
                                 'condition_index': condition_index,
+                                'condition_label': condition_label,
+                                'condition_label_height': condition_label_height,
                                 'sample_index': sample_index,
+                                'sample_label': sample_label,
+                                'sample_label_height': sample_label_height,
                                 'index': idx}
                     elif mode=='conditions':
                         
@@ -148,8 +185,33 @@ def get_data(path, keys_yaml, mode='samples'):
                         option_dict['sample_count'].append(sample_count)
 
                         condition_names.append(condition_name)
-                        condition_index.append(c_index)
                         
+                        short = utils.get_short_name(condition_name, {}, key_yaml=keys_yaml)
+                        
+                        c_label=[]
+                        for elem in short.split('-'):
+                            for part in elem.split('+'):
+                                c_label.append(part.split('.')[-1])
+
+                        break_label = c_label[0] + '-'
+                        row_len = len(break_label)
+                        label_height = 1
+
+                        for i in range(1,len(c_label)):
+                            elem = c_label[i] + '-' if i < len(c_label)-1 else c_label[i]
+                            if row_len + len(elem) >= 20:
+                                break_label += '<br>'
+                                label_height +=1
+                                row_len = len(elem)
+                            else:
+                                row_len += len(elem)
+                            break_label += elem
+                        c_label = break_label
+
+                        condition_label_height.append(label_height)
+                        condition_label.append(c_label)
+                        condition_index.append(c_index)
+
                         for option in options:
                             
                             if option not in option_dict:
@@ -198,6 +260,8 @@ def get_data(path, keys_yaml, mode='samples'):
                             
                             df_dict = {'condition_name': condition_names,
                                         'condition_index': condition_index,
+                                        'condition_label': condition_label,
+                                        'condition_label_height': condition_label_height
                                         } 
                                             
                     

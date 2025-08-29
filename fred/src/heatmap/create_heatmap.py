@@ -8,7 +8,7 @@ import io
 from PIL import Image
 
 
-def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode='samples', labels='factors', background=False):
+def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode='samples', labels='factors', background=False, sample_labels=False, condition_labels=False):
     settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict, max_annotation, conditions = get_data(path, keys_yaml, mode=mode)
 
     heatmaps=[]
@@ -77,7 +77,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                         z=df,
                         zmin=0,
                         zmax=max_vals[value],
-                        x=[settings[value]['condition_index'],settings[value]['sample_index']] if mode=='samples' else settings[value]['condition_index'],
+                        x=[settings[value]['condition_label'] if condition_labels else settings[value]['condition_index'],settings[value]['sample_label'] if sample_labels else settings[value]['sample_index']] if mode=='samples' else (settings[value]['condition_label'] if condition_labels else settings[value]['condition_index']),
                         y=val_sorter,
                         showscale=False,
                         customdata=annotated,
@@ -91,12 +91,24 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
             
             data_input = heatmap
             
+            if mode == 'samples':
+                if sample_labels:
+                    sample_label_height = max(settings[value]['sample_label_height'])
+                else:
+                    sample_label_height = 1
+            else: sample_label_height = 0
+
+            if condition_labels:
+                condition_label_height = max(settings[value]['condition_label_height'])
+            else:
+                condition_label_height = 1
+
             my_cell_width = 150
             #my_cell_height = max(50, (15*max_annotation[value])+20)
-            top_margin = 100
+            top_margin = 15*sample_label_height + 15*condition_label_height + 70 # minimum 100
             bottom_margin = 20
             left_margin = 200
-            right_margin = 200
+            right_margin = 20
             my_height = val_sorter[-1] #my_cell_height*len(sorter)
 
             if mode=='samples':
@@ -112,7 +124,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                 imgdata = base64.b64decode(plotly_logo)
                 im = Image.open(io.BytesIO(imgdata))
                 im_width, im_height = im.size
-                y_side = top_margin
+                y_side = 100
                 my_ysize=y_side/my_height
                 x_side = y_side*im_width / im_height
                 my_xsize = x_side/my_width
