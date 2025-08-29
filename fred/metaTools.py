@@ -255,7 +255,7 @@ def validate(args):
 def plot(args):
     fred_object = FRED(args.config)
     input_file = utils.read_in_yaml(args.path)
-    plots = create_heatmap.get_heatmap(input_file, fred_object.structure, mode=args.mode, labels=args.labels)
+    plots = create_heatmap.get_heatmap(input_file, fred_object.structure, mode=args.mode, labels=args.labels, background=args.background)
     output_filename = args.filename if args.filename is not None else 'fig1'
     if len(plots) > 0:
         try:
@@ -374,6 +374,8 @@ def main():
     plot_function.add_argument('-l', '--labels', default='factors', choices=['factors', 'all', 'none'])
     plot_function.add_argument('-o', '--output', default='show', choices=['show', 'png', 'html', 'dash'])
     plot_function.add_argument('-f', '--filename', type=pathlib.Path)
+    plot_function.add_argument('-b', '--background', default=False, action='store_true', 
+                               help='If stated, the background will be displayed in white. Per default it is transparent.')
     plot_function.set_defaults(func=plot)
 
     args = parser.parse_args()

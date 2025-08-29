@@ -8,7 +8,7 @@ import io
 from PIL import Image
 
 
-def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode='samples', labels='factors'):
+def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode='samples', labels='factors', background=False):
     settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict, max_annotation, conditions = get_data(path, keys_yaml, mode=mode)
 
     heatmaps=[]
@@ -149,8 +149,8 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                         font=dict(size=14, lineposition='under'),
                         ),
                     ),
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgb(255, 255, 255)' if background else 'rgba(0,0,0,0)',
+                paper_bgcolor='rgb(255, 255, 255)' if background else 'rgba(0,0,0,0)',
                 xaxis=dict(
                     side="top",
                     automargin=False
