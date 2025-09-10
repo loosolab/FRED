@@ -3,7 +3,7 @@ from src import utils
 import numpy as np
 import re
 
-def get_data(path, keys_yaml, mode='samples'):
+def get_data(path, keys_yaml, mode='samples', drop_defaults=False):
 
     setting_dict = {}
     annotated_dict = {}
@@ -329,6 +329,8 @@ def get_data(path, keys_yaml, mode='samples'):
                     max_vu += 1
                     
                 for option in option_dict:
+                    
+                    option_structure = list(utils.find_keys(keys, option))
 
                     option_num = []
                     if option_types[option] == 'value_unit':
@@ -336,12 +338,26 @@ def get_data(path, keys_yaml, mode='samples'):
                         option_values = sorted([x for x in option_dict[option] if x is not None], key=lambda d: d['unit'])
                     else:
                         option_values = sorted(list(set([x for x in option_dict[option] if x is not None])))
-                    if len(option_values) > 0:
-                        if option_types[option] == 'number':
-                            num_vals = [normalize(x, 0, max_number, 0.1, 1) for x in option_values]
-                        else:
-                            num_vals = list(np.linspace(1, len(option_values), len(option_values)))
-                        option_values = sorted([str(x) for x in option_values])
+                    
+                    keep = True
+                    if drop_defaults and len(option_structure) > 0:
+                        option_structure = option_structure[0]
+                        if 'value' in option_structure and option_structure['value'] is not None:
+                            if option == 'technical_replicates':
+                                if all([x == 1 for x in option_values]):
+                                    keep = False
+                            elif all([x == option_structure['value'] for x in option_values]):
+                                keep = False
+                    if keep:
+                        if len(option_values) > 0:
+                            if option_types[option] == 'number':
+                                num_vals = [normalize(x, 0, max_number, 0.1, 1) for x in option_values]
+                            else:
+                                num_vals = list(np.linspace(1, len(option_values), len(option_values)))
+                            option_values = sorted([str(x) for x in option_values])
+                    else:
+                        option_dict[option] = [None] * len(option_dict[option])
+
                     for value in option_dict[option]:
                         if value is None:
                             option_num.append(value)

@@ -6,10 +6,11 @@ import os
 import base64
 import io
 from PIL import Image
+import numpy
 
 
-def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode='samples', labels='factors', background=False, sample_labels=False, condition_labels=False):
-    settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict, max_annotation, conditions = get_data(path, keys_yaml, mode=mode)
+def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode='samples', labels='factors', background=False, sample_labels=False, condition_labels=False, transpose=False, drop_defaults=False):
+    settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict, max_annotation, conditions = get_data(path, keys_yaml, mode=mode, drop_defaults=drop_defaults)
 
     heatmaps=[]
 
@@ -28,12 +29,14 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
             val_sorter = [0]
             for elem in sorter:
                 if elem in max_annotation[value]:
-                    val_sorter.append(max(val_sorter[-1]+50, val_sorter[-1]+(15*max_annotation[value][elem])+20))
+                    val_sorter.append(max(val_sorter[-1]+(50 if not transpose else 150), val_sorter[-1]+(15*max_annotation[value][elem])+20))
                 else:
-                    val_sorter.append(val_sorter[-1]+50)
+                    val_sorter.append(val_sorter[-1]+(50 if not transpose else 150))
 
             df = [settings[value][f'{key}_num'] for key in sorter]   
             annotated = [annotated_dict[value][key] for key in sorter if key in annotated_dict[value]]
+            if transpose:
+                annotated = numpy.transpose(annotated)
             option_text = []
             label_text = []
             for key in sorter:
@@ -73,12 +76,39 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                 if i*1/(max_vals[value]) != 1:
                     colors.append([((i*1)/(max_vals[value]))+0.001, 'white'])
 
+            if transpose:
+                if condition_labels:
+                    if sample_labels:
+                        y_value = [settings[value]['condition_label'], settings[value]['sample_label']]
+                    else:
+                        y_value = [settings[value]['condition_label'], settings[value]['sample_index']]
+                else:
+                    if sample_labels:
+                        y_value = [settings[value]['condition_index'], settings[value]['sample_label']]
+                    else:
+                        y_value = [settings[value]['condition_index'], settings[value]['sample_index']]
+                x_value = val_sorter
+                label_text = numpy.transpose(label_text)
+                df = numpy.transpose(df)
+            else:
+                if condition_labels:
+                    if sample_labels:
+                        x_value = [settings[value]['condition_label'], settings[value]['sample_label']]
+                    else:
+                        x_value = [settings[value]['condition_label'], settings[value]['sample_index']]
+                else:
+                    if sample_labels:
+                        x_value = [settings[value]['condition_index'], settings[value]['sample_label']]
+                    else:
+                        x_value = [settings[value]['condition_index'], settings[value]['sample_index']]
+                y_value = val_sorter
+                                
             heatmap = [go.Heatmap(
                         z=df,
                         zmin=0,
                         zmax=max_vals[value],
-                        x=[settings[value]['condition_label'] if condition_labels else settings[value]['condition_index'],settings[value]['sample_label'] if sample_labels else settings[value]['sample_index']] if mode=='samples' else (settings[value]['condition_label'] if condition_labels else settings[value]['condition_index']),
-                        y=val_sorter,
+                        x=x_value,
+                        y=y_value,
                         showscale=False,
                         customdata=annotated,
                         text=label_text,
@@ -105,16 +135,24 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
 
             my_cell_width = 150
             #my_cell_height = max(50, (15*max_annotation[value])+20)
-            top_margin = 15*sample_label_height + 15*condition_label_height + 70 # minimum 100
-            bottom_margin = 20
-            left_margin = 200
-            right_margin = 20
-            my_height = val_sorter[-1] #my_cell_height*len(sorter)
-
-            if mode=='samples':
-                my_width = my_cell_width*len(settings[value]["sample_index"])
+            if transpose:
+                top_margin = 100
+                bottom_margin = 20
+                left_margin = 200
+                right_margin = 20
+                my_width = val_sorter[-1]
+                my_height = 50 * len(settings[value]["sample_index"])
             else:
-                my_width = my_cell_width*len(settings[value]['condition_index'])
+                top_margin = 15*sample_label_height + 15*condition_label_height + 70 # minimum 100
+                bottom_margin = 20
+                left_margin = 200
+                right_margin = 20
+                my_height = val_sorter[-1] #my_cell_height*len(sorter)
+
+                if mode=='samples':
+                    my_width = my_cell_width*len(settings[value]["sample_index"])
+                else:
+                    my_width = my_cell_width*len(settings[value]['condition_index'])
 
             organism_path = os.path.join(os.path.dirname(__file__), '..', '..', 'images', f'{organisms[value]}.png')
             images = None
@@ -166,6 +204,12 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                 xaxis=dict(
                     side="top",
                     automargin=False
+                ) if not transpose else dict(
+                    tickmode="array",
+                    ticktext=option_text, 
+                    tickvals=between,
+                    side="top",
+                    automargin=False
                 ),
                 yaxis=dict(
                     tickmode="array",
@@ -173,25 +217,46 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                     tickvals=between,
                     autorange="reversed",
                     automargin=False
+                ) if not transpose else dict(
+                    automargin=False,
+                    autorange="reversed",
                 )
             )    
 
             fig = go.Figure(data=data_input, layout=layout)     
-            for i in val_sorter:
-                fig.add_hline(i, line_width=0.5)
+            if transpose:
+                for i in val_sorter:
+                    fig.add_vline(i, line_width=0.5)
+                
+                for i in between:
+                    fig.add_vline(i, line_dash="dash", line_color='lightgrey',layer='below') 
+                fig.add_vline(len(sorter)-0.5, line_width=0.5)
 
-            for i in between:
-                fig.add_hline(i, line_dash="dash", line_color='lightgrey',layer='below') 
-            #fig.add_hline(len(sorter)-0.5, line_width=0.5)     
+                if mode == 'samples':
+                    for i in range(len(settings[value]['sample_index'])+1):
+                        fig.add_hline(i-0.5, line_width=0.5)
+                else:
+                    for i in range(len(settings[value]['condition_index'])+1):
+                        fig.add_hline(i-0.5, line_width=0.5)
+                
+                fig.add_vrect(x0=0, x1=val_sorter[len(experimental_factors[value])], line=dict(color="red", width=5), layer='above')
 
-            if mode == 'samples':
-                for i in range(len(settings[value]['sample_index'])+1):
-                    fig.add_vline(i-0.5, line_width=0.5)
             else:
-                for i in range(len(settings[value]['condition_index'])+1):
-                    fig.add_vline(i-0.5, line_width=0.5)
-            
-            fig.add_hrect(y0=0, y1=val_sorter[len(experimental_factors[value])], line=dict(color="red", width=5), layer='above')
+                for i in val_sorter:
+                    fig.add_hline(i, line_width=0.5)
+
+                for i in between:
+                    fig.add_hline(i, line_dash="dash", line_color='lightgrey',layer='below') 
+                fig.add_hline(len(sorter)-0.5, line_width=0.5)     
+
+                if mode == 'samples':
+                    for i in range(len(settings[value]['sample_index'])+1):
+                        fig.add_vline(i-0.5, line_width=0.5)
+                else:
+                    for i in range(len(settings[value]['condition_index'])+1):
+                        fig.add_vline(i-0.5, line_width=0.5)
+                
+                fig.add_hrect(y0=0, y1=val_sorter[len(experimental_factors[value])], line=dict(color="red", width=5), layer='above')
             
             fig.update_layout(modebar={'remove':['zoom', 'pan', 'zoomIn', 'zoomOut', 'autoScale']})
             fig.layout.yaxis.fixedrange = True
