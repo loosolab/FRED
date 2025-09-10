@@ -93,6 +93,14 @@ deployment:
       value: null
       whitelist: True
       input_type: short_text
+    mampok_bucket:
+      mandatory: False
+      list: False
+      display_name: 'Mampok-bucket'
+      desc: ''
+      value: null
+      whitelist: False
+      input_type: bool
     mampok_url:
       mandatory: False
       list:  False
