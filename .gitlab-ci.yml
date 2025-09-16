@@ -59,10 +59,6 @@ page:       # This job runs in the build stage, which runs first.
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
-  - mkdir .public
-  - cp -r ./* .public
-  - rm -rf public
-  - mv .public public
   - mkdocs build --strict --verbose
 
 
