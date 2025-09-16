@@ -51,15 +51,20 @@ test:       # Test run
 page:       # This job runs in the build stage, which runs first.
   stage: build-page
   image: python:3.8-buster
-  before_script:
-  - pip install .
-  artifacts:
-    paths:
-      - public
+  pages:
+    # The folder that contains the files to be exposed at the Page URL
+    publish: public
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # This ensures that only pushes to the default branch will trigger
+    # a pages deploy
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  # Functions that should be executed before the build script is run
+  before_script:
+    - pip install .
   script:
-  - mkdocs build --strict --verbose
+    - mkdocs build --strict --verbose
+
+  
 
 
 
