@@ -19,7 +19,8 @@ dependencies = [
     "jinja2",
     "gitpython",
     "kaleido<1.0.0",
-    "dash"
+    "dash",
+    "mkdocs",
 ]
 
 [project.scripts]

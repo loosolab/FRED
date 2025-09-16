@@ -52,7 +52,7 @@ page:       # This job runs in the build stage, which runs first.
   stage: build-page
   image: python:3.8-buster
   before_script:
-  - pip install -r requirements.txt
+  - pip install .
   artifacts:
     paths:
       - public
