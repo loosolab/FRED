@@ -10,7 +10,7 @@ import numpy
 
 
 def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode='samples', labels='factors', background=False, sample_labels=False, condition_labels=False, transpose=False, drop_defaults=False):
-    settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict, max_annotation, conditions = get_data(path, keys_yaml, mode=mode, drop_defaults=drop_defaults)
+    settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict, max_annotation, conditions = get_data(path, keys_yaml, mode=mode, drop_defaults=drop_defaults, transpose=transpose)
 
     heatmaps=[]
 
@@ -77,30 +77,44 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                     colors.append([((i*1)/(max_vals[value]))+0.001, 'white'])
 
             if transpose:
-                if condition_labels:
-                    if sample_labels:
-                        y_value = [settings[value]['condition_label'], settings[value]['sample_label']]
+                if mode == 'samples':
+                    if condition_labels:
+                        if sample_labels:
+                            
+                            y_value = [settings[value]['condition_label'], settings[value]['sample_label']]
+                        else:
+                            y_value = [settings[value]['condition_label'], settings[value]['sample_index']]
                     else:
-                        y_value = [settings[value]['condition_label'], settings[value]['sample_index']]
+                        if sample_labels:
+                            y_value = [settings[value]['condition_index'], settings[value]['sample_label']]
+                        else:
+                            y_value = [settings[value]['condition_index'], settings[value]['sample_index']]
                 else:
-                    if sample_labels:
-                        y_value = [settings[value]['condition_index'], settings[value]['sample_label']]
+                    if condition_labels:
+                        y_value = settings[value]['condition_label']
                     else:
-                        y_value = [settings[value]['condition_index'], settings[value]['sample_index']]
+                        y_value = settings[value]['condition_index']
+                        
                 x_value = val_sorter
                 label_text = numpy.transpose(label_text)
                 df = numpy.transpose(df)
             else:
-                if condition_labels:
-                    if sample_labels:
-                        x_value = [settings[value]['condition_label'], settings[value]['sample_label']]
+                if mode == 'samples':
+                    if condition_labels:
+                        if sample_labels:
+                            x_value = [settings[value]['condition_label'], settings[value]['sample_label']]
+                        else:
+                            x_value = [settings[value]['condition_label'], settings[value]['sample_index']]
                     else:
-                        x_value = [settings[value]['condition_label'], settings[value]['sample_index']]
+                        if sample_labels:
+                            x_value = [settings[value]['condition_index'], settings[value]['sample_label']]
+                        else:
+                            x_value = [settings[value]['condition_index'], settings[value]['sample_index']]
                 else:
-                    if sample_labels:
-                        x_value = [settings[value]['condition_index'], settings[value]['sample_label']]
+                    if condition_labels:
+                         x_value = settings[value]['condition_label']
                     else:
-                        x_value = [settings[value]['condition_index'], settings[value]['sample_index']]
+                        x_value = settings[value]['condition_index']
                 y_value = val_sorter
                                 
             heatmap = [go.Heatmap(
@@ -138,10 +152,10 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
             if transpose:
                 top_margin = 100
                 bottom_margin = 20
-                left_margin = 200
+                left_margin = (150 if condition_labels else 100) + (150 if sample_labels else 100)
                 right_margin = 20
                 my_width = val_sorter[-1]
-                my_height = 50 * len(settings[value]["sample_index"])
+                my_height = 50 * (len(settings[value]["sample_index"]) if mode=='samples' else len(settings[value]["condition_index"]))
             else:
                 top_margin = 15*sample_label_height + 15*condition_label_height + 70 # minimum 100
                 bottom_margin = 20
@@ -153,7 +167,6 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                     my_width = my_cell_width*len(settings[value]["sample_index"])
                 else:
                     my_width = my_cell_width*len(settings[value]['condition_index'])
-
             organism_path = os.path.join(os.path.dirname(__file__), '..', '..', 'images', f'{organisms[value]}.png')
             images = None
 
@@ -167,7 +180,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                 x_side = y_side*im_width / im_height
                 my_xsize = x_side/my_width
 
-                left_margin = max(200, x_side)
+                left_margin = max(left_margin, x_side)
 
                 images = [dict(
                     source='data:image/png;base64,{}'.format(plotly_logo.decode()),
@@ -203,7 +216,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                 paper_bgcolor='rgb(255, 255, 255)' if background else 'rgba(0,0,0,0)',
                 xaxis=dict(
                     side="top",
-                    automargin=False
+                    automargin=False,
                 ) if not transpose else dict(
                     tickmode="array",
                     ticktext=option_text, 

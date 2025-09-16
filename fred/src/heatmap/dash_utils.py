@@ -3,7 +3,7 @@ from src import utils
 import numpy as np
 import re
 
-def get_data(path, keys_yaml, mode='samples', drop_defaults=False):
+def get_data(path, keys_yaml, mode='samples', drop_defaults=False, transpose=False):
 
     setting_dict = {}
     annotated_dict = {}
@@ -102,15 +102,16 @@ def get_data(path, keys_yaml, mode='samples', drop_defaults=False):
                                                 annotated[key].append('')
                                             
                                             try:
+                                                max_width = 20
                                                 label=sample[key]["filenames"][0].split('__')[-2].replace("_", "-")
-                                                if len(label)+len(f'_{samp_index+1}')>=20:
+                                                if len(label)+len(f'_{samp_index+1}')>=max_width:
                                                     label_height = 1
                                                     splitted = label.split('-')
                                                     new_label = f'{splitted[0]}-'
                                                     row_len = len(new_label)
                                                     for i in range(1, len(splitted)):
                                                         elem = splitted[i] + '-' if i<len(splitted)-1 else splitted[i] + f'_{samp_index+1}'
-                                                        if row_len+len(elem) >= 20:
+                                                        if row_len+len(elem) >= max_width:
                                                             label_height += 1
                                                             new_label += '<br>'
                                                             row_len = len(elem)
@@ -148,6 +149,18 @@ def get_data(path, keys_yaml, mode='samples', drop_defaults=False):
                                                 except:
                                                     group_key = None
                                             annotation = annotate(sample[key], group_key)
+                                            if transpose:
+                                                new_annotation = []
+                                                single_val = ''
+                                                for i in range(len(annotation)):
+                                                    if len(single_val) + (1 if i>0 else 0) + len(annotation[i]) < 20:
+                                                        single_val += f'{" " if i > 0 else ""}{annotation[i]}'
+                                                    else:
+                                                        new_annotation.append(single_val)
+                                                        single_val = annotation[i]
+                                                if single_val != '':
+                                                    new_annotation.append(single_val)
+                                                annotation = new_annotation
                                             if key in max_annotation:
                                                 max_annotation[key] = max(max_annotation[key], len(annotation))
                                             else:
@@ -242,12 +255,25 @@ def get_data(path, keys_yaml, mode='samples', drop_defaults=False):
                                 
                                 key_structure = list(utils.find_keys(keys, key))
                                 group_key = None
+
                                 if len(key_structure) > 0:
                                     try:
                                         group_key = list(key_structure[0]['special_case']['control'].keys())[0]
                                     except:
                                         group_key = None
                                     annotation = annotate(splitted_condition[my_index][1], group_key)
+                                    if transpose:
+                                        new_annotation = []
+                                        single_val = ''
+                                        for i in range(len(annotation)):
+                                            if len(single_val) + (1 if i>0 else 0) + len(annotation[i]) < 20:
+                                                single_val += f'{" " if i > 0 else ""}{annotation[i]}'
+                                            else:
+                                                new_annotation.append(single_val)
+                                                single_val = annotation[i]
+                                        if single_val != '':
+                                            new_annotation.append(single_val)
+                                        annotation = new_annotation
                                     if key in max_annotation:
                                         max_annotation[key] = max(max_annotation[key], len(annotation))
                                     else:
