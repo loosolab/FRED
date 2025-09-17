@@ -53,7 +53,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                         label_vals.append('<br>'.join(new_val))
                     label_text.append(label_vals)
                 else:
-                    label_text.append('')
+                    label_text.append(['']* len(annotated_dict[value][key]))
 
             for option in sorter:
                 if option in experimental_factors[value]:
