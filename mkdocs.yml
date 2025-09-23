@@ -8,6 +8,7 @@ nav:
             - How to Install: index.md
             - File Generation: generate.md
             - File Searching: search.md
+            - Plots: plots.md
         - Data structure: 
             - General structure: structure.md
             - Whitelists: whitelists.md

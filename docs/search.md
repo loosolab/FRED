@@ -2,11 +2,11 @@
 
 ## Programm Call
 
-MetaTools includes a function to find metadata files using a search string over a specified path.
+FRED includes a function to find metadata files using a search string over a specified path.
 
-The find function of metaTools is called via
+The find function of FRED is called via
 ```bash
-$ python metaTools.py find
+$ fred find
 ```
 
 with these arguments:

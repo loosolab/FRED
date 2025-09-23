@@ -1,6 +1,6 @@
 ## Whitelist storage
 
-The whitelists for the project are located in the Git repository '[metadata_whitelists](https://github.com/loosolab/whitelists/)' inside the 'whitelists' folder. All newly created whitelist files must also be placed in this folder so that the metadata tool can read them.
+The whitelists for the project are located in the Git repository '[metadata_whitelists](https://github.com/loosolab/whitelists/)' inside the 'whitelists' folder. All newly created whitelist files must also be placed in this folder so that FRED can read them.
 
 The naming of the whitelists is identical to the key for which it is created. For example, the whitelist for the key 'organism' is also named 'organism'. 
 
