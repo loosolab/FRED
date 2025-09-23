@@ -1,10 +1,10 @@
 # File Generation
 
-MetaTools has a function to generate a metadata file. Information is requested from the user in a dialog and entered into a yaml structure.
+FRED has a function to generate a metadata file. Information is requested from the user in a dialog and entered into a yaml structure.
 
-The generate function of metaTools is called via
+The generate function of FRED is called via
 ```bash
-$ python metaTools.py generate
+$ fred generate
 ```
 
 with these arguments:
