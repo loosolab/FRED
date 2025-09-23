@@ -2,6 +2,12 @@
 
 FRED includes a function to plot the experimental design of a metadata file. 
 
+![](images/plot.png)
+
+The plot is structured like a heat map. The samples or conditions are plotted on the X-axis and the metadata fields on the Y-axis. This means that each column represents a sample and each row represents a metadata property of the sample. Different values within a row of the plot are colored differently. This allows identical and different values to be identified at a glance.
+
+In addition to the colors, the cells can also be labeled with values. The experimental factors are highlighted in particular, as they are displayed in the top rows with a red border.
+
 # Program Call
 
 The plot function of FRED is called via
