@@ -243,7 +243,6 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                 
                 for i in between:
                     fig.add_vline(i, line_dash="dash", line_color='lightgrey',layer='below') 
-                fig.add_vline(len(sorter)-0.5, line_width=0.5)
 
                 if mode == 'samples':
                     for i in range(len(settings[value]['sample_index'])+1):
@@ -257,10 +256,9 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
             else:
                 for i in val_sorter:
                     fig.add_hline(i, line_width=0.5)
-
+                
                 for i in between:
-                    fig.add_hline(i, line_dash="dash", line_color='lightgrey',layer='below') 
-                fig.add_hline(len(sorter)-0.5, line_width=0.5)     
+                    fig.add_hline(i, line_dash="dash", line_color='lightgrey',layer='below')      
 
                 if mode == 'samples':
                     for i in range(len(settings[value]['sample_index'])+1):
