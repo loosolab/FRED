@@ -12,6 +12,21 @@ import numpy
 def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode='samples', labels='factors', background=False, sample_labels=False, condition_labels=False, transpose=False, drop_defaults=False):
     settings, experimental_factors, organisms, max_vals, options_pretty, annotated_dict, max_annotation, conditions = get_data(path, keys_yaml, mode=mode, drop_defaults=drop_defaults, transpose=transpose)
 
+    techniques = list(utils.find_keys(path, 'techniques'))
+    setting_techniques = {}
+    if len(techniques) > 0:
+        techniques = techniques[0]
+        for elem in techniques:
+            try:
+                sett_id = elem['setting']
+                try:
+                    technique = elem['technique']
+                    setting_techniques[sett_id] = technique
+                except KeyError:
+                    pass
+            except KeyError:
+                pass
+
     heatmaps=[]
 
     for value in settings:
@@ -191,6 +206,11 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
             )]
 
             between = []
+            technique_list = setting_techniques[value] if value in setting_techniques else None
+            if technique_list is not None:
+                technique_list = f' - {", ".join(technique_list)}'
+            else:
+                technique_list = ''
             for i in range(len(val_sorter)-1):
                 between.append((val_sorter[i+1]+val_sorter[i])/2)
             layout = go.Layout(
@@ -200,7 +220,7 @@ def get_heatmap(path, keys_yaml, show_setting_id=True, only_factors=False, mode=
                 margin=dict(l=left_margin, r=right_margin, t=top_margin, b=bottom_margin),
                 autosize=False,
                 title=dict(
-                    text=f'<b>Setting {value}</b>' if show_setting_id else '', 
+                    text=f'<b>Setting {value}{technique_list}</b>' if show_setting_id else '', 
                     font=dict(size=15), 
                     automargin=False,
                     yref='container',

@@ -261,7 +261,7 @@ def plot(args):
         try:
             plot = plots[args.setting-1][1]
         except IndexError:
-            print(f'Setting exp{args.index} does not exist. Defaulting to exp1.')
+            print(f'Setting exp{args.setting} does not exist. Defaulting to exp1.')
             plot = plots[0][1]
         
         if plot is not None:
