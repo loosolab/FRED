@@ -1,0 +1,46 @@
+# This is a basic workflow that is manually triggered
+
+name: Mirror public whitelists
+
+on:
+  schedule:
+    - cron: '30 16 * * *'
+  workflow_dispatch:
+
+jobs:
+  
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: "actions/checkout@v4.1.2"
+    - name: set email
+      run: git config --global user.email "action@example.com"
+    - name: set name
+      run: git config --global user.name "Github Action"
+    - name: set rebase
+      run: git config pull.rebase true
+    - name: checkout dev
+      run: git checkout -b dev
+    - name: remove files
+      run: for FILE in $(ls); do if [ -d "${FILE}" ]; then git rm -r $FILE; elif [ -f "${FILE}" ]; then git rm $FILE; fi; done
+    - name: commit
+      run: git commit -m 'remove files'
+    - name: push dev
+      run: git push --set-upstream origin dev
+    - name: clone public branch
+      run: git remote add -t public other-repo https://oauth2:{{MIRROR_TOKEN}}@git@gitlab.gwdg.de:loosolab/software/metadata-organizer.git
+    - name: update
+      run: git remote update
+    - name: merge
+      run: git merge --allow-unrelated-histories --strategy-option=theirs other-repo/public
+    - name: push
+      run: git push 
+    - name: checkout main
+      run: git checkout main
+    - name: merge main
+      run: git merge --allow-unrelated-histories --strategy-option=theirs origin/dev
+    - name: push main
+      run: git push --set-upstream origin main
+    - name: remove dev
+      run: git push origin --delete dev
