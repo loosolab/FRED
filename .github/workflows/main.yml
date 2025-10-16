@@ -28,8 +28,8 @@ jobs:
       run: git commit -m 'remove files'
     - name: push dev
       run: git push --set-upstream origin dev
-    - name: clone public branch
-      run: git remote add -t public other-repo https://oauth2:{{MIRROR_TOKEN}}@gitlab.gwdg.de:loosolab/software/metadata-organizer.git
+    - name: clone main branch
+      run: git remote add -t main other-repo https://oauth2:{{MIRROR_TOKEN}}@gitlab.gwdg.de:loosolab/software/metadata-organizer.git
     - name: update
       run: git remote update
     - name: merge
