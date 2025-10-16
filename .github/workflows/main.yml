@@ -29,7 +29,7 @@ jobs:
     - name: push dev
       run: git push --set-upstream origin dev
     - name: clone public branch
-      run: git remote add -t public other-repo https://oauth2:{{MIRROR_TOKEN}}@git@gitlab.gwdg.de:loosolab/software/metadata-organizer.git
+      run: git remote add -t public other-repo https://oauth2:{{MIRROR_TOKEN}}@gitlab.gwdg.de:loosolab/software/metadata-organizer.git
     - name: update
       run: git remote update
     - name: merge
