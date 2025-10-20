@@ -6,8 +6,12 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fred"
+name = "fred-metadata"
 version = "0.0.12"
+authors = [
+  { name="Jasmin Walter", email="Jasmin.Walter@mpi-bn.mpg.de" },
+]
+description = "Metadata generation, validation, search and visualization."
 dependencies = [
     "PyYAML>=5.1",
     "pytz",
@@ -22,6 +26,8 @@ dependencies = [
     "dash",
     "mkdocs",
 ]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
 
 [project.scripts]
 fred = "fred.metaTools:main"
