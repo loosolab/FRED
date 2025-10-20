@@ -411,8 +411,11 @@ def get_data(path, keys_yaml, mode='samples', drop_defaults=False, transpose=Fal
 
 
 def normalize(x, minIn, maxIn, minOut, maxOut):
-    input = (x-minIn)/(maxIn-minIn)
-    return minOut + input * (maxOut-minOut)
+    if maxIn == minIn:
+        return x
+    else:
+        input = (x-minIn)/(maxIn-minIn) if maxIn != minIn else x
+        return minOut + input * (maxOut-minOut)
 
 def annotate(value, group_key=None):
     annotated_value = []
