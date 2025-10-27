@@ -1,13 +1,12 @@
 [build-system]
 requires = [
-    "setuptools",
-    "pip"
+    "setuptools"
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "fred-metadata"
-version = "0.0.12"
+version = "0.0.16"
 authors = [
   { name="Jasmin Walter", email="Jasmin.Walter@mpi-bn.mpg.de" },
 ]

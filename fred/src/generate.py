@@ -39,7 +39,6 @@ class Generate(Input):
                              self.result_dict)
             if part == 'experimental_setting':
                 plot = create_heatmap.get_heatmap({part: self.result_dict[part]}, self.key_yaml)
-                plots = [{'plot': elem[1], 'missing_samples': elem[2]}]
                 for elem in plot:
                     if elem[1] is not None:
                         elem[1].show()

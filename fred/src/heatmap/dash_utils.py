@@ -127,9 +127,11 @@ def get_data(path, keys_yaml, mode='samples', drop_defaults=False, transpose=Fal
                                                     condition_label_height.append(1)
                                                 sample_label.append(label)
                                                 condition_label.append(f'<b>{label.replace(f"_{samp_index+1}", "")}</b>')
-                                            except (KeyError, IndexError):
+                                            except (KeyError, IndexError) as e:
                                                 sample_label.append(f'Sample {samp_index+1}')
+                                                sample_label_height.append(1)
                                                 condition_label.append(f'<b>Condition {cond_index+1}</b>')
+                                                condition_label_height.append(1)
                                         else:
 
                                             if isinstance(sample[key], int) or isinstance(sample[key], float):
