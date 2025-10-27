@@ -252,7 +252,12 @@ class Generate(Input):
                 if 'special_case' in structure[key]:
                     if 'factor' in structure[key]['special_case'] and \
                             structure[key]['special_case']['factor']:
-                        self.fill_key(position + [key],
+                        if 'list' in structure[key] and structure[key]['list']:
+                            print(structure[key]['value'])
+                            self.fill_key(position + [key],
+                                      [structure[key]['value']], return_dict)
+                        else:
+                            self.fill_key(position + [key],
                                       structure[key]['value'], return_dict)
                     elif 'generated' in structure[key]['special_case']:
                         if structure[key]['special_case']['generated'] == \
