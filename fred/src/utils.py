@@ -34,12 +34,18 @@ def parse_config(config_file):
         password = None
     try:
         structure = config["structure"]
-        if structure == 'fred':
-            structure = os.path.join(os.path.dirname(__file__), '..', 'structure', 'keys.yaml')
-        elif structure == 'mampok':
-            structure = os.path.join(os.path.dirname(__file__), '..', 'structure', 'mamplan_keys.yaml')
+        if structure == "fred":
+            structure = os.path.join(
+                os.path.dirname(__file__), "..", "structure", "keys.yaml"
+            )
+        elif structure == "mampok":
+            structure = os.path.join(
+                os.path.dirname(__file__), "..", "structure", "mamplan_keys.yaml"
+            )
     except KeyError:
-        structure = os.path.join(os.path.dirname(__file__), '..', 'structure', 'keys.yaml')
+        structure = os.path.join(
+            os.path.dirname(__file__), "..", "structure", "keys.yaml"
+        )
         missing_keys.append("structure")
     try:
         whitelist_branch = config["branch"]
@@ -49,7 +55,9 @@ def parse_config(config_file):
     try:
         whitelist_path = config["whitelist_path"]
     except KeyError:
-        whitelist_path = os.path.join(os.path.dirname(__file__), '..', '..', "FRED_whitelists")
+        whitelist_path = os.path.join(
+            os.path.dirname(__file__), "..", "..", "FRED_whitelists"
+        )
         missing_keys.append("whitelist_path")
     try:
         update_whitelists = config["update_whitelists"]
@@ -87,7 +95,7 @@ def parse_config(config_file):
         update_whitelists,
         output_path,
         filename,
-        email
+        email,
     )
 
 
@@ -232,9 +240,15 @@ def read_grouped_whitelist(
                 whitelist_object is not None
                 and whitelist["whitelist"][key] in whitelist_object
             ):
-                whitelist["whitelist"][key] = get_whitelist(whitelist['whitelist'][key], filled_object, whitelist_object=whitelist_object, all_plain=all_plain, whitelist_path=whitelist_path)
+                whitelist["whitelist"][key] = get_whitelist(
+                    whitelist["whitelist"][key],
+                    filled_object,
+                    whitelist_object=whitelist_object,
+                    all_plain=all_plain,
+                    whitelist_path=whitelist_path,
+                )
                 new_whitelist = True
-            elif whitelist['whitelist'][key] is not None and os.path.isfile(
+            elif whitelist["whitelist"][key] is not None and os.path.isfile(
                 os.path.join(whitelist_path, "whitelists", whitelist["whitelist"][key])
             ):
                 whitelist["whitelist"][key] = get_whitelist(
@@ -887,7 +901,7 @@ def get_combis(values, key, result_dict, key_yaml, read_in_whitelists=None):
     control = values["control"] if "control" in values else None
     if "control" in values:
         values.pop("control")
-        
+
     key_info = list(find_keys(key_yaml, key))
     if len(key_info) > 0:
         key_info = key_info[0]

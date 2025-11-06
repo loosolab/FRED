@@ -22,8 +22,8 @@ def iterate_dir_metafiles(
     yaml=None,
     whitelist_path=None,
     return_false=False,
-    skip_validation = False,
-    show_logs = False
+    skip_validation=False,
+    show_logs=False,
 ):
     """
     iterate through a list of paths to find all _metadata.yaml(yml) files
@@ -71,7 +71,9 @@ def iterate_dir_metafiles(
     pool.close()
     end_reading = time.time()
     if show_logs:
-        print(f'File reading and validation took {"%.2f" % (end_reading-end_listing)} seconds with {cpu_count} CPUs.')
+        print(
+            f'File reading and validation took {"%.2f" % (end_reading-end_listing)} seconds with {cpu_count} CPUs.'
+        )
     reading_times = []
     for result in results:
         if result[0] is not None:
@@ -90,7 +92,9 @@ def iterate_dir_metafiles(
     end_result = time.time()
     if show_logs:
         print(f'Parsing the results took {"%.2f" % (end_result-end_reading)} seconds.')
-        print(f'File reading per file took MIN {"%.2f" % (min(reading_times))}s | MEAN {"%.2f" % (sum(reading_times)/len(reading_times))}s | MAX {"%.2f" % (max(reading_times))}s')
+        print(
+            f'File reading per file took MIN {"%.2f" % (min(reading_times))}s | MEAN {"%.2f" % (sum(reading_times)/len(reading_times))}s | MAX {"%.2f" % (max(reading_times))}s'
+        )
         try:
             largest_file = metafile_list[reading_times.index(max(reading_times))]
             print(f'Reading took longest for file {largest_file["project"]["id"]}')
@@ -106,7 +110,15 @@ def iterate_dir_metafiles(
     }
 
 
-def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml, skip_validation=False):
+def validate(
+    ypath,
+    filename,
+    key_yaml,
+    logical_validation,
+    whitelist_path,
+    yaml,
+    skip_validation=False,
+):
     error_reports = None
     warning_reports = None
     warning_count = False
@@ -140,7 +152,7 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
                 whitelist_path=whitelist_path,
             )
             end_val = time.time()
-            #print(f'The validation of ONE file took {"%.2f" % (end_val-end_read)} seconds.')
+            # print(f'The validation of ONE file took {"%.2f" % (end_val-end_read)} seconds.')
             # add path to dic
             if not valid:
                 error_reports = (
@@ -161,7 +173,7 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
                 corrupted = True
                 warning_count += len(logical_warn)
                 warning_reports = logical_warn
-            #print(f"validated file {ypath}")
+            # print(f"validated file {ypath}")
 
         metafile["path"] = ypath
     return (
@@ -171,5 +183,5 @@ def validate(ypath, filename, key_yaml, logical_validation, whitelist_path, yaml
         error_count,
         warning_reports,
         warning_count,
-        read_time
+        read_time,
     )

@@ -16,107 +16,134 @@ def validate_object(wi_object, key_yaml, read_in_whitelists, finish, email):
     pooled = None
     organisms = []
     settings = []
-    for setting in wi_object['experimental_setting']['list_value']:
+    for setting in wi_object["experimental_setting"]["list_value"]:
         for elem in setting:
-            if elem['position'].split(':')[-1] == 'organism':
-                if isinstance(elem['value'], dict):
-                    organisms.append(elem['value']['organism_name'].split(
-                        ' ')[0])
+            if elem["position"].split(":")[-1] == "organism":
+                if isinstance(elem["value"], dict):
+                    organisms.append(elem["value"]["organism_name"].split(" ")[0])
                 else:
-                    organisms.append(elem['value'].split(' ')[0])
-            elif elem['position'].split(':')[-1] == 'setting_id':
-                settings.append(elem['value'])
+                    organisms.append(elem["value"].split(" ")[0])
+            elif elem["position"].split(":")[-1] == "setting_id":
+                settings.append(elem["value"])
     warnings = {}
     errors = {}
     pubmed_ids = []
 
-    for part in ['project', 'experimental_setting', 'technical_details']:
+    for part in ["project", "experimental_setting", "technical_details"]:
 
-        part, wi_object[part], pooled, organisms, warnings[part], \
-                errors[part], pubmed_ids = validate_part(part, wi_object[part], [], pooled,
-                                             organisms, settings, [], pubmed_ids)
+        (
+            part,
+            wi_object[part],
+            pooled,
+            organisms,
+            warnings[part],
+            errors[part],
+            pubmed_ids,
+        ) = validate_part(
+            part, wi_object[part], [], pooled, organisms, settings, [], pubmed_ids
+        )
 
     pubmed_ids = list(set(pubmed_ids))
-    if any(x not in wi_object['publication_records'] for x in pubmed_ids):
-        wi_object['publication_records'] = get_publications(
-            wi_object['publication_records'], pubmed_ids, email)
+    if any(x not in wi_object["publication_records"] for x in pubmed_ids):
+        wi_object["publication_records"] = get_publications(
+            wi_object["publication_records"], pubmed_ids, email
+        )
 
     if finish:
         parsed = oty.parse_object(wi_object, key_yaml, read_in_whitelists)
-        for part in ['project', 'experimental_setting', 'technical_details']:
+        for part in ["project", "experimental_setting", "technical_details"]:
             if part not in parsed:
                 parsed[part] = {}
-            valid, missing_mandatory_keys, invalid_keys, invalid_entries, \
-            invalid_value, logical_warn = validate_yaml.validate_file(parsed[part], key_yaml[part]['value'], 'metadata', logical_validation=False, generated=False, only_mandatory=True)
+            (
+                valid,
+                missing_mandatory_keys,
+                invalid_keys,
+                invalid_entries,
+                invalid_value,
+                logical_warn,
+            ) = validate_yaml.validate_file(
+                parsed[part],
+                key_yaml[part]["value"],
+                "metadata",
+                logical_validation=False,
+                generated=False,
+                only_mandatory=True,
+            )
             for elem in missing_mandatory_keys:
-                diaplay_name = list(utils.find_keys(key_yaml, elem.split(':')[-1]))[0]['display_name']
-                errors[part].append({'position': f'{part}:{elem}',
-                                     'title': f'Missing {diaplay_name}',
-                                     'message': 'Missing mandatory input'})
-    validation_object = {'object': wi_object, 'errors': errors,
-                         'warnings': warnings}
+                diaplay_name = list(utils.find_keys(key_yaml, elem.split(":")[-1]))[0][
+                    "display_name"
+                ]
+                errors[part].append(
+                    {
+                        "position": f"{part}:{elem}",
+                        "title": f"Missing {diaplay_name}",
+                        "message": "Missing mandatory input",
+                    }
+                )
+    validation_object = {"object": wi_object, "errors": errors, "warnings": warnings}
     return validation_object
 
 
 def get_publications(publications, pubmed_ids, email):
     pubmed_entries = utils.get_publication_object(pubmed_ids, email)
     for pubmed_entry in pubmed_entries:
-        if pubmed_entry['Id'] not in publications:
-            publications[pubmed_entry['Id']] = {
-                'pubmed_id': int(pubmed_entry['Id'])}
+        if pubmed_entry["Id"] not in publications:
+            publications[pubmed_entry["Id"]] = {"pubmed_id": int(pubmed_entry["Id"])}
 
             try:
-                publications[pubmed_entry['Id']]['title'] = str(pubmed_entry['Title'])
+                publications[pubmed_entry["Id"]]["title"] = str(pubmed_entry["Title"])
             except ValueError:
                 pass
 
             try:
-                publications[pubmed_entry['Id']]['year'] = int(pubmed_entry['PubDate'].split(' ')[0])
+                publications[pubmed_entry["Id"]]["year"] = int(
+                    pubmed_entry["PubDate"].split(" ")[0]
+                )
             except ValueError:
                 pass
 
             try:
-                publications[pubmed_entry['Id']]['author'] = \
-                    [str(x) for x in pubmed_entry['AuthorList'][0:3]] + \
-                    ['et. al'] if len(pubmed_entry['AuthorList']) > 3 else \
-                        [str(x) for x in pubmed_entry['AuthorList']]
+                publications[pubmed_entry["Id"]]["author"] = (
+                    [str(x) for x in pubmed_entry["AuthorList"][0:3]] + ["et. al"]
+                    if len(pubmed_entry["AuthorList"]) > 3
+                    else [str(x) for x in pubmed_entry["AuthorList"]]
+                )
             except ValueError:
                 pass
 
             try:
-                publications[pubmed_entry['Id']]['journal'] = \
-                    str(pubmed_entry['Source'])
+                publications[pubmed_entry["Id"]]["journal"] = str(
+                    pubmed_entry["Source"]
+                )
             except ValueError:
                 pass
 
             try:
-                publications[pubmed_entry['Id']]['volume'] = \
-                    int(pubmed_entry['Volume'])
+                publications[pubmed_entry["Id"]]["volume"] = int(pubmed_entry["Volume"])
             except ValueError:
                 pass
 
             try:
-                publications[pubmed_entry['Id']]['issue'] = \
-                    int(pubmed_entry['Issue'])
+                publications[pubmed_entry["Id"]]["issue"] = int(pubmed_entry["Issue"])
             except ValueError:
                 pass
 
             try:
-                publications[pubmed_entry['Id']]['pages'] = \
-                    str(pubmed_entry['Pages'])
+                publications[pubmed_entry["Id"]]["pages"] = str(pubmed_entry["Pages"])
             except ValueError:
                 pass
 
             try:
-                publications[pubmed_entry['Id']]['doi'] = \
-                    str(pubmed_entry['DOI'])
+                publications[pubmed_entry["Id"]]["doi"] = str(pubmed_entry["DOI"])
             except ValueError:
                 pass
 
     return publications
 
 
-def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors, pubmed_ids):
+def validate_part(
+    elem, wi_object, warnings, pooled, organisms, settings, errors, pubmed_ids
+):
     """
     This function is used to validate a part of the WI object. If an error or a
     warning is found than it is added to the description of the key whose value
@@ -135,130 +162,201 @@ def validate_part(elem, wi_object, warnings, pooled, organisms, settings, errors
              warnings: a list containing all found warnings
              errors: a list containing all found errors
     """
-    error_desc = ''
-    warning_desc = ''
+    error_desc = ""
+    warning_desc = ""
     if isinstance(wi_object, dict):
-        if 'desc' in wi_object and 'backup_desc' not in wi_object:
-            wi_object['backup_desc'] = wi_object['desc']
+        if "desc" in wi_object and "backup_desc" not in wi_object:
+            wi_object["backup_desc"] = wi_object["desc"]
 
-        if wi_object['list']:
-            if wi_object['position'].split(':')[-1] == 'techniques':
+        if wi_object["list"]:
+            if wi_object["position"].split(":")[-1] == "techniques":
                 tech_settings = []
-                for t_elem in wi_object['list_value']:
+                for t_elem in wi_object["list_value"]:
                     for t_sub_elem in t_elem:
-                        if t_sub_elem['position'].split(':')[-1] == 'setting':
-                            tech_settings.append(t_sub_elem['value'])
-                warning, warn_text = validate_yaml.validate_techniques(settings, tech_settings)
+                        if t_sub_elem["position"].split(":")[-1] == "setting":
+                            tech_settings.append(t_sub_elem["value"])
+                warning, warn_text = validate_yaml.validate_techniques(
+                    settings, tech_settings
+                )
                 if warning:
-                    warnings.append({'position': wi_object['position'],
-                                     'title': 'Invalid Technique',
-                                     'message': warn_text})
+                    warnings.append(
+                        {
+                            "position": wi_object["position"],
+                            "title": "Invalid Technique",
+                            "message": warn_text,
+                        }
+                    )
 
-                    warn_text = warn_text.replace('\n', '<br>')
-                    warning_desc = \
-                        f'{warning_desc}' \
-                        f'{"<br>" if warning_desc != "" else ""}' \
+                    warn_text = warn_text.replace("\n", "<br>")
+                    warning_desc = (
+                        f"{warning_desc}"
+                        f'{"<br>" if warning_desc != "" else ""}'
                         f'<font color="orange">{warn_text}</font>'
-                    wi_object['desc'] =  \
-                        f'{wi_object["backup_desc"]}' \
-                        f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
-                        f'{warning_desc}'
+                    )
+                    wi_object["desc"] = (
+                        f'{wi_object["backup_desc"]}'
+                        f'{"<br>" if wi_object["backup_desc"] != "" else ""}'
+                        f"{warning_desc}"
+                    )
                 else:
-                    wi_object['desc'] = wi_object['backup_desc']
-            elif not any([isinstance(x, dict) or isinstance(x, list) for x in
-                        wi_object['list_value']]):
+                    wi_object["desc"] = wi_object["backup_desc"]
+            elif not any(
+                [
+                    isinstance(x, dict) or isinstance(x, list)
+                    for x in wi_object["list_value"]
+                ]
+            ):
                 error = False
                 messages = []
-                for sub_elem in wi_object['list_value']:
+                for sub_elem in wi_object["list_value"]:
                     valid, message = validate_yaml.validate_value(
-                        sub_elem, wi_object['input_type'],
-                        wi_object['position'].split(':')[-1])
+                        sub_elem,
+                        wi_object["input_type"],
+                        wi_object["position"].split(":")[-1],
+                    )
                     if not valid:
                         error = True
                         messages.append((sub_elem, message))
-                        errors.append({'position': wi_object['position'],
-                                       'title': f'Invalid {wi_object["displayName"]}',
-                                       'message': message})
-                wi_object['error'] = error
+                        errors.append(
+                            {
+                                "position": wi_object["position"],
+                                "title": f'Invalid {wi_object["displayName"]}',
+                                "message": message,
+                            }
+                        )
+                wi_object["error"] = error
                 if error:
-                    message = ', '.join(
-                        [f'{msg[0]}: {msg[1]}' for msg in messages])
-                    error_desc = f'{error_desc}' \
-                                 f'{"<br>" if error_desc != "" else ""}' \
-                                 f'<font color="red">{message}</font>'
-                wi_object['desc'] = \
-                    f'{wi_object["backup_desc"]}' \
-                    f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
-                    f'{error_desc}{"<br>" if error_desc != "" else ""}' \
-                    f'{warning_desc}'
+                    message = ", ".join([f"{msg[0]}: {msg[1]}" for msg in messages])
+                    error_desc = (
+                        f"{error_desc}"
+                        f'{"<br>" if error_desc != "" else ""}'
+                        f'<font color="red">{message}</font>'
+                    )
+                wi_object["desc"] = (
+                    f'{wi_object["backup_desc"]}'
+                    f'{"<br>" if wi_object["backup_desc"] != "" else ""}'
+                    f'{error_desc}{"<br>" if error_desc != "" else ""}'
+                    f"{warning_desc}"
+                )
             else:
-                elem, wi_object[
-                    'list_value'], pooled, organisms, warnings, errors, pubmed_ids = \
-                    validate_part(
-                        elem, wi_object['list_value'], warnings, pooled,
-                        organisms, settings, errors, pubmed_ids)
+                (
+                    elem,
+                    wi_object["list_value"],
+                    pooled,
+                    organisms,
+                    warnings,
+                    errors,
+                    pubmed_ids,
+                ) = validate_part(
+                    elem,
+                    wi_object["list_value"],
+                    warnings,
+                    pooled,
+                    organisms,
+                    settings,
+                    errors,
+                    pubmed_ids,
+                )
         else:
-            if 'input_fields' in wi_object:
-                elem, wi_object[
-                    'input_fields'], pooled, organisms, warnings, errors, pubmed_ids = \
-                    validate_part(
-                        elem, wi_object['input_fields'], warnings, pooled,
-                        organisms, settings, errors, pubmed_ids)
+            if "input_fields" in wi_object:
+                (
+                    elem,
+                    wi_object["input_fields"],
+                    pooled,
+                    organisms,
+                    warnings,
+                    errors,
+                    pubmed_ids,
+                ) = validate_part(
+                    elem,
+                    wi_object["input_fields"],
+                    warnings,
+                    pooled,
+                    organisms,
+                    settings,
+                    errors,
+                    pubmed_ids,
+                )
             else:
-                if wi_object['position'].split(':')[-1] == 'pubmed_id' and wi_object['value'] is not None:
-                    pubmed_ids.append(wi_object['value'])
-                if wi_object['value'] is not None and wi_object['value'] != '':
-                    if wi_object['input_type'] == 'date':
-                        value = wi_utils.date_to_str(wi_object['value'])
+                if (
+                    wi_object["position"].split(":")[-1] == "pubmed_id"
+                    and wi_object["value"] is not None
+                ):
+                    pubmed_ids.append(wi_object["value"])
+                if wi_object["value"] is not None and wi_object["value"] != "":
+                    if wi_object["input_type"] == "date":
+                        value = wi_utils.date_to_str(wi_object["value"])
                     else:
-                        value = wi_object['value']
+                        value = wi_object["value"]
                     valid, message = validate_yaml.validate_value(
-                        value, wi_object['input_type'],
-                        wi_object['position'].split(':')[-1])
-                    wi_object['error'] = not valid
+                        value,
+                        wi_object["input_type"],
+                        wi_object["position"].split(":")[-1],
+                    )
+                    wi_object["error"] = not valid
                     if not valid:
-                        errors.append({'position': wi_object["position"],
-                                       'title': f'Invalid {wi_object["displayName"]}',
-                                       'message': message})
-                        error_desc = f'{error_desc}' \
-                                     f'{"<br>" if error_desc != "" else ""}' \
-                                     f'<font color="red">{message}</font>'
+                        errors.append(
+                            {
+                                "position": wi_object["position"],
+                                "title": f'Invalid {wi_object["displayName"]}',
+                                "message": message,
+                            }
+                        )
+                        error_desc = (
+                            f"{error_desc}"
+                            f'{"<br>" if error_desc != "" else ""}'
+                            f'<font color="red">{message}</font>'
+                        )
                     warning = False
                     warn_text = None
-                    warn_title = ''
-                    key = wi_object['position'].split(':')[-1]
-                    if key == 'pooled':
-                        pooled = wi_object['value']
-                    elif key == 'donor_count':
-                        warning, warn_text = \
-                            validate_yaml.validate_donor_count(
-                                pooled, wi_object['value'])
-                        warn_title = 'Illogical donor count'
-                    elif key == 'organism':
-                        organisms.append(wi_object['value'].split(' ')[0])
-                    elif key == 'reference_genome':
-                        warning, warn_text = \
-                            validate_yaml.validate_reference_genome(
-                                organisms, wi_object['value'])
-                        warn_title = 'Illogical reference genome'
-                    wi_object['warning'] = warning
+                    warn_title = ""
+                    key = wi_object["position"].split(":")[-1]
+                    if key == "pooled":
+                        pooled = wi_object["value"]
+                    elif key == "donor_count":
+                        warning, warn_text = validate_yaml.validate_donor_count(
+                            pooled, wi_object["value"]
+                        )
+                        warn_title = "Illogical donor count"
+                    elif key == "organism":
+                        organisms.append(wi_object["value"].split(" ")[0])
+                    elif key == "reference_genome":
+                        warning, warn_text = validate_yaml.validate_reference_genome(
+                            organisms, wi_object["value"]
+                        )
+                        warn_title = "Illogical reference genome"
+                    wi_object["warning"] = warning
                     if warning:
-                        warnings.append({'position': wi_object["position"],
-                                         'title': warn_title,
-                                         'message': warn_text})
-                        warning_desc = \
-                            f'{warning_desc}' \
-                            f'{"<br>" if warning_desc != "" else ""}' \
+                        warnings.append(
+                            {
+                                "position": wi_object["position"],
+                                "title": warn_title,
+                                "message": warn_text,
+                            }
+                        )
+                        warning_desc = (
+                            f"{warning_desc}"
+                            f'{"<br>" if warning_desc != "" else ""}'
                             f'<font color="orange">{warn_text}</font>'
-                    wi_object['desc'] = \
-                        f'{wi_object["backup_desc"]}' \
-                        f'{"<br>" if wi_object["backup_desc"] != "" else ""}' \
-                        f'{error_desc}{"<br>" if error_desc != "" else ""}' \
-                        f'{warning_desc}'
+                        )
+                    wi_object["desc"] = (
+                        f'{wi_object["backup_desc"]}'
+                        f'{"<br>" if wi_object["backup_desc"] != "" else ""}'
+                        f'{error_desc}{"<br>" if error_desc != "" else ""}'
+                        f"{warning_desc}"
+                    )
     elif isinstance(wi_object, list):
         for i in range(len(wi_object)):
-            elem, wi_object[
-                i], pooled, organisms, warnings, errors, pubmed_ids = validate_part(
-                elem, wi_object[i], warnings, pooled, organisms, settings,
-                errors, pubmed_ids)
+            elem, wi_object[i], pooled, organisms, warnings, errors, pubmed_ids = (
+                validate_part(
+                    elem,
+                    wi_object[i],
+                    warnings,
+                    pooled,
+                    organisms,
+                    settings,
+                    errors,
+                    pubmed_ids,
+                )
+            )
     return elem, wi_object, pooled, organisms, warnings, errors, pubmed_ids

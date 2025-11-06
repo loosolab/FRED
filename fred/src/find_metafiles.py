@@ -145,32 +145,34 @@ def print_summary(result, output):
     for elem in result:
         # iterate over metadata IDs
         for key in elem:
-            project_res = {'id': key}
+            project_res = {"id": key}
             try:
                 project_path = elem[key]["path"]
-                project_res['path'] = project_path
+                project_res["path"] = project_path
             except KeyError:
                 project_path = "Not found"
-                project_res['path'] = None
+                project_res["path"] = None
             try:
                 project_name = elem[key]["project"]["project_name"]
-                project_res['project_name'] = project_name
+                project_res["project_name"] = project_name
             except KeyError:
                 project_name = "Not found"
-                project_res['project_name'] = None
+                project_res["project_name"] = None
             try:
                 owner_name = elem[key]["project"]["owner"]["name"]
-                project_res['owner'] = owner_name
+                project_res["owner"] = owner_name
             except KeyError:
                 owner_name = "Not found"
-                project_res['owner'] = None
+                project_res["owner"] = None
 
             try:
-                project_res['email'] = elem[key]['project']['owner']['email']
+                project_res["email"] = elem[key]["project"]["owner"]["email"]
             except KeyError:
-                project_res['email'] = None
+                project_res["email"] = None
 
-            project_res["organisms"] = list(set(list(utils.find_keys(elem[key], "organism_name"))))
+            project_res["organisms"] = list(
+                set(list(utils.find_keys(elem[key], "organism_name")))
+            )
 
             try:
                 project_res["description"] = elem[key]["project"]["description"]
@@ -191,49 +193,51 @@ def print_summary(result, output):
                 project_res["nerd"] = None
 
             try:
-                techniques = elem[key]['technical_details']['techniques']
+                techniques = elem[key]["technical_details"]["techniques"]
                 tech_list = []
                 for tech in techniques:
-                    tech_list += tech['technique']
-                project_res['technique'] = list(set(tech_list))
+                    tech_list += tech["technique"]
+                project_res["technique"] = list(set(tech_list))
             except:
-                project_res['technique'] = None
-            
-            cell_type = list(set(utils.find_keys(elem[key], 'cell_type')))
-            project_res['cell_type'] = cell_type
+                project_res["technique"] = None
+
+            cell_type = list(set(utils.find_keys(elem[key], "cell_type")))
+            project_res["cell_type"] = cell_type
 
             tissue = []
-            
-            tissues = list(utils.find_keys(elem[key], 'tissue'))
+
+            tissues = list(utils.find_keys(elem[key], "tissue"))
             for tis in tissues:
                 tissue += tis
             tissue = list(set(tissue))
-            project_res['tissue'] = tissue
+            project_res["tissue"] = tissue
 
             # treatment
             treatment = []
-            
-            medical = list(utils.find_list_key(elem[key], 'medical_treatment:treatment_type'))
+
+            medical = list(
+                utils.find_list_key(elem[key], "medical_treatment:treatment_type")
+            )
             treatment += list(set(medical))
-            
-            physical = list(utils.find_keys(elem[key], 'physical_treatment'))
+
+            physical = list(utils.find_keys(elem[key], "physical_treatment"))
             treatment += list(set(physical))
-            
-            injury = list(utils.find_list_key(elem[key], 'injury:injury_type'))
+
+            injury = list(utils.find_list_key(elem[key], "injury:injury_type"))
             treatment += list(set(injury))
 
-            project_res['treatment'] = treatment
+            project_res["treatment"] = treatment
 
             # disease
 
-            disease = list(utils.find_list_key(elem[key], 'disease:disease_type'))
-            project_res['disease'] = list(set(disease))
+            disease = list(utils.find_list_key(elem[key], "disease:disease_type"))
+            project_res["disease"] = list(set(disease))
 
-                # add the id, path, project_name and owner to res
+            # add the id, path, project_name and owner to res
             res.append([key, project_path, project_name, owner_name])
             save_res.append(project_res)
 
-    if output == 'print':
+    if output == "print":
         # convert res into a table using tabulate
         # set format to fancy_grid, define the headers as the first row and set the
         # column width to fit to the terminal size
@@ -248,7 +252,7 @@ def print_summary(result, output):
                 size.columns * 1 / 8,
             ],
         )
-    elif output == 'json':
+    elif output == "json":
         res = save_res
     # return the table
     return res

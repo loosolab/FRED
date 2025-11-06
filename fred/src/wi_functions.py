@@ -96,8 +96,11 @@ def get_conditions(pgm_object, factors, organism_name, read_in_whitelists):
 def validate_object(pgm_object, wi_object, read_in_whitelists, finish=False):
     new_object = copy.deepcopy(wi_object)
     return validation.validate_object(
-        new_object, pgm_object["structure"], read_in_whitelists, finish,
-        pgm_object['email']
+        new_object,
+        pgm_object["structure"],
+        read_in_whitelists,
+        finish,
+        pgm_object["email"],
     )
 
 
@@ -115,39 +118,40 @@ def save_object(dictionary, path, filename, edit_state):
 def save_filenames(file_str, path):
     return file_io.save_filenames(file_str, path)
 
+
 def get_plot(pgm_object, config, path, project_id):
     uuid = "".join(
-            random.choice(string.ascii_uppercase + string.digits) for _ in range(5)
-        )
+        random.choice(string.ascii_uppercase + string.digits) for _ in range(5)
+    )
     filename = f"{uuid}_{time.time()}"
     working_path = os.path.join(os.path.dirname(__file__), "..", "..")
     proc = subprocess.Popen(
-            [
-                "python3",
-                "metadata-organizer/metaTools.py",
-                "find",
-                "-p",
-                path,
-                "-s",
-                f'project:id:"{project_id}',
-                "-c",
-                config,
-                "-o",
-                "json",
-                "-f",
-                filename,
-                "-sv",
-            ],
-            cwd=working_path,
-        )
+        [
+            "python3",
+            "metadata-organizer/metaTools.py",
+            "find",
+            "-p",
+            path,
+            "-s",
+            f'project:id:"{project_id}',
+            "-c",
+            config,
+            "-o",
+            "json",
+            "-f",
+            filename,
+            "-sv",
+        ],
+        cwd=working_path,
+    )
     proc.wait()
     res = utils.read_in_json(os.path.join(working_path, f"{filename}.json"))
     os.remove(os.path.join(working_path, f"{filename}.json"))
 
     try:
-        yaml_file = utils.read_in_yaml(res['data'][0]['path'])
+        yaml_file = utils.read_in_yaml(res["data"][0]["path"])
         template = Template(
-        '''              
+            """              
         {% if input.html %}
             {{ input.html }}
         {% else %}            
@@ -162,17 +166,23 @@ def get_plot(pgm_object, config, path, project_id):
                     {% endif %}
             </div>
         {% endif %}
-        '''
+        """
         )
-        plots = create_heatmap.get_heatmap(yaml_file, pgm_object['structure'], show_setting_id=False)
+        plots = create_heatmap.get_heatmap(
+            yaml_file, pgm_object["structure"], show_setting_id=False
+        )
         plot_list = []
         for elem in plots:
             add_plot = {}
             if elem[1] is not None:
-                add_plot['plot'] = elem[1]
+                add_plot["plot"] = elem[1]
             if elem[2] is not None:
-                add_plot['missing_samples'] = html_output.object_to_html(elem[2], 0, False)
-            plot_list.append({'title': elem[0], 'plot': template.render(input=add_plot)})
+                add_plot["missing_samples"] = html_output.object_to_html(
+                    elem[2], 0, False
+                )
+            plot_list.append(
+                {"title": elem[0], "plot": template.render(input=add_plot)}
+            )
     except:
         plot_list = []
     return plot_list
@@ -260,13 +270,13 @@ def find_metadata(config, path, search_string):
     )
     proc.wait()
     subprocess_end = time.time()
-    print(
-        f'Subprocess "FIND" took {"%.2f" % (subprocess_end - start)} seconds.')
+    print(f'Subprocess "FIND" took {"%.2f" % (subprocess_end - start)} seconds.')
     res = utils.read_in_json(os.path.join(working_path, f"{filename}.json"))
     os.remove(os.path.join(working_path, f"{filename}.json"))
     read_end = time.time()
     print(
-        f'Reading and removing the json file took {"%.2f" % (read_end - subprocess_end)} seconds.')
+        f'Reading and removing the json file took {"%.2f" % (read_end - subprocess_end)} seconds.'
+    )
     return res["data"]
 
 
@@ -277,5 +287,4 @@ def edit_wi_object(path, pgm_object, read_in_whitelists):
 # TODO: not needed -> in summary
 def parse_object(pgm_object, wi_object, read_in_whitelists):
     # read in general structure
-    return oty.parse_object(wi_object, pgm_object["structure"],
-                            read_in_whitelists)
+    return oty.parse_object(wi_object, pgm_object["structure"], read_in_whitelists)
