@@ -8,18 +8,18 @@ import string
 import subprocess
 import time
 
-import src.utils as utils
-import src.web_interface.editing as editing
-import src.web_interface.factors_and_conditions as fac_cond
-import src.web_interface.file_io as file_io
-import src.git_whitelists as gwi
-import src.web_interface.html_output as html_output
-import src.web_interface.searching as searching
-import src.web_interface.validation as validation
-import src.web_interface.whitelist_parsing as whitelist_parsing
-import src.web_interface.wi_object_to_yaml as oty
-import src.web_interface.yaml_to_wi_object as yto
-import src.heatmap.create_heatmap as create_heatmap
+import fred.src.utils as utils
+import fred.src.web_interface.editing as editing
+import fred.src.web_interface.factors_and_conditions as fac_cond
+import fred.src.web_interface.file_io as file_io
+import fred.src.git_whitelists as gwi
+import fred.src.web_interface.html_output as html_output
+import fred.src.web_interface.searching as searching
+import fred.src.web_interface.validation as validation
+import fred.src.web_interface.whitelist_parsing as whitelist_parsing
+import fred.src.web_interface.wi_object_to_yaml as oty
+import fred.src.web_interface.yaml_to_wi_object as yto
+import fred.src.heatmap.create_heatmap as create_heatmap
 from jinja2 import Template
 
 # This script contains all functions for generation of objects for the web

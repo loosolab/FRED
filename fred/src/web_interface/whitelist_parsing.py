@@ -1,6 +1,6 @@
 import os
 
-import src.utils as utils
+import fred.src.utils as utils
 
 
 def get_whitelist_object(pgm_object):

@@ -1,5 +1,5 @@
 from src import generate_metafile
-import src.utils as utils
+import fred.src.utils as utils
 import copy
 import os
 

@@ -1,7 +1,7 @@
 import os
 
-import src.file_reading as file_reading
-import src.utils as utils
+import fred.src.file_reading as file_reading
+import fred.src.utils as utils
 from src.generate import Generate
 from tabulate import tabulate
 

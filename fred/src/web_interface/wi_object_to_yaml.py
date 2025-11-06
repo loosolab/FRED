@@ -1,7 +1,7 @@
 import copy
 
-import src.utils as utils
-import src.web_interface.wi_utils as wi_utils
+import fred.src.utils as utils
+import fred.src.web_interface.wi_utils as wi_utils
 import os
 
 

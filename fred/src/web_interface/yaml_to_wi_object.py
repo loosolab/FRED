@@ -1,9 +1,9 @@
 import copy
 
-import src.web_interface.whitelist_parsing as whitelist_parsing
-import src.web_interface.wi_utils as wi_utils
+import fred.src.web_interface.whitelist_parsing as whitelist_parsing
+import fred.src.web_interface.wi_utils as wi_utils
 import datetime
-import src.utils as utils
+import fred.src.utils as utils
 
 # TODO: example of format in wi_object (Keys)
 

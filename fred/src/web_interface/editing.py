@@ -1,7 +1,7 @@
-import src.utils as utils
-import src.web_interface.yaml_to_wi_object as yto
-import src.web_interface.factors_and_conditions as fac_cond
-import src.web_interface.wi_utils as wi_utils
+import fred.src.utils as utils
+import fred.src.web_interface.yaml_to_wi_object as yto
+import fred.src.web_interface.factors_and_conditions as fac_cond
+import fred.src.web_interface.wi_utils as wi_utils
 import copy
 
 disabled_fields = []

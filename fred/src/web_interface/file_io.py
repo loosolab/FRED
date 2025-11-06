@@ -1,4 +1,4 @@
-import src.utils as utils
+import fred.src.utils as utils
 import os
 
 # TODO: comment

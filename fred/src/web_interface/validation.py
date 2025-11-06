@@ -1,7 +1,7 @@
-import src.validate_yaml as validate_yaml
-import src.web_interface.wi_utils as wi_utils
-import src.web_interface.wi_object_to_yaml as oty
-import src.utils as utils
+import fred.src.validate_yaml as validate_yaml
+import fred.src.web_interface.wi_utils as wi_utils
+import fred.src.web_interface.wi_object_to_yaml as oty
+import fred.src.utils as utils
 
 # TODO: rewrite and documentation
 
