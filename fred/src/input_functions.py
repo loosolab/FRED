@@ -1,5 +1,5 @@
 import os
-from src import utils
+from fred.src import utils
 import datetime
 from tabulate import tabulate
 import readline

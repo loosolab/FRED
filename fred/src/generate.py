@@ -1,8 +1,8 @@
-from src.input_functions import Input
-from src.autogenerate import Autogenerate
-from src import validate_yaml
-from src import utils
-from src.heatmap import create_heatmap
+from fred.src.input_functions import Input
+from fred.src.autogenerate import Autogenerate
+from fred.src import validate_yaml
+from fred.src import utils
+from fred.src.heatmap import create_heatmap
 import os
 from jinja2 import Template
 

@@ -1,5 +1,5 @@
 import pandas as pd
-from src import utils
+from fred.src import utils
 import numpy as np
 import re
 

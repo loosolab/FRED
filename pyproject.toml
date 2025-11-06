@@ -30,3 +30,6 @@ license-files = ["LICEN[CS]E*"]
 
 [project.scripts]
 fred = "fred.metaTools:main"
+
+[tool.setuptools.packages.find]
+include = ["fred*"]

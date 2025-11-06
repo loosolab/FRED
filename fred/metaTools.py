@@ -6,13 +6,13 @@ import os
 import time
 
 sys.path.append(os.path.dirname(__file__))
-from src.generate import Generate
-from src import find_metafiles
-from src import validate_yaml
-from src import file_reading
-from src import utils
-from src import git_whitelists
-from src.heatmap import create_heatmap
+from fred.src.generate import Generate
+from fred.src import find_metafiles
+from fred.src import validate_yaml
+from fred.src import file_reading
+from fred.src import utils
+from fred.src import git_whitelists
+from fred.src.heatmap import create_heatmap
 
 
 class FRED:

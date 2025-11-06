@@ -2,7 +2,7 @@ import os
 
 import fred.src.file_reading as file_reading
 import fred.src.utils as utils
-from src.generate import Generate
+from fred.src.generate import Generate
 from tabulate import tabulate
 
 # This scripts implements functions to find metadata files that contain values

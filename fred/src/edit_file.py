@@ -1,4 +1,4 @@
-from src import generate_metafile
+from fred.src import generate_metafile
 import fred.src.utils as utils
 import copy
 import os

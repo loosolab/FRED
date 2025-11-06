@@ -1,6 +1,6 @@
 import plotly.graph_objects as go
 import fred.src.utils as utils
-from src.heatmap.dash_utils import *
+from fred.src.heatmap.dash_utils import *
 import plotly.express as px
 import os
 import base64
