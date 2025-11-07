@@ -54,11 +54,18 @@ def parse_config(config_file):
         missing_keys.append("branch")
     try:
         whitelist_path = config["whitelist_path"]
+        if whitelist_path == "fred":
+            whitelist_path = os.path.join(
+                os.path.dirname(__file__), "..", "..", "FRED_whitelists"
+            )
+        else:
+            whitelist_path = os.path.join(whitelist_path, "FRED_whitelists")
     except KeyError:
         whitelist_path = os.path.join(
             os.path.dirname(__file__), "..", "..", "FRED_whitelists"
         )
         missing_keys.append("whitelist_path")
+    print('Whitelist path', os.path.abspath(whitelist_path))
     try:
         update_whitelists = config["update_whitelists"]
     except KeyError:

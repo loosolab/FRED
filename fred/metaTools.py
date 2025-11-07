@@ -30,12 +30,6 @@ class FRED:
             self.filename,
             self.email,
         ) = utils.parse_config(config)
-        if self.whitelist_path == "fred":
-            self.whitelist_path = os.path.join(
-                os.path.dirname(__file__), "FRED_whitelists"
-            )
-        else:
-            self.whitelist_path = os.path.join(self.whitelist_path, "FRED_whitelists")
         self.fetch_whitelists()
         self.structure = utils.read_in_yaml(structure)
 
