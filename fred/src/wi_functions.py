@@ -187,6 +187,18 @@ def get_plot(pgm_object, config, path, project_id):
         plot_list = []
     return plot_list
 
+def download_plot(pgm_object, finished_yaml):
+    plots = create_heatmap.get_heatmap(
+                    finished_yaml, pgm_object["structure"], show_setting_id=True, labels="all", background=True
+                )
+    filenames = []
+    for i in range(len(plots)):
+        if plots[i][1] is not None:
+            filename = f'{plots[i][0]}_{i}.png'
+            plots[i][1].write_image(f"{filename}", format="png")
+            filenames.append(filename)
+    return filenames
+
 
 # TODO: fix path
 def get_meta_info(config, path, project_ids):
