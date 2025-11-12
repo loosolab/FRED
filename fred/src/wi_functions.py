@@ -192,9 +192,13 @@ def download_plot(pgm_object, finished_yaml, save_path):
                     finished_yaml, pgm_object["structure"], show_setting_id=True, labels="all", background=True
                 )
     filenames = []
+    try:
+        project_id = finished_yaml['project']['id']
+    except KeyError:
+        project_id = 'missingID'
     for i in range(len(plots)):
         if plots[i][1] is not None:
-            filename = f'{plots[i][0]}_{i}.png'
+            filename = f'{project_id}_{plots[i][0]}.png'
             plots[i][1].write_image(os.path.join(save_path, filename), format="png")
             filenames.append(filename)
     return filenames
