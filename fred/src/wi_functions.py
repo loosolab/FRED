@@ -187,7 +187,7 @@ def get_plot(pgm_object, config, path, project_id):
         plot_list = []
     return plot_list
 
-def download_plot(pgm_object, finished_yaml):
+def download_plot(pgm_object, finished_yaml, save_path):
     plots = create_heatmap.get_heatmap(
                     finished_yaml, pgm_object["structure"], show_setting_id=True, labels="all", background=True
                 )
@@ -195,7 +195,7 @@ def download_plot(pgm_object, finished_yaml):
     for i in range(len(plots)):
         if plots[i][1] is not None:
             filename = f'{plots[i][0]}_{i}.png'
-            plots[i][1].write_image(f"{filename}", format="png")
+            plots[i][1].write_image(os.path.join(save_path, filename), format="png")
             filenames.append(filename)
     return filenames
 
@@ -297,6 +297,6 @@ def edit_wi_object(path, pgm_object, read_in_whitelists):
 
 
 # TODO: not needed -> in summary
-def parse_object(pgm_object, wi_object, read_in_whitelists):
+def parse_object(pgm_object, wi_object, read_in_whitelists, return_id=False):
     # read in general structure
-    return oty.parse_object(wi_object, pgm_object["structure"], read_in_whitelists)
+    return oty.parse_object(wi_object, pgm_object["structure"], read_in_whitelists, return_id=return_id)

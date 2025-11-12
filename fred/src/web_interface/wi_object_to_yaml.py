@@ -5,7 +5,7 @@ import fred.src.web_interface.wi_utils as wi_utils
 import os
 
 
-def parse_object(wi_object, key_yaml, read_in_whitelists):
+def parse_object(wi_object, key_yaml, read_in_whitelists, return_id=False):
     """
     This function parses a wi object back into a yaml
     :param key_yaml: the read in general structure
@@ -96,7 +96,10 @@ def parse_object(wi_object, key_yaml, read_in_whitelists):
             result,
         )
 
-    return result
+    if return_id:
+        return (project_id, result)
+    else:
+        return result
 
 
 def get_filename_positions(metafile):
