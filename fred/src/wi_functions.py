@@ -127,8 +127,7 @@ def get_plot(pgm_object, config, path, project_id):
     working_path = os.path.join(os.path.dirname(__file__), "..", "..")
     proc = subprocess.Popen(
         [
-            "python3",
-            "metadata-organizer/metaTools.py",
+            "fred",
             "find",
             "-p",
             path,
@@ -220,8 +219,7 @@ def get_meta_info(config, path, project_ids):
         working_path = os.path.join(os.path.dirname(__file__), "..", "..")
         proc = subprocess.Popen(
             [
-                "python3",
-                "metadata-organizer/metaTools.py",
+                "fred",
                 "find",
                 "-p",
                 path,
@@ -267,8 +265,7 @@ def find_metadata(config, path, search_string):
     working_path = os.path.join(os.path.dirname(__file__), "..", "..")
     proc = subprocess.Popen(
         [
-            "python3",
-            "metadata-organizer/metaTools.py",
+            "fred",
             "find",
             "-p",
             path,
