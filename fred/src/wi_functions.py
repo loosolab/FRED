@@ -512,7 +512,15 @@ def get_metadata_search_view(metadata_path):
     except KeyError:
         res["email"] = None
 
-    res["organisms"] = list(utils.find_keys(metadata, "organism_name"))
+    res["organisms"] = list(set(utils.find_keys(metadata, "organism_name")))
+
+    technique = []
+
+    techniques = list(utils.find_keys(metadata, "technique"))
+    for elem in techniques:
+        technique += elem
+    technique = list(set(technique))
+    res['technique'] = technique
 
     try:
         res["description"] = metadata["project"]["description"]
