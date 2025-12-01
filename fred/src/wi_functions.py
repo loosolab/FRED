@@ -301,3 +301,275 @@ def edit_wi_object(path, pgm_object, read_in_whitelists):
 def parse_object(pgm_object, wi_object, read_in_whitelists, return_id=False):
     # read in general structure
     return oty.parse_object(wi_object, pgm_object["structure"], read_in_whitelists, return_id=return_id)
+
+
+def parse_search_string_to_query(search_string, structure):
+    query = ""
+    sub_list = ""
+    sub = ""
+
+    # set brace_count to 0 meaning that there is currently no open
+    # brace
+    brace_count = 0
+
+    # iterate over search string
+    for letter in search_string:
+
+        # if an opening bracket is reached, add 1 to brace_count, add
+        # the string within sub to the sub_list and set sub to an empty
+        # string
+        if letter == "(":
+            brace_count += 1
+            sub_list += sub
+            sub = ""
+
+        # if a closing bracket is reached, subtract 1 from brace_count
+        elif letter == ")":
+            brace_count -= 1
+
+            if sub != "":
+                res = parse_string_to_query_dict(sub, structure)
+                print('da', sub, res)
+                sub_list += res
+
+            # set sub to an empty string again
+            sub = ""
+
+        else:
+
+            # add the current character of the search string to sub
+            sub += letter
+
+    print(sub_list)
+    sub_list = parse_string_to_query_dict(sub_list, structure)
+    # add a dictionary containing information about the metadata file
+    # to result if it matches the search
+    # key: project id
+    # value: whole metafile or path to metafile depending on whether
+    # result_dict is set to True or False
+    
+    return sub_list
+
+
+def get_text_keys(structure, pre=''):
+    keys =  []
+    for key in structure:
+        if 'input_type' in structure[key]:
+            if structure[key]['input_type'] in ['short_text', 'long_text', 'select']:
+                keys.append(f'{pre}.{key}'.strip('.'))
+        else:
+            if 'value' in structure[key] and isinstance(structure[key]['value'], dict):
+                keys += get_text_keys(structure[key]['value'], key)
+    return keys
+
+def get_all_query(structure, value):
+    keys = get_text_keys(structure)
+    key_query =  []
+    for key in keys:
+        key_query.append(f'{"{"} "{key}": {"{"} "$regex": "{value}", "$options": "i" {"}"} {"}"}')
+    
+    return key_query
+    
+
+
+def parse_string_to_query_dict(string, structure, all_keys=None):
+    if ' or ' in string:
+        or_vals = string.split(' or ')
+        for i in range(len(or_vals)):
+            if not or_vals[i].startswith('{ '):
+                if 'and' in or_vals[i]:
+                    and_vals = or_vals[i].split(' and ')
+                    for j in range(len(and_vals)):
+                        if not and_vals[j].startswith('{ '):
+                            is_not = False
+                            if and_vals[j].strip().startswith('not '):
+                                and_vals[j] = and_vals[j].split('not ')[1].strip()
+                                is_not = True
+                            if '"' in and_vals[j]:
+                                key, value = and_vals[j].rstrip('"').split('"')
+                                if key != '':
+                                    key = key.replace(':', '.').rstrip('.')
+                                    value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                                else:
+                                    if all_keys is None:
+                                        all_keys = get_all_query(structure, value)
+                                    key = "$or"
+                                    value = f'[ {", ".join(all_keys)} ]'
+                            else:
+                                if all_keys is None:
+                                    all_keys = get_all_query(structure, value)
+                                key = "$or"
+                                value = f'[ {", ".join(all_keys)} ]'
+                            if is_not:
+                                and_vals[j] = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
+                            else:
+                                and_vals[j] = f'{"{"} "{key}": {value} {"}"}'
+                    or_vals[i] = f'{"{"} "$and": [ {", ".join(and_vals)} ] {"}"}'
+                else:
+                    is_not = False
+                    if or_vals[i].strip().startswith('not '):
+                        or_vals[i] = or_vals[i].split('not ')[1].strip()
+                        is_not = True
+                    if '"' in or_vals[i]:
+                        key, value = or_vals[i].rstrip('"').split('"')
+                        if key != '':
+                            key = key.replace(':', '.').rstrip('.')
+                            value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                        else:
+                            if all_keys is None:
+                                all_keys = get_all_query(structure, value)
+                            key = "$or"
+                            value = f'[ {", ".join(all_keys)} ]'
+                    else:
+                        if all_keys is None:
+                            all_keys = get_all_query(structure, value)
+                        key = "$or"
+                        value = f'[ {", ".join(all_keys)} ]'
+                    if is_not:
+                        or_vals[i] = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
+                    else:
+                        or_vals[i] = f'{"{"} "{key}": {value} {"}"}'
+        res = f'{"{"} "$or": [ {", ".join(or_vals)} ] {"}"}'
+    elif ' and ' in string:
+        and_vals = string.split(' and ')
+        for i in range(len(and_vals)):
+            if not and_vals[i].startswith('{ '):
+                is_not = False
+                if and_vals[i].strip().startswith('not '):
+                    and_vals[i] = and_vals[i].split('not ')[1].strip()
+                    is_not = True
+                if '"' in and_vals[i]:
+                    key, value = and_vals[i].rstrip('"').split('"')
+                    if key != '':
+                        key = key.replace(':', '.').rstrip('.') 
+                        value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                    else:
+                        if all_keys is None:
+                            all_keys = get_all_query(structure, value)
+                        key = "$or"
+                        alue = f'[ {", ".join(all_keys)} ]'
+                else:
+                    if all_keys is None:
+                        all_keys = get_all_query(structure, value)
+                    key = "$or"
+                    value = f'[ {", ".join(all_keys)} ]'
+                if is_not:
+                    and_vals[i] = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
+                else:
+                    and_vals[i] = f'{"{"} "{key}": {value} {"}"}'
+        res = f'{"{"} "$and": [ {", ".join(and_vals)} ] {"}"}'
+    else:
+        is_not = False
+        if not string.startswith('{ '):
+            if string.strip().startswith('not '):
+                string = string.split('not ')[1].strip()
+                is_not = True
+            if '"' in string:
+                key, value = string.rstrip('"').split('"')
+                if key != '':
+                    key = key.replace(':', '.').rstrip('.') 
+                else:
+                    if all_keys is None:
+                        all_keys = get_all_query(structure, value)
+                    key = "$or"
+                    value = f'[ {", ".join(all_keys)} ]'
+            else:
+                if all_keys is None:
+                    all_keys = get_all_query(structure, value)
+                key = "$or"
+                value = f'[ {", ".join(all_keys)} ]'
+            if is_not:
+                res = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
+            else:
+                res = f'{"{"} "{key}": {value} {"}"}'
+        else:
+            res=string
+    return res
+            
+
+def get_metadata_search_view(metadata_path):
+
+    metadata = utils.read_in_yaml(metadata_path)
+    res = {}
+
+    try:
+        res["id"] = metadata["project"]["id"]
+    except KeyError:
+        res["id"] = None
+    
+    try:
+        res["project_name"] = metadata["project"]["project_name"]
+    except KeyError:
+        res["project_name"] = None
+
+    try:
+        res["owner"] = metadata["project"]["owner"]["name"]
+    except KeyError:
+        res["owner"] = None
+
+    try:
+        res["email"] = metadata["project"]["owner"]["email"]
+    except KeyError:
+        res["email"] = None
+
+    res["organisms"] = list(utils.find_keys(metadata, "organism_name"))
+
+    try:
+        res["description"] = metadata["project"]["description"]
+    except KeyError:
+        res["description"] = None
+
+    try:
+        res["date"] = metadata["project"]["date"]
+    except KeyError:
+        res["date"] = None
+
+    if "nerd" in metadata["project"]:
+        nerds = []
+        for nerd in metadata["project"]["nerd"]:
+            nerds.append(nerd["name"])
+        res["nerd"] = nerds
+    else:
+        res["nerd"] = None
+
+    cell_type = list(set(utils.find_keys(metadata, "cell_type")))
+    res["cell_type"] = cell_type
+
+    tissue = []
+
+    tissues = list(utils.find_keys(metadata, "tissue"))
+    for elem in tissues:
+        tissue += elem
+    tissue = list(set(tissue))
+    res["tissue"] = tissue
+
+    # treatment
+    treatment = []
+
+    medical = list(
+        utils.find_list_key(metadata, "medical_treatment:treatment_type")
+    )
+    treatment += list(set(medical))
+
+    physical = list(utils.find_keys(metadata, "physical_treatment"))
+    treatment += list(set(physical))
+
+    injury = list(utils.find_list_key(metadata, "injury:injury_type"))
+    treatment += list(set(injury))
+
+    res["treatment"] = treatment
+
+    # disease
+
+    disease = list(utils.find_list_key(metadata, "disease:disease_type"))
+    res["disease"] = list(set(disease))
+
+    return res
+
+def read_metadata(path):
+    return utils.read_in_yaml(path)
+
+def get_metadata(path):
+    full_metadata = utils.read_in_yaml(path)
+    search_view = get_metadata_search_view(path)
+    return full_metadata, search_view
