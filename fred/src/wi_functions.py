@@ -304,6 +304,9 @@ def parse_object(pgm_object, wi_object, read_in_whitelists, return_id=False):
 
 
 def parse_search_string_to_query(search_string, structure):
+    if not search_string.startswith("("):
+        search_string = f'({search_string})'
+
     query = ""
     sub_list = ""
     sub = ""
@@ -329,7 +332,6 @@ def parse_search_string_to_query(search_string, structure):
 
             if sub != "":
                 res = parse_string_to_query_dict(sub, structure)
-                print('da', sub, res)
                 sub_list += res
 
             # set sub to an empty string again
@@ -340,7 +342,6 @@ def parse_search_string_to_query(search_string, structure):
             # add the current character of the search string to sub
             sub += letter
 
-    print(sub_list)
     sub_list = parse_string_to_query_dict(sub_list, structure)
     # add a dictionary containing information about the metadata file
     # to result if it matches the search
@@ -362,8 +363,7 @@ def get_text_keys(structure, pre=''):
                 keys += get_text_keys(structure[key]['value'], key)
     return keys
 
-def get_all_query(structure, value):
-    keys = get_text_keys(structure)
+def get_all_query(keys, value):
     key_query =  []
     for key in keys:
         key_query.append(f'{"{"} "{key}": {"{"} "$regex": "{value}", "$options": "i" {"}"} {"}"}')
@@ -392,14 +392,14 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                                     value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
                                 else:
                                     if all_keys is None:
-                                        all_keys = get_all_query(structure, value)
+                                        all_keys = get_text_keys(structure)
                                     key = "$or"
-                                    value = f'[ {", ".join(all_keys)} ]'
+                                    value = f'[ {", ".join(get_all_query(all_keys, and_vals[j]))} ]'
                             else:
                                 if all_keys is None:
-                                    all_keys = get_all_query(structure, value)
+                                    all_keys = get_text_keys(structure)
                                 key = "$or"
-                                value = f'[ {", ".join(all_keys)} ]'
+                                value = f'[ {", ".join(get_all_query(all_keys, and_vals[j]))} ]'
                             if is_not:
                                 and_vals[j] = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
                             else:
@@ -417,14 +417,14 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                             value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
                         else:
                             if all_keys is None:
-                                all_keys = get_all_query(structure, value)
+                                all_keys = get_text_keys(structure)
                             key = "$or"
-                            value = f'[ {", ".join(all_keys)} ]'
+                            value = f'[ {", ".join(get_all_query(all_keys, or_vals[i]))} ]'
                     else:
                         if all_keys is None:
-                            all_keys = get_all_query(structure, value)
+                            all_keys = get_text_keys(structure)
                         key = "$or"
-                        value = f'[ {", ".join(all_keys)} ]'
+                        value = f'[ {", ".join(get_all_query(all_keys, or_vals[i]))} ]'
                     if is_not:
                         or_vals[i] = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
                     else:
@@ -445,14 +445,14 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                         value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
                     else:
                         if all_keys is None:
-                            all_keys = get_all_query(structure, value)
+                            all_keys = get_text_keys(structure)
                         key = "$or"
-                        alue = f'[ {", ".join(all_keys)} ]'
+                        alue = f'[ {", ".join(get_all_query(all_keys, and_vals[i]))} ]'
                 else:
                     if all_keys is None:
-                        all_keys = get_all_query(structure, value)
+                        all_keys = get_text_keys(structure)
                     key = "$or"
-                    value = f'[ {", ".join(all_keys)} ]'
+                    value = f'[ {", ".join(get_all_query(all_keys, and_vals[i]))} ]'
                 if is_not:
                     and_vals[i] = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
                 else:
@@ -470,14 +470,14 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                     key = key.replace(':', '.').rstrip('.') 
                 else:
                     if all_keys is None:
-                        all_keys = get_all_query(structure, value)
+                        all_keys = get_text_keys(structure)
                     key = "$or"
-                    value = f'[ {", ".join(all_keys)} ]'
+                    value = f'[ {", ".join(get_all_query(all_keys, string))} ]'
             else:
                 if all_keys is None:
-                    all_keys = get_all_query(structure, value)
+                    all_keys = get_text_keys(structure)
                 key = "$or"
-                value = f'[ {", ".join(all_keys)} ]'
+                value = f'[ {", ".join(get_all_query(all_keys, string))} ]'
             if is_not:
                 res = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
             else:
