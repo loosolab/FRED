@@ -7,6 +7,7 @@ import random
 import string
 import subprocess
 import time
+import json
 
 import fred.src.utils as utils
 import fred.src.web_interface.editing as editing
@@ -348,8 +349,8 @@ def parse_search_string_to_query(search_string, structure):
     # key: project id
     # value: whole metafile or path to metafile depending on whether
     # result_dict is set to True or False
-    
-    return sub_list
+    d = json.loads(sub_list)
+    return d
 
 
 def get_text_keys(structure, pre=''):
@@ -468,6 +469,7 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                 key, value = string.rstrip('"').split('"')
                 if key != '':
                     key = key.replace(':', '.').rstrip('.') 
+                    value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
                 else:
                     if all_keys is None:
                         all_keys = get_text_keys(structure)
