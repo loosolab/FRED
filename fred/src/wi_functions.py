@@ -120,70 +120,82 @@ def save_filenames(file_str, path):
     return file_io.save_filenames(file_str, path)
 
 
-def get_plot(pgm_object, config, path, project_id):
-    uuid = "".join(
-        random.choice(string.ascii_uppercase + string.digits) for _ in range(5)
-    )
-    filename = f"{uuid}_{time.time()}"
-    working_path = os.path.join(os.path.dirname(__file__), "..", "..")
-    proc = subprocess.Popen(
-        [
-            "fred",
-            "find",
-            "-p",
-            path,
-            "-s",
-            f'project:id:"{project_id}',
-            "-c",
-            config,
-            "-o",
-            "json",
-            "-f",
-            filename,
-            "-sv",
-        ],
-        cwd=working_path,
-    )
-    proc.wait()
-    res = utils.read_in_json(os.path.join(working_path, f"{filename}.json"))
-    os.remove(os.path.join(working_path, f"{filename}.json"))
+def get_plot(pgm_object, config=None, path=None, project_id=None, object=None):
 
-    try:
-        yaml_file = utils.read_in_yaml(res["data"][0]["path"])
-        template = Template(
-            """              
-        {% if input.html %}
-            {{ input.html }}
-        {% else %}            
-            <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
-                    {% if input.plot %}
-                        {{ input.plot }}
-                    {% endif %}
-                    
-                    {% if input.missing_samples %}
-                        <i>Conditions without samples:</i>
-                        {{ input.missing_samples }}
-                    {% endif %}
-            </div>
-        {% endif %}
-        """
+    if object is not None:
+        yaml_file = object
+    elif config is not None and path is not None and project_id is not None:
+        uuid = "".join(
+            random.choice(string.ascii_uppercase + string.digits) for _ in range(5)
         )
-        plots = create_heatmap.get_heatmap(
-            yaml_file, pgm_object["structure"], show_setting_id=False
+        filename = f"{uuid}_{time.time()}"
+        working_path = os.path.join(os.path.dirname(__file__), "..", "..")
+        proc = subprocess.Popen(
+            [
+                "fred",
+                "find",
+                "-p",
+                path,
+                "-s",
+                f'project:id:"{project_id}',
+                "-c",
+                config,
+                "-o",
+                "json",
+                "-f",
+                filename,
+                "-sv",
+            ],
+            cwd=working_path,
         )
-        plot_list = []
-        for elem in plots:
-            add_plot = {}
-            if elem[1] is not None:
-                add_plot["plot"] = elem[1]
-            if elem[2] is not None:
-                add_plot["missing_samples"] = html_output.object_to_html(
-                    elem[2], 0, False
-                )
-            plot_list.append(
-                {"title": elem[0], "plot": template.render(input=add_plot)}
+        proc.wait()
+        res = utils.read_in_json(os.path.join(working_path, f"{filename}.json"))
+        os.remove(os.path.join(working_path, f"{filename}.json"))
+        try:
+            yaml_file = utils.read_in_yaml(res["data"][0]["path"])
+        except:
+            yaml_file = None
+    else: 
+        yaml_file = None
+
+    if yaml_file:
+        try:
+            template = Template(
+                """              
+            {% if input.html %}
+                {{ input.html }}
+            {% else %}            
+                <div style="overflow:auto; overflow-y:hidden; margin:0 auto; white-space:nowrap; padding-top:20">
+                        {% if input.plot %}
+                            {{ input.plot }}
+                        {% endif %}
+                        
+                        {% if input.missing_samples %}
+                            <i>Conditions without samples:</i>
+                            {{ input.missing_samples }}
+                        {% endif %}
+                </div>
+            {% endif %}
+            """
             )
-    except:
+            plots = create_heatmap.get_heatmap(
+                yaml_file, pgm_object["structure"], show_setting_id=False
+            )
+            plot_list = []
+            for elem in plots:
+                add_plot = {}
+                if elem[1] is not None:
+                    add_plot["plot"] = elem[1]
+                if elem[2] is not None:
+                    add_plot["missing_samples"] = html_output.object_to_html(
+                        elem[2], 0, False
+                    )
+                plot_list.append(
+                    {"title": elem[0], "plot": template.render(input=add_plot)}
+                )
+        except:
+            plot_list = []
+    else:
         plot_list = []
     return plot_list
 
@@ -202,6 +214,13 @@ def download_plot(pgm_object, finished_yaml, save_path):
             plots[i][1].write_image(os.path.join(save_path, filename), format="png")
             filenames.append(filename)
     return filenames
+
+def get_meta_info_from_object(object):
+    try:
+        project_id = object['project']['id']
+    except KeyError:
+        project_id = ''
+    return searching.get_html_str('', object, project_id, None)
 
 
 # TODO: fix path
