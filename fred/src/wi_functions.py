@@ -161,7 +161,7 @@ def get_plot(pgm_object, config=None, path=None, project_id=None, object=None):
     if yaml_file:
         try:
             template = Template(
-                """              
+            '''             
             {% if input.html %}
                 {{ input.html }}
             {% else %}            
@@ -176,7 +176,7 @@ def get_plot(pgm_object, config=None, path=None, project_id=None, object=None):
                         {% endif %}
                 </div>
             {% endif %}
-            """
+            '''
             )
             plots = create_heatmap.get_heatmap(
                 yaml_file, pgm_object["structure"], show_setting_id=False
