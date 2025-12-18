@@ -493,7 +493,7 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                     if all_keys is None:
                         all_keys = get_text_keys(structure)
                     key = "$or"
-                    value = f'[ {", ".join(get_all_query(all_keys, string))} ]'
+                    value = f'[ {", ".join(get_all_query(all_keys, value))} ]'
             else:
                 if all_keys is None:
                     all_keys = get_text_keys(structure)
