@@ -408,22 +408,43 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                             if '"' in and_vals[j]:
                                 key, value = and_vals[j].rstrip('"').split('"')
                                 if key != '':
-                                    key = key.replace(':', '.').rstrip('.')
-                                    value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                                    end_key = key.rstrip(':').split(':')[-1]
+                                    start_key = '.'.join(key.rstrip(':').split(':')[:-1])
+                                    key_params = list(utils.find_keys(structure, end_key))
+                                    if len(key_params) > 0 and 'special_case' in key_params[0] and 'merge' in key_params[0]['special_case']:
+                                        key_params = key_params[0]
+                                        if 'value' in key_params:
+                                            sub_keys = [k for k in key_params['value']]
+                                            sub_values = value.split(' ')
+                                            sub_and_vals = []
+                                            for sv in sub_values:
+                                               sub_or_vals = []
+                                               for sk in sub_keys:
+                                                   full_key = f'{start_key}.{end_key}.{sk}'
+                                                   sub_or_vals.append(f'{"{"} "{full_key}": {"{"} "$regex": "{sv}", "$options": "i" {"}"} {"}"}') 
+                                               sub_and_value = f'[ {", ".join(sub_or_vals)} ]'
+                                               sub_and_vals.append(f'{"{"} "$or": {sub_and_value} {"}"}')
+                                        sub_and_value = f'[ {", ".join(sub_and_vals)} ]'
+                                        search_val = f'"$and": {sub_and_value}'
+                                    else:
+                                        key = key.replace(':', '.').rstrip('.')
+                                        value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                                        search_val = f'"{key}": {value}'
                                 else:
                                     if all_keys is None:
                                         all_keys = get_text_keys(structure)
-                                    key = "$or"
                                     value = f'[ {", ".join(get_all_query(all_keys, and_vals[j]))} ]'
+                                    search_val = f'"$or": {value}'
                             else:
                                 if all_keys is None:
                                     all_keys = get_text_keys(structure)
                                 key = "$or"
                                 value = f'[ {", ".join(get_all_query(all_keys, and_vals[j]))} ]'
+                                search_val = f'"{key}": {value}'
                             if is_not:
-                                and_vals[j] = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
+                                and_vals[j] = f'{"{"} "$not": {"{"} {search_val} {"}"} {"}"}'
                             else:
-                                and_vals[j] = f'{"{"} "{key}": {value} {"}"}'
+                                and_vals[j] = f'{"{"} {search_val} {"}"}'
                     or_vals[i] = f'{"{"} "$and": [ {", ".join(and_vals)} ] {"}"}'
                 else:
                     is_not = False
@@ -433,22 +454,48 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                     if '"' in or_vals[i]:
                         key, value = or_vals[i].rstrip('"').split('"')
                         if key != '':
-                            key = key.replace(':', '.').rstrip('.')
-                            value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                            end_key = key.rstrip(':').split(':')[-1]
+                            start_key = '.'.join(key.rstrip(':').split(':')[:-1])
+                            key_params = list(utils.find_keys(structure, end_key))
+                            if len(key_params) > 0 and 'special_case' in key_params[0] and 'merge' in key_params[0]['special_case']:
+                                key_params = key_params[0]
+                                if 'value' in key_params:
+                                    sub_keys = [k for k in key_params['value']]
+                                    sub_values = value.split(' ')
+                                    sub_and_vals = []
+                                    for sv in sub_values:
+                                        sub_or_vals = []
+                                        for sk in sub_keys:
+                                            full_key = f'{start_key}.{end_key}.{sk}'
+                                            sub_or_vals.append(f'{"{"} "{full_key}": {"{"} "$regex": "{sv}", "$options": "i" {"}"} {"}"}') 
+                                        sub_and_value = f'[ {", ".join(sub_or_vals)} ]'
+                                        sub_and_vals.append(f'{"{"} "$or": {sub_and_value} {"}"}')
+                                    sub_and_value = f'[ {", ".join(sub_and_vals)} ]'
+                                    search_val = f'"$and": {sub_and_value}'
+                                else:
+                                    key = key.replace(':', '.').rstrip('.')
+                                    value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                                    search_val = f'"{key}": {value}'
+                            else:
+                                key = key.replace(':', '.').rstrip('.')
+                                value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                                search_val = f'"{key}": {value}'
                         else:
                             if all_keys is None:
                                 all_keys = get_text_keys(structure)
                             key = "$or"
                             value = f'[ {", ".join(get_all_query(all_keys, or_vals[i]))} ]'
+                            search_val = f'"{key}": {value}'
                     else:
                         if all_keys is None:
                             all_keys = get_text_keys(structure)
                         key = "$or"
                         value = f'[ {", ".join(get_all_query(all_keys, or_vals[i]))} ]'
+                        search_val = f'"{key}": {value}'
                     if is_not:
-                        or_vals[i] = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
+                        or_vals[i] = f'{"{"} "$not": {"{"} {search_val} {"}"} {"}"}'
                     else:
-                        or_vals[i] = f'{"{"} "{key}": {value} {"}"}'
+                        or_vals[i] = f'{"{"} {search_val} {"}"}'
         res = f'{"{"} "$or": [ {", ".join(or_vals)} ] {"}"}'
     elif ' and ' in string:
         and_vals = string.split(' and ')
@@ -461,22 +508,48 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                 if '"' in and_vals[i]:
                     key, value = and_vals[i].rstrip('"').split('"')
                     if key != '':
-                        key = key.replace(':', '.').rstrip('.') 
-                        value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                        end_key = key.rstrip(':').split(':')[-1]
+                        start_key = '.'.join(key.rstrip(':').split(':')[:-1])
+                        key_params = list(utils.find_keys(structure, end_key))
+                        if len(key_params) > 0 and 'special_case' in key_params[0] and 'merge' in key_params[0]['special_case']:
+                            key_params = key_params[0]
+                            if 'value' in key_params:
+                                sub_keys = [k for k in key_params['value']]
+                                sub_values = value.split(' ')
+                                sub_and_vals = []
+                                for sv in sub_values:
+                                    sub_or_vals = []
+                                    for sk in sub_keys:
+                                        full_key = f'{start_key}.{end_key}.{sk}'
+                                        sub_or_vals.append(f'{"{"} "{full_key}": {"{"} "$regex": "{sv}", "$options": "i" {"}"} {"}"}') 
+                                    sub_and_value = f'[ {", ".join(sub_or_vals)} ]'
+                                    sub_and_vals.append(f'{"{"} "$or": {sub_and_value} {"}"}')
+                                sub_and_value = f'[ {", ".join(sub_and_vals)} ]'
+                                search_val = f'"$and": {sub_and_value}'
+                            else:
+                                key = key.replace(':', '.').rstrip('.')
+                                value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                                search_val = f'"{key}": {value}'
+                        else:
+                            key = key.replace(':', '.').rstrip('.') 
+                            value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                            search_val = f'"{key}": {value}'
                     else:
                         if all_keys is None:
                             all_keys = get_text_keys(structure)
                         key = "$or"
                         value = f'[ {", ".join(get_all_query(all_keys, and_vals[i]))} ]'
+                        search_val = f'"{key}": {value}'
                 else:
                     if all_keys is None:
                         all_keys = get_text_keys(structure)
                     key = "$or"
                     value = f'[ {", ".join(get_all_query(all_keys, and_vals[i]))} ]'
+                    search_val = f'"{key}": {value}'
                 if is_not:
-                    and_vals[i] = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
+                    and_vals[i] = f'{"{"} "$not": {"{"} {search_val} {"}"} {"}"}'
                 else:
-                    and_vals[i] = f'{"{"} "{key}": {value} {"}"}'
+                    and_vals[i] = f'{"{"} {search_val} {"}"}'
         res = f'{"{"} "$and": [ {", ".join(and_vals)} ] {"}"}'
     else:
         is_not = False
@@ -487,22 +560,48 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
             if '"' in string:
                 key, value = string.rstrip('"').split('"')
                 if key != '':
-                    key = key.replace(':', '.').rstrip('.') 
-                    value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                    end_key = key.rstrip(':').split(':')[-1]
+                    start_key = '.'.join(key.rstrip(':').split(':')[:-1])
+                    key_params = list(utils.find_keys(structure, end_key))
+                    if len(key_params) > 0 and 'special_case' in key_params[0] and 'merge' in key_params[0]['special_case']:
+                        key_params = key_params[0]
+                        if 'value' in key_params:
+                            sub_keys = [k for k in key_params['value']]
+                            sub_values = value.split(' ')
+                            sub_and_vals = []
+                            for sv in sub_values:
+                                sub_or_vals = []
+                                for sk in sub_keys:
+                                    full_key = f'{start_key}.{end_key}.{sk}'
+                                    sub_or_vals.append(f'{"{"} "{full_key}": {"{"} "$regex": "{sv}", "$options": "i" {"}"} {"}"}') 
+                                sub_and_value = f'[ {", ".join(sub_or_vals)} ]'
+                                sub_and_vals.append(f'{"{"} "$or": {sub_and_value} {"}"}')
+                            sub_and_value = f'[ {", ".join(sub_and_vals)} ]'
+                            search_val = f'"$and": {sub_and_value}'
+                        else:
+                            key = key.replace(':', '.').rstrip('.')
+                            value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                            search_val = f'"{key}": {value}'
+                    else:
+                        key = key.replace(':', '.').rstrip('.') 
+                        value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
+                        search_val = f'"{key}": {value}'
                 else:
                     if all_keys is None:
                         all_keys = get_text_keys(structure)
                     key = "$or"
                     value = f'[ {", ".join(get_all_query(all_keys, value))} ]'
+                    search_val = f'"{key}": {value}'
             else:
                 if all_keys is None:
                     all_keys = get_text_keys(structure)
                 key = "$or"
                 value = f'[ {", ".join(get_all_query(all_keys, string))} ]'
+                search_val = f'"{key}": {value}'
             if is_not:
-                res = f'{"{"} "$not": {"{"} "{key}": {value} {"}"} {"}"}'
+                res = f'{"{"} "$not": {"{"} {search_val} {"}"} {"}"}'
             else:
-                res = f'{"{"} "{key}": {value} {"}"}'
+                res = f'{"{"} {search_val} {"}"}'
         else:
             res=string
     return res
