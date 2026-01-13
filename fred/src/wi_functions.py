@@ -148,7 +148,11 @@ def get_plot_from_object(pgm_object, object):
         for elem in plots:
             add_plot = {}
             if elem[1] is not None:
-                add_plot["plot"] = elem[1]
+                add_plot["plot"] = (
+                            add_plot[1].to_html(full_html=False, include_plotlyjs="cdn")
+                            if add_plot[1] is not None
+                            else add_plot[1]
+                        )
             if elem[2] is not None:
                 add_plot["missing_samples"] = html_output.object_to_html(
                     elem[2], 0, False
