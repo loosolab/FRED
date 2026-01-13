@@ -376,7 +376,7 @@ def get_text_keys(structure, pre=''):
     keys =  []
     for key in structure:
         if 'input_type' in structure[key]:
-            if structure[key]['input_type'] in ['short_text', 'long_text', 'select']:
+            if structure[key]['input_type'] in ['short_text', 'long_text', 'select', 'restricted_short_text']:
                 keys.append(f'{pre}.{key}'.strip('.'))
         else:
             if 'value' in structure[key] and isinstance(structure[key]['value'], dict):
