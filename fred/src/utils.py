@@ -411,7 +411,10 @@ def get_whitelist(
                     for key in whitelist["whitelist"]:
                         if not isinstance(
                             whitelist["whitelist"][key], list
-                        ) and os.path.isfile(
+                        ):
+                         if whitelist_object is not None and whitelist["whitelist"][key] in whitelist_object:
+                             paths.append(whitelist["whitelist"][key])
+                         elif os.path.isfile(
                             os.path.join(
                                 whitelist_path,
                                 "whitelists",
