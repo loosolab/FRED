@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fred-metadata"
-version = "0.0.30"
+version = "0.0.32"
 authors = [
   { name="Jasmin Walter", email="Jasmin.Walter@mpi-bn.mpg.de" },
 ]
