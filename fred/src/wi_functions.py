@@ -422,6 +422,7 @@ def get_all_query(keys, value):
 
 
 def parse_string_to_query_dict(string, structure, all_keys=None):
+    regex_chars = ['(', ')', '[', ']', '*', '+', '?']
     if ' or ' in string:
         or_vals = string.split(' or ')
         for i in range(len(or_vals)):
@@ -436,6 +437,8 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                                 is_not = True
                             if '"' in and_vals[j]:
                                 key, value = and_vals[j].rstrip('"').split('"')
+                                for rc in regex_chars:
+                                    value = value.replace(rc, f'\\\\{rc}')
                                 if key != '':
                                     end_key = key.rstrip(':').split(':')[-1]
                                     start_key = '.'.join(key.rstrip(':').split(':')[:-1])
@@ -482,6 +485,8 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                         is_not = True
                     if '"' in or_vals[i]:
                         key, value = or_vals[i].rstrip('"').split('"')
+                        for rc in regex_chars:
+                                    value = value.replace(rc, f'\\\\{rc}')
                         if key != '':
                             end_key = key.rstrip(':').split(':')[-1]
                             start_key = '.'.join(key.rstrip(':').split(':')[:-1])
@@ -536,6 +541,8 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                     is_not = True
                 if '"' in and_vals[i]:
                     key, value = and_vals[i].rstrip('"').split('"')
+                    for rc in regex_chars:
+                        value = value.replace(rc, f'\\\\{rc}')
                     if key != '':
                         end_key = key.rstrip(':').split(':')[-1]
                         start_key = '.'.join(key.rstrip(':').split(':')[:-1])
@@ -588,6 +595,8 @@ def parse_string_to_query_dict(string, structure, all_keys=None):
                 is_not = True
             if '"' in string:
                 key, value = string.rstrip('"').split('"')
+                for rc in regex_chars:
+                    value = value.replace(rc, f'\\\\{rc}')
                 if key != '':
                     end_key = key.rstrip(':').split(':')[-1]
                     start_key = '.'.join(key.rstrip(':').split(':')[:-1])
