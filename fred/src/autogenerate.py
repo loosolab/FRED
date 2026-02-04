@@ -1,6 +1,6 @@
 import copy
 
-from src import utils
+from fred.src import utils
 
 
 class Autogenerate:
@@ -34,12 +34,12 @@ class Autogenerate:
         if len(setting_ids) > 0:
             max_id = 0
             for s_id in setting_ids:
-                max_id = max(max_id, int(s_id.replace('exp', '')))
-            setting_id = f'exp{max_id+1}'
+                max_id = max(max_id, int(s_id.replace("exp", "")))
+            setting_id = f"exp{max_id+1}"
 
         # set setting_id to exp1 if it is the first setting
         else:
-            setting_id = 'exp1'
+            setting_id = "exp1"
 
         self.gen.setting_ids.append(setting_id)
 
@@ -52,21 +52,20 @@ class Autogenerate:
                  -> [{factor: <fac>, values: [<val>,...]}, ...]
         """
 
-
-        factor_list = utils.get_whitelist('factor', self.gen.result_dict)['whitelist']
+        factor_list = utils.get_whitelist("factor", self.gen.result_dict)["whitelist"]
         plain_list = []
-        exp_info = list(utils.find_keys(self.gen.key_yaml, 'experimental_factors'))[0]
-        factor_info = \
-        list(utils.find_keys(self.gen.key_yaml, 'factor'))[0]
+        exp_info = list(utils.find_keys(self.gen.key_yaml, "experimental_factors"))[0]
+        factor_info = list(utils.find_keys(self.gen.key_yaml, "factor"))[0]
         for fk in factor_list:
             plain_list += factor_list[fk]
 
         print(f'\n---\n{exp_info["factor_desc"]}')
         print(
-            f'\nPlease select the analyzed experimental factors '
-            f'(1-{len(plain_list)}) divided by comma:\n')
+            f"\nPlease select the analyzed experimental factors "
+            f"(1-{len(plain_list)}) divided by comma:\n"
+        )
 
-        used_factors = self.gen.get_input_list(factor_info, 'factor')
+        used_factors = self.gen.get_input_list(factor_info, "factor")
         experimental_factors = []
 
         for fac in used_factors:
@@ -75,61 +74,79 @@ class Autogenerate:
             fac_dict = {}
             self.gen.parse_lists(fac_node, [fac], 2, fac_dict, is_factor=True)
 
-            experimental_factors.append({'factor': fac, 'values': fac_dict[fac]})
+            experimental_factors.append({"factor": fac, "values": fac_dict[fac]})
         return experimental_factors
 
     def get_condition_name(self):
-        experimental_setting = utils.find_position(self.gen.result_dict, self.position[:-3] + ['setting_id'])
+        experimental_setting = utils.find_position(
+            self.gen.result_dict, self.position[:-3] + ["setting_id"]
+        )
         if experimental_setting not in self.gen.conditions:
-            factors = utils.find_position(self.gen.result_dict, self.position[:-3] + ['experimental_factors'])
+            factors = utils.find_position(
+                self.gen.result_dict, self.position[:-3] + ["experimental_factors"]
+            )
             factor_combis = {}
             for i in range(len(factors)):
 
-                factor_info = \
-                    list(utils.find_keys(self.gen.key_yaml, factors[i]['factor']))[0]
-                factor = factors[i]['factor']
-                values = copy.deepcopy(factors[i]['values'][0]) if len(
-                    factors[i]['values']) == 1 and isinstance(
-                    factors[i]['values'][0], dict) else copy.deepcopy(
-                    factors[i]['values'])
+                factor_info = list(
+                    utils.find_keys(self.gen.key_yaml, factors[i]["factor"])
+                )[0]
+                factor = factors[i]["factor"]
+                values = (
+                    copy.deepcopy(factors[i]["values"][0])
+                    if len(factors[i]["values"]) == 1
+                    and isinstance(factors[i]["values"][0], dict)
+                    else copy.deepcopy(factors[i]["values"])
+                )
                 # if the values of the experimental factor are in a dictionary or the
                 # factor contains a list (so the factor can occur multiple times in a
                 # condition) than call the function get_combinations to create all
                 # possible combinations of this factor with its values
-                if factor_info['list'] or (
-                        isinstance(factor_info['value'], dict)
-                        and not ('special_case' in factor_info
-                                 and 'value_unit' in
-                                 factor_info['special_case'])):
+                if factor_info["list"] or (
+                    isinstance(factor_info["value"], dict)
+                    and not (
+                        "special_case" in factor_info
+                        and "value_unit" in factor_info["special_case"]
+                    )
+                ):
                     for val in values:
                         val_info = list(utils.find_keys(self.gen.key_yaml, val))
                         if len(val_info) > 0:
                             val_info = val_info[0]
-                            if 'special_case' in val_info:
-                                if 'merge' in val_info['special_case']:
+                            if "special_case" in val_info:
+                                if "merge" in val_info["special_case"]:
                                     for j in range(len(values[val])):
                                         new_val = []
                                         for elem_key in values[val][j]:
                                             new_val.append(
-                                                f'{elem_key}:"{values[val][j][elem_key]}"')
+                                                f'{elem_key}:"{values[val][j][elem_key]}"'
+                                            )
                                         values[val][
-                                            j] = f'{"{"}{"|".join(new_val)}{"}"}'
+                                            j
+                                        ] = f'{"{"}{"|".join(new_val)}{"}"}'
                         for j in range(len(values[val])):
                             if isinstance(values[val][j], dict):
-                                new_val = "|".join([f'{key}:"{values[val][j][key]}"' for key in values[val][j]])
+                                new_val = "|".join(
+                                    [
+                                        f'{key}:"{values[val][j][key]}"'
+                                        for key in values[val][j]
+                                    ]
+                                )
                                 values[val][j] = f'{"{"}{new_val}{"}"}'
 
-                    if 'special_case' in factor_info:
-                        if 'group' in factor_info['special_case']:
-                            values['ident_key'] = factor_info['special_case'][
-                                'group']
-                        if 'control' in factor_info['special_case']:
-                            values['control'] = factor_info['special_case'][
-                                'control']
+                    if "special_case" in factor_info:
+                        if "group" in factor_info["special_case"]:
+                            values["ident_key"] = factor_info["special_case"]["group"]
+                        if "control" in factor_info["special_case"]:
+                            values["control"] = factor_info["special_case"]["control"]
                     # overwrite the values with the combinations
                     factor_combis[factor] = utils.get_combis(
-                        values, factor, self.gen.result_dict, self.gen.key_yaml)
-                elif 'special_case' in factor_info and 'value_unit' in factor_info['special_case']:
+                        values, factor, self.gen.result_dict, self.gen.key_yaml
+                    )
+                elif (
+                    "special_case" in factor_info
+                    and "value_unit" in factor_info["special_case"]
+                ):
                     values = [f'{val["value"]}{val["unit"]}' for val in values]
                     factor_combis[factor] = [f'{factor}:"{val}"' for val in values]
                 else:
@@ -137,58 +154,74 @@ class Autogenerate:
             factor_dict = []
             for elem_key in factor_combis:
                 factor_dict.append(
-                    {'factor': elem_key, 'values': factor_combis[elem_key]})
+                    {"factor": elem_key, "values": factor_combis[elem_key]}
+                )
             # call get_condition_combinations to create all conditions
             combinations = utils.get_condition_combinations(factor_dict)
             for key in factor_combis:
-                factor_combis[key] = [x for x in factor_combis[key] if x.count(f'{key}:') <= 1]
+                factor_combis[key] = [
+                    x for x in factor_combis[key] if x.count(f"{key}:") <= 1
+                ]
             self.gen.conditions[experimental_setting] = [factor_combis, combinations]
 
         i = 1
-        print('Please combine the factors to create a condition.')
+        print("Please combine the factors to create a condition.")
         for key in self.gen.conditions[experimental_setting][0]:
-            print(f'\n\033[1m{key}\033[0m')
+            print(f"\n\033[1m{key}\033[0m")
             for elem in self.gen.conditions[experimental_setting][0][key]:
-                print(f'{i} {elem}')
+                print(f"{i} {elem}")
                 i += 1
 
-        w = [x for xs in list(self.gen.conditions[experimental_setting][0].values())
-             for x in xs]
+        w = [
+            x
+            for xs in list(self.gen.conditions[experimental_setting][0].values())
+            for x in xs
+        ]
         used_values = self.gen.parse_input_list(w, False)
         condition_name = None
         for elem in self.gen.conditions[experimental_setting][1]:
-            if all([x in elem for x in used_values]) and len(elem) == len('-'.join(used_values)):
+            if all([x in elem for x in used_values]) and len(elem) == len(
+                "-".join(used_values)
+            ):
                 condition_name = elem
                 break
         if condition_name is not None:
             filled_conditions = []
             for i in range(self.position[-2]):
-                filled_conditions.append(utils.find_position(self.gen.result_dict, self.position[:-2] + [i, 'condition_name']))
+                filled_conditions.append(
+                    utils.find_position(
+                        self.gen.result_dict, self.position[:-2] + [i, "condition_name"]
+                    )
+                )
             if condition_name not in filled_conditions:
                 return condition_name
             else:
-                print('You already selected this condition. Try again.')
+                print("You already selected this condition. Try again.")
                 return self.get_condition_name()
         else:
-            print('Invalid condition. Please try again.')
+            print("Invalid condition. Please try again.")
             return self.get_condition_name()
 
     def get_samples(self):
-        cond_name = utils.find_position(self.gen.result_dict, self.position[:-2] + ['condition_name'])
+        cond_name = utils.find_position(
+            self.gen.result_dict, self.position[:-2] + ["condition_name"]
+        )
         test = utils.split_cond(cond_name)
-        sample_structure = list(utils.find_keys(self.gen.key_yaml, 'samples'))[0]
+        sample_structure = list(utils.find_keys(self.gen.key_yaml, "samples"))[0]
         for elem in test:
-            sample_structure['value'][elem[0]]['value'] = elem[1]
-            if 'special_case' in sample_structure['value'][elem[0]]:
-                sample_structure['value'][elem[0]]['special_case']['factor'] = True
+            sample_structure["value"][elem[0]]["value"] = elem[1]
+            if "special_case" in sample_structure["value"][elem[0]]:
+                sample_structure["value"][elem[0]]["special_case"]["factor"] = True
             else:
-                sample_structure['value'][elem[0]]['special_case'] = {'factor': True}
-        self.gen.parse_lists(sample_structure, self.position, 2, self.gen.result_dict, is_factor=False)
+                sample_structure["value"][elem[0]]["special_case"] = {"factor": True}
+        self.gen.parse_lists(
+            sample_structure, self.position, 2, self.gen.result_dict, is_factor=False
+        )
         return utils.find_position(self.gen.result_dict, self.position)
 
     def get_sample_name(self, read_in_whitelists=None):
-        if self.position[-2] == 'technical_replicates':
-            '''count = utils.find_position(self.gen.result_dict, self.position[:-1] + ['count'])
+        if self.position[-2] == "technical_replicates":
+            """count = utils.find_position(self.gen.result_dict, self.position[:-1] + ['count'])
             nom = utils.find_position(self.gen.result_dict, self.position[:-2] + ['number_of_measurements'])
             sample_name = utils.find_position(self.gen.result_dict, self.position[:-2] + ['sample_name'])
             organism = utils.find_position(self.gen.result_dict, self.position[:self.position.index('experimental_setting')+2] + ['organism', 'organism_name'])
@@ -201,124 +234,144 @@ class Autogenerate:
                     # list
                     samples.append(f'{self.gen.project_id}_{organism}_{sample_name}_'
                                    f't{"{:02d}".format(i + 1)}_'
-                                   f'm{"{:02d}".format(j + 1)}')'''
+                                   f'm{"{:02d}".format(j + 1)}')"""
             return utils.create_sample_names(self.gen.result_dict, {}, self.position)
         else:
-            condition = utils.find_position(self.gen.result_dict, self.position[:-4]+['condition_name'])
+            condition = utils.find_position(
+                self.gen.result_dict, self.position[:-4] + ["condition_name"]
+            )
             return f'{utils.get_short_name(condition, self.gen.result_dict, self.gen.key_yaml, read_in_whitelists=read_in_whitelists)}_b{"{:02d}".format(self.position[-2] + 1)}'
 
     def get_filenames(self):
-        setting_index = self.position.index('experimental_setting') + 1
-        experimental_factors = utils.find_position(self.gen.result_dict, self.position[:setting_index+1] + ['experimental_factors'])
+        setting_index = self.position.index("experimental_setting") + 1
+        experimental_factors = utils.find_position(
+            self.gen.result_dict,
+            self.position[: setting_index + 1] + ["experimental_factors"],
+        )
         double = []
-        if len(list(utils.find_keys(experimental_factors, 'gene'))) > 0 or len(list(utils.find_values(experimental_factors, 'gene'))) > 0:
-            gene_whitelist = utils.get_whitelist('gene', self.gen.result_dict)
-            double = gene_whitelist['double'] if 'double' in gene_whitelist else []
+        if (
+            len(list(utils.find_keys(experimental_factors, "gene"))) > 0
+            or len(list(utils.find_values(experimental_factors, "gene"))) > 0
+        ):
+            gene_whitelist = utils.get_whitelist("gene", self.gen.result_dict)
+            double = gene_whitelist["double"] if "double" in gene_whitelist else []
         return utils.create_filenames(self.gen.result_dict, double, self.position, {})
 
     def get_count(self):
-        return len(utils.find_position(self.gen.result_dict, self.position[:-1] + ['samples']))
+        return len(
+            utils.find_position(self.gen.result_dict, self.position[:-1] + ["samples"])
+        )
 
     def get_publications(self):
-        pubmed_ids = list(utils.find_keys(self.gen.result_dict, 'pubmed_id'))
+        pubmed_ids = list(utils.find_keys(self.gen.result_dict, "pubmed_id"))
         if any([x not in self.gen.publications for x in pubmed_ids]):
             records = utils.get_publication_object(pubmed_ids, self.gen.email)
             for record in records:
-                if 'Id' in record and int(record['Id']) not in self.gen.publications:
-                    self.gen.publications[int(record['Id'])] = record
+                if "Id" in record and int(record["Id"]) not in self.gen.publications:
+                    self.gen.publications[int(record["Id"])] = record
 
     def get_author(self):
         self.get_publications()
-        pubmed_id = utils.find_position(self.gen.result_dict,
-                                        self.position[:-1] + ['pubmed_id'])
+        pubmed_id = utils.find_position(
+            self.gen.result_dict, self.position[:-1] + ["pubmed_id"]
+        )
         try:
-            res = [str(x) for x in self.gen.publications[pubmed_id]['AuthorList'][0:3]] + ['et. al'] \
-            if len(self.gen.publications[pubmed_id]['AuthorList']) > 3 \
-            else [str(x) for x in self.gen.publications[pubmed_id]['AuthorList']]
+            res = (
+                [str(x) for x in self.gen.publications[pubmed_id]["AuthorList"][0:3]]
+                + ["et. al"]
+                if len(self.gen.publications[pubmed_id]["AuthorList"]) > 3
+                else [str(x) for x in self.gen.publications[pubmed_id]["AuthorList"]]
+            )
         except ValueError:
             res = None
         return res
 
     def get_title(self):
         self.get_publications()
-        pubmed_id = utils.find_position(self.gen.result_dict,
-                                        self.position[:-1] + ['pubmed_id'])
+        pubmed_id = utils.find_position(
+            self.gen.result_dict, self.position[:-1] + ["pubmed_id"]
+        )
         try:
-            res = str(self.gen.publications[pubmed_id]['Title'])
+            res = str(self.gen.publications[pubmed_id]["Title"])
         except ValueError:
             res = None
         return res
 
     def get_journal(self):
         self.get_publications()
-        pubmed_id = utils.find_position(self.gen.result_dict,
-                                        self.position[:-1] + ['pubmed_id'])
+        pubmed_id = utils.find_position(
+            self.gen.result_dict, self.position[:-1] + ["pubmed_id"]
+        )
         try:
-            res = str(self.gen.publications[pubmed_id]['Source'])
+            res = str(self.gen.publications[pubmed_id]["Source"])
         except ValueError:
             res = None
         return res
 
     def get_volume(self):
         self.get_publications()
-        pubmed_id = utils.find_position(self.gen.result_dict,
-                                        self.position[:-1] + ['pubmed_id'])
+        pubmed_id = utils.find_position(
+            self.gen.result_dict, self.position[:-1] + ["pubmed_id"]
+        )
         try:
-            res = int(self.gen.publications[pubmed_id]['Volume'])
+            res = int(self.gen.publications[pubmed_id]["Volume"])
         except ValueError:
             res = None
         return res
 
     def get_year(self):
         self.get_publications()
-        pubmed_id = utils.find_position(self.gen.result_dict,
-                                        self.position[:-1] + ['pubmed_id'])
+        pubmed_id = utils.find_position(
+            self.gen.result_dict, self.position[:-1] + ["pubmed_id"]
+        )
         try:
-            res = int(self.gen.publications[pubmed_id]['PubDate'].split(' ')[0])
+            res = int(self.gen.publications[pubmed_id]["PubDate"].split(" ")[0])
         except ValueError:
             res = None
         return res
 
     def get_issue(self):
         self.get_publications()
-        pubmed_id = utils.find_position(self.gen.result_dict,
-                                        self.position[:-1] + ['pubmed_id'])
+        pubmed_id = utils.find_position(
+            self.gen.result_dict, self.position[:-1] + ["pubmed_id"]
+        )
         try:
-            res = int(self.gen.publications[pubmed_id]['Issue'])
+            res = int(self.gen.publications[pubmed_id]["Issue"])
         except ValueError:
             res = None
         return res
 
     def get_pages(self):
         self.get_publications()
-        pubmed_id = utils.find_position(self.gen.result_dict,
-                                        self.position[:-1] + ['pubmed_id'])
+        pubmed_id = utils.find_position(
+            self.gen.result_dict, self.position[:-1] + ["pubmed_id"]
+        )
         try:
-            res = str(self.gen.publications[pubmed_id]['Pages'])
+            res = str(self.gen.publications[pubmed_id]["Pages"])
         except ValueError:
             res = None
         return res
 
     def get_doi(self):
         self.get_publications()
-        pubmed_id = utils.find_position(self.gen.result_dict,
-                                        self.position[:-1] + ['pubmed_id'])
+        pubmed_id = utils.find_position(
+            self.gen.result_dict, self.position[:-1] + ["pubmed_id"]
+        )
         try:
-            res = str(self.gen.publications[pubmed_id]['DOI'])
+            res = str(self.gen.publications[pubmed_id]["DOI"])
         except ValueError:
             res = None
         return res
 
     def get_techniques(self):
         all_settings = self.gen.setting_ids
-        structure = list(utils.find_keys(self.gen.key_yaml, 'techniques'))[0]
-        structure['list'] = False
+        structure = list(utils.find_keys(self.gen.key_yaml, "techniques"))[0]
+        structure["list"] = False
         for i in range(len(all_settings)):
-            self.gen.parse_lists(structure, self.position + [i], 2, self.gen.result_dict)
+            self.gen.parse_lists(
+                structure, self.position + [i], 2, self.gen.result_dict
+            )
         return utils.find_position(self.gen.result_dict, self.position)
 
     def get_setting(self):
         return self.gen.setting_ids[self.position[-2]]
-
-
-

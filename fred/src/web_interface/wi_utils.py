@@ -24,8 +24,9 @@ def pop_key(metafile, key_list, value):
 
             # if the remaining list element is an empty dictionary or list then
             # set it to None
-            if (isinstance(metafile[i], dict) or
-                    isinstance(metafile[i], list)) and len(metafile[i]) == 0:
+            if (isinstance(metafile[i], dict) or isinstance(metafile[i], list)) and len(
+                metafile[i]
+            ) == 0:
                 metafile[i] = None
 
         # remove all list elements that are None
@@ -49,13 +50,13 @@ def pop_key(metafile, key_list, value):
 
             # call this function on the part of the metafile within the first
             # key of the list
-            metafile[key_list[0]] = pop_key(metafile[key_list[0]],
-                                            key_list[1:], value)
+            metafile[key_list[0]] = pop_key(metafile[key_list[0]], key_list[1:], value)
             # test if the remaining part of the metafile is an empty dictionary
             # or list
-            if (isinstance(metafile[key_list[0]], dict) or
-                    isinstance(metafile[key_list[0]], list)) and \
-                    len(metafile[key_list[0]]) == 0:
+            if (
+                isinstance(metafile[key_list[0]], dict)
+                or isinstance(metafile[key_list[0]], list)
+            ) and len(metafile[key_list[0]]) == 0:
 
                 # remove the key from the metafile
                 metafile.pop(key_list[0])
@@ -86,9 +87,9 @@ def pop_value(metafile, key_list, value):
                 metafile[i] = pop_value(metafile[i], key_list, value)
 
                 # test if the remaining element is an empty dictionary or list
-                if (isinstance(metafile[i], dict) or
-                        isinstance(metafile[i], list)) and \
-                        len(metafile[i]) == 0:
+                if (
+                    isinstance(metafile[i], dict) or isinstance(metafile[i], list)
+                ) and len(metafile[i]) == 0:
 
                     # set the element to None
                     metafile[i] = None
@@ -103,8 +104,7 @@ def pop_value(metafile, key_list, value):
             if isinstance(metafile[key_list[0]], list):
 
                 # remove the faulty value from the list
-                metafile[key_list[0]] = [x for x in metafile[key_list[0]] if
-                                         x != value]
+                metafile[key_list[0]] = [x for x in metafile[key_list[0]] if x != value]
 
                 # test if the remaining list is empty then remove the key
                 if len(metafile[key_list[0]]) == 0:
@@ -139,13 +139,15 @@ def pop_value(metafile, key_list, value):
 
             # call this function on the part of the metafile within the first
             # key of the list
-            metafile[key_list[0]] = pop_value(metafile[key_list[0]],
-                                              key_list[1:], value)
+            metafile[key_list[0]] = pop_value(
+                metafile[key_list[0]], key_list[1:], value
+            )
             # test if the remaining part of the metafile is an empty dictionary
             # or list
-            if (isinstance(metafile[key_list[0]], dict) or
-                    isinstance(metafile[key_list[0]], list)) and \
-                    len(metafile[key_list[0]]) == 0:
+            if (
+                isinstance(metafile[key_list[0]], dict)
+                or isinstance(metafile[key_list[0]], list)
+            ) and len(metafile[key_list[0]]) == 0:
 
                 # remove the key from the metafile
                 metafile.pop(key_list[0])
@@ -193,7 +195,7 @@ def str_to_date(value):
     return default_time.strftime("%Y-%m-%dT%X.%fZ")
 
 
-def parse_headers(headers, value, mode='dict'):
+def parse_headers(headers, value, mode="dict"):
     """
     This function splits a value into a dictionary depending on the header
     :param mode: a string defining the type the split value should be returned
@@ -208,33 +210,34 @@ def parse_headers(headers, value, mode='dict'):
 
     # define a dictionary or string to save the new value to
     # (depending on mode)
-    new_val = {} if mode == 'dict' else ''
+    new_val = {} if mode == "dict" else ""
     # iterate over the keys in the header
-    if len(value.split(' ')) == len(headers.split(' ')):
-        for key_index in range(len(headers.split(' '))):
+    if len(value.split(" ")) == len(headers.split(" ")):
+        for key_index in range(len(headers.split(" "))):
 
             # return a dictionary
-            if mode == 'dict':
+            if mode == "dict":
 
                 # save the header and value at index 'key_index' in the dictionary
                 # (header and value split at ' ' -> lists that are indexed)
-                new_val[headers.split(' ')[key_index]] = \
-                    value.split(' ')[key_index]
+                new_val[headers.split(" ")[key_index]] = value.split(" ")[key_index]
 
             # return a string
-            elif mode == 'str':
+            elif mode == "str":
 
                 # add the header and value at index 'key_index' to the string
-                new_val = f'{new_val}{"|" if key_index > 0 else ""}' \
-                        f'{headers.split(" ")[key_index]}:"' \
-                        f'{value.split(" ")[key_index]}"'
+                new_val = (
+                    f'{new_val}{"|" if key_index > 0 else ""}'
+                    f'{headers.split(" ")[key_index]}:"'
+                    f'{value.split(" ")[key_index]}"'
+                )
     else:
         new_val = value
 
     return new_val
 
 
-def parse_whitelist_keys(whitelist_keys, value, headers, mode='dict'):
+def parse_whitelist_keys(whitelist_keys, value, headers, mode="dict"):
     """
     This function removes the group-key from the end of the value of a plain
     grouped whitelist and splits the value into a dictionary depending on a
@@ -256,8 +259,8 @@ def parse_whitelist_keys(whitelist_keys, value, headers, mode='dict'):
     for k in whitelist_keys:
 
         # remove the '(<whitelist_key>)' from the end of the value
-        if value.endswith(f' ({k})'):
-            value = value.replace(f' ({k})', '')
+        if value.endswith(f" ({k})"):
+            value = value.replace(f" ({k})", "")
 
             # test if wi object contains headers
             if headers is not None and k in headers:

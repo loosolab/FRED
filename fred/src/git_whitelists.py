@@ -2,7 +2,8 @@ import os
 import git
 import re
 
-#TODO: username, pw
+
+# TODO: username, pw
 def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whitelist):
     """
     This function clones the whitelist repository. If the repository already
@@ -10,11 +11,10 @@ def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whit
     """
     if not os.path.exists(whitelist_path) or update_whitelist:
 
-        print('Fetching whitelists...\n')
+        print("Fetching whitelists...\n")
 
         if not os.path.exists(whitelist_path):
-            repo = git.Repo.clone_from(whitelist_repo,
-                                   whitelist_path)
+            repo = git.Repo.clone_from(whitelist_repo, whitelist_path)
             whitelist_branch = get_branch(repo, whitelist_branch)
             repo.git.checkout(whitelist_branch)
         else:
@@ -24,7 +24,7 @@ def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whit
             repo.git.checkout(whitelist_branch)
             repo.remotes.origin.pull(whitelist_branch)
 
-        print(f'Fetched branch {whitelist_branch}.\n')
+        print(f"Fetched branch {whitelist_branch}.\n")
     else:
         repo = git.Repo(whitelist_path)
         repo.remotes.origin.fetch(prune=True, prune_tags=True)
@@ -33,10 +33,23 @@ def get_whitelists(whitelist_path, whitelist_repo, whitelist_branch, update_whit
 
 
 def get_branch(repo, whitelist_branch):
-    if '*' in whitelist_branch:
-        regex_branch = whitelist_branch.replace(".", "\.").replace("$", "\$").replace("+", "\+").replace("*", ".*")
-        branch_list = [a.name.replace('origin/', '') for a in repo.tags + repo.remote().refs if a.name != 'origin/HEAD']
-        matching_branches = [x.lstrip('v').split('.') for x in branch_list if re.search(f'^{regex_branch}$', x) is not None]
+    if "*" in whitelist_branch:
+        regex_branch = (
+            whitelist_branch.replace(".", "\.")
+            .replace("$", "\$")
+            .replace("+", "\+")
+            .replace("*", ".*")
+        )
+        branch_list = [
+            a.name.replace("origin/", "")
+            for a in repo.tags + repo.remote().refs
+            if a.name != "origin/HEAD"
+        ]
+        matching_branches = [
+            x.lstrip("v").split(".")
+            for x in branch_list
+            if re.search(f"^{regex_branch}$", x) is not None
+        ]
         splitted_branches = []
         for branch in matching_branches:
             try:

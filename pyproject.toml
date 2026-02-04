@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fred-metadata"
-version = "0.0.17"
+version = "0.0.37"
 authors = [
   { name="Jasmin Walter", email="Jasmin.Walter@mpi-bn.mpg.de" },
 ]
@@ -30,3 +30,6 @@ license-files = ["LICEN[CS]E*"]
 
 [project.scripts]
 fred = "fred.metaTools:main"
+
+[tool.setuptools.packages.find]
+include = ["fred*"]
