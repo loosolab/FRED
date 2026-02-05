@@ -1,27 +1,30 @@
+<img align="right" width=300 src="docs/images/fred_logo.png">
+
 # FRED
 
-https://loosolab.pages.gwdg.de/software/metadata-organizer/
+Introduction 
+------------
+
+**FRED** (**F**ai**R** **E**xperimental **D**esigns) is a tool to help researchers generate and manage FAIR metadata. It includes:
+
+- dialog based creation of metadata files
+- structured semantic validation
+- logical search
+- an external programming interface (API)
+- standalone web-front end.
+
+For more information about FRED, please see the [documentation](https://loosolab.pages.gwdg.de/software/metadata-organizer/).
 
 
 # How to install
 
-1. Clone the repository 
 ```
-git clone git@gitlab.gwdg.de:loosolab/software/metadata-organizer.git
+pip install fred-metadata
 ```
-2. Move to the new repository directory
-```
-cd metadata-organizer
-```
-3. Create a pip environment
-```
-python3 -m venv .venv
-```
-4. Activate the environment
-```
-source .venv/bin/activate
-```
-5. Install the package
-```
-pip install .
-```
+
+# Standalone Version
+
+The standalone web-frontend is provided in a separate Repository. You can find it here:
+
+https://github.com/loosolab/FRED_standalone
+
