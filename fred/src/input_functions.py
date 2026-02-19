@@ -20,7 +20,7 @@ class WhitelistCompleter:
 
 class Input:
 
-    def __init__(self, path, project_id, mandatory_only, filename, key_yaml, email):
+    def __init__(self, path, project_id, mandatory_only, filename, key_yaml, email, whitelist_path):
         self.path = path
         self.project_id = project_id
         self.mandatory_only = mandatory_only
@@ -33,6 +33,7 @@ class Input:
         self.generate_end = []
         self.email = email
         self.setting_ids = []
+        self.whitelis_path = whitelist_path
 
     def parse_input_value(self, key, structure, allow_float=False):
         """
@@ -44,7 +45,7 @@ class Input:
 
         # read in whitelist if the key has one or set the whitelist to None
         if structure["whitelist"]:
-            whitelist = utils.get_whitelist(key, self.result_dict)
+            whitelist = utils.get_whitelist(key, self.result_dict, whitelist_path=self.whitelis_path)
         else:
             whitelist = None
 

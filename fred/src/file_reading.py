@@ -17,7 +17,7 @@ import yaml as yml
 def iterate_dir_metafiles(
     key_yaml,
     path_metafiles,
-    filename="_metadata",
+    filename="_mamplan",
     logical_validation=True,
     yaml=None,
     whitelist_path=None,

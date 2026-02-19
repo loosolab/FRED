@@ -66,7 +66,7 @@ class FRED:
 
     def generate(self, path, project_id, mandatory_only):
         gen = Generate(
-            path, project_id, mandatory_only, self.filename, self.structure, self.email
+            path, project_id, mandatory_only, self.filename, self.structure, self.email, self.whitelist_path
         )
         gen.generate()
 
