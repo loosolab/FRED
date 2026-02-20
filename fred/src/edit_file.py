@@ -1,7 +1,219 @@
-from fred.src import generate_metafile
+from fred.src.generate import Generate
 import fred.src.utils as utils
 import copy
 import os
+
+
+class Edit(Generate):
+
+    def create_result_dict(self):
+        self.result_dict = utils.read_in_yaml(self.path)
+        self.id = self.result_dict['project']['id']
+    
+    def edit(self):
+        options = [key for key in self.key_yaml]
+        print(
+        f"Choose the parts you want to edit (1,...,{len(options)}) divided "
+        f"by comma.\n"
+        )
+        self.print_option_list(options, False)
+        edit_keys = self.parse_input_list(options, True)
+
+        for key in edit_keys:
+
+            if key in self.result_dict:
+                self.edit_item(self.result_dict[key], [key], 1)
+            else:
+                self.parse_lists(self.key_yaml[key], [key], 1, self.result_dict)
+
+    def edit_item(self, values, position, indent, not_editable=[]):
+
+        # TODO: handle special cases
+
+        item_structure = list(utils.find_keys(self.key_yaml, position[-1]))[0]
+
+        if item_structure['list']:
+            
+            if not isinstance(item_structure['value'], dict):
+                self.parse_lists(item_structure, position, indent, self.result_dict, is_factor=False)
+            
+            else:
+                
+                all_options = ["remove element from list"]
+
+                for i in range(len(values)):
+
+                    # TODO: enhance display of dictionary
+
+                    if isinstance(values[i], dict):
+                        str_dict = "\n".join(f"{x}: {values[i][x]}" for x in values[i])
+                        all_options.append(f"edit: {str_dict}")
+                    else:
+                        all_options.append(f"edit: {values[i]}")
+
+                # add the option to add a new element to the list
+                all_options.append("add element to list")
+
+                # request user input
+                print(
+                    f"Please choose how you want to edit the list choosing "
+                    f"from the following options (1-{len(values)}) divided by "
+                    f"comma."
+                )
+
+                # print the list elements as options and parse the user input
+                self.print_option_list(all_options, False)
+                chosen_options = self.parse_input_list(all_options, False)
+
+                # remove the options that do not represent a distinct list element
+                all_options.remove("remove element from list")
+                all_options.remove("add element to list")
+
+                # initialize a list to store list elements that should be removed
+                remove_options = []
+
+                # test if user chose to remove elements
+                if "remove element from list" in chosen_options:
+
+                    # request user to state elements to delete
+                    print(
+                        f"Please choose the list elements you want to remove"
+                        f" (1-{len(values)}) divided by comma."
+                    )
+
+                    # print a list of removable elements and parse user input
+                    self.print_option_list(all_options, False)
+                    remove_options = self.parse_input_list(all_options, False)
+
+                # initialize a dictionary to save editing information for all list
+                # elements
+                edit_options = {}
+
+                # iterate over all list elements
+                for i in range(len(all_options)):
+
+                    # define an action for the element depending on the users input
+                    # possible values are:
+                    # 'remove': if the element should be removed from the list
+                    # 'edit': if the element should be edited
+                    # None: if the element should stay as it is
+                    if all_options[i] in remove_options:
+                        action = "remove"
+                    elif all_options[i] in chosen_options:
+                        action = "edit"
+                    else:
+                        action = None
+
+                    # add the list element and its according action to the dict
+                    edit_options[all_options[i]] = {"element": values[i], "action": action}
+
+                # initialize a new list to save all elements to which do not get
+                # removed (edited as well as not edited)
+
+                # iterate over all list elements
+                for key in edit_options:
+
+                    # test if the element should be edited
+                    if edit_options[key]["action"] == "edit":
+
+                        # TODO: enhance line breaks (if display name > size)
+
+                        # print header for current element
+                        display_name = key.replace("\n", " | ")
+                        print(
+                            f"\n"
+                            f'{"".center(self.size, "-")}\n'
+                            f'{f"{display_name}".center(self.size, " ")}\n'
+                            f'{"".center(self.size, "-")}\n'
+                        )
+
+                        # call this function to overwrite the list element with its
+                        # edited version
+                        self.fill_key(position, self.edit_item(values[key], position + [key], indent, not_editable=not_editable), self.result_dict)
+                        
+
+                    # test if the list element should NOT be removed
+                    if edit_options[key]["action"] == "remove":
+                        
+                        self.result_dict.pop(edit_options[key]['element'])
+                        
+
+                # test if the user chose to add new list elements
+                if "add element to list" in chosen_options:
+
+                    # set the display_name and print it as header for the new
+                    # element
+                    display_name = self.key_yaml["display_name"]
+                    print(
+                        f"\n"
+                        f'{"".center(self.size, "-")}\n'
+                        f'{f"New {display_name}".center(self.size, " ")}\n'
+                        f'{"".center(self.size, "-")}\n'
+                    )
+
+                    # get input for new element
+                    self.parse_lists(item_structure, position, indent, self.result_dict)
+
+        # item to edit is a dictionary
+        elif isinstance(item_structure['value'], dict):
+
+            # request input from the user
+            print(
+                f"Please choose the keys (1-{len(values.keys())}) you want to edit"
+                f" divided by comma."
+            )
+
+            # TODO: remove not_editable
+
+            # create a list of options from the dictionary keys (only add them if
+            # they are supposed to be edited)
+            print(item_structure)
+            edit_index = [key for key in item_structure["value"] if key not in not_editable]
+
+            # add option 'all' to redo the complete dictionary
+            edit_index.insert(0, "all")
+
+            # print options for the user and parse the given input
+            self.print_option_list(edit_index, False)
+            edit_index = self.parse_input_list(edit_index, False)
+
+            # test if 'all' was selected
+            if "all" in edit_index:
+
+                # redo input for the whole dictionary
+                self.parse_lists(item_structure, position, indent, self.result_dict)
+
+            # keys were selected but not 'all'
+            else:
+
+                # iterate over keys
+                for key in edit_index:
+
+                    
+                    # key was already filled out
+                    if key in values:
+
+                        # call this function to edit the value of the key
+                        self.edit_item(item_structure['value'][key], position + [key], indent, not_editable=not_editable)   
+                            
+                    # key was not filled out yet
+                    else:
+                        
+                        self.parse_lists(item_structure['value'][key], position + [key], indent, self.result_dict)
+
+        # item is a single value
+        else:
+            
+            print(item_structure)
+            # call function to input value
+            self.fill_key(
+                position,
+                (
+                    self.parse_input_value(position[-1], item_structure)
+                ),
+                self.result_dict
+            )
+        print(utils.find_position(self.result_dict, position))
 
 
 def edit_file(project_id, path, mode, mandatory_only, size=80):

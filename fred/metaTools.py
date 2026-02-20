@@ -13,6 +13,7 @@ from fred.src import file_reading
 from fred.src import utils
 from fred.src import git_whitelists
 from fred.src.heatmap import create_heatmap
+from fred.src.edit_file import Edit
 
 
 class FRED:
@@ -246,14 +247,13 @@ class FRED:
 
         return validation_reports["error_count"], validation_reports["warning_count"]
 
-    # def edit(self, path, mandatory_only):
-    #    try:
-    #        size = os.get_terminal_size()
-    #        size = size.columns
-    #    except OSError:
-    #        size = 80
-
-    #    edit_file.edit_file(path, self.filename, mandatory_only, size)
+    def edit(self, path, mandatory_only):
+        
+        edit = Edit(
+            path, None, mandatory_only, self.filename, self.structure, self.email, self.whitelist_path
+        )
+        edit.create_result_dict()
+        edit.edit()
 
     def add_value(self, path, position, value, edit_existing):
         files, errors = file_reading.iterate_dir_metafiles(
@@ -344,9 +344,9 @@ def plot(args):
         print("No settings found.")
 
 
-# def edit(args):
-#    editing = FRED(args.config)
-#    editing.edit(args.path, args.mandatory_only)
+def edit(args):
+    editing = FRED(args.config)
+    editing.edit(args.path, args.mandatory_only)
 
 
 def add_value(args):
@@ -417,9 +417,6 @@ def main():
         action="store_true",
         help="If True, only mandatory keys will " "be filled out",
     )
-    create_function.add_argument(
-        "-m", "--mode", default="metadata", choices=["metadata", "mamplan"]
-    )
     create_function.set_defaults(func=generate)
 
     validate_function = subparsers.add_parser("validate", help="")
@@ -444,17 +441,17 @@ def main():
     )
     validate_function.set_defaults(func=validate)
 
-    # edit_function = subparsers.add_parser('edit', help='')
-    # edit_group = edit_function.add_argument_group('mandatory_arguments')
-    # edit_group.add_argument('-p', '--path', type=pathlib.Path, required=True)
-    # edit_function.add_argument('-mo', '--mandatory_only', default=False,
-    #                             action='store_true',
-    #                             help='If True, only mandatory keys will '
-    #                                  'be filled out')
-    # edit_function.add_argument('-c', '--config', type=pathlib.Path,
-    #                          help='Config file', default='config.yaml')
+    edit_function = subparsers.add_parser('edit', help='')
+    edit_group = edit_function.add_argument_group('mandatory_arguments')
+    edit_group.add_argument('-p', '--path', type=pathlib.Path, required=True)
+    edit_function.add_argument('-mo', '--mandatory_only', default=False,
+                                 action='store_true',
+                                 help='If True, only mandatory keys will '
+                                      'be filled out')
+    edit_function.add_argument('-c', '--config', type=pathlib.Path,
+                              help='Config file', default=os.path.join(os.path.dirname(__file__), "config", "config.yaml"))
     # edit_function.add_argument('-m', '--mode', default='metadata', choices=['metadata', 'mamplan'])
-    # edit_function.set_defaults(func=edit)
+    edit_function.set_defaults(func=edit)
 
     add_value_function = subparsers.add_parser("add_value", help="")
     add_value_function.add_argument(
