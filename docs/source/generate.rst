@@ -59,6 +59,7 @@ Dialog Options
      - Autofill
    * - 
        .. thumbnail:: ../images/text_input.gif
+          :width: 100%
     
      - TBA
      - TBA
