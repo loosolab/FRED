@@ -22,14 +22,16 @@ Table of Contents
 
 .. toctree:: FRED Functions
    :maxdepth: 2
+   :caption: FRED Functions
 
    install
    generate
    search
    plots
 
-.. toctree:: FRED Structure
+.. toctree:: 
    :maxdepth: 2
+   :caption: FRED Structure
 
    ../structure
    ../whitelists
