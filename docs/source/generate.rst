@@ -18,11 +18,11 @@ with the following arguments:
 .. list-table::
    :widths: 100
 
-   * - -p, --path
+   * - p, path
      - The path to the directory where the generated metadata YAML is to be stored.
-   * - -id, --id
+   * - id, id
      - The ID of the project.
-   * - -c, --config 
+   * - c, config 
      - The path to a config file. If not stated, the default config is used.
 
 The generate function has a mode in which only mandatory keys are requested in order to speed up metadata entry. The mandatory-only mode can be activated with the following argument:
