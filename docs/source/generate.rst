@@ -15,6 +15,17 @@ The generate function of FRED is called via
 
 with the following arguments:
 
+.. list-table:: Frozen Delights!
+   :widths: 15 10 30
+   :header-rows: 1
+
+   * - Treat
+     - Quantity
+     - Description
+   * - Albatross
+     - 2.99
+     - On a stick!
+     
 .. list-table::
    :widths: 100
 
