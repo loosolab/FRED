@@ -85,7 +85,7 @@ deploy-pages-MR:
     default: false
   environment:
     name: pages/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    url: "https://loosolab.pages.gwdg.de/-/software/manual_nucleodetective/-/jobs/$CI_JOB_ID/artifacts/docs/build/html/index.html"
+    url: "https://loosolab.pages.gwdg.de/-/software/metadata-organizer/-/jobs/$CI_JOB_ID/artifacts/docs/build/html/index.html"
   artifacts:
     paths:
       - docs/build/html/
