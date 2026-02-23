@@ -15,39 +15,29 @@ The generate function of FRED is called via
 
 with the following arguments:
 
-.. list-table:: Frozen Delights!
-   :widths: 15 10 30
-   :header-rows: 1
-
-   * - Treat
-     - Quantity
-     - Description
-   * - Albatross
-     - 2.99
-     - On a stick!
-     
 .. list-table::
-   :widths: 100
 
-   * - p, path
+   * - -p, --path
      - The path to the directory where the generated metadata YAML is to be stored.
-   * - id, id
+   * - -id, --id
      - The ID of the project.
-   * - c, config 
+   * - -c, --config 
      - The path to a config file. If not stated, the default config is used.
 
 The generate function has a mode in which only mandatory keys are requested in order to speed up metadata entry. The mandatory-only mode can be activated with the following argument:
 
 .. list-table::
-   :widths: 100
 
-   * - -mo, --mandatory_only
+   * - 
+       .. code-block:: 
+    
+          -mo, --mandatory_only
+     
      - If stated, the mandatory-only mode is activated.
 
 To show the correct usage of the function, as well as all possible arguments in a help message, the function also be called with the parameter:
 
 .. list-table::
-   :widths: 100
 
    * - -h, --help
      - Show a help message.
