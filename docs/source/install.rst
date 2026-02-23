@@ -5,7 +5,7 @@ How to install
 Via Python package
 --------------------
 
-FRED is published in the Python Package Index (PyPI) under the name **`fred-metadata <https://pypi.org/project/fred-metadata/>`_**\ . It can be installed with the following command:
+FRED is published in the Python Package Index (PyPI) under the name `fred-metadata <https://pypi.org/project/fred-metadata/>`_. It can be installed with the following command:
 
 .. code-block::
 
