@@ -3,9 +3,6 @@ FRED
 ##############################
 
 
-Introduction 
-=============
-
 .. figure:: ../images/fred_logo.png
     :align: right
     :width: 40%
