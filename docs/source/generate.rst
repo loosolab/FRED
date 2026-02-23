@@ -63,3 +63,33 @@ Dialog Options
     
      - TBA
      - TBA
+
+Summary 
+^^^^^^^^^^^^^^
+
+
+Experimental Factors, Conditions and Samples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Select Experimental Factors
+""""""""""""""""""""""""""""""""
+
+Combine Conditions
+""""""""""""""""""""""
+
+Add Samples
+""""""""""""""""
+
+
+Replicates
+""""""""""""""""""
+
+.. list-table::
+   :width: 100%
+
+   * - Biological Replicates
+     - TBA
+   * - Technical Replicates
+     - TBA
+   * - Number of Measurements
+     - TBA

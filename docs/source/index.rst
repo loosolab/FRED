@@ -20,8 +20,22 @@ FRED
 Table of Contents
 ####################
 
-.. toctree::
+.. toctree:: FRED Functions
    :maxdepth: 2
 
    install
    generate
+   search
+   ../plots
+
+.. toctree:: FRED Structure
+   :maxdepth: 2
+
+   ../structure
+   ../whitelists
+   ../add_factor
+   ../add_keys
+   ../add_organism
+   ../add_whitelist_values
+   ../add_whitelist
+   
