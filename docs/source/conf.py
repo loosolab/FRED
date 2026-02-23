@@ -37,6 +37,7 @@ extensions = ['sphinx.ext.autodoc',
               'myst_parser',
               'sphinx_toolbox.collapse',
               'sphinx.ext.intersphinx',
+              'sphinxcontrib.images',
               ]
 
 napoleon_numpy_docstring = True

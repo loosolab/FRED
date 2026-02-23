@@ -17,7 +17,7 @@ with the following arguments:
 
 .. list-table::
    :width: 100%
-   :widths: 40 60
+   :widths: 25 75
 
    * - \-p, \-\-path
      - The path to the directory where the generated metadata YAML is to be stored.
@@ -30,7 +30,7 @@ The generate function has a mode in which only mandatory keys are requested in o
 
 .. list-table::
    :width: 100%
-   :widths: 40 60
+   :widths: 25 75
 
    * - \-mo, \-\-mandatory_only
      - If stated, the mandatory-only mode is activated.
@@ -39,7 +39,7 @@ To show the correct usage of the function, as well as all possible arguments in 
 
 .. list-table::
    :width: 100%
-   :widths: 40 60
+   :widths: 25 75
 
    * - \-h, \-\-help
      - Show a help message.
