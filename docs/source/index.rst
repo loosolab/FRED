@@ -8,6 +8,7 @@ Introduction
 
 .. figure:: ../images/fred_logo.png
     :align: right
+    :width: 40%
 
 **FRED** (**F**\ ai\ **R** **E**\ xperimental **D**\ esigns) is a tool to help researchers generate and manage FAIR metadata. It includes:
 
