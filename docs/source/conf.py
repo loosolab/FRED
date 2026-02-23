@@ -37,7 +37,6 @@ extensions = ['sphinx.ext.autodoc',
               'myst_parser',
               'sphinx_toolbox.collapse',
               'sphinx.ext.intersphinx',
-              'sphinxcontrib.youtube'
               ]
 
 napoleon_numpy_docstring = True
