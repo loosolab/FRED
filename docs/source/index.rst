@@ -26,16 +26,11 @@ Table of Contents
    install
    generate
    search
-   ../plots
+   plots
 
 .. toctree:: FRED Structure
    :maxdepth: 2
 
    ../structure
    ../whitelists
-   ../add_factor
-   ../add_keys
-   ../add_organism
-   ../add_whitelist_values
-   ../add_whitelist
    
