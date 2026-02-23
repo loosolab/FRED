@@ -61,6 +61,8 @@ build-pages:
     - pip install nbsphinx
     - pip install nbsphinx_link
     - pip install sphinx-design # carsten 20251208: https://github.com/executablebooks/sphinx-design
+    - pip install sphinxcontrib-youtube
+    - pip install sphinxcontrib.images
     - cd docs
     - make html
   artifacts:

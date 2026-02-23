@@ -45,6 +45,20 @@ To show the correct usage of the function, as well as all possible arguments in 
      - Show a help message.
 
 
-Dialog 
----------
+Metadata Input 
+-----------------
 
+Dialog Options
+^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :width: 100%
+
+   * - Text input
+     - Selections
+     - Autofill
+   * - 
+       .. thumbnail:: ../images/text_input.gif
+    
+     - TBA
+     - TBA

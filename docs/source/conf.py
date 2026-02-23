@@ -38,6 +38,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx_toolbox.collapse',
               'sphinx.ext.intersphinx',
               'sphinxcontrib.images',
+              'sphinxcontrib.youtube',
               ]
 
 napoleon_numpy_docstring = True
