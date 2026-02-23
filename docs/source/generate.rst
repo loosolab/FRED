@@ -16,8 +16,8 @@ The generate function of FRED is called via
 with the following arguments:
 
 .. list-table::
-   :width: 100
-   :widths: 40 60
+   :width: 100%
+   :widths: 40% 60%
 
    * - \-p, \-\-path
      - The path to the directory where the generated metadata YAML is to be stored.
@@ -29,8 +29,8 @@ with the following arguments:
 The generate function has a mode in which only mandatory keys are requested in order to speed up metadata entry. The mandatory-only mode can be activated with the following argument:
 
 .. list-table::
-   :width: 100
-   :widths: 40 60
+   :width: 100%
+   :widths: 40% 60%
 
    * - \-mo, \-\-mandatory_only
      - If stated, the mandatory-only mode is activated.
@@ -38,8 +38,8 @@ The generate function has a mode in which only mandatory keys are requested in o
 To show the correct usage of the function, as well as all possible arguments in a help message, the function also be called with the parameter:
 
 .. list-table::
-   :width: 100
-   :widths: 40 60
+   :width: 100%
+   :widths: 40% 60%
 
    * - \-h, \-\-help
      - Show a help message.
