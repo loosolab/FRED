@@ -1,7 +1,23 @@
 File Generation
 =================
 
-With FRED, you can create metadata files in YAML format. The information for the metadata is entered using interactive dialogs.
+When publishing scientific studies, it is important to make all data and metadata available to promote scientific discovery and innovation. **FRED** allows users to create metadata files in a hierarchical structured YAML file using interactive dialogs.
+The metadata is divided into three parts:
+
+.. figure:: ../images/fred_logo.png
+    :align: right
+    :width: 40%
+
+.. list-table::
+   :width: 100%
+   :widths: 25 75
+
+   * - project
+     - General information about the project like description or owner.
+   * - experimental setting
+     - Experimental Design information containing investigated conditions and their respective samples.
+   * - technical details
+     - Technical information about the project like sequencing technique or analysis runs.
 
 
 Function Call
@@ -54,9 +70,10 @@ Dialog Options
 .. list-table::
    :width: 100%
 
-   * - Text input
-     - Selections
-     - Autofill
+   * - **Text input:**
+       Free text entry consisting of words, numbers, or dates.
+     - **Selections:**
+     - **Autofill:**
    * - 
        .. thumbnail:: ../images/text_input.gif
           :width: 100%
@@ -67,12 +84,23 @@ Dialog Options
 Summary 
 ^^^^^^^^^^^^^^
 
+After finishing a section of the metadata, a summary is displayed for checking if everything is correct. 
+For the **project** and **technical details** section, the summary is displayed in YAML formatting. 
+For the **experimental setting** section a plot is created. 
 
 Experimental Factors, Conditions and Samples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Select Experimental Factors
 """"""""""""""""""""""""""""""""
+
+Experimental Factors are used to create the conditions, so it is important to state all information that you actively compared between samples. 
+Additional information that are not used to generate the conditions can be entered later per sample.
+The following video explains how to differentiate experimental factors from additional information in more detail:
+
+..  youtube:: 7SAsh-0FeR4
+   :align: center
+   :width: 100%
 
 Combine Conditions
 """"""""""""""""""""""
