@@ -56,7 +56,7 @@ images_config = {
     "default_image_width": "15%"
 }
 html_static_path = ['_static']
-html_css_files = ['custom.scss']
+html_css_files = ['custom.css']
 
 # -- Options for HTML output -------------------------------------------------
 
