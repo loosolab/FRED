@@ -136,8 +136,8 @@ Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary 
             male: m
             female: f
             mixed: x
-      - 
-        .. code-block:: yaml
+    - 
+      .. code-block:: yaml
           
           whitelist_type: plain
           whitelist:
@@ -172,7 +172,7 @@ A special case to be considered is when an experimental factor can take a dictio
                 ...
               disease_stage:
                 ...              
-      - 
+    - 
         .. code-block:: yaml
           
           whitelist_type: abbrev
@@ -249,7 +249,7 @@ This example shows what a link in a whitelist of type 'plain' can look like. Ass
                             whitelist: True
                             input_type: select
 
-      - 
+    - 
         .. code-block:: yaml
           
           whitelist_type: plain
@@ -260,7 +260,7 @@ This example shows what a link in a whitelist of type 'plain' can look like. Ass
           - bulk ChIP-seq
           ...
       
-      - 
+    - 
         .. code-block:: yaml
           
           whitelist_type: plain
@@ -294,7 +294,7 @@ This example shows how a link in a whitelist of type "group" can look like. For 
             - dmR24
             - dmR24delta
             ...
-      - 
+    - 
         .. code-block:: yaml
           
           whitelist_type: depend
@@ -349,7 +349,7 @@ Links can also be added for dependent whitelists. There are two ways to do this.
           - body_mass_index
           - injury
 
-      - 
+    - 
         .. code-block:: yaml
           
           whitelist_type: depend
@@ -366,7 +366,7 @@ Links can also be added for dependent whitelists. There are two ways to do this.
             flow: flow
             enrichment: enrichment
       
-      - 
+    - 
         .. code-block:: yaml
           
           whitelist_type: depend
@@ -399,7 +399,7 @@ If whitelists are very long, it may make sense to split them into smaller whitel
             mouse_10090: genes/mouse
             zebrafish_7955: genes/zebrafish
             ...
-      - 
+    - 
         .. code-block:: yaml
           
           whitelist_type: plain
