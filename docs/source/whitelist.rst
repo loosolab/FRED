@@ -102,6 +102,7 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
             - danrer11
             - danrer10
             ...
+
       - 
         .. code-block:: yaml
           
@@ -136,6 +137,7 @@ Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary 
             male: m
             female: f
             mixed: x
+
     - 
       .. code-block:: yaml
           
@@ -171,7 +173,8 @@ A special case to be considered is when an experimental factor can take a dictio
               disease_status:
                 ...
               disease_stage:
-                ...              
+                ...  
+
     - 
         .. code-block:: yaml
           
@@ -180,6 +183,7 @@ A special case to be considered is when an experimental factor can take a dictio
             disease_status: sts
             disease_type: tp
             disease_stage: stg
+
       - **disease_status:**
 
         .. code-block:: yaml
@@ -294,6 +298,7 @@ This example shows how a link in a whitelist of type "group" can look like. For 
             - dmR24
             - dmR24delta
             ...
+
     - 
         .. code-block:: yaml
           
@@ -399,6 +404,7 @@ If whitelists are very long, it may make sense to split them into smaller whitel
             mouse_10090: genes/mouse
             zebrafish_7955: genes/zebrafish
             ...
+            
     - 
         .. code-block:: yaml
           
