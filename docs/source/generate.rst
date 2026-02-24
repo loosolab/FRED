@@ -50,7 +50,8 @@ The generate function has a mode in which only mandatory keys are requested in o
    :width: 100%
    :widths: 25 75
 
-   * - \-mo, \-\-mandatory_only
+   * - \-mo, 
+       | \-\-mandatory_only
      - If stated, the mandatory-only mode is activated.
 
 To show the correct usage of the function, as well as all possible arguments in a help message, the function also be called with the parameter:
