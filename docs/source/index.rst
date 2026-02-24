@@ -33,6 +33,6 @@ Table of Contents
    :maxdepth: 2
    :caption: FRED Structure
 
-   ../structure
-   ../whitelists
+   structure
+   whitelist
    
