@@ -26,7 +26,7 @@ Table of Contents
 
    install
    generate
-   search
+   search_metadata
    plots
 
 .. toctree:: 
