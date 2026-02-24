@@ -78,7 +78,6 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
 
    * - whitelists/reference_genome
      - whitelists/organism
@@ -102,7 +101,7 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
             zebrafish_7955:
             - danrer11
             - danrer10
-            - ...
+            ...
       - 
         .. code-block:: yaml
           
@@ -111,7 +110,7 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
           - human_9606
           - mouse_10090
           - zebrafish_7955
-          - ...
+          ...
 
 Type 4: abbrev
 --------------------
@@ -124,7 +123,6 @@ Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary 
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
 
    * - whitelists/abbrev/gender
      - whitelists/gender
@@ -154,7 +152,6 @@ A special case to be considered is when an experimental factor can take a dictio
 
 .. list-table::
    :width: 100%
-   :widths: 33 33 33
 
    * - Extract for disease from keys.yaml
      - whitelists/abbrev/disease
@@ -218,7 +215,6 @@ This example shows what a link in a whitelist of type 'plain' can look like. Ass
 
 .. list-table::
    :width: 100%
-   :widths: 33 33 33
 
    * - Extract for technique from keys.yaml
      - whitelists/technique
@@ -277,7 +273,6 @@ This example shows how a link in a whitelist of type "group" can look like. For 
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
 
    * - whitelists/enrichment
      - whitelists/gene
@@ -322,7 +317,6 @@ Links can also be added for dependent whitelists. There are two ways to do this.
 
 .. list-table::
    :width: 100%
-   :widths: 33 33 33
 
    * - whitelists/factor
      - whitelists/values
@@ -388,7 +382,6 @@ If whitelists are very long, it may make sense to split them into smaller whitel
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
 
    * - whitelists/gene
      - whitelists/genes/human
