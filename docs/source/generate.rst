@@ -3,6 +3,7 @@ File Generation
 
 .. figure:: ../images/FRED_generate.png
     :align: right
+    :width: 50%
 
 
 When publishing scientific studies, it is important to make all data and metadata available to promote scientific discovery and innovation. **FRED** allows users to create metadata files in a hierarchical structured YAML file using interactive dialogs.
