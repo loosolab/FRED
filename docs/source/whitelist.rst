@@ -102,7 +102,7 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
             zebrafish_7955:
             - danrer11
             - danrer10
-            ...
+            - ...
       - 
         .. code-block:: yaml
           
@@ -111,7 +111,7 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
           - human_9606
           - mouse_10090
           - zebrafish_7955
-          ...
+          - ...
 
 Type 4: abbrev
 --------------------
