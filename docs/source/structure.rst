@@ -45,7 +45,9 @@ Included keys
 
 The following extract shows all keys that have already been created in the metadata structure under 'keys.yaml'.
 
+
 .. code-block:: yaml
+    
     project:
         id:
         project_name:
