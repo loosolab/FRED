@@ -1,6 +1,6 @@
-<img align="right" width=250 src="docs/images/fred_logo.png">
-
 # FRED
+
+<img align="right" width=250 src="docs/images/fred_logo.png">
 
 Introduction 
 ------------
