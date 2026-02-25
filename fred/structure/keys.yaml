@@ -356,6 +356,8 @@ experimental_setting:
       list: True
       display_name: "Conditions"
       desc: "Add samples to conditions."
+      special_case:
+        edit: "not removable"
       value:
         condition_name:
           mandatory: True

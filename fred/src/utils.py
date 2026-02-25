@@ -65,7 +65,6 @@ def parse_config(config_file):
             os.path.dirname(__file__), "..", "..", "FRED_whitelists"
         )
         missing_keys.append("whitelist_path")
-    print('Whitelist path', os.path.abspath(whitelist_path))
     try:
         update_whitelists = config["update_whitelists"]
     except KeyError:
