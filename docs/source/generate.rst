@@ -1,19 +1,11 @@
 File Generation
 =================
 
-
-.. list-table::
-   :width: 100%
-   :widths: 50 50
-
-   * - When publishing scientific studies, it is important to make all data and metadata available to promote scientific discovery and innovation. **FRED** allows users to create metadata files in a hierarchical structured YAML file using interactive dialogs.
-       The metadata is divided into three parts:
-     -
-
-      .. figure:: ../images/FRED_generate.png
-        :align: right
-        :width: 50%
-    
+.. figure:: ../images/FRED_generate.png
+    :align: right
+    :width: 50%
+When publishing scientific studies, it is important to make all data and metadata available to promote scientific discovery and innovation. **FRED** allows users to create metadata files in a hierarchical structured YAML file using interactive dialogs.
+The metadata is divided into three parts:
 
 
 .. list-table::
@@ -50,7 +42,6 @@ with the following arguments:
    * - \-c, \-\-config 
      - The path to a config file. If not stated, the default config is used.
 
-
 The generate function has a mode in which only mandatory keys are requested in order to speed up metadata entry. The mandatory-only mode can be activated with the following argument:
 
 .. list-table::
@@ -59,7 +50,6 @@ The generate function has a mode in which only mandatory keys are requested in o
 
    * - \-mo, \-\-mandatory_only
      - If stated, the mandatory-only mode is activated.
-
 
 To show the correct usage of the function, as well as all possible arguments in a help message, the function also be called with the parameter:
 
