@@ -8,6 +8,8 @@ stages:          # List of stages for jobs, and their order of execution
 
 docker:
     stage: build-container
+    tags:
+    - docker
     only:
       - main
     image: docker:latest
@@ -25,6 +27,8 @@ docker:
 
 docker-dev:
     stage: build-container
+    tags:
+    - docker
     only:
       - unstable
     image: docker:latest
