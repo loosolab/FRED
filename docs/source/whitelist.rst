@@ -158,13 +158,11 @@ A special case to be considered is when an experimental factor can take a dictio
 **Example:**
 
 .. list-table::
-   :width: 99%
-   :widths: 33 33 33
+   :width: 100%
+   :widths: 50 50
 
    * - Extract for disease from keys.yaml
      - whitelists/abbrev/disease
-     - whitelists/abbrev/disease_status
-       whitelists/abbrev/disease_type
    * - As shown in the extract from keys.yaml, the experimental factor disease is divided into the subdomains status, type, and stage using an underlying dictionary.
      - Abbreviations must be created for the keys disease_status, disease_type and disease_stage which are included in disease, since these keys are also written in the file name.
      - Here you can see the abbreviated whitelists for the values of the keys. For disease_stage no abbrev whitelist was created, because the included values are already very short and do not contain any special characters.
@@ -190,7 +188,15 @@ A special case to be considered is when an experimental factor can take a dictio
             disease_type: tp
             disease_stage: stg
 
-      - **disease_status:**
+
+.. list-table::
+   :width: 100%
+   :widths: 50
+
+   * - whitelists/abbrev/disease_status
+       whitelists/abbrev/disease_type
+   * - Here you can see the abbreviated whitelists for the values of the keys. For disease_stage no abbrev whitelist was created, because the included values are already very short and do not contain any special characters.
+   * - **disease_status:**
 
         .. code-block:: yaml
           
@@ -209,7 +215,6 @@ A special case to be considered is when an experimental factor can take a dictio
             Asthma: Asth
             Pneumonia: pneum
 
-
 Linking whitelists
 -------------------
 
@@ -225,15 +230,13 @@ This example shows what a link in a whitelist of type 'plain' can look like. Ass
 
 .. list-table::
    :width: 100%
-   :widths: 33 33 33
+   :widths: 50 50
 
    * - Extract for technique from keys.yaml
      - whitelists/technique
-     - whitelists/setting_technique
    * - For this example it is assumed that under 'experimental_setting' a new key 'setting_technique' is added, which contains the measurement of the samples per experimental
        setting. All used techniques are then summarized again in a list under 'technical_details'.
      - In the whitelist for technique all possible techniques for sample measurement are already defined.
-     - For the whitelist 'setting_technique' the values can be adopted from the whitelist 'technique' by specifying its path under the key 'whitelist'. 
    * - 
        .. code-block:: yaml
           
@@ -271,7 +274,14 @@ This example shows what a link in a whitelist of type 'plain' can look like. Ass
           - bulk ChIP-seq
           ...
       
-    - 
+    
+.. list-table::
+   :width: 100%
+   :widths: 50
+
+   * - whitelists/setting_technique
+   * - For the whitelist 'setting_technique' the values can be adopted from the whitelist 'technique' by specifying its path under the key 'whitelist'. 
+   * - 
         .. code-block:: yaml
           
           whitelist_type: plain
@@ -330,17 +340,13 @@ Links can also be added for dependent whitelists. There are two ways to do this.
 
 .. list-table::
    :width: 100%
-   :widths: 33 33 33
+   :widths: 50 50
 
    * - whitelists/factor
-     - whitelists/values
      - whitelists/values
    * - The whitelist for the experimental factors is displayed here for overview. The values in the whitelist for 'values' depend on the factor entered from this list.
      - The whitelist for values depends on the entered value under 'factor' and the possible values should correspond to the values of the selected factor. For this
        reason, for each key under 'whitelist', the corresponding whitelist of the experimental factor is linked.
-     - Each key in column two under 'whitelist' represents an experimental factor. The linked whitelist files show that the respective whitelist is named the same as 
-       the factor whose possible values it contains. For this reason, it is possible to omit the keys for the experimental factors, since the program automatically 
-       searches for a whitelist with the same name as the key/experimental factor.
    * - 
        .. code-block:: yaml
           
@@ -380,7 +386,16 @@ Links can also be added for dependent whitelists. There are two ways to do this.
             flow: flow
             enrichment: enrichment
       
-    - 
+
+.. list-table::
+   :width: 100%
+   :widths: 50 50
+
+   * - whitelists/values
+   * - Each key in column two under 'whitelist' represents an experimental factor. The linked whitelist files show that the respective whitelist is named the same as 
+       the factor whose possible values it contains. For this reason, it is possible to omit the keys for the experimental factors, since the program automatically 
+       searches for a whitelist with the same name as the key/experimental factor.
+   * - 
         .. code-block:: yaml
           
           whitelist_type: depend
