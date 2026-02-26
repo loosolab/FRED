@@ -142,7 +142,7 @@ Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary 
             mixed: x
 
   
-  .. list-table::
+.. list-table::
    :width: 100%
    :widths: 50 
 
@@ -164,12 +164,10 @@ A special case to be considered is when an experimental factor can take a dictio
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
+   :widths: 50
 
    * - Extract for disease from keys.yaml
-     - whitelists/abbrev/disease
    * - As shown in the extract from keys.yaml, the experimental factor disease is divided into the subdomains status, type, and stage using an underlying dictionary.
-     - Abbreviations must be created for the keys disease_status, disease_type and disease_stage which are included in disease, since these keys are also written in the file name.
    * - 
        .. code-block:: yaml
           
@@ -181,9 +179,16 @@ A special case to be considered is when an experimental factor can take a dictio
               disease_status:
                 ...
               disease_stage:
-                ...  
+                ... 
+            
 
-    - 
+.. list-table::
+   :width: 100%
+   :widths: 50
+
+   * - whitelists/abbrev/disease
+   * - Abbreviations must be created for the keys disease_status, disease_type and disease_stage which are included in disease, since these keys are also written in the file name.
+   * - 
         .. code-block:: yaml
           
           whitelist_type: abbrev
@@ -191,7 +196,6 @@ A special case to be considered is when an experimental factor can take a dictio
             disease_status: sts
             disease_type: tp
             disease_stage: stg
-            
 
 
 .. list-table::
