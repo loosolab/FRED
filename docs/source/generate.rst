@@ -4,6 +4,7 @@ File Generation
 .. figure:: ../images/FRED_generate.png
     :align: right
     :width: 50%
+
 When publishing scientific studies, it is important to make all data and metadata available to promote scientific discovery and innovation. **FRED** allows users to create metadata files in a hierarchical structured YAML file using interactive dialogs.
 The metadata is divided into three parts:
 
@@ -72,14 +73,24 @@ Dialog Options
 
    * - **Text input:**
        Free text entry consisting of words, numbers, or dates.
-     - **Selections:**
-     - **Autofill:**
-   * - 
+     - 
+       .. thumbnail:: ../images/text_input.gif
+          :width: 100%
+
+
+   * - **Selections:**
+       Selection of listed values by stating their number in the list.
+     - 
+       .. thumbnail:: ../images/text_input.gif
+          :width: 100%
+
+
+   * - **Autofill:**
+       Type in values that match a pre-defined list. Upon pressing the tabulator key, up to 30 values that match the input are displayed. If only one value matches, it is set as your input.  
+     - 
        .. thumbnail:: ../images/text_input.gif
           :width: 100%
     
-     - TBA
-     - TBA
 
 Summary 
 ^^^^^^^^^^^^^^
@@ -105,19 +116,25 @@ The following video explains how to differentiate experimental factors from addi
 Combine Conditions
 """"""""""""""""""""""
 
+You create conditions by selecting experimental factors from the displayed list that will be combined. The factors are grouped by experimental factor. If the factor allows for a list as input,
+you can select multiple values from this factor. If your selection is not a valid condition or already exists, you will be notified via a warning and prompted to redo your selection.
+Once you selected your condition, you will be prompted to add samples. After finishing the sample input, you can add another condition.
+
 Add Samples
 """"""""""""""""
 
+Once you selected a condition, you now have to add samples. Per Sample you need to state the number of technical replicates. Optionally you can then enter additional information like age oder cell type.
+You have the option to enter multiple samples per condition.
 
-Replicates
-""""""""""""""""""
+Replicates & Measurements
+""""""""""""""""""""""""""""""
 
 .. list-table::
    :width: 100%
 
    * - Biological Replicates
-     - TBA
+     - A biological replicate captures random biological variation and typically originates from an individual organism. It usually corresponds to the tube collected from the donor.
    * - Technical Replicates
-     - TBA
+     - Result of measuring one biological replicate including all technical noise induced by experimental/measurement protocols (typically just 1). Occurs when an experiment is repeated or a sequencing library is recreated based on the same biological replicate.
    * - Number of Measurements
-     - TBA
+     - A measurement represents one readout of a technical replicate. Occurs when the same sequencing library is sequenced again or when an MS sample is splitted and/or measured multiple times. Does not contain any technical noise apart from the measurement itself.

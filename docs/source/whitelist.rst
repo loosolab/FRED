@@ -115,6 +115,7 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
           ...
 
 
+
 Type 4: abbrev
 --------------------
 

@@ -8,4 +8,4 @@ whitelist_path: fred
 update_whitelists: True
 output_path: .
 filename: '_metadata' # example_metadata.yaml
-email: bcu.support@mpi-bn.mpg.de
+email: example@email.de

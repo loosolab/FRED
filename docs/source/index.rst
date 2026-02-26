@@ -25,9 +25,11 @@ Table of Contents
    :caption: FRED Functions
 
    install
+   config
    generate
    search_metadata
    plots
+   standalone
 
 .. toctree:: 
    :maxdepth: 2
