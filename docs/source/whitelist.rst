@@ -128,12 +128,10 @@ Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary 
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
+   :widths: 50 
 
    * - whitelists/abbrev/gender
-     - whitelists/gender
    * - In this example, the abbrev whitelist was created for the experimental factor gender.
-     - Here you can see the non-abbreviated gender whitelist for comparison.
    * - 
        .. code-block:: yaml
           
@@ -143,7 +141,14 @@ Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary 
             female: f
             mixed: x
 
-    - 
+  
+  .. list-table::
+   :width: 100%
+   :widths: 50 
+
+   * - whitelists/gender
+   * - Here you can see the non-abbreviated gender whitelist for comparison.
+   * - 
       .. code-block:: yaml
           
           whitelist_type: plain
@@ -165,7 +170,6 @@ A special case to be considered is when an experimental factor can take a dictio
      - whitelists/abbrev/disease
    * - As shown in the extract from keys.yaml, the experimental factor disease is divided into the subdomains status, type, and stage using an underlying dictionary.
      - Abbreviations must be created for the keys disease_status, disease_type and disease_stage which are included in disease, since these keys are also written in the file name.
-     - Here you can see the abbreviated whitelists for the values of the keys. For disease_stage no abbrev whitelist was created, because the included values are already very short and do not contain any special characters.
    * - 
        .. code-block:: yaml
           
@@ -187,6 +191,7 @@ A special case to be considered is when an experimental factor can take a dictio
             disease_status: sts
             disease_type: tp
             disease_stage: stg
+            
 
 
 .. list-table::
@@ -230,13 +235,11 @@ This example shows what a link in a whitelist of type 'plain' can look like. Ass
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
+   :widths: 50
 
    * - Extract for technique from keys.yaml
-     - whitelists/technique
    * - For this example it is assumed that under 'experimental_setting' a new key 'setting_technique' is added, which contains the measurement of the samples per experimental
        setting. All used techniques are then summarized again in a list under 'technical_details'.
-     - In the whitelist for technique all possible techniques for sample measurement are already defined.
    * - 
        .. code-block:: yaml
           
@@ -263,7 +266,15 @@ This example shows what a link in a whitelist of type 'plain' can look like. Ass
                             whitelist: True
                             input_type: select
 
-    - 
+.. list-table::
+   :width: 100%
+   :widths: 50 50
+
+   * - whitelists/technique
+     - whitelists/setting_technique
+   * - In the whitelist for technique all possible techniques for sample measurement are already defined.
+     - For the whitelist 'setting_technique' the values can be adopted from the whitelist 'technique' by specifying its path under the key 'whitelist'. 
+   * - 
         .. code-block:: yaml
           
           whitelist_type: plain
@@ -273,15 +284,8 @@ This example shows what a link in a whitelist of type 'plain' can look like. Ass
           - bulk ATAC-seq
           - bulk ChIP-seq
           ...
-      
-    
-.. list-table::
-   :width: 100%
-   :widths: 50
-
-   * - whitelists/setting_technique
-   * - For the whitelist 'setting_technique' the values can be adopted from the whitelist 'technique' by specifying its path under the key 'whitelist'. 
-   * - 
+     
+     - 
         .. code-block:: yaml
           
           whitelist_type: plain
@@ -294,14 +298,12 @@ This example shows how a link in a whitelist of type "group" can look like. For 
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
+   :widths: 50 
 
    * - whitelists/enrichment
-     - whitelists/gene
    * - The whitelist for enrichment is grouped into 'histone marks', 'proteins' and 'other'. The proteins correspond to the genes specified in the gene
        whitelist for each organism. By specifying the path to 'gene' whitelist, it can be linked under 'proteins', so that for this section the values
        from gene whitelist are adopted.
-     - The gene whitelist depends on the organism. This means that the 'proteins' part of the 'enrichment' whitelist is also dependent on the organism.
    * - 
        .. code-block:: yaml
           
@@ -317,7 +319,14 @@ This example shows how a link in a whitelist of type "group" can look like. For 
             - dmR24delta
             ...
 
-    - 
+
+.. list-table::
+   :width: 100%
+   :widths: 50 
+
+   * - whitelists/gene
+   * - The gene whitelist depends on the organism. This means that the 'proteins' part of the 'enrichment' whitelist is also dependent on the organism.
+   * - 
         .. code-block:: yaml
           
           whitelist_type: depend
@@ -340,7 +349,7 @@ Links can also be added for dependent whitelists. There are two ways to do this.
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
+   :widths: 40 60
 
    * - whitelists/factor
      - whitelists/values
@@ -369,7 +378,7 @@ Links can also be added for dependent whitelists. There are two ways to do this.
           - body_mass_index
           - injury
 
-    - 
+     - 
         .. code-block:: yaml
           
           whitelist_type: depend
@@ -389,7 +398,7 @@ Links can also be added for dependent whitelists. There are two ways to do this.
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
+   :widths: 50
 
    * - whitelists/values
    * - Each key in column two under 'whitelist' represents an experimental factor. The linked whitelist files show that the respective whitelist is named the same as 
@@ -411,14 +420,11 @@ If whitelists are very long, it may make sense to split them into smaller whitel
 
 .. list-table::
    :width: 100%
-   :widths: 50 50
+   :widths: 50
 
    * - whitelists/gene
-     - whitelists/genes/human
    * - The whitelists for the genes per organism are very long, which is why they are outsourced to individual files. The keys are named 
        after the organisms and the path to the respective whitelist is given as value. 
-     - For the whitelists per organism a new folder 'genes' was created. The whitelists are named after the organism for which they 
-       contain the genes. The naming of the files does not follow any fixed rule but is subject to personal preference.
    * - 
        .. code-block:: yaml
           
@@ -429,8 +435,16 @@ If whitelists are very long, it may make sense to split them into smaller whitel
             mouse_10090: genes/mouse
             zebrafish_7955: genes/zebrafish
             ...
-            
-    - 
+
+
+.. list-table::
+   :width: 100%
+   :widths: 50
+
+   * - whitelists/genes/human
+   * - For the whitelists per organism a new folder 'genes' was created. The whitelists are named after the organism for which they 
+       contain the genes. The naming of the files does not follow any fixed rule but is subject to personal preference.
+   * - 
         .. code-block:: yaml
           
           whitelist_type: plain
