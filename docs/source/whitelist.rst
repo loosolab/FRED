@@ -158,7 +158,7 @@ A special case to be considered is when an experimental factor can take a dictio
 **Example:**
 
 .. list-table::
-   :width: 100%
+   :width: 99%
    :widths: 33 33 33
 
    * - Extract for disease from keys.yaml
