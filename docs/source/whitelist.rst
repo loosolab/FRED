@@ -105,14 +105,7 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
 
 
       - 
-        .. code-block:: yaml
-          
-          whitelist_type: plain
-          whitelist:
-          - human_9606
-          - mouse_10090
-          - zebrafish_7955
-          ...
+        test
 
 
 
