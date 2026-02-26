@@ -28,7 +28,7 @@ dependencies = [
 ]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
-keywords = ["FAIR", "metadata", "experiment", "Research Data", "Research Data Management", "RDM]
+keywords = ["FAIR", "metadata", "experiment", "research", "data", "management", "RDM]
 
 [project.scripts]
 fred = "fred.metaTools:main"
