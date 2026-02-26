@@ -1,0 +1,142 @@
+.red {
+    color:red;
+}
+
+.blue {
+    color:blue;
+}
+
+/* Table appearance */
+.wy-table-responsive table td, .wy-table-responsive table th {
+    /* !important prevents the common CSS stylesheets from
+       overriding this as on RTD they are loaded after this stylesheet */
+    white-space: normal !important;
+}
+
+/* disabled 20260223 to test fixing missing scroll bar in table; see "FEATURE-COUNT (RNA-Seq only)" table */
+/* .wy-table-responsive {
+    overflow: visible !important;
+} */
+
+
+/* Custom table class with reduced spacings */
+.small-table1 {
+    /* Extend the wy-table-responsive class */
+    @extend .wy-table-responsive;
+    
+    font-size: 16px !important;  /* Table title */
+
+    td, td p {
+        font-size: 8px !important;
+        margin: 0; /* Remove extra spacing */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+
+    th {
+        font-size: 32px !important;
+        font-weight: normal; /* Optional: Reduce boldness */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */ 
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+}
+
+/* Custom table class with reduced spacing */
+.small-table2 {
+    /* Extend the wy-table-responsive class */
+    @extend .wy-table-responsive;
+    
+    font-size: 16px !important;  /* Table title */
+
+    td, td p {
+        font-size: 10px !important;
+        margin: 0; /* Remove extra spacing */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+
+    th {
+        font-size: 32px !important;
+        font-weight: normal; /* Optional: Reduce boldness */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */ 
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+}
+
+
+/* Custom table class with reduced spacing */
+.small-table3 {
+    /* Extend the wy-table-responsive class */
+    @extend .wy-table-responsive;
+    
+    font-size: 16px !important;  /* Table title */
+
+    td, td p {
+        font-size: 12px !important;
+        margin: 0; /* Remove extra spacing */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+
+    th {
+        font-size: 32px !important;
+        font-weight: normal; /* Optional: Reduce boldness */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */ 
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+}
+
+
+/* Custom table class with reduced spacing */
+.small-table4 {
+    /* Extend the wy-table-responsive class */
+    @extend .wy-table-responsive;
+    
+    font-size: 16px !important;  /* Table title */
+
+    td, td p {
+        font-size: 14px !important;
+        margin: 0; /* Remove extra spacing */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+
+    th {
+        font-size: 32px !important;
+        font-weight: normal; /* Optional: Reduce boldness */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */ 
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+}
+
+/* Custom table class with reduced spacing */
+.small-table5 {
+    /* Extend the wy-table-responsive class */
+    @extend .wy-table-responsive;
+    
+    font-size: 16px !important;  /* Table title */
+
+    td, td p {
+        font-size: 16px !important;
+        margin: 0; /* Remove extra spacing */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+
+    th {
+        font-size: 32px !important;
+        font-weight: normal; /* Optional: Reduce boldness */
+        word-break: break-word; /* break long words if needed */
+        overflow-wrap: anywhere; /* handle very long tokens/URLs */ 
+        padding: 0.1em 0.2em !important; /* Adjust these values as needed */
+    }
+}

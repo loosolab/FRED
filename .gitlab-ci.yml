@@ -2,7 +2,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: normal
 
 stages:          # List of stages for jobs, and their order of execution
-  - build-page
+  - deploy
   - build-container
   - run-test
 
@@ -48,21 +48,97 @@ test:       # Test run
   script:
     - test/test_key_yaml.py
 
-page:       # This job runs in the build stage, which runs first.
-  stage: build-page
-  image: python:3.8-buster
-  pages:
-    # The folder that contains the files to be exposed at the Page URL
-    publish: public
-  rules:
-    # This ensures that only pushes to the default branch will trigger
-    # a pages deploy
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-  # Functions that should be executed before the build script is run
-  before_script:
-    - pip install .
+# Build documentation
+build-pages:
+  image: python:3.12
+  stage: deploy
   script:
-    - mkdocs build --strict --verbose
+    - apt-get update -qq && apt-get install -qq -y pandoc  # system install of pandoc is needed
+    - pip install --upgrade pip # carsten 20251208: just to remove warning; no other effect?
+    - pip install sphinx sphinx-rtd-theme
+    - pip install myst_parser
+    - pip install sphinx-toolbox
+    - pip install nbsphinx
+    - pip install nbsphinx_link
+    - pip install sphinx-design # carsten 20251208: https://github.com/executablebooks/sphinx-design
+    - pip install sphinxcontrib-youtube
+    - pip install sphinxcontrib.images
+    - cd docs
+    - make html
+  artifacts:
+    paths:
+      - docs/build/html/
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" # always for commits to main
+    - if: $CI_COMMIT_BRANCH == "dev"  # always for commits to dev
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "dev"
+      when: never   # but not again for any merge requests coming from dev
+    - when: manual  # otherwise manual
+      allow_failure: True  # manual is not required
+
+# Deploy pages for a MR - needs to be separate from deploy-pages-commit due to 
+# $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME != $CI_COMMIT_BRANCH
+deploy-pages-MR:
+  stage: deploy
+  needs: 
+    - job: build-pages
+      artifacts: True
+  inherit:
+    default: false
+  environment:
+    name: pages/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    url: "https://loosolab.pages.gwdg.de/-/software/metadata-organizer/-/jobs/$CI_JOB_ID/artifacts/docs/build/html/index.html"
+  artifacts:
+    paths:
+      - docs/build/html/
+  script: 
+    - ls -l docs/
+    - echo "deploy"
+  artifacts:
+    paths:
+      - docs/build/html/
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME != "dev" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME != "main" # dev/main are built automatically
+      allow_failure: True
+
+# Deploy pages for a commit without a MR
+deploy-pages-commit:
+  stage: deploy
+  needs:
+    - job: build-pages
+      artifacts: True
+  inherit:
+    default: false
+  environment:
+    name: pages/$CI_COMMIT_BRANCH
+    url: "https://loosolab.pages.gwdg.de/-/software/manual_nucleodetective/-/jobs/$CI_JOB_ID/artifacts/docs/build/html/index.html"
+  script:
+    - ls -l docs/
+    - echo "deploy" #mv docs/build/html/ public/
+  artifacts:
+    paths:
+      - docs/build/html/
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event"
+      allow_failure: True
+
+# Deploy documentation to public pages if it was the main branch
+pages:
+  stage: deploy
+  needs:
+    - job: build-pages
+      artifacts: True
+  inherit:
+    default: false
+  script:
+    - mv docs/build/html/ public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" # after accepted MR to main
+      allow_failure: False  # main not allowed to fail
+
 
   
 

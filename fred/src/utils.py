@@ -65,7 +65,6 @@ def parse_config(config_file):
             os.path.dirname(__file__), "..", "..", "FRED_whitelists"
         )
         missing_keys.append("whitelist_path")
-    print('Whitelist path', os.path.abspath(whitelist_path))
     try:
         update_whitelists = config["update_whitelists"]
     except KeyError:
@@ -209,7 +208,7 @@ def read_whitelist(key, whitelist_path=None):
 
     if whitelist_path is None:
         whitelist_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "..", "FRED_whitelists"
+            os.path.dirname(os.path.abspath(__file__)), "..", "..", "FRED_whitelists"
         )
     try:
         whitelist = read_in_json(os.path.join(whitelist_path, "misc", "json", key))
@@ -361,9 +360,8 @@ def get_whitelist(
 
     if whitelist_path is None:
         whitelist_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "..", "FRED_whitelists"
+            os.path.dirname(os.path.abspath(__file__)), "..", "..", "FRED_whitelists"
         )
-
     if whitelist_object is not None:
         if key in whitelist_object:
             whitelist = whitelist_object[key]
@@ -371,7 +369,6 @@ def get_whitelist(
             whitelist = None
     else:
         whitelist = read_whitelist(key, whitelist_path=whitelist_path)
-
     while (
         isinstance(whitelist, dict)
         and not group

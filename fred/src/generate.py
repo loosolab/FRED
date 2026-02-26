@@ -198,9 +198,11 @@ class Generate(Input):
         return summary
 
     def parse_lists(self, structure, position, indent, return_dict, is_factor=False):
-
         if isinstance(structure["value"], dict):
-            elem_index = 0
+            try:
+                elem_index = len(utils.find_position(self.result_dict, position))
+            except KeyError:
+                elem_index = 0
             redo = True
 
             while redo:
@@ -308,7 +310,6 @@ class Generate(Input):
                         and structure[key]["special_case"]["factor"]
                     ):
                         if "list" in structure[key] and structure[key]["list"]:
-                            print(structure[key]["value"])
                             self.fill_key(
                                 position + [key], [structure[key]["value"]], return_dict
                             )

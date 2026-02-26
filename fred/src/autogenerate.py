@@ -221,20 +221,6 @@ class Autogenerate:
 
     def get_sample_name(self, read_in_whitelists=None):
         if self.position[-2] == "technical_replicates":
-            """count = utils.find_position(self.gen.result_dict, self.position[:-1] + ['count'])
-            nom = utils.find_position(self.gen.result_dict, self.position[:-2] + ['number_of_measurements'])
-            sample_name = utils.find_position(self.gen.result_dict, self.position[:-2] + ['sample_name'])
-            organism = utils.find_position(self.gen.result_dict, self.position[:self.position.index('experimental_setting')+2] + ['organism', 'organism_name'])
-            samples = []
-            for i in range(count):
-                # iterate over the number of measurements
-                for j in range(nom):
-                    # add sample name containing id, organism, sample identifier,
-                    # index of technical replicate and index of measurement to samples
-                    # list
-                    samples.append(f'{self.gen.project_id}_{organism}_{sample_name}_'
-                                   f't{"{:02d}".format(i + 1)}_'
-                                   f'm{"{:02d}".format(j + 1)}')"""
             return utils.create_sample_names(self.gen.result_dict, {}, self.position)
         else:
             condition = utils.find_position(
