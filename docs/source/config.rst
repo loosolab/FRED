@@ -42,10 +42,10 @@ Config Keys
      - keys: name, token
    * - private access - name 
      - username for access token (github) or oauth2 for project access token (gitlab)
-     - -
+     - 
    * - private access - token
      - personal (github) or project (gitlab) access token
-     - -
+     - 
    * - branch
      - The branch of the whitelist repository; can also be set to versions if version tags are used (e.g. 1.2.0 or 1.2.*)
      - main

@@ -73,23 +73,15 @@ Dialog Options
 
    * - **Text input:**
        Free text entry consisting of words, numbers, or dates.
-     - 
-       .. thumbnail:: ../images/text_input.gif
-          :width: 100%
-
+     
 
    * - **Selections:**
        Selection of listed values by stating their number in the list.
-     - 
-       .. thumbnail:: ../images/text_input.gif
-          :width: 100%
-
+     
 
    * - **Autofill:**
        Type in values that match a pre-defined list. Upon pressing the tabulator key, up to 30 values that match the input are displayed. If only one value matches, it is set as your input.  
-     - 
-       .. thumbnail:: ../images/text_input.gif
-          :width: 100%
+     
     
 
 Summary 
