@@ -86,7 +86,34 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
        The possible organisms form the keys specified under 'whitelist'. Their values are those reference genomes that can be set for the respective organism.
        This allows faster finding of diseases in the list, as well as a better overview.
      - The whitelist for 'organism_name' contains all allowed organisms as values. These form the keys in the dependent whitelist 'reference_genome'.
-   
+   * - 
+       .. code-block:: yaml
+          
+          whitelist_type: depend
+          ident_key: organism_name
+          whitelist:
+            human_9606:
+            - hg38
+            - hg19
+            mouse_10090:
+            - mm10
+            - mm9
+            - mm38
+            zebrafish_7955:
+            - danrer11
+            - danrer10
+            ...
+     
+     
+     -  
+        .. code-block:: yaml
+          
+          whitelist_type: plain
+          whitelist:
+          - human_9606
+          - mouse_10090
+          - zebrafish_7955
+          ...
 
 
 
