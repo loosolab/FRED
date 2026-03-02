@@ -115,7 +115,7 @@ deploy-pages-commit:
     default: false
   environment:
     name: pages/$CI_COMMIT_BRANCH
-    url: "https://loosolab.pages.gwdg.de/-/software/manual_nucleodetective/-/jobs/$CI_JOB_ID/artifacts/docs/build/html/index.html"
+    url: "https://loosolab.pages.gwdg.de/-/software/metadata-organizer/-/jobs/$CI_JOB_ID/artifacts/docs/build/html/index.html"
   script:
     - ls -l docs/
     - echo "deploy" #mv docs/build/html/ public/
