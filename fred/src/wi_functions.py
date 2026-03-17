@@ -732,6 +732,33 @@ def get_metadata_search_view(metadata_path):
 
     return res
 
+def add_nerd(path, nerd_dict):
+    """
+    Add a new nerd to the nerd list in a metadata file.
+
+    :param path: path to the metadata YAML file
+    :param nerd_dict: dictionary containing the sub-keys of the new nerd.
+                      Example with mandatory keys:
+                      {
+                          "name": "Mustermann, Max",
+                          "ldap_name": "mmuster",
+                          "department": "AG-mustermann",
+                          "email": "max.mustermann@mpi-bn.mpg.de"
+                      }
+    :return: True if the nerd was added, False if a nerd with the same
+             ldap_name already exists in the file
+    """
+    metadata = utils.read_in_yaml(path)
+    if "nerd" not in metadata["project"] or metadata["project"]["nerd"] is None:
+        metadata["project"]["nerd"] = []
+    existing_usernames = [n["ldap_name"] for n in metadata["project"]["nerd"] if "ldap_name" in n]
+    if nerd_dict["ldap_name"] in existing_usernames:
+        return False
+    metadata["project"]["nerd"].append(nerd_dict)
+    utils.save_as_yaml(metadata, path)
+    return True
+
+
 def read_metadata(path):
     return utils.read_in_yaml(path)
 
