@@ -409,7 +409,7 @@ def get_text_keys(structure, pre=''):
                 keys.append(f'{pre}.{key}'.strip('.'))
         else:
             if 'value' in structure[key] and isinstance(structure[key]['value'], dict):
-                keys += get_text_keys(structure[key]['value'], key)
+                keys += get_text_keys(structure[key]['value'], f'{pre}.{key}')
     return keys
 
 def get_all_query(keys, value):
