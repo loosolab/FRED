@@ -112,7 +112,7 @@ def save_as_yaml(dictionary, file_path):
     :param file_path: the path of the yaml file to be created
     """
     with open(file_path, "w") as file:
-        yaml.dump(dictionary, file, sort_keys=False, Dumper=Dumper)
+        yaml.dump(dictionary, file, sort_keys=False, Dumper=Dumper, encoding='utf-8', allow_unicode=True)
 
 
 def read_in_yaml(yaml_file):
