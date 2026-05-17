@@ -25,6 +25,7 @@ dependencies = [
     "kaleido<1.0.0",
     "dash",
     "mkdocs",
+    "openpyxl",
 ]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]

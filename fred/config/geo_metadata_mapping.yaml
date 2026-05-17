@@ -132,8 +132,8 @@ protocols:
   "*processed data files format and content": "[fill in: e.g. tab-delimited counts matrix]"
 
 # ---------------------------------------------------------------------------
-# sample_characteristics: Zusätzliche Spalten in der SAMPLES-Tabelle.
-# **tissue und **cell type haben eigene Pflichtspalten und fehlen hier.
+# sample_characteristics: Characteristic-Spalten in der SAMPLES-Tabelle (ab Spalte H).
+# **tissue, **cell line, **cell type sind Template-Pflichtspalten (A–G) und fehlen hier.
 # Nur Spalten mit mindestens einem Wert werden ausgegeben.
 # ---------------------------------------------------------------------------
 sample_characteristics:
@@ -148,6 +148,6 @@ sample_characteristics:
   "ChIP antibody":       "sample.enrichment.enrichment_type.gene_name"
   "treatment":           "sample.medical_treatment.treatment_type"
   "injury":              "sample.injury.injury_type"
-  "time point":
+  "time":
     - "sample.time_point.value"
     - "sample.time_point.unit"

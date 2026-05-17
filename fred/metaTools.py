@@ -255,6 +255,26 @@ class FRED:
         edit.create_result_dict()
         edit.edit()
 
+    def export(self, path, output_dir, filename, mapping_path, settings, fmt="mage-tab"):
+        setting_filter = [s.strip() for s in settings.split(",")] if settings else None
+        if fmt == "geo":
+            from fred.src.geo_export import GeoMetadataExporter
+            default_mapping = os.path.join(os.path.dirname(__file__), "config", "geo_metadata_mapping.yaml")
+            mapping = utils.read_in_yaml(mapping_path or default_mapping)
+            metadata = utils.read_in_yaml(path)
+            exporter = GeoMetadataExporter(metadata, mapping, setting_filter)
+            xlsx_path = exporter.export(output_dir or self.output_path, filename)
+            print(f"GEO metadata spreadsheet saved to: {xlsx_path}")
+        else:
+            from fred.src.export import MageTabExporter
+            default_mapping = os.path.join(os.path.dirname(__file__), "config", "mage_tab_mapping.yaml")
+            mapping = utils.read_in_yaml(mapping_path or default_mapping)
+            metadata = utils.read_in_yaml(path)
+            exporter = MageTabExporter(metadata, mapping, setting_filter)
+            idf_path, sdrf_path = exporter.export(output_dir or self.output_path, filename)
+            print(f"IDF saved to: {idf_path}")
+            print(f"SDRF saved to: {sdrf_path}")
+
     def add_value(self, path, position, value, edit_existing):
         files, errors = file_reading.iterate_dir_metafiles(
             self.structure,
@@ -352,6 +372,11 @@ def edit(args):
 def add_value(args):
     adding = FRED(args.config)
     adding.add_value(args.path, args.position, args.value, args.edit_existing)
+
+
+def export(args):
+    exporting = FRED(args.config)
+    exporting.export(args.path, args.output_dir, args.filename, args.mapping, args.settings, args.format)
 
 
 def main():
@@ -593,6 +618,62 @@ def main():
         help="Drop all properties, that only contain default values"
     )
     plot_function.set_defaults(func=plot)
+
+    # Export Function
+    export_function = subparsers.add_parser(
+        "export",
+        help="Export metadata to MAGE-TAB (IDF + SDRF) or GEO metadata spreadsheet (.xlsx)"
+    )
+    export_group = export_function.add_argument_group("mandatory arguments")
+    export_group.add_argument(
+        "-p",
+        "--path",
+        type=pathlib.Path,
+        required=True,
+        help="Path to metadata YAML file",
+    )
+    export_function.add_argument(
+        "-o",
+        "--output_dir",
+        type=pathlib.Path,
+        default=None,
+        help="Output directory (default: output_path from config)",
+    )
+    export_function.add_argument(
+        "-f",
+        "--filename",
+        type=str,
+        default=None,
+        help="Base filename for output files (default: project ID)",
+    )
+    export_function.add_argument(
+        "-m",
+        "--mapping",
+        type=pathlib.Path,
+        default=None,
+        help="Path to custom mapping YAML (default: format-specific mapping in fred/config/)",
+    )
+    export_function.add_argument(
+        "--format",
+        choices=["mage-tab", "geo"],
+        default="mage-tab",
+        help="Export format: 'mage-tab' (default, IDF + SDRF) or 'geo' (GEO metadata spreadsheet, .xlsx)",
+    )
+    export_function.add_argument(
+        "-s",
+        "--settings",
+        type=str,
+        default=None,
+        help="Comma-separated setting IDs to export, e.g. exp1,exp3 (default: all)",
+    )
+    export_function.add_argument(
+        "-c",
+        "--config",
+        type=pathlib.Path,
+        help="Config file",
+        default=os.path.join(os.path.dirname(__file__), "config", "config.yaml"),
+    )
+    export_function.set_defaults(func=export)
 
     args = parser.parse_args()
 
