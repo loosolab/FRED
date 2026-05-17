@@ -3,6 +3,7 @@ from fred.src.autogenerate import Autogenerate
 from fred.src import validate_yaml
 from fred.src import utils
 from fred.src.heatmap import create_heatmap
+import copy
 import os
 from jinja2 import Template
 
@@ -33,19 +34,228 @@ template = Template(
 
 class Generate(Input):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        tmp_dir = os.path.join(os.path.expanduser("~"), ".fred", "tmp")
+        self.tmp_path = os.path.join(tmp_dir, f"{self.project_id}_autosave.yaml")
+
+    def _autosave(self):
+        os.makedirs(os.path.dirname(self.tmp_path), exist_ok=True)
+        utils.save_as_yaml(self.result_dict, self.tmp_path)
+
+    def _delete_autosave(self):
+        if os.path.exists(self.tmp_path):
+            os.remove(self.tmp_path)
+
+    def edit_item(self, values, position, indent):
+
+        if isinstance(position[-1], int):
+            structure_pos = [pos for pos in position if isinstance(pos, str)]
+            item_structure = list(utils.find_keys(copy.deepcopy(self.key_yaml), structure_pos[-1]))[0]
+            item_structure['list'] = False
+        else:
+            structure_pos = position
+            item_structure = list(utils.find_keys(self.key_yaml, position[-1]))[0]
+
+        if item_structure['list']:
+
+            if not isinstance(item_structure['value'], dict):
+
+                if 'special_case' in item_structure and 'edit' in item_structure['special_case'] and item_structure['special_case']['edit'] == 'not removable':
+                    self.fill_key(position, values + self.get_input_list(item_structure, structure_pos[-1]), self.result_dict)
+                else:
+                    self.fill_key(position, self.get_input_list(item_structure, structure_pos[-1]), self.result_dict)
+
+            else:
+
+                if 'special_case' in item_structure and 'edit' in item_structure['special_case'] and item_structure['special_case']['edit'] == 'not removable':
+                    all_options = []
+                else:
+                    all_options = ["remove element from list"]
+
+                if 'special_case' in item_structure and 'edit' in item_structure['special_case'] and item_structure['special_case']['edit'] == 'not editable':
+                    pass
+                elif 'special_case' in item_structure and 'generated' in item_structure['special_case'] and item_structure['special_case']['generated'] == 'end':
+                    self.generate_end.append(position)
+                else:
+                    for i in range(len(values)):
+
+                        if isinstance(values[i], dict):
+                            display_keys = [x for x in list(values[i].keys()) if 'id' in x or 'name' in x]
+                            if len(display_keys) == 0:
+                                display_keys = list(values[i].keys())[:3]
+                            str_dict = "\n".join(f"{x}: {values[i][x]}" for x in display_keys)
+                            all_options.append(f"edit: {str_dict}")
+                        else:
+                            all_options.append(f"edit: {values[i]}")
+
+                all_options.append("add element to list")
+
+                print(
+                    f"Please choose how you want to edit the list choosing "
+                    f"from the following options (1-{len(all_options)}) divided by "
+                    f"comma."
+                )
+
+                self.print_option_list(all_options, False)
+                chosen_options = self.parse_input_list(all_options, False)
+
+                if "remove element from list" in all_options:
+                    all_options.remove("remove element from list")
+                if "add element to list" in all_options:
+                    all_options.remove("add element to list")
+
+                remove_options = []
+
+                if "remove element from list" in chosen_options:
+
+                    print(
+                        f"Please choose the list elements you want to remove"
+                        f" (1-{len(all_options)}) divided by comma."
+                    )
+
+                    self.print_option_list(all_options, False)
+                    remove_options = self.parse_input_list(all_options, False)
+
+                edit_options = {}
+
+                for i in range(len(all_options)):
+
+                    if all_options[i] in remove_options:
+                        action = "remove"
+                    elif all_options[i] in chosen_options:
+                        action = "edit"
+                    else:
+                        action = None
+
+                    edit_options[all_options[i]] = {"element": values[i], "action": action, "index": i}
+
+                for key in edit_options:
+
+                    if edit_options[key]["action"] == "edit":
+
+                        display_name = key.replace("\n", " | ")
+                        print(
+                            f"\n"
+                            f'{"".center(self.size, "-")}\n'
+                            f'{f"{display_name}".center(self.size, " ")}\n'
+                            f'{"".center(self.size, "-")}\n'
+                        )
+
+                        self.edit_item(copy.deepcopy(edit_options[key]['element']), position + [edit_options[key]['index']], indent+1)
+
+                    if edit_options[key]["action"] == "remove":
+
+                        result_pos = utils.find_position(self.result_dict, position)
+                        result_pos.pop(result_pos.index(edit_options[key]['element']))
+
+                if "add element to list" in chosen_options:
+
+                    display_name = item_structure["display_name"]
+                    print(
+                        f"\n"
+                        f'{"".center(self.size, "-")}\n'
+                        f'{f"New {display_name}".center(self.size, " ")}\n'
+                        f'{"".center(self.size, "-")}\n'
+                    )
+
+                    if 'special_case' in item_structure and 'generated' in item_structure['special_case'] and item_structure['special_case']['generated'] == 'now':
+                        func = getattr(Autogenerate, f"get_{position[-1]}")
+                        self.fill_key(position, func(Autogenerate(self, position)), self.result_dict)
+
+                    else:
+                        self.parse_lists(item_structure, position, indent, self.result_dict)
+
+        elif isinstance(item_structure['value'], dict):
+
+            edit_index = []
+            edit_all = True
+            for value_key in item_structure["value"]:
+                if 'special_case' in item_structure["value"][value_key] and 'edit' in item_structure["value"][value_key]['special_case'] and item_structure["value"][value_key]['special_case']['edit'] == 'not editable':
+                    edit_all = False
+                elif 'special_case' in item_structure["value"][value_key] and 'generated' in item_structure["value"][value_key]['special_case'] and item_structure["value"][value_key]['special_case']['generated'] == 'end':
+                    edit_all = False
+                    self.generate_end.append(position + [value_key])
+                else:
+                    edit_index.append(value_key)
+
+            if edit_all:
+                edit_index.insert(0, "all")
+
+            if len(edit_index) == 0:
+                print('No elements to edit under this key.')
+
+            elif len(edit_index) > 1:
+                print(
+                    f"Please choose the keys (1-{len(edit_index)}) you want to edit"
+                    f" divided by comma."
+                )
+
+                self.print_option_list(edit_index, False)
+                edit_index = self.parse_input_list(edit_index, False)
+
+            if "all" in edit_index:
+
+                self.parse_lists(item_structure, position, indent, self.result_dict)
+
+            else:
+
+                for key in edit_index:
+
+                    if key in values:
+
+                        self.edit_item(values[key], position + [key], indent+1)
+
+                    else:
+
+                        self.parse_lists(item_structure['value'][key], position + [key], indent+1, self.result_dict)
+
+        else:
+            self.fill_key(
+                position,
+                (
+                    self.parse_input_value(position[-1], item_structure)
+                ),
+                self.result_dict
+            )
+
     def generate(self):
+        if os.path.exists(self.tmp_path):
+            resume = self.parse_list_choose_one(
+                ["yes", "no"],
+                f"Found autosave for ID '{self.project_id}'. Resume where you left off?"
+            )
+            if resume == "yes":
+                self.result_dict = utils.read_in_yaml(self.tmp_path)
+                print("Resuming...")
+            else:
+                self._delete_autosave()
+
         indent = 1
         for part in self.key_yaml:
+            if part in self.result_dict:
+                print(f"\n[Resumed] Section '{part}' already completed, skipping.")
+                continue
             self.parse_lists(self.key_yaml[part], [part], indent, self.result_dict)
-            if part == "experimental_setting":
-                plot = create_heatmap.get_heatmap(
-                    {part: self.result_dict[part]}, self.key_yaml
+            self._autosave()
+            while True:
+                if part == "experimental_setting":
+                    plot = create_heatmap.get_heatmap(
+                        {part: self.result_dict[part]}, self.key_yaml
+                    )
+                    for elem in plot:
+                        if elem[1] is not None:
+                            elem[1].show()
+                else:
+                    print(self.get_summary(self.result_dict[part]))
+                answer = self.parse_list_choose_one(
+                    ["yes", "no"],
+                    f"Is the '{part}' section correct?"
                 )
-                for elem in plot:
-                    if elem[1] is not None:
-                        elem[1].show()
-            else:
-                print(self.get_summary(self.result_dict[part]))
+                if answer == "yes":
+                    break
+                self.edit_item(self.result_dict[part], [part], indent)
+                self._autosave()
         for elem in self.generate_end:
             func = getattr(Autogenerate, f"get_{elem[-1]}")
             fill_val = func(Autogenerate(self, elem))
@@ -65,6 +275,7 @@ class Generate(Input):
             self.result_dict,
             os.path.join(self.path, f"{self.project_id}{self.filename}.yaml"),
         )
+        self._delete_autosave()
 
     def print_sample_names(self):
         """

@@ -66,10 +66,32 @@ class FRED:
             print(f"The report was saved to the file '{json_filename}'.")
 
     def generate(self, path, project_id, mandatory_only):
+        existing_path = None
+        results = find_metafiles.find_projects(
+            self.structure, path, f"project:id:{project_id}", False
+        )
+        if results:
+            existing_path = list(results[0].values())[0]
+            print(f"\nA metadata file for ID '{project_id}' already exists ({existing_path}).")
+            while True:
+                print("1: edit\n2: overwrite")
+                choice = input("Enter choice (1/2): ").strip()
+                if choice in ("1", "2"):
+                    break
+                print("Invalid entry. Please enter 1 or 2.")
+            if choice == "1":
+                self.edit(existing_path, mandatory_only)
+                return
+
         gen = Generate(
             path, project_id, mandatory_only, self.filename, self.structure, self.email, self.whitelist_path
         )
         gen.generate()
+
+        if existing_path:
+            new_path = os.path.join(path, f"{project_id}{self.filename}.yaml")
+            if os.path.abspath(existing_path) != os.path.abspath(new_path):
+                os.remove(existing_path)
 
     def validate(
         self, logical_validation, path, output, output_filename, save_empty=False

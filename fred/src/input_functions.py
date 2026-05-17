@@ -176,8 +176,8 @@ class Input:
                     input_value = input(f"\n{key}: ")
                 else:
                     input_value = input(f"{key}: ")
-                # no user input -> repeat
 
+                # no user input -> repeat
                 if input_value == "":
                     print(f"Please enter something.")
                     input_value = self.parse_input_value(
