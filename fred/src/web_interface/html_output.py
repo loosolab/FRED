@@ -195,7 +195,7 @@ def object_to_html(yaml_object, depth, is_list):
     else:
 
         # add value to html string
-        html_str = f"{html_str}{yaml_object}"
+        html_str = f"{html_str}{str(yaml_object).replace(chr(10), '<br>')}"
 
     return html_str
 

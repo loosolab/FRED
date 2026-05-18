@@ -44,7 +44,7 @@ class FRED:
 
     def find(self, search_path, search, output, output_filename, skip_validation):
         result = find_metafiles.find_projects(
-            self.structure, search_path, search, True, skip_validation
+            self.structure, search_path, search, True, skip_validation, filename=self.filename
         )
         if output == "print":
             if len(result) > 0:
@@ -68,7 +68,7 @@ class FRED:
     def generate(self, path, project_id, mandatory_only):
         existing_path = None
         results = find_metafiles.find_projects(
-            self.structure, path, f"project:id:{project_id}", False
+            self.structure, path, f"project:id:{project_id}", False, filename=self.filename
         )
         if results:
             existing_path = list(results[0].values())[0]

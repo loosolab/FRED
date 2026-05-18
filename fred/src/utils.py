@@ -6,6 +6,15 @@ import textwrap
 from Bio import Entrez
 import yaml
 from yaml import CLoader as Loader, CDumper as Dumper
+
+
+def _str_representer(dumper, data):
+    if "\n" in data:
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+
+
+Dumper.add_representer(str, _str_representer)
 from tabulate import tabulate
 
 # The following functions were copied from Mampok

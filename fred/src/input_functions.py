@@ -171,18 +171,27 @@ class Input:
 
             else:
 
-                # print the key, add a newline if a description was printed
-                if structure["desc"] == "":
-                    input_value = input(f"\n{key}: ")
-                else:
-                    input_value = input(f"{key}: ")
+                if structure["input_type"] == "long_text":
+                    input_value = self.parse_multiline_input(key)
+                    if input_value == "":
+                        print(f"Please enter something.")
+                        input_value = self.parse_input_value(
+                            key, structure, allow_float=allow_float
+                        )
 
-                # no user input -> repeat
-                if input_value == "":
-                    print(f"Please enter something.")
-                    input_value = self.parse_input_value(
-                        key, structure, allow_float=allow_float
-                    )
+                else:
+                    # print the key, add a newline if a description was printed
+                    if structure["desc"] == "":
+                        input_value = input(f"\n{key}: ")
+                    else:
+                        input_value = input(f"{key}: ")
+
+                    # no user input -> repeat
+                    if input_value == "":
+                        print(f"Please enter something.")
+                        input_value = self.parse_input_value(
+                            key, structure, allow_float=allow_float
+                        )
 
                 # input type number
                 # TODO: allow float
@@ -224,6 +233,9 @@ class Input:
                         input_value = self.parse_input_value(
                             key, structure, allow_float=allow_float
                         )
+
+                elif structure["input_type"] == "long_text":
+                    pass  # already collected via parse_multiline_input; yaml.dump handles escaping
 
                 else:
 
@@ -280,6 +292,32 @@ class Input:
 
         # return the user input
         return input_value
+
+    def parse_multiline_input(self, key):
+        """
+        Reads multi-line input line by line.
+        A single empty line creates a paragraph break (\n\n);
+        two consecutive empty lines finish the input.
+        """
+        print(f"{key} (empty line = new paragraph, two empty lines = finish):")
+        lines = []
+        prev_empty = False
+        while True:
+            try:
+                line = input()
+            except EOFError:
+                break
+            if line == "":
+                if prev_empty:
+                    break
+                prev_empty = True
+                if lines:
+                    lines.append("")
+                    print()
+            else:
+                prev_empty = False
+                lines.append(line)
+        return "\n".join(lines)
 
     def parse_list_choose_one(self, whitelist, header):
         """
