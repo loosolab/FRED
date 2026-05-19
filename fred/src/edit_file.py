@@ -9,6 +9,7 @@ class Edit(Generate):
     def create_result_dict(self):
         self.result_dict = utils.read_in_yaml(self.path)
         self.id = self.result_dict['project']['id']
+        self.setting_ids = list(utils.find_keys(self.result_dict, "setting_id"))
     
     def edit(self):
         options = [key for key in self.key_yaml]

@@ -1,0 +1,2 @@
+class GoBackSignal(Exception):
+    pass
