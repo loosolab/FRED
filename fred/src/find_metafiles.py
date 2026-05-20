@@ -18,7 +18,7 @@ except OSError:
     size = 80
 
 
-def find_projects(key_yaml, dir_path, search, return_dict, skip_validation=False, filename="_mamplan"):
+def find_projects(key_yaml, dir_path, search, return_dict, skip_validation=False, filename="_metadata"):
     """
     This function iterates through the search string and evaluates all parts
     within round brackets from the inside to the outside. It calls the function

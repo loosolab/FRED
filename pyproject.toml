@@ -33,5 +33,12 @@ license-files = ["LICEN[CS]E*"]
 [project.scripts]
 fred = "fred.metaTools:main"
 
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-mock", "pytest-cov"]
+
 [tool.setuptools.packages.find]
 include = ["fred*"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+python_files = ["test_*.py"]

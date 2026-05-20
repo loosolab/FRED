@@ -265,7 +265,7 @@ class Input:
                                 pattern = re.compile(
                                     structure["special_case"]["restriction"]["regex"]
                                 )
-                                if pattern.match(input_value):
+                                if pattern.search(input_value):
                                     print(
                                         f"Input does not conform to defined pattern. Please try again."
                                     )
