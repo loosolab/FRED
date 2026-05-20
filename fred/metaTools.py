@@ -379,11 +379,7 @@ def plot(args):
                     file.write(plot.to_html(full_html=False, include_plotlyjs="cdn"))
                 print(f"Plot was saved to {fred_object.output_path}/{output_filename}.{args.output}")
             else:
-                utils.show_or_save_heatmap(
-                    plot,
-                    output_path=fred_object.output_path,
-                    filename=output_filename,
-                )
+                plot.show()
         else:
             print("Plot could not be created due to missing samples or conditions.")
     else:

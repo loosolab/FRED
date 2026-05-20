@@ -2,8 +2,6 @@ import copy
 import json
 import math
 import os
-import sys
-import tempfile
 import textwrap
 from Bio import Entrez
 import yaml
@@ -1320,34 +1318,3 @@ def get_publication_object(pubmed_id, email):
     except RuntimeError:
         records = None
     return records
-
-
-# Renderers that write HTML/JSON to stdout in a non-notebook terminal (e.g. VS Code terminal
-# with IPython active). Plotly auto-detects these when the Python extension initialises IPython.
-_STDOUT_RENDERERS = frozenset(
-    {"json", "svg", "notebook", "notebook_connected", "iframe_connected", "colab"}
-)
-
-
-def show_or_save_heatmap(fig, output_path=None, filename="heatmap"):
-    """Show a Plotly figure or, when the current renderer would write to stdout, save as HTML.
-
-    In VS Code's terminal Plotly sometimes auto-selects a notebook-style renderer that
-    prints raw HTML instead of opening a viewer. This function detects that case and falls
-    back to writing an HTML file and printing a clickable file:// link.
-    """
-    import plotly.io as pio
-
-    renderer = str(pio.renderers.default)
-    active = {r.strip() for r in renderer.split("+")}
-
-    if active & _STDOUT_RENDERERS:
-        if output_path is not None:
-            html_path = os.path.join(output_path, f"{filename}.html")
-        else:
-            fd, html_path = tempfile.mkstemp(suffix=".html", prefix=f"{filename}_")
-            os.close(fd)
-        fig.write_html(html_path)
-        print(f"Heatmap: file://{os.path.abspath(html_path)}")
-    else:
-        fig.show()
