@@ -371,15 +371,19 @@ def plot(args):
             plot = plots[0][1]
 
         if plot is not None:
-            if args.output == "png":
-                plot.write_image(os.path.join(fred_object.output_path, f"{output_filename}.{args.output}"), format="png")
+            if args.output in ("png", "svg"):
+                plot.write_image(os.path.join(fred_object.output_path, f"{output_filename}.{args.output}"), format=args.output)
                 print(f"Plot was saved to {fred_object.output_path}/{output_filename}.{args.output}")
             elif args.output == "html":
                 with open(os.path.join(fred_object.output_path,f"{output_filename}.{args.output}"), "w") as file:
                     file.write(plot.to_html(full_html=False, include_plotlyjs="cdn"))
                 print(f"Plot was saved to {fred_object.output_path}/{output_filename}.{args.output}")
             else:
-                plot.show()
+                utils.show_or_save_heatmap(
+                    plot,
+                    output_path=fred_object.output_path,
+                    filename=output_filename,
+                )
         else:
             print("Plot could not be created due to missing samples or conditions.")
     else:
@@ -596,7 +600,7 @@ def main():
         "-o", 
         "--output", 
         default="show", 
-        choices=["show", "png", "html"],
+        choices=["show", "png", "svg", "html"],
         help="Define how to display/save the plot"
     )
     plot_function.add_argument(

@@ -336,7 +336,7 @@ class Generate(Input):
                     )
                     for elem in plot:
                         if elem[1] is not None:
-                            elem[1].show()
+                            utils.show_or_save_heatmap(elem[1])
                 else:
                     print(self.get_summary(self.result_dict[part]))
                 answer = self.parse_list_choose_one(
