@@ -76,6 +76,32 @@ def tmp_metadata_dir(tmp_path, valid_metadata_minimal):
     return tmp_path
 
 
+@pytest.fixture
+def metadata_yaml_file(tmp_path, valid_metadata_minimal):
+    """Writes valid_metadata_minimal as YAML into tmp_path and returns the file path."""
+    path = tmp_path / "test001_metadata.yaml"
+    utils.save_as_yaml(valid_metadata_minimal, str(path))
+    return path
+
+
+@pytest.fixture
+def minimal_pgm_object(key_yaml, tmp_path):
+    """Minimal pgm_object dict (like Webinterface.__dict__) for wi_functions tests."""
+    return {
+        "whitelist_repo": None,
+        "whitelist_branch": "main",
+        "whitelist_path": str(tmp_path / "whitelists"),
+        "username": None,
+        "password": None,
+        "structure": key_yaml,
+        "update_whitelists": False,
+        "output_path": str(tmp_path),
+        "filename": "_metadata",
+        "email": None,
+        "whitelist_version": None,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Schema introspection helpers (used for parametrization)
 # ---------------------------------------------------------------------------
