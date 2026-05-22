@@ -421,228 +421,89 @@ def get_all_query(keys, value):
     
 
 
+def _escape_regex_chars(value):
+    for rc in ['(', ')', '[', ']', '*', '+', '?']:
+        value = value.replace(rc, f'\\\\{rc}')
+    return value
+
+
+def _build_keyed_search_val(key_raw, value, structure):
+    end_key = key_raw.rstrip(':').split(':')[-1]
+    start_key = '.'.join(key_raw.rstrip(':').split(':')[:-1])
+    key_params = list(utils.find_keys(structure, end_key))
+    if len(key_params) > 0 and 'special_case' in key_params[0] and 'merge' in key_params[0]['special_case']:
+        key_params = key_params[0]
+        if 'value' in key_params:
+            sub_keys = [k for k in key_params['value']]
+            sub_values = value.split(' ')
+            sub_and_vals = []
+            for sv in sub_values:
+                sub_or_vals = []
+                for sk in sub_keys:
+                    full_key = f'{start_key}.{end_key}.{sk}'
+                    sub_or_vals.append(f'{"{"} "{full_key}": {"{"} "$regex": "{sv}", "$options": "i" {"}"} {"}"}')
+                sub_and_value = f'[ {", ".join(sub_or_vals)} ]'
+                sub_and_vals.append(f'{"{"} "$or": {sub_and_value} {"}"}')
+            sub_and_value = f'[ {", ".join(sub_and_vals)} ]'
+            return f'"$and": {sub_and_value}'
+        else:
+            key = key_raw.replace(':', '.').rstrip('.')
+            return f'"{key}": {"{"} "$regex": "{value}", "$options": "i" {"}"}'
+    else:
+        key = key_raw.replace(':', '.').rstrip('.')
+        return f'"{key}": {"{"} "$regex": "{value}", "$options": "i" {"}"}'
+
+
+def _build_term_json(term, structure, all_keys):
+    is_not = False
+    if term.strip().startswith('not '):
+        term = term.split('not ')[1].strip()
+        is_not = True
+    if '"' in term:
+        key, value = term.rstrip('"').split('"')
+        value = _escape_regex_chars(value)
+        if key != '':
+            search_val = _build_keyed_search_val(key, value, structure)
+        else:
+            if all_keys is None:
+                all_keys = get_text_keys(structure)
+            search_val = f'"$or": [ {", ".join(get_all_query(all_keys, value))} ]'
+    else:
+        if all_keys is None:
+            all_keys = get_text_keys(structure)
+        search_val = f'"$or": [ {", ".join(get_all_query(all_keys, term))} ]'
+    if is_not:
+        return f'{"{"} "$not": {"{"} {search_val} {"}"} {"}"}', all_keys
+    else:
+        return f'{"{"} {search_val} {"}"}', all_keys
+
+
+def _build_and_json(string, structure, all_keys):
+    and_vals = string.split(' and ')
+    for i, val in enumerate(and_vals):
+        if not val.startswith('{ '):
+            and_vals[i], all_keys = _build_term_json(val, structure, all_keys)
+    return f'{"{"} "$and": [ {", ".join(and_vals)} ] {"}"}', all_keys
+
+
 def parse_string_to_query_dict(string, structure, all_keys=None):
-    regex_chars = ['(', ')', '[', ']', '*', '+', '?']
     if ' or ' in string:
         or_vals = string.split(' or ')
-        for i in range(len(or_vals)):
-            if not or_vals[i].startswith('{ '):
-                if 'and' in or_vals[i]:
-                    and_vals = or_vals[i].split(' and ')
-                    for j in range(len(and_vals)):
-                        if not and_vals[j].startswith('{ '):
-                            is_not = False
-                            if and_vals[j].strip().startswith('not '):
-                                and_vals[j] = and_vals[j].split('not ')[1].strip()
-                                is_not = True
-                            if '"' in and_vals[j]:
-                                key, value = and_vals[j].rstrip('"').split('"')
-                                for rc in regex_chars:
-                                    value = value.replace(rc, f'\\\\{rc}')
-                                if key != '':
-                                    end_key = key.rstrip(':').split(':')[-1]
-                                    start_key = '.'.join(key.rstrip(':').split(':')[:-1])
-                                    key_params = list(utils.find_keys(structure, end_key))
-                                    if len(key_params) > 0 and 'special_case' in key_params[0] and 'merge' in key_params[0]['special_case']:
-                                        key_params = key_params[0]
-                                        if 'value' in key_params:
-                                            sub_keys = [k for k in key_params['value']]
-                                            sub_values = value.split(' ')
-                                            sub_and_vals = []
-                                            for sv in sub_values:
-                                               sub_or_vals = []
-                                               for sk in sub_keys:
-                                                   full_key = f'{start_key}.{end_key}.{sk}'
-                                                   sub_or_vals.append(f'{"{"} "{full_key}": {"{"} "$regex": "{sv}", "$options": "i" {"}"} {"}"}') 
-                                               sub_and_value = f'[ {", ".join(sub_or_vals)} ]'
-                                               sub_and_vals.append(f'{"{"} "$or": {sub_and_value} {"}"}')
-                                        sub_and_value = f'[ {", ".join(sub_and_vals)} ]'
-                                        search_val = f'"$and": {sub_and_value}'
-                                    else:
-                                        key = key.replace(':', '.').rstrip('.')
-                                        value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
-                                        search_val = f'"{key}": {value}'
-                                else:
-                                    if all_keys is None:
-                                        all_keys = get_text_keys(structure)
-                                    value = f'[ {", ".join(get_all_query(all_keys, and_vals[j]))} ]'
-                                    search_val = f'"$or": {value}'
-                            else:
-                                if all_keys is None:
-                                    all_keys = get_text_keys(structure)
-                                key = "$or"
-                                value = f'[ {", ".join(get_all_query(all_keys, and_vals[j]))} ]'
-                                search_val = f'"{key}": {value}'
-                            if is_not:
-                                and_vals[j] = f'{"{"} "$not": {"{"} {search_val} {"}"} {"}"}'
-                            else:
-                                and_vals[j] = f'{"{"} {search_val} {"}"}'
-                    or_vals[i] = f'{"{"} "$and": [ {", ".join(and_vals)} ] {"}"}'
+        for i, val in enumerate(or_vals):
+            if not val.startswith('{ '):
+                if ' and ' in val:
+                    or_vals[i], all_keys = _build_and_json(val, structure, all_keys)
                 else:
-                    is_not = False
-                    if or_vals[i].strip().startswith('not '):
-                        or_vals[i] = or_vals[i].split('not ')[1].strip()
-                        is_not = True
-                    if '"' in or_vals[i]:
-                        key, value = or_vals[i].rstrip('"').split('"')
-                        for rc in regex_chars:
-                                    value = value.replace(rc, f'\\\\{rc}')
-                        if key != '':
-                            end_key = key.rstrip(':').split(':')[-1]
-                            start_key = '.'.join(key.rstrip(':').split(':')[:-1])
-                            key_params = list(utils.find_keys(structure, end_key))
-                            if len(key_params) > 0 and 'special_case' in key_params[0] and 'merge' in key_params[0]['special_case']:
-                                key_params = key_params[0]
-                                if 'value' in key_params:
-                                    sub_keys = [k for k in key_params['value']]
-                                    sub_values = value.split(' ')
-                                    sub_and_vals = []
-                                    for sv in sub_values:
-                                        sub_or_vals = []
-                                        for sk in sub_keys:
-                                            full_key = f'{start_key}.{end_key}.{sk}'
-                                            sub_or_vals.append(f'{"{"} "{full_key}": {"{"} "$regex": "{sv}", "$options": "i" {"}"} {"}"}') 
-                                        sub_and_value = f'[ {", ".join(sub_or_vals)} ]'
-                                        sub_and_vals.append(f'{"{"} "$or": {sub_and_value} {"}"}')
-                                    sub_and_value = f'[ {", ".join(sub_and_vals)} ]'
-                                    search_val = f'"$and": {sub_and_value}'
-                                else:
-                                    key = key.replace(':', '.').rstrip('.')
-                                    value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
-                                    search_val = f'"{key}": {value}'
-                            else:
-                                key = key.replace(':', '.').rstrip('.')
-                                value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
-                                search_val = f'"{key}": {value}'
-                        else:
-                            if all_keys is None:
-                                all_keys = get_text_keys(structure)
-                            key = "$or"
-                            value = f'[ {", ".join(get_all_query(all_keys, or_vals[i]))} ]'
-                            search_val = f'"{key}": {value}'
-                    else:
-                        if all_keys is None:
-                            all_keys = get_text_keys(structure)
-                        key = "$or"
-                        value = f'[ {", ".join(get_all_query(all_keys, or_vals[i]))} ]'
-                        search_val = f'"{key}": {value}'
-                    if is_not:
-                        or_vals[i] = f'{"{"} "$not": {"{"} {search_val} {"}"} {"}"}'
-                    else:
-                        or_vals[i] = f'{"{"} {search_val} {"}"}'
-        res = f'{"{"} "$or": [ {", ".join(or_vals)} ] {"}"}'
+                    or_vals[i], all_keys = _build_term_json(val, structure, all_keys)
+        return f'{"{"} "$or": [ {", ".join(or_vals)} ] {"}"}'
     elif ' and ' in string:
-        and_vals = string.split(' and ')
-        for i in range(len(and_vals)):
-            if not and_vals[i].startswith('{ '):
-                is_not = False
-                if and_vals[i].strip().startswith('not '):
-                    and_vals[i] = and_vals[i].split('not ')[1].strip()
-                    is_not = True
-                if '"' in and_vals[i]:
-                    key, value = and_vals[i].rstrip('"').split('"')
-                    for rc in regex_chars:
-                        value = value.replace(rc, f'\\\\{rc}')
-                    if key != '':
-                        end_key = key.rstrip(':').split(':')[-1]
-                        start_key = '.'.join(key.rstrip(':').split(':')[:-1])
-                        key_params = list(utils.find_keys(structure, end_key))
-                        if len(key_params) > 0 and 'special_case' in key_params[0] and 'merge' in key_params[0]['special_case']:
-                            key_params = key_params[0]
-                            if 'value' in key_params:
-                                sub_keys = [k for k in key_params['value']]
-                                sub_values = value.split(' ')
-                                sub_and_vals = []
-                                for sv in sub_values:
-                                    sub_or_vals = []
-                                    for sk in sub_keys:
-                                        full_key = f'{start_key}.{end_key}.{sk}'
-                                        sub_or_vals.append(f'{"{"} "{full_key}": {"{"} "$regex": "{sv}", "$options": "i" {"}"} {"}"}') 
-                                    sub_and_value = f'[ {", ".join(sub_or_vals)} ]'
-                                    sub_and_vals.append(f'{"{"} "$or": {sub_and_value} {"}"}')
-                                sub_and_value = f'[ {", ".join(sub_and_vals)} ]'
-                                search_val = f'"$and": {sub_and_value}'
-                            else:
-                                key = key.replace(':', '.').rstrip('.')
-                                value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
-                                search_val = f'"{key}": {value}'
-                        else:
-                            key = key.replace(':', '.').rstrip('.') 
-                            value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
-                            search_val = f'"{key}": {value}'
-                    else:
-                        if all_keys is None:
-                            all_keys = get_text_keys(structure)
-                        key = "$or"
-                        value = f'[ {", ".join(get_all_query(all_keys, and_vals[i]))} ]'
-                        search_val = f'"{key}": {value}'
-                else:
-                    if all_keys is None:
-                        all_keys = get_text_keys(structure)
-                    key = "$or"
-                    value = f'[ {", ".join(get_all_query(all_keys, and_vals[i]))} ]'
-                    search_val = f'"{key}": {value}'
-                if is_not:
-                    and_vals[i] = f'{"{"} "$not": {"{"} {search_val} {"}"} {"}"}'
-                else:
-                    and_vals[i] = f'{"{"} {search_val} {"}"}'
-        res = f'{"{"} "$and": [ {", ".join(and_vals)} ] {"}"}'
+        res, _ = _build_and_json(string, structure, all_keys)
+        return res
     else:
-        is_not = False
-        if not string.startswith('{ '):
-            if string.strip().startswith('not '):
-                string = string.split('not ')[1].strip()
-                is_not = True
-            if '"' in string:
-                key, value = string.rstrip('"').split('"')
-                for rc in regex_chars:
-                    value = value.replace(rc, f'\\\\{rc}')
-                if key != '':
-                    end_key = key.rstrip(':').split(':')[-1]
-                    start_key = '.'.join(key.rstrip(':').split(':')[:-1])
-                    key_params = list(utils.find_keys(structure, end_key))
-                    if len(key_params) > 0 and 'special_case' in key_params[0] and 'merge' in key_params[0]['special_case']:
-                        key_params = key_params[0]
-                        if 'value' in key_params:
-                            sub_keys = [k for k in key_params['value']]
-                            sub_values = value.split(' ')
-                            sub_and_vals = []
-                            for sv in sub_values:
-                                sub_or_vals = []
-                                for sk in sub_keys:
-                                    full_key = f'{start_key}.{end_key}.{sk}'
-                                    sub_or_vals.append(f'{"{"} "{full_key}": {"{"} "$regex": "{sv}", "$options": "i" {"}"} {"}"}') 
-                                sub_and_value = f'[ {", ".join(sub_or_vals)} ]'
-                                sub_and_vals.append(f'{"{"} "$or": {sub_and_value} {"}"}')
-                            sub_and_value = f'[ {", ".join(sub_and_vals)} ]'
-                            search_val = f'"$and": {sub_and_value}'
-                        else:
-                            key = key.replace(':', '.').rstrip('.')
-                            value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
-                            search_val = f'"{key}": {value}'
-                    else:
-                        key = key.replace(':', '.').rstrip('.') 
-                        value = f'{"{"} "$regex": "{value}", "$options": "i" {"}"}'
-                        search_val = f'"{key}": {value}'
-                else:
-                    if all_keys is None:
-                        all_keys = get_text_keys(structure)
-                    key = "$or"
-                    value = f'[ {", ".join(get_all_query(all_keys, value))} ]'
-                    search_val = f'"{key}": {value}'
-            else:
-                if all_keys is None:
-                    all_keys = get_text_keys(structure)
-                key = "$or"
-                value = f'[ {", ".join(get_all_query(all_keys, string))} ]'
-                search_val = f'"{key}": {value}'
-            if is_not:
-                res = f'{"{"} "$not": {"{"} {search_val} {"}"} {"}"}'
-            else:
-                res = f'{"{"} {search_val} {"}"}'
-        else:
-            res=string
-    return res
+        if string.startswith('{ '):
+            return string
+        res, _ = _build_term_json(string, structure, all_keys)
+        return res
             
 
 def get_metadata_search_view(metadata_path):
