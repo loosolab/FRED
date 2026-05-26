@@ -209,7 +209,13 @@ class Autogenerate:
         test = utils.split_cond(cond_name)
         sample_structure = copy.deepcopy(list(utils.find_keys(self.gen.key_yaml, "samples"))[0])
         for elem in test:
-            sample_structure["value"][elem[0]]["value"] = elem[1]
+            field_struct = sample_structure["value"][elem[0]]
+            val = (
+                utils.split_value_unit(elem[1])
+                if field_struct.get("special_case", {}).get("value_unit")
+                else elem[1]
+            )
+            field_struct["value"] = val
             if "special_case" in sample_structure["value"][elem[0]]:
                 sample_structure["value"][elem[0]]["special_case"]["factor"] = True
             else:

@@ -64,7 +64,13 @@ def _simulate_sample_assignment(key_yaml, cond_name):
     for elem in parsed:
         factor_key, factor_val = elem
         if factor_key in sample_structure["value"]:
-            sample_structure["value"][factor_key]["value"] = factor_val
+            field_struct = sample_structure["value"][factor_key]
+            val = (
+                utils.split_value_unit(factor_val)
+                if field_struct.get("special_case", {}).get("value_unit")
+                else factor_val
+            )
+            field_struct["value"] = val
             if "special_case" in sample_structure["value"][factor_key]:
                 sample_structure["value"][factor_key]["special_case"]["factor"] = True
             else:
@@ -191,14 +197,6 @@ class TestGetSamples:
         ("time_point",   'time_point:"1days"',   {"value": 1,  "unit": "days"}),
         ("time_point",   'time_point:"7weeks"',  {"value": 7,  "unit": "weeks"}),
     ])
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Known bug: get_samples() stores value_unit factors as composite string "
-            "instead of dict. Fix in autogenerate.get_samples(). "
-            "Remove xfail after fix."
-        ),
-    )
     def test_value_unit_factor_stored_as_dict(self, key_yaml, factor, cond_name, expected_dict):
         sample_structure = _simulate_sample_assignment(key_yaml, cond_name)
         stored = sample_structure["value"][factor]["value"]
@@ -206,15 +204,6 @@ class TestGetSamples:
             f"value_unit factor '{factor}' should store as dict, got {type(stored).__name__}: {stored!r}"
         )
         assert stored == expected_dict
-
-    def test_value_unit_currently_stores_as_string(self, key_yaml):
-        """Documents the current (buggy) behaviour: value is stored as a string."""
-        sample_structure = _simulate_sample_assignment(key_yaml, 'time_point:"1days"')
-        stored = sample_structure["value"]["time_point"]["value"]
-        assert isinstance(stored, str), (
-            "Bug may have been fixed — update test_value_unit_factor_stored_as_dict"
-        )
-        assert stored == "1days"
 
     # --- Category 3: Nested grouped factors ---------------------------------
 
