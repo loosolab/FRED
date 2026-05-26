@@ -48,6 +48,35 @@ class Generate(Input):
         if os.path.exists(self.tmp_path):
             os.remove(self.tmp_path)
 
+    def _collect_generate_end(self, structure, position):
+        """Dry-run over a completed section to reconstruct generate_end positions."""
+        if not isinstance(structure.get('value'), dict):
+            return
+        if structure.get('list'):
+            try:
+                items = utils.find_position(self.result_dict, position)
+                count = len(items) if isinstance(items, list) else 0
+            except (KeyError, IndexError):
+                count = 0
+            for i in range(count):
+                self._collect_generate_end_keys(structure['value'], position + [i])
+        else:
+            self._collect_generate_end_keys(structure['value'], position)
+
+    def _collect_generate_end_keys(self, sub_keys, position):
+        """Collect generate_end positions from a dict of key definitions."""
+        for key, key_struct in sub_keys.items():
+            if not isinstance(key_struct, dict):
+                continue
+            if key_struct.get('special_case', {}).get('generated') == 'end':
+                self.generate_end.append(position + [key])
+            elif isinstance(key_struct.get('value'), dict):
+                try:
+                    utils.find_position(self.result_dict, position + [key])
+                except (KeyError, IndexError):
+                    continue
+                self._collect_generate_end(key_struct, position + [key])
+
     def _resolve_go_back(self, position, mandatory_keys):
         """
         Handle GoBackSignal at one level: find the previous history entry that
@@ -307,6 +336,7 @@ class Generate(Input):
             )
             if resume == "yes":
                 self.result_dict = utils.read_in_yaml(self.tmp_path)
+                self.setting_ids = list(utils.find_keys(self.result_dict, "setting_id"))
                 print("Resuming...")
             else:
                 self._delete_autosave()
@@ -315,6 +345,7 @@ class Generate(Input):
         for part in self.key_yaml:
             if part in self.result_dict:
                 print(f"\n[Resumed] Section '{part}' already completed, skipping.")
+                self._collect_generate_end(self.key_yaml[part], [part])
                 continue
             while True:
                 try:
