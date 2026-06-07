@@ -147,7 +147,11 @@ sample_characteristics:
     - "sample.gene_editing.gene.gene_name"
   "ChIP antibody":       "sample.enrichment.enrichment_type.gene_name"
   "treatment":           "sample.medical_treatment.treatment_type"
+  "physical treatment":  "sample.physical_treatment"
   "injury":              "sample.injury.injury_type"
   "time":
     - "sample.time_point.value"
     - "sample.time_point.unit"
+  "age":
+    - "sample.age.value"
+    - "sample.age.unit"
