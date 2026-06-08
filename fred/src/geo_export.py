@@ -214,7 +214,7 @@ class GeoMetadataExporter:
         for setting in self._active_settings():
             sid = setting.get("setting_id", "")
             techniques = tech_lookup.get(sid, [])
-            org = ((setting.get("organism") or {}).get("organism_name") or "")
+            org = ((setting.get("organism") or {}).get("organism_name") or "").replace("_", " ")
             primary_tech = techniques[0] if techniques else ""
             strategy = strategy_idx.get(primary_tech, primary_tech)
             molecule = molecule_idx.get(primary_tech, "")

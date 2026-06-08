@@ -258,7 +258,10 @@ class MageTabExporter:
                         row = {"source name": sample.get("sample_name", "")}
                         row["characteristics[biological replicate]"] = str(bio_idx)
                         for col, path_spec in char_map.items():
-                            row[col] = _resolve_path_str(path_spec, ctx)
+                            val = _resolve_path_str(path_spec, ctx)
+                            if isinstance(path_spec, str) and path_spec.endswith("organism_name"):
+                                val = val.replace("_", " ") if val else val
+                            row[col] = val
                         row["assay name"] = assay_name
                         row["technology type"] = tech
                         row["comment[technical replicate]"] = str(tech_idx)

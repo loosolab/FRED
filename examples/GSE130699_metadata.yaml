@@ -31,7 +31,7 @@ project:
 experimental_setting:
 - setting_id: exp1
   organism:
-    organism_name: mouse
+    organism_name: Mus_musculus
     taxonomy_id: '10090'
   experimental_factors:
   - factor: injury
@@ -73,7 +73,7 @@ experimental_setting:
         technical_replicates:
           count: 1
           sample_name:
-          - GSE130699_exp1_snRNA_mouse_inj#tp.LAD+sts.inj-age.1d-tmp.1d_b01_t01_m01
+          - GSE130699_exp1_snRNA_mmu_inj#tp.LAD+sts.inj-age.1d-tmp.1d_b01_t01_m01
           filenames:
           - GSE130699__1__snRNA__LAD-inj_1d_1d__1
         cell_type: Cardiomyocytes
@@ -101,7 +101,7 @@ experimental_setting:
         technical_replicates:
           count: 1
           sample_name:
-          - GSE130699_exp1_snRNA_mouse_inj#tp.LAD+sts.inj-age.1d-tmp.3d_b01_t01_m01
+          - GSE130699_exp1_snRNA_mmu_inj#tp.LAD+sts.inj-age.1d-tmp.3d_b01_t01_m01
           filenames:
           - GSE130699__2__snRNA__LAD-inj_1d_3d__1
         cell_type: Cardiomyocytes
@@ -129,7 +129,7 @@ experimental_setting:
         technical_replicates:
           count: 1
           sample_name:
-          - GSE130699_exp1_snRNA_mouse_inj#tp.LAD+sts.inj-age.8d-tmp.1d_b01_t01_m01
+          - GSE130699_exp1_snRNA_mmu_inj#tp.LAD+sts.inj-age.8d-tmp.1d_b01_t01_m01
           filenames:
           - GSE130699__3__snRNA__LAD-inj_8d_1d__1
         cell_type: Cardiomyocytes
@@ -157,7 +157,7 @@ experimental_setting:
         technical_replicates:
           count: 1
           sample_name:
-          - GSE130699_exp1_snRNA_mouse_inj#tp.LAD+sts.inj-age.8d-tmp.3d_b01_t01_m01
+          - GSE130699_exp1_snRNA_mmu_inj#tp.LAD+sts.inj-age.8d-tmp.3d_b01_t01_m01
           filenames:
           - GSE130699__4__snRNA__LAD-inj_8d_3d__1
         cell_type: Cardiomyocytes
@@ -185,7 +185,7 @@ experimental_setting:
         technical_replicates:
           count: 1
           sample_name:
-          - GSE130699_exp1_snRNA_mouse_inj#tp.sham+sts.inj-age.1d-tmp.1d_b01_t01_m01
+          - GSE130699_exp1_snRNA_mmu_inj#tp.sham+sts.inj-age.1d-tmp.1d_b01_t01_m01
           filenames:
           - GSE130699__5__snRNA__sham-inj_1d_1d__1
         cell_type: Cardiomyocytes
@@ -213,7 +213,7 @@ experimental_setting:
         technical_replicates:
           count: 1
           sample_name:
-          - GSE130699_exp1_snRNA_mouse_inj#tp.sham+sts.inj-age.1d-tmp.3d_b01_t01_m01
+          - GSE130699_exp1_snRNA_mmu_inj#tp.sham+sts.inj-age.1d-tmp.3d_b01_t01_m01
           filenames:
           - GSE130699__6__snRNA__sham-inj_1d_3d__1
         cell_type: Cardiomyocytes
@@ -241,7 +241,7 @@ experimental_setting:
         technical_replicates:
           count: 1
           sample_name:
-          - GSE130699_exp1_snRNA_mouse_inj#tp.sham+sts.inj-age.8d-tmp.1d_b01_t01_m01
+          - GSE130699_exp1_snRNA_mmu_inj#tp.sham+sts.inj-age.8d-tmp.1d_b01_t01_m01
           filenames:
           - GSE130699__7__snRNA__sham-inj_8d_1d__1
         cell_type: Cardiomyocytes
@@ -269,7 +269,7 @@ experimental_setting:
         technical_replicates:
           count: 1
           sample_name:
-          - GSE130699_exp1_snRNA_mouse_inj#tp.sham+sts.inj-age.8d-tmp.3d_b01_t01_m01
+          - GSE130699_exp1_snRNA_mmu_inj#tp.sham+sts.inj-age.8d-tmp.3d_b01_t01_m01
           filenames:
           - GSE130699__8__snRNA__sham-inj_8d_3d__1
         cell_type: Cardiomyocytes
