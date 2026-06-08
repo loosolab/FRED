@@ -50,7 +50,8 @@ test:       # Test run
   before_script:
   - pip install ".[dev]"
   script:
-    - pytest
+    - pytest --cov=fred --cov-report=term-missing
+  coverage: '/TOTAL.*\s+(\d+%)$/'
 
 # Build documentation
 build-pages:
