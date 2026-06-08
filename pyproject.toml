@@ -27,8 +27,7 @@ dependencies = [
     "mkdocs",
     "openpyxl",
 ]
-license = "MIT"
-license-files = ["LICEN[CS]E*"]
+license = {text = "MIT"}
 
 [project.scripts]
 fred = "fred.metaTools:main"
