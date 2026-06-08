@@ -23,11 +23,11 @@ authors:
     given-names: Mario
     affiliation: "Bioinformatics Core Unit, Max Planck Institute for Heart and Lung Research, Bad Nauheim, Germany; Cardio-Pulmonary Institute (CPI), Bad Nauheim, Germany"
     orcid: "https://orcid.org/0000-0003-1495-9530"
-version: "1.0.2"  # TODO: auf finale Release-Version aktualisieren
+version: "2.0.0"
 license: MIT
 repository-code: "https://github.com/loosolab/FRED"
 url: "https://loosolab.pages.gwdg.de/software/metadata-organizer/"
-# doi: "10.5281/zenodo.XXXXXXX"  # TODO: nach Zenodo-Release eintragen
+doi: "10.5281/zenodo.20595412"
 keywords:
   - FAIR data
   - metadata
