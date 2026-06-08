@@ -50,7 +50,7 @@ test:       # Test run
   before_script:
   - pip install .
   script:
-    - test/test_key_yaml.py
+    - pytest
 
 # Build documentation
 build-pages:
