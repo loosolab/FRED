@@ -46,7 +46,7 @@ docker-dev:
 
 test:       # Test run
   stage: run-test
-  image: python:3.8-buster
+  image: python:3.12
   before_script:
   - pip install ".[dev]"
   script:
