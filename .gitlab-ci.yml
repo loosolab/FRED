@@ -48,7 +48,7 @@ test:       # Test run
   stage: run-test
   image: python:3.8-buster
   before_script:
-  - pip install .
+  - pip install ".[dev]"
   script:
     - pytest
 
