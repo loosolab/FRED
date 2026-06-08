@@ -4,6 +4,7 @@
 [![bioRxiv](https://img.shields.io/badge/bioRxiv-10.64898%2F2026.02.03.703529-b31b1b)](https://doi.org/10.64898/2026.02.03.703529)
 [![PyPI](https://img.shields.io/pypi/v/fred-metadata)](https://pypi.org/project/fred-metadata/)
 [![Release](https://img.shields.io/github/v/release/loosolab/FRED)](https://github.com/loosolab/FRED/releases)
+[![FAIR checklist badge](https://img.shields.io/badge/Software-green?label=FAIR)](https://fairsoftwarechecklist.net/v0.2?f=31&a=32113&i=32011&r=133)
 
 
 # FRED
