@@ -1,0 +1,119 @@
+# MAGE-TAB Mapping — vollständig konfigurierbar
+#
+# Keys:   SDRF/IDF column names (EFO terms — change only if MAGE-TAB standard changes)
+# Values: FRED key paths (change when your keys.yaml structure changes)
+#
+# Path format: <scope>.<key1>.<key2>...
+#   Scopes are defined in the "scopes" block below.
+#   A value without a known scope prefix is treated as a literal string.
+#
+# Multiple paths (YAML list): values are combined into one column (space-separated).
+#   Empty values are skipped.
+#
+# SDRF column names must be fully lowercase (validator requirement).
+# IDF field names use Title Case (MAGE-TAB 1.1 standard).
+#
+# Date conversion:
+#   date_input_format defines the strptime format string for dates stored in your
+#   FRED metadata. Dates are always exported as YYYY-MM-DD (MAGE-TAB standard).
+#   Common values:
+#     "%d.%m.%Y"  →  05.02.2024  (FRED default, European dot)
+#     "%d/%m/%Y"  →  05/02/2024  (European slash)
+#     "%m/%d/%Y"  →  02/05/2024  (US slash)
+#     "%Y-%m-%d"  →  2024-02-05  (ISO, already correct — no conversion needed)
+#
+# Conditional literals: use {literal: "...", condition: "path"} to write a static
+#   value only when a given path is non-empty (e.g. Publication Status).
+
+# ---------------------------------------------------------------------------
+# Scope anchors: root paths for each scope.
+# Adjust if your keys.yaml structure changes.
+# ---------------------------------------------------------------------------
+scopes:
+  project: "project"
+  setting: "experimental_setting"
+  sample:  "experimental_setting.conditions.biological_replicates.samples"
+
+# Input date format used in your FRED metadata files (Python strptime syntax).
+# Dates are always exported as YYYY-MM-DD in the MAGE-TAB output.
+date_input_format: "%d.%m.%Y"
+
+# ---------------------------------------------------------------------------
+# Technology type mapping: SDRF term → list of FRED technique names.
+# Used for the 'technology type' SDRF column.
+# If a FRED technique is NOT listed here, the original value from the metadata
+# is used as-is (no mapping applied).
+# Only proteomics techniques are mapped because sdrf-pipelines (the available
+# validator) only accepts proteomics technology types. Sequencing and array
+# techniques pass through unchanged and are valid MAGE-TAB 1.1 values.
+# ---------------------------------------------------------------------------
+technology_type_mapping:
+  "proteomic profiling by mass spectrometry":
+    - "Proteomics"
+    - "Redox proteomics"
+    - "Complexome profiling"
+    - "Dynamic complexome profiling"
+    - "Interaction proteomics"
+    - "Q-PerS-SID"
+    - "PTM"
+    - "Phospho proteomics"
+    - "Mass Spectrometry"
+
+# ---------------------------------------------------------------------------
+# IDF fields (Title Case — MAGE-TAB 1.1 standard)
+# Rows where the resolved path is empty are skipped entirely.
+# ---------------------------------------------------------------------------
+idf:
+  "Investigation Title":       "project.project_name"
+  "Investigation Accession":   "project.id"
+  "Investigation Description": "project.description"
+  "Date of Experiment":        "project.date"
+  "Public Release Date":       "project.date"
+  "Contact Name":              "project.owner.name"
+  "Contact Email":             "project.owner.email"
+  "Contact Organization":      "project.owner.department"
+  "Contact Address":           "project.owner.address"
+  "Publication PubMed ID":     "project.publication.pubmed_id"
+  "Publication Author List":   "project.publication.author"
+  "Publication Title":         "project.publication.title"
+  "Publication Status":
+    literal: "published"
+    condition: "project.publication"
+
+# ---------------------------------------------------------------------------
+# SDRF Characteristics columns (lowercase — validator requirement)
+# Only columns with at least one non-empty value across all rows are written.
+# ---------------------------------------------------------------------------
+characteristics:
+  "characteristics[organism]":            "setting.organism.organism_name"
+  "characteristics[organism part]":       "sample.tissue"
+  "characteristics[cell type]":           "sample.cell_type"
+  "characteristics[strain]":              "sample.strain"
+  "characteristics[developmental stage]": "sample.life_stage"
+  "characteristics[sex]":                 "sample.gender"
+  "characteristics[genetic background]":  "sample.genetic_background"
+  "characteristics[disease]":             "sample.disease.disease_type"
+
+# ---------------------------------------------------------------------------
+# SDRF Factor Value columns (lowercase — validator requirement)
+# Only columns with at least one non-empty value across all rows are written.
+# The factor names (text inside [...]) also fill the IDF fields
+# "Experimental Factor Name" and "Experimental Factor Type" automatically.
+# ---------------------------------------------------------------------------
+factor_values:
+  "factor value[injury]":                 "sample.injury.injury_type"
+  "factor value[disease]":                "sample.disease.disease_type"
+  "factor value[genotype]":
+    - "sample.gene_editing.editing_type"
+    - "sample.gene_editing.gene.gene_name"
+  "factor value[immunoprecipitate]":      "sample.enrichment.enrichment_type.gene_name"
+  "factor value[cell type]":              "sample.cell_type"
+  "factor value[organism part]":          "sample.tissue"
+  "factor value[developmental stage]":    "sample.life_stage"
+  "factor value[genetic background]":     "sample.genetic_background"
+  "factor value[sex]":                    "sample.gender"
+  "factor value[strain]":                 "sample.strain"
+  "factor value[compound]":               "sample.medical_treatment.treatment_type"
+  "factor value[time point]":
+    - "sample.time_point.value"
+    - "sample.time_point.unit"

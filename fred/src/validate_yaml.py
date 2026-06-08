@@ -663,7 +663,7 @@ def validate_logic(metafile, filename="_metadata"):
                             (f'Sample \'{sample["sample_name"]}\'', warn_message)
                         )
         organisms = list(utils.find_keys(metafile, "organism_name"))
-        runs = list(utils.find_keys(metafile, "runs"))
+        runs = list(utils.find_keys(metafile, "analysis_runs"))
         if len(runs) > 0:
             for run in runs[0]:
                 if "reference_genome" in run:

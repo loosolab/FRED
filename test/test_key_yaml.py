@@ -1,88 +1,86 @@
-#!/usr/bin/env python
+"""
+Tests for fred/structure/keys.yaml schema integrity.
+Migrated from the original sys.exit()-style script to pytest.
+"""
+import pytest
 
-import os
-import sys
-import yaml.parser
-import yaml.scanner
+import fred.src.utils as utils
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'fred', 'src'))
-import utils
+ALL_KEYS = {
+    "mandatory": "bool",
+    "list": "bool",
+    "display_name": "str",
+    "desc": "str",
+    "value": "value",
+}
 
-#TODO: test special_case
+INNER_KEYS = {
+    "whitelist": "bool",
+    "input_type": [
+        "short_text",
+        "long_text",
+        "select",
+        "number",
+        "bool",
+        "date",
+        "restricted_short_text",
+    ],
+}
 
-def test_key_yaml(all_keys, inner_keys):
-    try:
-        key_yaml = utils.read_in_yaml(os.path.join(os.path.dirname(__file__), '..', 'fred', 'structure', 'keys.yaml'))
-    except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
-        print(f'The yaml file could not be parsed:\n{e}')
-        sys.exit(1)
 
-    for key in key_yaml:
-        test_properties(key_yaml[key], key, all_keys, inner_keys)
+# ---------------------------------------------------------------------------
+# Helpers (logic copied from original script, using assert instead of sys.exit)
+# ---------------------------------------------------------------------------
 
 
-def test_properties(part, key, all_keys, inner_keys):
-    for prop in all_keys:
-        if prop not in part:
-            print(f'Property \'{prop}\' is missing for key \'{key}\'')
-            sys.exit(1)
-        else:
-            error, prop_type = test_property_input(part[prop], prop, all_keys)
-            if error:
-                print(f'Wrong input \'{part[prop]}\' for property \'{prop}\' for key \'{key}\'. Input should be {prop_type}')
-                sys.exit(1)
+def _check_property(prop_input, prop, keys):
+    """Return (error: bool, expected_type_description: str)."""
+    expected = keys[prop]
+    if expected == "bool":
+        return not isinstance(prop_input, bool), "of type 'bool'"
+    elif expected == "str":
+        if prop != "desc" and not isinstance(prop_input, str):
+            return True, "of type 'str'"
+    elif expected == "int":
+        return not isinstance(prop_input, int), "of type 'int'"
+    elif expected == "value":
+        valid = prop_input is None or isinstance(prop_input, (dict, str, bool, int))
+        return not valid, "dict or scalar (None, str, bool, int)"
+    elif isinstance(expected, list):
+        return prop_input not in expected, " / ".join(f"'{x}'" for x in expected)
+    return False, ""
 
-    if isinstance(part['value'], dict):
-        for sub_key in part['value']:
-            test_properties(part['value'][sub_key], f'{key}:{sub_key}', all_keys, inner_keys)
+
+def _assert_properties(part, path, keys):
+    for prop in keys:
+        assert prop in part, f"Property '{prop}' missing for key '{path}'"
+        error, desc = _check_property(part[prop], prop, keys)
+        assert not error, (
+            f"Wrong value '{part[prop]}' for property '{prop}' at '{path}'. Expected {desc}"
+        )
+
+
+def _walk_key_yaml(part, path):
+    _assert_properties(part, path, ALL_KEYS)
+    if isinstance(part["value"], dict):
+        for sub_key, sub_val in part["value"].items():
+            _walk_key_yaml(sub_val, f"{path}:{sub_key}")
     else:
-        test_for_inner_keys(part, key, inner_keys)
+        _assert_properties(part, path, INNER_KEYS)
 
 
-def test_for_inner_keys(part, key, inner_keys):
-    for prop in inner_keys:
-        if prop not in part:
-            print(f'Property \'{prop}\' is missing for key \'{key}\'')
-            sys.exit(1)
-        else:
-            error, prop_type = test_property_input(part[prop], prop, inner_keys)
-            if error:
-                print(
-                    f'Wrong input \'{part[prop]}\' for property \'{prop}\' for key \'{key}\'. Input should be {prop_type}')
-                sys.exit(1)
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
 
 
-def test_property_input(prop_input, prop, keys):
-    if keys[prop] == 'bool':
-        if type(prop_input) != bool:
-            return True, 'of type \'bool\''
-    elif keys[prop] == 'str':
-        if type(prop_input) != str:
-            if prop != 'desc':
-                return True, 'of type \'str\''
-    elif keys[prop] == 'int':
-        if type(prop_input) != int:
-            return True, 'of type \'int\''
-    elif keys[prop] == 'value':
-        if prop_input is not None and not isinstance(prop_input, dict) and type(prop_input) not in [str, bool, int]:
-            return True, 'either a dictionary or a default value that can be \'None\' or of type \'str\', \'bool\' or \'int\''
-    elif isinstance(keys[prop], list):
-        if prop_input not in keys[prop]:
-            return True, ', '.join(f'\'{x}\'' for x in keys[prop])
-    return False, 'None'
+def test_keys_yaml_structure(key_yaml):
+    """Every key in keys.yaml must have the required properties with correct types."""
+    for key, value in key_yaml.items():
+        _walk_key_yaml(value, key)
 
 
-if __name__ == "__main__":
-
-    all_keys = {'mandatory': 'bool',
-                'list': 'bool',
-                'display_name': 'str',
-                'desc': 'str',
-                'value': 'value'}
-
-    inner_keys = {'whitelist': 'bool',
-                  'input_type': ['short_text', 'long_text', 'select', 'number', 'bool', 'date', 'restricted_short_text']}
-
-    test_key_yaml(all_keys, inner_keys)
-
-    sys.exit(0)
+@pytest.mark.parametrize("top_key", ["project", "experimental_setting", "technical_details"])
+def test_top_level_keys_present(key_yaml, top_key):
+    """The three mandatory top-level sections must exist in keys.yaml."""
+    assert top_key in key_yaml

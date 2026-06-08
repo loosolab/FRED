@@ -1,0 +1,30 @@
+project:
+  id: test006
+  project_name: Wrong Key Test
+  date: "01.01.2024"
+  description: Test project with an invalid key.
+  owner:
+    name: Walter, Jasmin
+    ldap_name: jwalter
+    department: Abt-K
+    email: test@example.com
+  nonexistent_key: this_key_does_not_exist_in_schema
+experimental_setting:
+  - setting_id: exp1
+    organism:
+      organism_name: mouse
+      taxonomy_id: "10090"
+    experimental_factors:
+      - factor: strain
+        values:
+          - WT
+    conditions:
+      - condition_name: 'strain:"WT"'
+        biological_replicates:
+          count: 0
+          samples: []
+technical_details:
+  techniques:
+    - setting: exp1
+      technique:
+        - bulk RNA-seq

@@ -1,0 +1,15 @@
+Investigation Title	Single-nucleus RNA-seq of mouse ventricular cardiomyocytes (cardiac regeneration)
+Investigation Accession	GSE130699
+Investigation Description	Single-nucleus RNA-seq dataset examining cardiac regeneration potential in mouse ventricular cardiomyocytes across two injury conditions (LAD-ligation, sham), two developmental stages (postnatal day 1 and day 8), and two post-operative time points (day 1 and day 3). Source: Cui et al. 2020, Developmental Cell 53, 102-116. GEO accession GSE130699.
+
+Date of Experiment	2020-03-18
+Public Release Date	2020-03-18
+Contact Name	Mustermann, Max
+Contact Email	max.mustermann@email.de
+Contact Organization	AG-Mustermann
+Publication PubMed ID	32220304
+Publication Author List	Cui M, Wang Z, Chen K, et. al
+Publication Title	Dynamic Transcriptional Responses to Injury of Regenerative and Non-regenerative Cardiomyocytes Revealed by Single-Nucleus RNA Sequencing.
+Experimental Factor Name	factor value[injury]	factor value[cell type]	factor value[organism part]	factor value[developmental stage]	factor value[time point]
+Experimental Factor Type	factor value[injury]	factor value[cell type]	factor value[organism part]	factor value[developmental stage]	factor value[time point]
+SDRF File	GSE130699.sdrf.txt
