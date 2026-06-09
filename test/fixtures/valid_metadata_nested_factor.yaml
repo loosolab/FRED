@@ -1,0 +1,75 @@
+project:
+  id: test004
+  project_name: Nested Factor Test
+  date: "01.01.2024"
+  description: Test project with a nested grouped factor (disease).
+  owner:
+    name: Walter, Jasmin
+    ldap_name: jwalter
+    department: Abt-K
+    email: test@example.com
+experimental_setting:
+  - setting_id: exp1
+    organism:
+      organism_name: human
+      taxonomy_id: "9606"
+    experimental_factors:
+      - factor: disease
+        values:
+          disease_status:
+            - healthy
+            - ill
+          disease_type:
+            - PAH
+    conditions:
+      - condition_name: 'disease:{disease_status:"healthy"}'
+        biological_replicates:
+          count: 2
+          samples:
+            - sample_name: healthy_b01
+              pooled: false
+              donor_count: 1
+              technical_replicates:
+                count: 1
+                sample_name: []
+                filenames: []
+              disease:
+                disease_status: healthy
+            - sample_name: healthy_b02
+              pooled: false
+              donor_count: 1
+              technical_replicates:
+                count: 1
+                sample_name: []
+                filenames: []
+              disease:
+                disease_status: healthy
+      - condition_name: 'disease:{disease_status:"ill"|disease_type:"PAH"}'
+        biological_replicates:
+          count: 2
+          samples:
+            - sample_name: ill_b01
+              pooled: false
+              donor_count: 1
+              technical_replicates:
+                count: 1
+                sample_name: []
+                filenames: []
+              disease:
+                disease_status: ill
+                disease_type: PAH
+            - sample_name: ill_b02
+              pooled: false
+              donor_count: 1
+              technical_replicates:
+                count: 1
+                sample_name: []
+                filenames: []
+              disease:
+                disease_status: ill
+                disease_type: PAH
+technical_details:
+  techniques:
+    - setting: exp1
+      technique:
+        - bulk RNA-seq

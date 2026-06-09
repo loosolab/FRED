@@ -509,6 +509,12 @@ def parse_part(
                                     val = True
                                 else:
                                     val = False
+                            elif (
+                                len(info) > 0
+                                and "input_type" in info[0]
+                                and info[0]["input_type"] == "long_text"
+                            ):
+                                val = convert_value.replace("\\n", "\n")
                             else:
                                 val = (
                                     convert_value.replace("\\n", " ")

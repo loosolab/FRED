@@ -1,0 +1,157 @@
+# GEO Metadata Spreadsheet Mapping
+#
+# Gleiche Scope/Pfad-Konvention wie mage_tab_mapping.yaml:
+#   <scope>.<key1>.<key2>...
+#   Unbekannter Scope-Prefix → Literal-String
+#
+# Mapping-Dicts (library_strategy_mapping, library_source_mapping):
+#   Keys:   GEO-Terme (stabil)
+#   Values: Listen von FRED-Techniken
+#   Fehlende FRED-Techniken werden unverändert übernommen.
+
+scopes:
+  project: "project"
+  setting: "experimental_setting"
+  sample:  "experimental_setting.conditions.biological_replicates.samples"
+
+date_input_format: "%d.%m.%Y"
+
+# ---------------------------------------------------------------------------
+# library_strategy_mapping: GEO library_strategy → Liste von FRED-Techniken
+# ---------------------------------------------------------------------------
+library_strategy_mapping:
+  "RNA-Seq":
+    - "bulk RNA-seq"
+    - "Quant-seq"
+    - "CAGE-seq"
+    - "Ribo-seq"
+    - "RiboTag"
+    - "snRNA-seq"
+    - "small RNA-seq"
+    - "GLORI-seq"
+    - "DART-seq"
+    - "HyperTribe-seq"
+    - "RIP-seq"
+  "scRNA-seq":
+    - "sc RNA-seq"
+    - "CITE-seq"
+    - "Spatial Gene Expression"
+  "ChIP-Seq":
+    - "bulk ChIP-seq"
+    - "Cut&Run"
+    - "Cut&Tag"
+    - "ACT-seq"
+    - "MapR"
+    - "MeDIP-seq"
+    - "ChiRP-seq"
+    - "DRIP-seq"
+    - "DamID-seq"
+    - "ChAR-seq"
+  "ATAC-seq":
+    - "bulk ATAC-seq"
+    - "sc ATAC-seq"
+    - "snATAC-seq"
+    - "MNase-seq"
+  "PRO-Seq":       ["PRO-seq"]
+  "Bisulfite-Seq": ["Bisulfit-seq"]
+  "Hi-C":          ["HiC-seq"]
+  "WGS":           ["WGS"]
+  "WXS":           ["Whole Exome Sequencing"]
+  "OTHER":
+    - "Multiome"
+    - "Array"
+    - "bulk RNA array"
+    - "Methylation array"
+
+# ---------------------------------------------------------------------------
+# library_source_mapping: GEO molecule → Liste von FRED-Techniken
+# ---------------------------------------------------------------------------
+library_source_mapping:
+  "polyA RNA":
+    - "bulk RNA-seq"
+    - "sc RNA-seq"
+    - "snRNA-seq"
+    - "CITE-seq"
+    - "Spatial Gene Expression"
+    - "Multiome"
+    - "Quant-seq"
+    - "CAGE-seq"
+    - "Ribo-seq"
+    - "RiboTag"
+    - "small RNA-seq"
+    - "GLORI-seq"
+    - "DART-seq"
+    - "HyperTribe-seq"
+    - "RIP-seq"
+    - "bulk RNA array"
+  "genomic DNA":
+    - "bulk ChIP-seq"
+    - "bulk ATAC-seq"
+    - "sc ATAC-seq"
+    - "snATAC-seq"
+    - "Cut&Run"
+    - "Cut&Tag"
+    - "ACT-seq"
+    - "MapR"
+    - "MeDIP-seq"
+    - "ChiRP-seq"
+    - "DRIP-seq"
+    - "DamID-seq"
+    - "ChAR-seq"
+    - "MNase-seq"
+    - "PRO-seq"
+    - "HiC-seq"
+    - "WGS"
+    - "Whole Exome Sequencing"
+    - "Bisulfit-seq"
+    - "Methylation array"
+    - "Array"
+
+# ---------------------------------------------------------------------------
+# study: STUDY-Sektion (Key-Value, Projektebene)
+# "*experimental design" wird automatisch aus experimental_factors generiert
+# und nach "*summary (abstract)" eingefügt.
+# ---------------------------------------------------------------------------
+study:
+  "*title":              "project.project_name"
+  "*summary (abstract)": "project.description"
+  "contributor":         "project.owner.name"
+
+# ---------------------------------------------------------------------------
+# protocols: PROTOCOLS-Sektion (Key-Value)
+# Pflichtfelder, die FRED nicht kennt → konfigurierbare Platzhalter.
+# Platzhalter einmalig für das Labor anpassen.
+# ---------------------------------------------------------------------------
+protocols:
+  "growth protocol":                          "optional"
+  "treatment protocol":                       "optional"
+  "*extract protocol":                        "[fill in: RNA/DNA extraction method]"
+  "*library construction protocol":           "[fill in: library preparation method]"
+  "*data processing step":                    "[fill in: alignment tool, parameters, genome version]"
+  "*genome build/assembly":                   "[fill in: e.g. mm10, hg38, GRCm38]"
+  "*processed data files format and content": "[fill in: e.g. tab-delimited counts matrix]"
+
+# ---------------------------------------------------------------------------
+# sample_characteristics: Characteristic-Spalten in der SAMPLES-Tabelle (ab Spalte H).
+# **tissue, **cell line, **cell type sind Template-Pflichtspalten (A–G) und fehlen hier.
+# Nur Spalten mit mindestens einem Wert werden ausgegeben.
+# ---------------------------------------------------------------------------
+sample_characteristics:
+  "strain":              "sample.strain"
+  "developmental stage": "sample.life_stage"
+  "Sex":                 "sample.gender"
+  "genetic background":  "sample.genetic_background"
+  "disease":             "sample.disease.disease_type"
+  "genotype":
+    - "sample.gene_editing.editing_type"
+    - "sample.gene_editing.gene.gene_name"
+  "ChIP antibody":       "sample.enrichment.enrichment_type.gene_name"
+  "treatment":           "sample.medical_treatment.treatment_type"
+  "physical treatment":  "sample.physical_treatment"
+  "injury":              "sample.injury.injury_type"
+  "time":
+    - "sample.time_point.value"
+    - "sample.time_point.unit"
+  "age":
+    - "sample.age.value"
+    - "sample.age.unit"

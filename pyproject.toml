@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fred-metadata"
-version = "1.0.2"
+version = "2.0.0"
 authors = [
   { name="Jasmin Walter", email="Jasmin.Walter@mpi-bn.mpg.de" },
 ]
@@ -25,12 +25,19 @@ dependencies = [
     "kaleido>=1.0.0",
     "dash",
     "mkdocs",
+    "openpyxl",
 ]
-license = "MIT"
-license-files = ["LICEN[CS]E*"]
+license = {text = "MIT"}
 
 [project.scripts]
 fred = "fred.metaTools:main"
 
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-mock", "pytest-cov"]
+
 [tool.setuptools.packages.find]
 include = ["fred*"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+python_files = ["test_*.py"]

@@ -6,6 +6,15 @@ import textwrap
 from Bio import Entrez
 import yaml
 from yaml import CLoader as Loader, CDumper as Dumper
+
+
+def _str_representer(dumper, data):
+    if "\n" in data:
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+
+
+Dumper.add_representer(str, _str_representer)
 from tabulate import tabulate
 
 # The following functions were copied from Mampok
@@ -112,7 +121,7 @@ def save_as_yaml(dictionary, file_path):
     :param file_path: the path of the yaml file to be created
     """
     with open(file_path, "w") as file:
-        yaml.dump(dictionary, file, sort_keys=False, Dumper=Dumper)
+        yaml.dump(dictionary, file, sort_keys=False, Dumper=Dumper, encoding='utf-8', allow_unicode=True)
 
 
 def read_in_yaml(yaml_file):

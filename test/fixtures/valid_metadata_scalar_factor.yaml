@@ -1,0 +1,66 @@
+project:
+  id: test002
+  project_name: Scalar Factor Test
+  date: "01.01.2024"
+  description: Test project with a simple scalar factor (strain).
+  owner:
+    name: Walter, Jasmin
+    ldap_name: jwalter
+    department: Abt-K
+    email: test@example.com
+experimental_setting:
+  - setting_id: exp1
+    organism:
+      organism_name: mouse
+      taxonomy_id: "10090"
+    experimental_factors:
+      - factor: strain
+        values:
+          - WT
+          - KO
+    conditions:
+      - condition_name: 'strain:"WT"'
+        biological_replicates:
+          count: 2
+          samples:
+            - sample_name: WT_b01
+              pooled: false
+              donor_count: 1
+              technical_replicates:
+                count: 1
+                sample_name: []
+                filenames: []
+              strain: WT
+            - sample_name: WT_b02
+              pooled: false
+              donor_count: 1
+              technical_replicates:
+                count: 1
+                sample_name: []
+                filenames: []
+              strain: WT
+      - condition_name: 'strain:"KO"'
+        biological_replicates:
+          count: 2
+          samples:
+            - sample_name: KO_b01
+              pooled: false
+              donor_count: 1
+              technical_replicates:
+                count: 1
+                sample_name: []
+                filenames: []
+              strain: KO
+            - sample_name: KO_b02
+              pooled: false
+              donor_count: 1
+              technical_replicates:
+                count: 1
+                sample_name: []
+                filenames: []
+              strain: KO
+technical_details:
+  techniques:
+    - setting: exp1
+      technique:
+        - bulk RNA-seq

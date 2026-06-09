@@ -1,0 +1,29 @@
+project:
+  id: test005
+  project_name: Missing Keys Test
+  # date is missing (mandatory)
+  description: Test project missing mandatory fields.
+  owner:
+    name: Walter, Jasmin
+    ldap_name: jwalter
+    # department is missing (mandatory)
+    email: test@example.com
+experimental_setting:
+  - setting_id: exp1
+    organism:
+      organism_name: mouse
+      taxonomy_id: "10090"
+    experimental_factors:
+      - factor: strain
+        values:
+          - WT
+    conditions:
+      - condition_name: 'strain:"WT"'
+        biological_replicates:
+          count: 0
+          samples: []
+technical_details:
+  techniques:
+    - setting: exp1
+      technique:
+        - bulk RNA-seq

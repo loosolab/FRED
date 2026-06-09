@@ -17,7 +17,7 @@ import yaml as yml
 def iterate_dir_metafiles(
     key_yaml,
     path_metafiles,
-    filename="_mamplan",
+    filename="_metadata",
     logical_validation=True,
     yaml=None,
     whitelist_path=None,
@@ -129,7 +129,7 @@ def validate(
     start = time.time()
     try:
         metafile = read_in_yaml(ypath)
-    except yml.scanner.ScannerError:
+    except yml.YAMLError:
         metafile = None
     end_read = time.time()
     read_time = end_read - start

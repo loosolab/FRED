@@ -1,5 +1,6 @@
 import os
 from fred.src import utils
+from fred.src.exceptions import GoBackSignal
 import datetime
 from tabulate import tabulate
 import readline
@@ -34,6 +35,7 @@ class Input:
         self.email = email
         self.setting_ids = []
         self.whitelis_path = whitelist_path
+        self.field_history = []  # list of (position, key, structure) for go-back
 
     def parse_input_value(self, key, structure, allow_float=False):
         """
@@ -171,18 +173,30 @@ class Input:
 
             else:
 
-                # print the key, add a newline if a description was printed
-                if structure["desc"] == "":
-                    input_value = input(f"\n{key}: ")
-                else:
-                    input_value = input(f"{key}: ")
-                # no user input -> repeat
+                if structure["input_type"] == "long_text":
+                    input_value = self.parse_multiline_input(key)
+                    if input_value == "":
+                        print(f"Please enter something.")
+                        input_value = self.parse_input_value(
+                            key, structure, allow_float=allow_float
+                        )
 
-                if input_value == "":
-                    print(f"Please enter something.")
-                    input_value = self.parse_input_value(
-                        key, structure, allow_float=allow_float
-                    )
+                else:
+                    # print the key, add a newline if a description was printed
+                    if structure["desc"] == "":
+                        input_value = input(f"\n{key} [!back]: ")
+                    else:
+                        input_value = input(f"{key} [!back]: ")
+
+                    if input_value.strip() == "!back":
+                        raise GoBackSignal()
+
+                    # no user input -> repeat
+                    if input_value == "":
+                        print(f"Please enter something.")
+                        input_value = self.parse_input_value(
+                            key, structure, allow_float=allow_float
+                        )
 
                 # input type number
                 # TODO: allow float
@@ -225,6 +239,9 @@ class Input:
                             key, structure, allow_float=allow_float
                         )
 
+                elif structure["input_type"] == "long_text":
+                    pass  # already collected via parse_multiline_input; yaml.dump handles escaping
+
                 else:
 
                     # input type restricted_short_text
@@ -248,7 +265,7 @@ class Input:
                                 pattern = re.compile(
                                     structure["special_case"]["restriction"]["regex"]
                                 )
-                                if pattern.match(input_value):
+                                if pattern.search(input_value):
                                     print(
                                         f"Input does not conform to defined pattern. Please try again."
                                     )
@@ -281,6 +298,34 @@ class Input:
         # return the user input
         return input_value
 
+    def parse_multiline_input(self, key):
+        """
+        Reads multi-line input line by line.
+        A single empty line creates a paragraph break (\n\n);
+        two consecutive empty lines finish the input.
+        """
+        print(f"{key} (empty line = new paragraph, two empty lines = finish, !back = go back):")
+        lines = []
+        prev_empty = False
+        while True:
+            try:
+                line = input()
+            except EOFError:
+                break
+            if not lines and line.strip() == "!back":
+                raise GoBackSignal()
+            if line == "":
+                if prev_empty:
+                    break
+                prev_empty = True
+                if lines:
+                    lines.append("")
+                    print()
+            else:
+                prev_empty = False
+                lines.append(line)
+        return "\n".join(lines)
+
     def parse_list_choose_one(self, whitelist, header):
         """
         This function prints an indexed whitelist and prompts the user to
@@ -294,7 +339,10 @@ class Input:
         try:
             print(f"{header}\n")
             self.print_option_list(whitelist, False)
-            value = whitelist[int(input()) - 1]
+            raw = input()
+            if raw.strip() == "!back":
+                raise GoBackSignal()
+            value = whitelist[int(raw) - 1]
 
         # redo the input prompt if the user input is not an integer
         except (IndexError, ValueError):
@@ -751,8 +799,10 @@ class Input:
         completer = WhitelistCompleter(whitelist)
         readline.set_completer(completer.complete)
         readline.set_completer_delims("")
-        input_value = input(f"{key}: ")
+        input_value = input(f"{key} [!back]: ")
         readline.parse_and_bind("tab: self-insert")
+        if input_value.strip() == "!back":
+            raise GoBackSignal()
         return input_value
 
     def get_value_unit(self, structure):

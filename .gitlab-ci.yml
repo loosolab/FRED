@@ -46,11 +46,12 @@ docker-dev:
 
 test:       # Test run
   stage: run-test
-  image: python:3.8-buster
+  image: python:3.12
   before_script:
-  - pip install -r requirements.txt
+  - pip install ".[dev]"
   script:
-    - test/test_key_yaml.py
+    - pytest --cov=fred --cov-report=term-missing
+  coverage: '/TOTAL.*\s+(\d+%)$/'
 
 # Build documentation
 build-pages:
