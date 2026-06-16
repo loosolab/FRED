@@ -3,7 +3,7 @@
 [![DOI](https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.20595412-blue)](https://doi.org/10.5281/zenodo.20595412)
 [![bioRxiv](https://img.shields.io/badge/bioRxiv-10.64898%2F2026.02.03.703529-b31b1b)](https://doi.org/10.64898/2026.02.03.703529)
 [![PyPI](https://img.shields.io/pypi/v/fred-metadata)](https://pypi.org/project/fred-metadata/)
-[![Release](https://img.shields.io/github/v/release/loosolab/FRED)](https://github.com/loosolab/FRED/releases)
+[![Release](https://img.shields.io/badge/release-v2.0.2-blue)](https://github.com/loosolab/FRED/releases)
 [![FAIR checklist badge](https://img.shields.io/badge/Software-green?label=FAIR)](https://fairsoftwarechecklist.net/v0.2?f=31&a=32113&i=32011&r=133)
 
 
