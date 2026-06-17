@@ -73,23 +73,32 @@ Dialog Options
 
    * - **Text input:**
        Free text entry consisting of words, numbers, or dates.
-     
 
    * - **Selections:**
        Selection of listed values by stating their number in the list.
-     
 
    * - **Autofill:**
-       Type in values that match a pre-defined list. Upon pressing the tabulator key, up to 30 values that match the input are displayed. If only one value matches, it is set as your input.  
-     
-    
+       Type in values that match a pre-defined list. Upon pressing the tabulator key, up to 30 values that match the input are displayed. If only one value matches, it is set as your input.
 
-Summary 
-^^^^^^^^^^^^^^
+   * - **Go back:**
+       Enter ``!back`` at any prompt to return to the previous field and correct an earlier entry.
 
-After finishing a section of the metadata, a summary is displayed for checking if everything is correct. 
-For the **project** and **technical details** section, the summary is displayed in YAML formatting. 
-For the **experimental setting** section a plot is created. 
+Publication Auto-Fill
+^^^^^^^^^^^^^^^^^^^^^^
+
+When entering a publication, only the PubMed ID needs to be provided manually. FRED automatically retrieves the title, authors, journal, year, volume, issue, pages, and DOI from PubMed and fills them in without further input.
+
+Autosave
+^^^^^^^^^
+
+FRED automatically saves the current progress to ``~/.fred/tmp/`` while the dialog is running. If the session is interrupted before completion, the saved state is offered for continuation the next time ``fred generate`` is started with the same project ID and path.
+
+Summary
+^^^^^^^^
+
+After finishing a section of the metadata, a summary is displayed for checking if everything is correct.
+For the **project** and **technical details** section, the summary is displayed in YAML formatting.
+For the **experimental setting** section a plot is created.
 
 Experimental Factors, Conditions and Samples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

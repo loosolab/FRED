@@ -27,14 +27,27 @@ Table of Contents
    install
    config
    generate
+   validate
+   edit
    search_metadata
+   export
    plots
    standalone
+   api
 
-.. toctree:: 
+.. toctree::
    :maxdepth: 2
    :caption: FRED Structure
 
    structure
    whitelist
-   
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Extending FRED
+
+   add_keys
+   add_factor
+   add_whitelist
+   add_whitelist_values
+   add_organism

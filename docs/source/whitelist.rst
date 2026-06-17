@@ -80,39 +80,36 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
    :width: 100%
    :widths: 50 50
 
-   * - whitelists/reference_genome
+   * - whitelists/gene
      - whitelists/organism
-   * - In this example, the whitelist for the reference genome is represented as depending on the organism.For this reason, the 'ident_key' is assigned 'organism_name'. 
-       The possible organisms form the keys specified under 'whitelist'. Their values are those reference genomes that can be set for the respective organism.
-       This allows faster finding of diseases in the list, as well as a better overview.
-     - The whitelist for 'organism_name' contains all allowed organisms as values. These form the keys in the dependent whitelist 'reference_genome'.
-   * - 
+   * - In this example, the whitelist for genes is represented as depending on the organism. The 'ident_key' is assigned 'organism_name'.
+       The possible organisms form the keys specified under 'whitelist'. Their values are paths to organism-specific gene whitelist files.
+       The keys must exactly match the ``organism_name`` values as they appear in the ``organism`` whitelist (the part before the space in each entry).
+     - The whitelist for 'organism' uses NCBI taxonomy names in the format ``Genus_species taxonomy_id``. The ``organism_name`` (part before the space) is used as the key in dependent whitelists.
+   * -
        .. code-block:: yaml
-          
+
           whitelist_type: depend
           ident_key: organism_name
           whitelist:
-            human_9606:
-            - hg38
-            - hg19
-            mouse_10090:
-            - mm10
-            - mm9
-            - mm38
-            zebrafish_7955:
-            - danrer11
-            - danrer10
+            Homo_sapiens: genes/human
+            Mus_musculus: genes/mouse
+            Danio_rerio: genes/zebrafish
+            Rattus_norvegicus: genes/rat
+            Sus_scrofa: genes/pig
             ...
-     
-     
-     -  
+
+
+     -
         .. code-block:: yaml
-          
+
           whitelist_type: plain
+          headers: organism_name taxonomy_id
           whitelist:
-          - human_9606
-          - mouse_10090
-          - zebrafish_7955
+          - Homo_sapiens 9606
+          - Mus_musculus 10090
+          - Danio_rerio 7955
+          - Rattus_norvegicus 10116
           ...
 
 
