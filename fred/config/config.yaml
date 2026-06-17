@@ -3,7 +3,7 @@ whitelist_repository: https://github.com/loosolab/FRED_whitelists
 private_access:
   name: # github: username for access token; gitlab: oauth2 for project access token
   token: # personal (github) or project (gitlab) access token
-branch: v2.0.0
+branch: v2.0.*
 whitelist_path: fred
 update_whitelists: True
 output_path: .
