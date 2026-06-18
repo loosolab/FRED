@@ -3,18 +3,12 @@ Adding values to a whitelist
 
 For this example, we will extend the whitelist for ``reference_genome`` with the reference genomes for zebrafish (danrer10, danrer11). This whitelist is created as a whitelist of type ``group``. To show the extension of whitelists of different types, it is converted to a ``plain`` and ``depend`` format for this example as well.
 
-Step 1: Finding the whitelist file and opening it in the web editor
---------------------------------------------------------------------
+Step 1: Finding and opening the whitelist file
+-----------------------------------------------
 
-Go to the `whitelist folder <https://github.com/loosolab/FRED_whitelists/tree/main/whitelists>`_ in the repository. There, look for the file whose name matches the key whose possible values you want to extend. In this example, this is the file named ``reference_genome``.
+Navigate to the `whitelist folder <https://github.com/loosolab/FRED_whitelists/tree/main/whitelists>`_ in the FRED_whitelists repository and open the file named after the key you want to extend. In this example, this is the file named ``reference_genome``.
 
-.. figure:: ../images/whitelist_selection.png
-
-Open this file. Inside Github you will see a blue button **Open in Web IDE** in the upper right corner.
-
-.. figure:: ../images/web-ide.png
-
-Clicking on it will open an editor where you can edit the selected whitelist.
+You can edit the file directly on GitHub using the built-in editor (pencil icon), or clone the repository and edit it locally with your preferred editor or IDE.
 
 Step 2: Adding new values to the file
 --------------------------------------
@@ -59,28 +53,28 @@ The following snippet shows the whitelist file for ``reference_genome`` in type 
 
     whitelist_type: group
     whitelist:
-        human:
+        Homo_sapiens:
           - hg38
           - hg19
-        mouse:
+        Mus_musculus:
           - mm10
           - mm9
           - mm38
 
-In the ``group`` type whitelist, the specified reference genomes are grouped according to the organism to which they are assigned. To add the reference genomes ``danrer10`` and ``danrer11`` of the organism zebrafish in a meaningful way, we create the new category ``zebrafish`` as a key within the dictionary under ``whitelist``. This key ``zebrafish`` then gets ``danrer10`` and ``danrer11`` in a list as value.
+In the ``group`` type whitelist, the specified reference genomes are grouped according to the organism to which they are assigned. To add the reference genomes ``danrer10`` and ``danrer11`` of the organism zebrafish in a meaningful way, we create the new category ``Danio_rerio`` as a key within the dictionary under ``whitelist``. This key ``Danio_rerio`` then gets ``danrer10`` and ``danrer11`` in a list as value.
 
 .. code-block:: yaml
 
     whitelist_type: group
     whitelist:
-        human:
+        Homo_sapiens:
           - hg38
           - hg19
-        mouse:
+        Mus_musculus:
           - mm10
           - mm9
           - mm38
-        zebrafish:
+        Danio_rerio:
           - danrer10
           - danrer11
 
@@ -94,10 +88,10 @@ The following snippet shows the whitelist file for ``reference_genome`` in type 
     whitelist_type: depend
     ident_key: organism_name
     whitelist:
-        human:
+        Homo_sapiens:
           - hg38
           - hg19
-        mouse:
+        Mus_musculus:
           - mm10
           - mm9
           - mm38
@@ -128,10 +122,10 @@ In this whitelist we find an entry for zebrafish. From the header we see that th
     whitelist_type: depend
     ident_key: organism_name
     whitelist:
-        human:
+        Homo_sapiens:
           - hg38
           - hg19
-        mouse:
+        Mus_musculus:
           - mm10
           - mm9
           - mm38
@@ -150,24 +144,35 @@ The illustrated yaml file shows the whitelist for experimental factors where ``i
 
 .. code-block:: yaml
 
-    whitelist_type: plain
+    whitelist_type: group
     whitelist:
-        - genotype
+        genetic:
+        - genetic_background
+        - gene_editing
+        enrichments:
+        - enrichment
+        treatments:
+        - medical_treatment
+        - physical_treatment
+        - temperature_treatment
+        - injury
+        biological factors:
         - tissue
         - cell_type
-        - knockdown
+        - cell_line
+        - strain
+        - cellular_compartment
+        - disease
         - gender
         - life_stage
         - age
         - ethnicity
-        - gene
-        - disease
-        - treatment
-        - time_point
-        - flow
-        - enrichment
+        - body_type
         - body_mass_index
-        - injury
+        other:
+        - concentration
+        - time_point
+        - signal
 
 A new key must now be added to the abbreviation whitelist for ``injury``. This key ``injury`` then contains an abbreviation as value. Abbreviations may only contain letters and numbers. Please note that the created abbreviation may only appear once in the whitelist. For ``injury`` the abbreviation ``inj`` was defined.
 
@@ -175,16 +180,24 @@ A new key must now be added to the abbreviation whitelist for ``injury``. This k
 
     whitelist_type: abbrev
     whitelist:
-        genotype: gnt
+        genetic_background: gnb
+        gene_editing: ge
+        cell_line: cll
         tissue: tis
         cell_type: clt
-        knockdown: knd
         gender: gnd
         life_stage: lfs
         ethnicity: eth
         disease: dis
-        treatment: trt
+        medical_treatment: mtrt
+        temperature_treatment: tempt
         time_point: tmp
         enrichment: enr
         body_mass_index: bmi
+        body_type: bt
         injury: inj
+        cellular_compartment: ccmp
+        physical_treatment: ptrt
+        strain: str
+        signal: sgl
+        concentration: conc

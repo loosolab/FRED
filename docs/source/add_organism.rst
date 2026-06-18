@@ -26,21 +26,21 @@ where ``Genus_species`` is the NCBI taxonomy name and ``taxonomy_id`` is the num
 Step 2: Add reference genomes to the ``reference_genome`` whitelist
 --------------------------------------------------------------------
 
-Open the file ``whitelists/reference_genome`` and add a new section for the organism. Since this whitelist is of type ``group``, add a new key with the organism's common name (matching the existing convention in that file) and list the available reference genome assemblies as values.
+Open the file ``whitelists/reference_genome`` and add a new section for the organism. Since this whitelist is of type ``group``, add a new key using the NCBI taxonomy name (matching the convention in that file) and list the available reference genome assemblies as values.
 
 .. code-block:: yaml
 
     whitelist_type: group
     whitelist:
-        human:
+        Homo_sapiens:
           - hg38
           - hg19
-        mouse:
+        Mus_musculus:
           - mm10
           - mm9
           - mm38
         ...
-        cattle:
+        Bos_taurus:
           - bosTau9
           - bosTau8
 
@@ -54,8 +54,8 @@ Step 3: Create a gene whitelist and register it in the ``gene`` whitelist
     whitelist_type: plain
     headers: gene_name ensembl_id
     whitelist:
-        - A1CF_ENSBTAG00000000139
-        - A2M_ENSBTAG00000001170
+        - A1CF ENSBTAG00000000139
+        - A2M ENSBTAG00000001170
         ...
 
 **3b.** Open ``whitelists/gene`` and add the new organism. The key must exactly match the ``organism_name`` from the ``organism`` whitelist (i.e. ``Bos_taurus``):

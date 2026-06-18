@@ -45,30 +45,30 @@ The conjunction **and** corresponds to a logical and, whereas the conjunction **
    :width: 100%
    :widths: 25 75
 
-   * - 
+   * -
         .. code-block:: bash
-            
-            -s "human"
 
-     - search for files that contain 'human'
-   * - 
+            -s "Homo_sapiens"
+
+     - search for files that contain 'Homo_sapiens'
+   * -
         .. code-block:: bash
-            
-            -s 'not "human"'
 
-     - search for files that do not contain 'human'
-   * - 
+            -s 'not "Homo_sapiens"'
+
+     - search for files that do not contain 'Homo_sapiens'
+   * -
         .. code-block:: bash
-            
-            -s '"human" and "mouse"'
 
-     - search for files that contain 'human' and 'mouse'
-   * - 
+            -s '"Homo_sapiens" and "lung"'
+
+     - search for files that contain 'Homo_sapiens' and 'lung'
+   * -
         .. code-block:: bash
-            
-            -s "human" or "mouse"
 
-     - search for files that contain 'human' or 'mouse'
+            -s '"Homo_sapiens" or "Mus_musculus"'
+
+     - search for files that contain 'Homo_sapiens' or 'Mus_musculus'
 
 
 Increase accuracy
@@ -79,13 +79,13 @@ If only a specific field should contain the searched value, a key can be specifi
 
 e.g.
 
-`-s 'organism_name:"human"'` searches for Files that contain 'humam' as organism
+``-s 'organism_name:"Homo_sapiens"'`` searches for files that contain 'Homo_sapiens' as organism name
 
 Multiple keys can also be chained together with colons to narrow the search even further. However, it should be noted that the order of the keys must match the indentations within the underlying yaml structure.
 
 **Example:**
 
-The following yaml shows the structur of the keys for the project part.
+The following yaml shows the structure of the keys for the project part.
 
 .. code-block:: yaml
     project:
@@ -113,15 +113,15 @@ The following yaml shows the structur of the keys for the project part.
    :width: 100%
    :widths: 25 75
 
-   * - 
+   * -
         .. code-block:: bash
-            
+
             -s "Mustermann, Max"
 
      - search for 'Mustermann, Max' in all fields
-   * - 
+   * -
         .. code-block:: bash
-            
+
             -s 'project:owner:name:"Mustermann, Max"'
 
      - search for 'Mustermann, Max' only as the name of the owner
@@ -135,11 +135,11 @@ If search strings are concatenated with 'and' and 'or', 'and' is normally evalua
 
 e.g. 
 
-`gender:"female" or gender:"male" and organism_name:"human"` 
+``gender:"female" or gender:"male" and organism_name:"Homo_sapiens"``
 
-is evaluated as 
+is evaluated as
 
-`gender:"female" or (gender:"male" and organism_name:"human")`
+``gender:"female" or (gender:"male" and organism_name:"Homo_sapiens")``
 
 To explicitly specify the order in which the individual search terms are to be evaluated, round brackets can be integrated in the search string. The content within the round brackets is then evaluated first. It is also possible to nest several round brackets, in which case they are evaluated from the inside out.
 

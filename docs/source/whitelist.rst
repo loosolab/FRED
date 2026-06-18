@@ -1,7 +1,7 @@
 Whitelist storage
 ====================
 
-The whitelists for the project are located in the Git repository `metadata_whitelists <https://github.com/loosolab/FRED_whitelists>`_ inside the 'whitelists' folder. All newly created whitelist files must also be placed in this folder so that FRED can read them.
+The whitelists for the project are located in the Git repository `FRED_whitelists <https://github.com/loosolab/FRED_whitelists>`_ inside the 'whitelists' folder. All newly created whitelist files must also be placed in this folder so that FRED can read them.
 
 The naming of the whitelists is identical to the key for which it is created. For example, the whitelist for the key 'organism' is also named 'organism'. 
 
@@ -117,7 +117,7 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
 Type 4: abbrev
 --------------------
 
-This type of whitelist must be provided for all experimental factors, their values, and for the organisms. The fields mentioned are those from which file names for samples are generated during metadata creation. Since file names are limited in length, the values must be shortened using the abbrev whitelist. In this process, all special characters are also removed from the values.
+This type of whitelist must be provided for all experimental factors, their values, and for organism names (``organism_name``). The fields mentioned are those from which file names for samples are generated during metadata creation. Since file names are limited in length, the values must be shortened using the abbrev whitelist. In this process, all special characters are also removed from the values.
 Whitelists of type abbrev are located inside the 'whitelists' folder in the 'abbrev' folder. They are named after the key for whose values they contain the abbreviations.  
 Here a dictionary is passed to the key 'whitelist'. The keys of this dictionary correspond to the values of the non-abbreviated whitelist. Each key receives its abbreviated version. If an non-abbreviated value has only a short length and does not contain any special characters, it does not have to be specified in the abbrev whitelist. In such a case it will be included unchanged in the filename.
 
@@ -329,19 +329,19 @@ This example shows how a link in a whitelist of type "group" can look like. For 
    * - The gene whitelist depends on the organism. This means that the 'proteins' part of the 'enrichment' whitelist is also dependent on the organism.
    * - 
         .. code-block:: yaml
-          
+
           whitelist_type: depend
           ident_key: organism_name
           whitelist:
-            human: genes/human
-            mouse: genes/mouse
-            zebrafish: genes/zebrafish
-            rat: genes/rat
-            pig: genes/pig
-            medaka: genes/medaka
-            chicken: genes/chicken
-            drosophila: genes/drosophila
-            yeast: genes/yeast
+            Homo_sapiens: genes/human
+            Mus_musculus: genes/mouse
+            Danio_rerio: genes/zebrafish
+            Rattus_norvegicus: genes/rat
+            Sus_scrofa: genes/pig
+            Oryzias_latipes: genes/medaka
+            Gallus_gallus: genes/chicken
+            Drosophila_melanogaster: genes/drosophila
+            Saccharomyces_cerevisiae: genes/yeast
 
 
 **Example 3 : depend**
@@ -357,44 +357,44 @@ Links can also be added for dependent whitelists. There are two ways to do this.
    * - The whitelist for the experimental factors is displayed here for overview. The values in the whitelist for 'values' depend on the factor entered from this list.
      - The whitelist for values depends on the entered value under 'factor' and the possible values should correspond to the values of the selected factor. For this
        reason, for each key under 'whitelist', the corresponding whitelist of the experimental factor is linked.
-   * - 
+   * -
        .. code-block:: yaml
-          
-          whitelist_type: plain
-          whitelist:
-          - genotype
-          - tissue
-          - cell_type
-          - knockdown
-          - gender
-          - life_stage
-          - age
-          - ethnicity
-          - gene
-          - disease
-          - treatment
-          - time_point
-          - flow
-          - enrichment
-          - body_mass_index
-          - injury
 
-     - 
+          whitelist_type: group
+          whitelist:
+            genetic:
+            - genetic_background
+            - gene_editing
+            enrichments:
+            - enrichment
+            treatments:
+            - medical_treatment
+            - physical_treatment
+            - temperature_treatment
+            - injury
+            biological factors:
+            - tissue
+            - cell_type
+            - cell_line
+            - strain
+            - cellular_compartment
+            - disease
+            - gender
+            - life_stage
+            - age
+            - ethnicity
+            - body_type
+            - body_mass_index
+            other:
+            - concentration
+            - time_point
+            - signal
+
+     -
         .. code-block:: yaml
-          
+
           whitelist_type: depend
           ident_key: factor
-          whitelist:
-            genotype: genotype
-            tissue: tissue
-            cell_type: cell_type
-            knockdown: knockdown
-            gender: gender
-            life_stage: life_stage
-            ethnicity: ethnicity
-            gene: gene
-            flow: flow
-            enrichment: enrichment
       
 
 .. list-table::
@@ -428,13 +428,13 @@ If whitelists are very long, it may make sense to split them into smaller whitel
        after the organisms and the path to the respective whitelist is given as value. 
    * - 
        .. code-block:: yaml
-          
+
           whitelist_type: depend
-          ident_key: organism
+          ident_key: organism_name
           whitelist:
-            human_9606: genes/human
-            mouse_10090: genes/mouse
-            zebrafish_7955: genes/zebrafish
+            Homo_sapiens: genes/human
+            Mus_musculus: genes/mouse
+            Danio_rerio: genes/zebrafish
             ...
 
 
@@ -447,14 +447,13 @@ If whitelists are very long, it may make sense to split them into smaller whitel
        contain the genes. The naming of the files does not follow any fixed rule but is subject to personal preference.
    * - 
         .. code-block:: yaml
-          
+
           whitelist_type: plain
-          ...
+          headers: gene_name ensembl_id
           whitelist:
-          - TSPAN6_ENSG00000000003
-          - TNMD_ENSG00000000005
-          - DPM1_ENSG00000000419
-          - SCYL3_ENSG00000000457
-          - C1orf112_ENSG00000000460
+          - TSPAN6 ENSG00000000003
+          - TNMD ENSG00000000005
+          - DPM1 ENSG00000000419
+          - SCYL3 ENSG00000000457
           ...
 

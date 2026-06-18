@@ -1,7 +1,7 @@
-Standalone Web Frontend
-=========================
+Self-Hosted Web Application
+============================
 
-FRED provides a graphical user interface consisting of two containers, a web app using Angular and a REST-application programming interface using Flask. 
+FRED provides a graphical user interface consisting of two containers, a web app using Angular and a REST-application programming interface using Flask.
 The containers can be built and started using docker compose.
 
 .. figure:: ../images/FRED_standalone.png
@@ -12,7 +12,7 @@ The containers can be built and started using docker compose.
 How to install
 ----------------
 
-The standalone Version of FRED is located in a `separate Repository <https://github.com/loosolab/FRED_standalone>`_. 
+The self-hosted version of FRED is located in a `separate Repository <https://github.com/loosolab/FRED_standalone>`_.
 
 1. Clone the repository 
 
@@ -36,7 +36,7 @@ The standalone Version of FRED is located in a `separate Repository <https://git
 
         docker compose up --build
     
-    b. Run without build: Use this if you aleady built the containers.
+    b. Run without build: Use this if you already built the containers.
     
     .. code-block::
 

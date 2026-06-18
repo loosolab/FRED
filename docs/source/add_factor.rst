@@ -101,28 +101,39 @@ Step 2: Add experimental factor to the ``factor`` whitelist
 ------------------------------------------------------------
 
 In the second step, the new experimental factor must be added to the whitelist ``factor``. The steps required for this are described in more detail under :doc:`add_whitelist_values`.
-The new factor ``injury`` is added to the whitelist for ``factor`` so that it looks like this:
+The new factor ``injury`` is added to the appropriate group in the whitelist for ``factor``. Since injuries are a type of treatment, it is added under ``treatments``:
 
 .. code-block:: yaml
 
-    whitelist_type: plain
+    whitelist_type: group
     whitelist:
-        - genotype
+        genetic:
+        - genetic_background
+        - gene_editing
+        enrichments:
+        - enrichment
+        treatments:
+        - medical_treatment
+        - physical_treatment
+        - temperature_treatment
+        - injury
+        biological factors:
         - tissue
         - cell_type
-        - knockdown
+        - cell_line
+        - strain
+        - cellular_compartment
+        - disease
         - gender
         - life_stage
         - age
         - ethnicity
-        - gene
-        - disease
-        - treatment
-        - time_point
-        - flow
-        - enrichment
+        - body_type
         - body_mass_index
-        - injury
+        other:
+        - concentration
+        - time_point
+        - signal
 
 Step 3: Add abbreviation of experimental factor
 -------------------------------------------------
@@ -133,19 +144,27 @@ In the third step, an abbreviation must be added to the abbreviation whitelist o
 
     whitelist_type: abbrev
     whitelist:
-        genotype: gnt
+        genetic_background: gnb
+        gene_editing: ge
+        cell_line: cll
         tissue: tis
         cell_type: clt
-        knockdown: knd
         gender: gnd
         life_stage: lfs
         ethnicity: eth
         disease: dis
-        treatment: trt
+        medical_treatment: mtrt
+        temperature_treatment: tempt
         time_point: tmp
         enrichment: enr
         body_mass_index: bmi
+        body_type: bt
         injury: inj
+        cellular_compartment: ccmp
+        physical_treatment: ptrt
+        strain: str
+        signal: sgl
+        concentration: conc
 
 Since the experimental factor for injuries includes not only the key ``injury``, but also ``injury_status`` and ``injury_type`` underneath, these must also be abbreviated. The abbreviation of ``injury`` has already been done in the abbreviation whitelist for ``factor``. For the subordinate keys a new abbreviation whitelist must be created. This is named after the key under which the abbreviated keys are placed. In this example it is ``injury``. The creation of the whitelist is explained in more detail in :doc:`add_whitelist`. The resulting abbreviation whitelist ``injury`` looks like this:
 

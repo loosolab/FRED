@@ -88,10 +88,16 @@ Publication Auto-Fill
 
 When entering a publication, only the PubMed ID needs to be provided manually. FRED automatically retrieves the title, authors, journal, year, volume, issue, pages, and DOI from PubMed and fills them in without further input.
 
+.. note::
+
+   PubMed retrieval requires a valid email address to be set in the config file (``email`` key). Make sure to pass a config with your actual email address to ensure the auto-fill works reliably.
+
 Autosave
 ^^^^^^^^^
 
-FRED automatically saves the current progress to ``~/.fred/tmp/`` while the dialog is running. If the session is interrupted before completion, the saved state is offered for continuation the next time ``fred generate`` is started with the same project ID and path.
+FRED automatically saves progress to ``~/.fred/tmp/`` after each completed section (**project**, **experimental setting**, **technical details**). If the session is interrupted, the saved state is offered for continuation the next time ``fred generate`` is started with the same project ID and path.
+
+Note that autosave is section-based: if you abort mid-section (e.g. while entering samples), only the sections already completed in full are restored. The interrupted section must be re-entered from the beginning.
 
 Summary
 ^^^^^^^^

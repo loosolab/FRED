@@ -51,12 +51,12 @@ Optional arguments
 Editing workflow
 -----------------
 
-When ``fred edit`` is started, the top-level sections of the metadata file are displayed as a numbered list. Select the section you want to edit by entering the corresponding number. FRED then steps through the keys within that section, showing the current value and allowing you to enter a new one.
+When ``fred edit`` is started, the top-level sections of the metadata file are displayed as a numbered list. You can select one or more sections to edit (comma-separated). FRED then steps through the editable keys within each selected section.
 
-The same dialog options as in :doc:`generate` are available:
+The behavior depends on the type of field:
 
-- Press **Enter** to keep the current value unchanged.
-- Type a new value to overwrite the current one.
+- **List fields** — The existing entries are displayed as numbered options. You can choose to edit a specific entry, remove an entry, or add a new one.
+- **Simple fields** — A new value is prompted directly.
 - Enter ``!back`` to go back to the previous field.
 
-Auto-generated fields (such as condition names and sample names) are recalculated automatically when the values they depend on are changed.
+Fields marked as auto-generated (e.g. IDs, setting IDs, sample names) are skipped and cannot be modified directly.

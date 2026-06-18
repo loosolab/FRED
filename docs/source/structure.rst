@@ -170,4 +170,6 @@ The following extract shows all keys that have already been created in the metad
             reference_genome:
             parameters:
             output:
+        sample_preparation:
+        further_description:
 

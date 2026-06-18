@@ -29,8 +29,8 @@ In this example, first a key ``owner`` is added to the ``project`` part to creat
 
 .. _section-a:
 
-A — Adding a key as section
------------------------------
+A — Adding an inner node (section)
+------------------------------------
 
 To add the key ``owner`` to `keys.yaml <https://github.com/loosolab/FRED/blob/main/fred/structure/keys.yaml>`_, you first have to find the place where you want to add it. In this example the ``owner`` key should be on the same level as ``id`` and is therefore added in the same list element as ``id`` and with the same indentation.
 
@@ -112,8 +112,8 @@ The last property to be specified is ``value``. For keys that act as section hea
 
 .. _section-b:
 
-B — Adding a key with value
------------------------------
+B — Adding a leaf key (user input)
+------------------------------------
 
 To add a key, you must first find the appropriate position and indentation for it in the `keys.yaml <https://github.com/loosolab/FRED/blob/main/fred/structure/keys.yaml>`_. In this example we add a key ``name`` to the ``owner`` added in :ref:`section-a`. It is placed inside the ``owner`` under ``value``.
 
