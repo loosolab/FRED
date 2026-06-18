@@ -14,7 +14,7 @@ Default config
         private_access:
             name: 
             token: 
-        branch: main
+        branch: v2.0.*
         whitelist_path: fred
         update_whitelists: True
         output_path: .
@@ -48,7 +48,7 @@ Config Keys
      - 
    * - branch
      - The branch of the whitelist repository; can also be set to versions if version tags are used (e.g. 1.2.0 or 1.2.*)
-     - main
+     - v2.0.*
    * - whitelist_path
      - path the whitelist repository is cloned to or 'fred' to use the default path
      - fred
@@ -56,7 +56,7 @@ Config Keys
      - bool to define if whitelists should be updated/pulled when running FRED
      - True 
    * - output_path
-     - path plots and valiadtion reporst should be saved to
+     - path plots and validation reports should be saved to
      - .
    * - filename
      - identifier added to the filenames to distinguish them as metadata files (e.g. '_metadata' leads to naming <my_file>_metadata.yaml)

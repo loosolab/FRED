@@ -38,7 +38,7 @@ The following properties are defined for each key in the specified order:
      - The input type for the key value
 
 The properties 'whitelist' and 'input_type' are specified only for keys that expect direct user input.
-Detailed instructions on how to add the properties for new keys can be found under [Add keys](add_keys.md).
+Detailed instructions on how to add the properties for new keys can be found under :doc:`add_keys`.
 
 Included keys
 --------------
@@ -47,11 +47,24 @@ The following extract shows all keys that have already been created in the metad
 
 
 .. code-block:: yaml
-    
+
     project:
         id:
         project_name:
         date:
+        description:
+        further_description:
+        graphical_abstract:
+        publication:
+            pubmed_id:
+            title:
+            year:
+            author:
+            journal:
+            volume:
+            issue:
+            pages:
+            doi:
         owner:
             name:
             ldap_name:
@@ -66,12 +79,12 @@ The following extract shows all keys that have already been created in the metad
             email:
             address:
             telephone:
-        description:
-        further_description:
-        graphical_abstract:
 
     experimental_setting:
+        setting_id:
         organism:
+            organism_name:
+            taxonomy_id:
         experimental_factors:
             factor:
             values:
@@ -82,52 +95,81 @@ The following extract shows all keys that have already been created in the metad
                 samples:
                     sample_name:
                     pooled:
-                    genotype:
-                    gender:
-                    life_stage:
-                    age:
-                        value:
-                        unit:
-                    ethnicity:
-                    tissue:
-                    cell_type:
-                    gene:
-                    disease_information:
-                        healthy:
-                        disease:
-                            disease_status:
-                            disease_type:
-                            disease_stage:
+                    donor_count:
+                    number_of_measurements:
+                    gene_editing:
+                        editing_type:
+                        editing_method:
+                        gene:
+                            gene_name:
+                            ensembl_id:
+                        modification:
+                    genetic_background:
+                    enrichment:
+                        enrichment_type:
+                        modification:
                     injury:
                         injury_status:
                         injury_type:
-                    treatment_information:
-                        treated:
-                        treatment:
-                            treatment_status:
-                            treatment_type:
-                            treatment_duration:
-                                value:
-                                unit:
+                    medical_treatment:
+                        treatment_type:
+                        treatment_status:
+                        treatment_duration:
+                            value:
+                            unit:
+                        treatment_amount:
+                            value:
+                            unit:
+                    physical_treatment:
+                    temperature_treatment:
+                        treatment_status:
+                        temperature:
+                            value:
+                            unit:
+                        treatment_duration:
+                            value:
+                            unit:
+                    age:
+                        value:
+                        unit:
+                    body_type:
+                    body_mass_index:
+                        value:
+                        unit:
+                    cell_line:
+                    cell_type:
+                    cellular_compartment:
+                    disease:
+                        disease_type:
+                        disease_status:
+                        disease_stage:
+                        disease_risk:
+                    ethnicity:
+                    gender:
+                    life_stage:
+                    strain:
+                    tissue:
+                    concentration:
+                        value:
+                        unit:
+                    signal:
                     time_point:
                         value:
                         unit:
-                    flow:
-                    knockdown:
-                    body_mass_index:
-                    donor_count:
                     technical_replicates:
                         count:
                         sample_name:
-                            
+                        filenames:
+
     technical_details:
-        technique:
-        analysis:
-            sample_preparation:
-            further_description:
-            runs:
-                date:
-                reference_genome:
-                parameters:
-                output:
+        techniques:
+            setting:
+            technique:
+        analysis_runs:
+            date:
+            reference_genome:
+            parameters:
+            output:
+        sample_preparation:
+        further_description:
 

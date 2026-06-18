@@ -73,23 +73,38 @@ Dialog Options
 
    * - **Text input:**
        Free text entry consisting of words, numbers, or dates.
-     
 
    * - **Selections:**
        Selection of listed values by stating their number in the list.
-     
 
    * - **Autofill:**
-       Type in values that match a pre-defined list. Upon pressing the tabulator key, up to 30 values that match the input are displayed. If only one value matches, it is set as your input.  
-     
-    
+       Type in values that match a pre-defined list. Upon pressing the tabulator key, up to 30 values that match the input are displayed. If only one value matches, it is set as your input.
 
-Summary 
-^^^^^^^^^^^^^^
+   * - **Go back:**
+       Enter ``!back`` at any prompt to return to the previous field and correct an earlier entry.
 
-After finishing a section of the metadata, a summary is displayed for checking if everything is correct. 
-For the **project** and **technical details** section, the summary is displayed in YAML formatting. 
-For the **experimental setting** section a plot is created. 
+Publication Auto-Fill
+^^^^^^^^^^^^^^^^^^^^^^
+
+When entering a publication, only the PubMed ID needs to be provided manually. FRED automatically retrieves the title, authors, journal, year, volume, issue, pages, and DOI from PubMed and fills them in without further input.
+
+.. note::
+
+   PubMed retrieval requires a valid email address to be set in the config file (``email`` key). Make sure to pass a config with your actual email address to ensure the auto-fill works reliably.
+
+Autosave
+^^^^^^^^^
+
+FRED automatically saves progress to ``~/.fred/tmp/`` after each completed section (**project**, **experimental setting**, **technical details**). If the session is interrupted, the saved state is offered for continuation the next time ``fred generate`` is started with the same project ID and path.
+
+Note that autosave is section-based: if you abort mid-section (e.g. while entering samples), only the sections already completed in full are restored. The interrupted section must be re-entered from the beginning.
+
+Summary
+^^^^^^^^
+
+After finishing a section of the metadata, a summary is displayed for checking if everything is correct.
+For the **project** and **technical details** section, the summary is displayed in YAML formatting.
+For the **experimental setting** section a plot is created.
 
 Experimental Factors, Conditions and Samples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

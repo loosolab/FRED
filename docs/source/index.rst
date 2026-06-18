@@ -13,28 +13,42 @@ FRED
 * structured semantic validation,
 * a logical search,
 * an external programming interface (API) and
-* a standalone web front end.
+* a self-hosted web application.
 
 
 ####################
 Table of Contents
 ####################
 
-.. toctree:: FRED Functions
+.. toctree::
    :maxdepth: 2
    :caption: FRED Functions
 
    install
    config
    generate
+   validate
+   edit
    search_metadata
+   export
    plots
    standalone
+   api
 
-.. toctree:: 
+.. toctree::
    :maxdepth: 2
    :caption: FRED Structure
 
    structure
    whitelist
-   
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Extending FRED
+
+   custom_whitelists
+   add_keys
+   add_factor
+   add_whitelist
+   add_whitelist_values
+   add_organism
