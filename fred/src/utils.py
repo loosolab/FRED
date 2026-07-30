@@ -7,6 +7,8 @@ from Bio import Entrez
 import yaml
 from yaml import CLoader as Loader, CDumper as Dumper
 
+from fred.src.exceptions import WhitelistSplitError, WhitelistJoinError
+
 
 def _str_representer(dumper, data):
     if "\n" in data:
@@ -248,6 +250,7 @@ def read_grouped_whitelist(
             os.path.dirname(os.path.abspath(__file__)), "..", "metadata_whitelists"
         )
     headers = {}
+    delimiters = {}
     for key in whitelist["whitelist"]:
         if not isinstance(whitelist["whitelist"][key], list):
             new_whitelist = False
@@ -293,6 +296,8 @@ def read_grouped_whitelist(
                     elif whitelist["whitelist"][key]["whitelist_type"] == "plain":
                         if "headers" in whitelist["whitelist"][key]:
                             headers[key] = whitelist["whitelist"][key]["headers"]
+                        if "delimiter" in whitelist["whitelist"][key]:
+                            delimiters[key] = whitelist["whitelist"][key]["delimiter"]
                         whitelist["whitelist"][key] = whitelist["whitelist"][key][
                             "whitelist"
                         ]
@@ -321,6 +326,8 @@ def read_grouped_whitelist(
         whitelist["whitelist_type"] = "plain_group"
     if len(list(headers.keys())) > 0:
         whitelist["headers"] = headers
+    if len(list(delimiters.keys())) > 0:
+        whitelist["delimiter"] = delimiters
     return whitelist
 
 
@@ -400,13 +407,23 @@ def get_whitelist(
             abbrev = True
         elif whitelist["whitelist_type"] == "depend":
             depend = list(find_keys(filled_object, whitelist["ident_key"]))
+            depend_delimiter = " "
             if len(depend) == 0:
                 if whitelist["ident_key"] == "organism_name":
                     depend = list(find_keys(filled_object, "organism"))
+            if whitelist["ident_key"] == "organism_name":
+                organism_whitelist = get_whitelist(
+                    "organism",
+                    filled_object,
+                    whitelist_object=whitelist_object,
+                    whitelist_path=whitelist_path,
+                )
+                if organism_whitelist:
+                    depend_delimiter = organism_whitelist.get("delimiter", " ")
             if len(depend) > 0:
                 whitelist = read_depend_whitelist(
                     whitelist["whitelist"],
-                    depend[0].split(" ")[0],
+                    split_header_value(depend[0], depend_delimiter)[0],
                     whitelist_object=whitelist_object,
                     whitelist_path=whitelist_path,
                 )
@@ -458,6 +475,7 @@ def get_whitelist(
                 if (
                     whitelist["whitelist"][key] is not None
                     and key != "headers"
+                    and key != "delimiter"
                     and key != "whitelist_type"
                     and key != "whitelist_keys"
                 ):
@@ -1308,6 +1326,72 @@ def split_cond(condition):
         conditions[j] = (key, d[key])
 
     return conditions
+
+
+def split_headers(headers):
+    """
+    This function splits a header-whitelist's 'headers' string into a list
+    of column names.
+    :param headers: a string containing header names divided by space
+    :return: a list of header names
+    """
+    return headers.split(" ")
+
+
+def split_header_value(value, delimiter=" "):
+    """
+    This function splits a header-whitelist value into its per-column
+    tokens. This is the single place that performs the actual split of a
+    value string, so that a future change to the splitting mechanism only
+    needs to be made here.
+    :param value: a string value to be split into tokens
+    :param delimiter: the delimiter to split on, defaults to a single space
+        for backwards compatibility. If a non-default delimiter is given,
+        each token is additionally stripped of surrounding whitespace.
+    :return: a list of value tokens
+    """
+    tokens = value.split(delimiter)
+    if delimiter != " ":
+        tokens = [token.strip() for token in tokens]
+    return tokens
+
+
+def header_value_to_dict(value, headers, delimiter=" "):
+    """
+    This function splits a header-whitelist value into a dictionary mapping
+    each header name to its corresponding token.
+    :param value: a string value to be split according to the headers
+    :param headers: a string containing header names divided by space
+    :param delimiter: the delimiter used to split value, defaults to a
+        single space
+    :return: a dictionary mapping header names to their value tokens
+    :raises WhitelistSplitError: if value does not split into exactly as
+        many tokens as there are headers
+    """
+    header_list = split_headers(headers)
+    value_list = split_header_value(value, delimiter)
+    if len(value_list) != len(header_list):
+        raise WhitelistSplitError(headers, value, delimiter, header_list, value_list)
+    return {header_list[i]: value_list[i] for i in range(len(header_list))}
+
+
+def dict_to_header_value(value_dict, headers, delimiter=" "):
+    """
+    This function joins a dictionary mapping header names to values back
+    into a single value string, in the column order given by headers.
+    :param value_dict: a dictionary mapping header names to their values
+    :param headers: a string containing header names divided by space
+    :param delimiter: the delimiter used to join the values, defaults to a
+        single space
+    :return: the joined value string
+    :raises WhitelistJoinError: if value_dict does not contain a value for
+        every header
+    """
+    header_list = split_headers(headers)
+    for header in header_list:
+        if header not in value_dict:
+            raise WhitelistJoinError(headers, value_dict, header_list, header)
+    return delimiter.join(value_dict[header] for header in header_list)
 
 
 def get_publication_object(pubmed_id, email):

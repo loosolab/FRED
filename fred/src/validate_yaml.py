@@ -234,9 +234,11 @@ def new_test(
                                     headers = []
                                     for w_k in w["whitelist_keys"]:
                                         if w_k in w["headers"]:
-                                            headers += w["headers"][w_k].split(" ")
+                                            headers += utils.split_headers(
+                                                w["headers"][w_k]
+                                            )
                             else:
-                                headers = w["headers"].split(" ")
+                                headers = utils.split_headers(w["headers"])
                             new_yaml[0]["value"] = headers
                     # TODO: enrichment
                     if new_yaml[0]["value"] is not None:

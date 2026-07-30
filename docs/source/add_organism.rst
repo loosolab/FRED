@@ -23,6 +23,14 @@ where ``Genus_species`` is the NCBI taxonomy name and ``taxonomy_id`` is the num
         ...
         - Bos_taurus 9913    # newly added
 
+.. note::
+
+    Underscores are used here because whitelist entries are split on a single
+    space by default. An optional ``delimiter`` field can be set on a
+    whitelist file to use real spaces (or another separator) in multi-word
+    values instead — see :doc:`whitelist` for details. This is not currently
+    used for ``organism`` itself.
+
 Step 2: Add reference genomes to the ``reference_genome`` whitelist
 --------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 import os
 from fred.src import utils
-from fred.src.exceptions import GoBackSignal
+from fred.src.exceptions import GoBackSignal, WhitelistSplitError
 import datetime
 from tabulate import tabulate
 import readline
@@ -119,43 +119,39 @@ class Input:
 
             # test if the whitelist contains the key 'headers'
             if "headers" in whitelist:
-                if (
-                    whitelist["whitelist_type"] == "group"
-                    or whitelist["whitelist_type"] == "plain_group"
-                    and w_key is not None
-                ):
-                    if w_key in whitelist["headers"]:
-                        headers = whitelist["headers"][w_key].split(" ")
-                        vals = input_value.split(" ")
+                delimiter = whitelist.get("delimiter", " ")
+                try:
+                    if (
+                        whitelist["whitelist_type"] == "group"
+                        or whitelist["whitelist_type"] == "plain_group"
+                        and w_key is not None
+                    ):
+                        if w_key in whitelist["headers"]:
+                            w_delimiter = (
+                                delimiter[w_key]
+                                if isinstance(delimiter, dict) and w_key in delimiter
+                                else " "
+                            )
+                            # overwrite the input value with the dictionary
+                            input_value = utils.header_value_to_dict(
+                                input_value, whitelist["headers"][w_key], w_delimiter
+                            )
 
-                        # create a dictionary to store the new value
-                        value = {}
-
-                        # iterate through the headers and save the header and value of the
-                        # same index into a dictionary with header as key
-                        for i in range(len(headers)):
-                            value[headers[i]] = vals[i]
+                    else:
 
                         # overwrite the input value with the dictionary
-                        input_value = value
-
-                else:
-
-                    # split the headers and the input value at ' ' and save each to
-                    # a list
-                    headers = whitelist["headers"].split(" ")
-                    vals = input_value.split(" ")
-
-                    # create a dictionary to store the new value
-                    value = {}
-
-                    # iterate through the headers and save the header and value of the
-                    # same index into a dictionary with header as key
-                    for i in range(len(headers)):
-                        value[headers[i]] = vals[i]
-
-                    # overwrite the input value with the dictionary
-                    input_value = value
+                        input_value = utils.header_value_to_dict(
+                            input_value, whitelist["headers"], delimiter
+                        )
+                except WhitelistSplitError as e:
+                    print(e)
+                    print(
+                        "Please choose a different value or ask an admin to fix "
+                        "the whitelist file."
+                    )
+                    input_value = self.parse_input_value(
+                        key, structure, allow_float=allow_float
+                    )
 
         # no whitelist
         else:
@@ -564,65 +560,46 @@ class Input:
 
                 # test if headers were defined in the whitelist
                 if "headers" in whitelist:
+                    delimiter = whitelist.get("delimiter", " ")
+                    try:
+                        # test if whitelist is of type group or plain group and if
+                        # w_keys were defined
+                        # TODO: works for group?
+                        if (
+                            whitelist["whitelist_type"] == "group"
+                            or whitelist["whitelist_type"] == "plain_group"
+                            and len(w_keys) > 0
+                        ):
 
-                    # test if whitelist is of type group or plain group and if
-                    # w_keys were defined
-                    # TODO: works for group?
-                    if (
-                        whitelist["whitelist_type"] == "group"
-                        or whitelist["whitelist_type"] == "plain_group"
-                        and len(w_keys) > 0
-                    ):
+                            # iterate over input values
+                            for i in range(len(used_values)):
 
-                        # iterate over input values
-                        for i in range(len(used_values)):
+                                # look at index of value in w_keys and see if a header
+                                # was defined for that w_key
+                                if w_keys[i] in whitelist["headers"]:
+                                    w_delimiter = (
+                                        delimiter[w_keys[i]]
+                                        if isinstance(delimiter, dict)
+                                        and w_keys[i] in delimiter
+                                        else " "
+                                    )
+                                    used_values[i] = utils.header_value_to_dict(
+                                        used_values[i],
+                                        whitelist["headers"][w_keys[i]],
+                                        w_delimiter,
+                                    )
 
-                            # look at index of value in w_keys and see if a header
-                            # was defined for that w_key
-                            if w_keys[i] in whitelist["headers"]:
+                        else:
 
-                                # TODO: own function for header?
-
-                                # split the header at the whitespace to get a list
-                                # of keys
-                                headers = whitelist["headers"][w_keys[i]].split(" ")
-
-                                # split the value at whitespace to get the
-                                # according values
-                                vals = used_values[i].split(" ")
-
-                                # initialize an empty dictionary to save the
-                                # key-value-pairs to
-                                used_values[i] = {}
-
-                                # iterate over the keys in the header
-                                for j in range(len(headers)):
-                                    # save the key and value at the same index into
-                                    # the dictionary
-                                    used_values[i][headers[j]] = vals[j]
-
-                    else:
-
-                        # split the header of a non-group whitelist at whitespace
-                        # to get a list of keys
-                        headers = whitelist["headers"].split(" ")
-
-                        # iterate over the input values
-                        for i in range(len(used_values)):
-
-                            # split the value at whitespace to get the
-                            # according values
-                            vals = used_values[i].split(" ")
-
-                            # initialize an empty dictionary to save the
-                            # key-value-pairs to
-                            used_values[i] = {}
-
-                            # iterate over the keys in the header
-                            for j in range(len(headers)):
-                                # save the key and value at the same index into
-                                # the dictionary
-                                used_values[i][headers[j]] = vals[j]
+                            # iterate over the input values
+                            for i in range(len(used_values)):
+                                used_values[i] = utils.header_value_to_dict(
+                                    used_values[i], whitelist["headers"], delimiter
+                                )
+                    except WhitelistSplitError as e:
+                        print(e)
+                        print("Please re-select the values for this field.")
+                        used_values = self.get_input_list(node, item)
 
             else:
                 # TODO: kann weg?

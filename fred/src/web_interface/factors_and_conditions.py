@@ -292,6 +292,16 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
     # value is stored in a grouped whitelist that was refactored to plain
     real_val = {}
 
+    # determine the delimiter the 'organism' whitelist uses, so that
+    # organism_name (which may still be in its raw 'headers' form) can be
+    # split into just the organism name regardless of the configured delimiter
+    organism_delimiter = " "
+    organism_whitelist = utils.get_whitelist(
+        "organism", {}, whitelist_object=read_in_whitelists
+    )
+    if organism_whitelist:
+        organism_delimiter = organism_whitelist.get("delimiter", " ")
+
     # iterate over factors
     for i in range(len(factors)):
 
@@ -353,6 +363,9 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
                                             whitelist_key = w_key
                                             break
                                 if "headers" in factors[i]["nested_infos"][val_key]:
+                                    delimiter = factors[i]["nested_infos"][
+                                        val_key
+                                    ].get("delimiter", " ")
                                     if isinstance(
                                         factors[i]["nested_infos"][val_key]["headers"],
                                         dict,
@@ -364,12 +377,19 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
                                                 "headers"
                                             ]
                                         ):
+                                            w_delimiter = (
+                                                delimiter[whitelist_key]
+                                                if isinstance(delimiter, dict)
+                                                and whitelist_key in delimiter
+                                                else " "
+                                            )
                                             str_value = wi_utils.parse_headers(
                                                 factors[i]["nested_infos"][val_key][
                                                     "headers"
                                                 ][whitelist_key],
                                                 val[val_key][v],
                                                 mode="str",
+                                                delimiter=w_delimiter,
                                             )
                                             val[val_key][v] = (
                                                 f'{"{"}' f'{str_value}{"}"}'
@@ -381,6 +401,7 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
                                             ],
                                             val[val_key][v],
                                             mode="str",
+                                            delimiter=delimiter,
                                         )
                                         val[val_key][v] = f'{"{"}' f'{str_value}{"}"}'
                                 real_val[val[val_key][v]] = full_value
@@ -390,7 +411,7 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
                 factors[i]["values"] = utils.get_combis(
                     val,
                     factors[i]["factor"],
-                    {"organism": organism_name.split(" ")[0]},
+                    {"organism": utils.split_header_value(organism_name, organism_delimiter)[0]},
                     key_yaml,
                     read_in_whitelists=read_in_whitelists,
                 )
@@ -408,17 +429,28 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
                             single_val_key = w_key
                             break
                 if "headers" in factors[i]:
+                    delimiter = factors[i].get("delimiter", " ")
                     if isinstance(factors[i]["headers"], dict):
                         if single_val_key is not None:
                             if single_val_key in factors[i]["headers"]:
+                                w_delimiter = (
+                                    delimiter[single_val_key]
+                                    if isinstance(delimiter, dict)
+                                    and single_val_key in delimiter
+                                    else " "
+                                )
                                 single_val = wi_utils.parse_headers(
                                     factors[i]["headers"][single_val_key],
                                     single_val,
                                     mode="dict",
+                                    delimiter=w_delimiter,
                                 )
                     else:
                         single_val = wi_utils.parse_headers(
-                            factors[i]["headers"], single_val, mode="dict"
+                            factors[i]["headers"],
+                            single_val,
+                            mode="dict",
+                            delimiter=delimiter,
                         )
                 if isinstance(single_val, dict):
                     val = "|".join([f'{key}:"{single_val[key]}"' for key in single_val])
@@ -428,7 +460,7 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
             factors[i]["values"] = utils.get_combis(
                 new_values,
                 factors[i]["factor"],
-                {"organism": organism_name.split(" ")[0]},
+                {"organism": utils.split_header_value(organism_name, organism_delimiter)[0]},
                 key_yaml,
                 read_in_whitelists=read_in_whitelists,
             )
@@ -453,6 +485,7 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
                     factors[i]["values"][j],
                     headers,
                     mode="str",
+                    delimiter=factors[i].get("delimiter"),
                 )
 
                 # headers were defined and the whitelist key of the value is
@@ -480,7 +513,10 @@ def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):
                 # split the value according to the header and save them as a
                 # string
                 str_value = wi_utils.parse_headers(
-                    factors[i]["headers"], factors[i]["values"][j], mode="str"
+                    factors[i]["headers"],
+                    factors[i]["values"][j],
+                    mode="str",
+                    delimiter=factors[i].get("delimiter", " "),
                 )
 
                 # # rewrite the value to '<factor>:{<values>}'
@@ -833,29 +869,43 @@ def get_samples(
                                 elif "headers" in sample[i]:
                                     headers = [x for x in c[1]]
                                     w_key = None
+                                    header_string = None
                                     if isinstance(sample[i]["headers"], dict):
 
                                         for k in sample[i]["headers"]:
                                             if sorted(
-                                                sample[i]["headers"][k].split(" ")
+                                                utils.split_headers(
+                                                    sample[i]["headers"][k]
+                                                )
                                             ) == sorted(headers):
                                                 w_key = k
+                                                header_string = sample[i]["headers"][k]
                                                 break
                                     else:
-                                        if sorted(headers) != sorted(
-                                            sample[i]["headers"].split(" ")
+                                        if sorted(headers) == sorted(
+                                            utils.split_headers(sample[i]["headers"])
                                         ):
-                                            headers = None
+                                            header_string = sample[i]["headers"]
 
-                                    if headers is not None:
-                                        filled_value = ""
-                                        for header in headers:
-                                            filled_value = (
-                                                filled_value + " " + c[1][header]
+                                    if header_string is not None:
+                                        delimiter = sample[i].get("delimiter", " ")
+                                        join_delimiter = (
+                                            delimiter[w_key]
+                                            if isinstance(delimiter, dict)
+                                            and w_key in delimiter
+                                            else (
+                                                " "
+                                                if isinstance(delimiter, dict)
+                                                else delimiter
                                             )
-                                        filled_value = filled_value.lstrip(" ").rstrip(
-                                            " "
                                         )
+                                        try:
+                                            filled_value = utils.dict_to_header_value(
+                                                c[1], header_string, join_delimiter
+                                            )
+                                        except utils.WhitelistJoinError as e:
+                                            print(f"Warning: {e}")
+                                            filled_value = ""
 
                                     if (
                                         filled_value is not None

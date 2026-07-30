@@ -333,17 +333,28 @@ def parse_part(
                                 break
 
                     if "headers" in wi_object:
+                        delimiter = wi_object.get("delimiter", " ")
                         if isinstance(wi_object["headers"], dict):
                             if parse_w_key is not None:
                                 if parse_w_key in wi_object["headers"]:
+                                    w_delimiter = (
+                                        delimiter[parse_w_key]
+                                        if isinstance(delimiter, dict)
+                                        and parse_w_key in delimiter
+                                        else " "
+                                    )
                                     new_val = wi_utils.parse_headers(
                                         wi_object["headers"][parse_w_key],
                                         new_val,
                                         mode="dict",
+                                        delimiter=w_delimiter,
                                     )
                         else:
                             new_val = wi_utils.parse_headers(
-                                wi_object["headers"], new_val, mode="dict"
+                                wi_object["headers"],
+                                new_val,
+                                mode="dict",
+                                delimiter=delimiter,
                             )
                     # add list element to list
                     val.append(new_val)
@@ -440,6 +451,7 @@ def parse_part(
                             wi_object["whitelist_keys"],
                             convert_value,
                             wi_object["headers"] if "headers" in wi_object else None,
+                            delimiter=wi_object.get("delimiter"),
                         )
 
                     # wi object contains headers but no whitelist keys
@@ -448,7 +460,9 @@ def parse_part(
                         # replace the original value with the one split
                         # according to the header
                         convert_value = wi_utils.parse_headers(
-                            wi_object["headers"], convert_value
+                            wi_object["headers"],
+                            convert_value,
+                            delimiter=wi_object.get("delimiter", " "),
                         )
 
                     # value is of type value_unit
@@ -601,7 +615,15 @@ def parse_list_part(
 
             # TODO: headers
             # save the organism name
-            organism = wi_object[i]["value"].split(" ")[0]
+            organism_whitelist = utils.get_whitelist(
+                "organism", {}, whitelist_object=read_in_whitelists
+            )
+            organism_delimiter = (
+                organism_whitelist.get("delimiter", " ") if organism_whitelist else " "
+            )
+            organism = utils.split_header_value(
+                wi_object[i]["value"], organism_delimiter
+            )[0]
 
             # read in the abbrev whitelist for organisms
             short = utils.get_whitelist(
@@ -723,6 +745,7 @@ def parse_factor(factors, key_yaml, double):
 
                     whitelist_keys = None
                     headers = None
+                    delimiter = None
 
                     if "nested_infos" in factors and key in factors["nested_infos"]:
                         if "whitelist_keys" in factors["nested_infos"][key]:
@@ -731,6 +754,8 @@ def parse_factor(factors, key_yaml, double):
                             ]
                         if "headers" in factors["nested_infos"][key]:
                             headers = factors["nested_infos"][key]["headers"]
+                        if "delimiter" in factors["nested_infos"][key]:
+                            delimiter = factors["nested_infos"][key]["delimiter"]
 
                     if factors["values"][i][key] is None or (
                         isinstance(factors["values"][i][key], list)
@@ -747,12 +772,16 @@ def parse_factor(factors, key_yaml, double):
                                     factors["values"][i][key][j],
                                     headers,
                                     mode="dict",
+                                    delimiter=delimiter,
                                 )
                             )
                     elif headers is not None:
                         for j in range(len(factors["values"][i][key])):
                             factors["values"][i][key][j] = wi_utils.parse_headers(
-                                headers, factors["values"][i][key][j], mode="dict"
+                                headers,
+                                factors["values"][i][key][j],
+                                mode="dict",
+                                delimiter=delimiter if delimiter is not None else " ",
                             )
 
                     # if isinstance(factors['values'][i][key], dict):
@@ -783,6 +812,7 @@ def parse_factor(factors, key_yaml, double):
                     factors["whitelist_keys"],
                     factors["values"][j],
                     factors["headers"] if "headers" in factors else None,
+                    delimiter=factors.get("delimiter"),
                 )
 
             # factor contains headers but no whitelist keys
@@ -791,7 +821,9 @@ def parse_factor(factors, key_yaml, double):
                 # replace the original value with the one split
                 # according to the header
                 factors["values"][j] = wi_utils.parse_headers(
-                    factors["headers"], factors["values"][j]
+                    factors["headers"],
+                    factors["values"][j],
+                    delimiter=factors.get("delimiter", " "),
                 )
 
             # factor of type value_unit
