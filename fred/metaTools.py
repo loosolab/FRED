@@ -1,5 +1,6 @@
 import argparse
 import copy
+import importlib.metadata
 import pathlib
 import sys
 import os
@@ -23,8 +24,8 @@ class FRED:
             self.whitelist_repo,
             self.whitelist_branch,
             self.whitelist_path,
-            self.username,
-            self.password,
+            self.name,
+            self.token,
             structure,
             self.update_whitelists,
             self.output_path,
@@ -40,6 +41,8 @@ class FRED:
             self.whitelist_repo,
             self.whitelist_branch,
             self.update_whitelists,
+            self.name,
+            self.token,
         )
 
     def find(self, search_path, search, output, output_filename, skip_validation):
@@ -403,7 +406,17 @@ def export(args):
 
 def main():
 
-    parser = argparse.ArgumentParser(prog="metaTools.py")
+    try:
+        version = importlib.metadata.version("fred-metadata")
+    except importlib.metadata.PackageNotFoundError:
+        version = "unknown"
+
+    parser = argparse.ArgumentParser(prog="fred")
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {version}",
+    )
     subparsers = parser.add_subparsers(title="commands")
 
     # Generate Function
