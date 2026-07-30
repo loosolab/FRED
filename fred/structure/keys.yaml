@@ -766,14 +766,6 @@ experimental_setting:
                       value: "kg/m2"
                       whitelist: True
                       input_type: select
-                cell_line:
-                  mandatory: False
-                  list: False
-                  display_name: "Cell line"
-                  desc: "Cell line used for sample.\n[HUVEC]"
-                  value: null
-                  whitelist: True
-                  input_type: select
                 cell_type:
                   mandatory: False
                   list: False
@@ -874,6 +866,46 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
+                cell_line:
+                  mandatory: False
+                  list: False
+                  display_name: "Cell line"
+                  desc: "Cell line used for sample.\n[HUVEC]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                culture_type:
+                  mandatory: False
+                  list: False
+                  display_name: "Culture Type"
+                  desc: "Cell culture format.\n[adherent, sphere]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                passage_number:
+                  mandatory: False
+                  list: False
+                  display_name: "Passage Number"
+                  desc: "Number of passages of the cultured cells.\n[5 passages]"
+                  special_case:
+                    value_unit: passage
+                  value:
+                    value:
+                      mandatory: True
+                      list: False
+                      display_name: "Value"
+                      desc: ""
+                      value: null
+                      whitelist: False
+                      input_type: number
+                    unit:
+                      mandatory: True
+                      list: False
+                      display_name: "Unit"
+                      desc: ""
+                      value: "passages"
+                      whitelist: True
+                      input_type: select
                 concentration:
                   mandatory: False
                   list: False
