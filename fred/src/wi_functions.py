@@ -34,8 +34,8 @@ class Webinterface:
             self.whitelist_repo,
             self.whitelist_branch,
             self.whitelist_path,
-            self.username,
-            self.password,
+            self.name,
+            self.token,
             structure,
             self.update_whitelists,
             self.output_path,
@@ -55,6 +55,8 @@ def fetch_whitelists(pgm_object):
         pgm_object["whitelist_repo"],
         pgm_object["whitelist_branch"],
         pgm_object["update_whitelists"],
+        pgm_object["name"],
+        pgm_object["token"],
     )
     return whitelist_version
 

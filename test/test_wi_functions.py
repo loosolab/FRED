@@ -489,6 +489,8 @@ class TestFetchWhitelists:
                 minimal_pgm_object["whitelist_repo"],
                 minimal_pgm_object["whitelist_branch"],
                 minimal_pgm_object["update_whitelists"],
+                minimal_pgm_object["name"],
+                minimal_pgm_object["token"],
             )
 
     def test_returns_version_from_get_whitelists(self, minimal_pgm_object):

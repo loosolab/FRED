@@ -33,16 +33,16 @@ def parse_config(config_file):
         whitelist_repo = "https://github.com/loosolab/FRED_whitelists.git"
     if (
         "private_access" in config
-        and "username" in config["private_access"]
-        and "password" in config["private_access"]
-        and config["private_access"]["username"] is not None
-        and config["private_access"]["password"] is not None
+        and "name" in config["private_access"]
+        and "token" in config["private_access"]
+        and config["private_access"]["name"] is not None
+        and config["private_access"]["token"] is not None
     ):
-        username = config["private_access"]["username"]
-        password = config["private_access"]["password"]
+        name = config["private_access"]["name"]
+        token = config["private_access"]["token"]
     else:
-        username = None
-        password = None
+        name = None
+        token = None
     try:
         structure = config["structure"]
         if structure == "fred":
@@ -106,8 +106,8 @@ def parse_config(config_file):
         whitelist_repo,
         whitelist_branch,
         whitelist_path,
-        username,
-        password,
+        name,
+        token,
         structure,
         update_whitelists,
         output_path,
