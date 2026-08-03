@@ -20,7 +20,7 @@ def get_factors(organism, key_yaml, read_in_whitelists):
     ]
     f_node = list(utils.find_keys(key_yaml, "factor"))[0]
     # initialize dictionary with all factors
-    factor_list, whitelist_type, input_type, headers, whitelist_keys, double = (
+    factor_list, whitelist_type, input_type, headers, whitelist_keys, double, delimiter = (
         whitelist_parsing.parse_whitelist(
             "factor",
             f_node,
@@ -55,6 +55,7 @@ def get_factors(organism, key_yaml, read_in_whitelists):
                 w_keys,
                 double,
                 nested_infos,
+                delimiter,
             ) = get_factor_values(
                 factor, node[0], {"organism": organism}, read_in_whitelists
             )
@@ -105,6 +106,8 @@ def get_factors(organism, key_yaml, read_in_whitelists):
             # add header and whitelist keys if they are defined
             if headers is not None:
                 values[factor]["headers"] = headers
+            if delimiter is not None:
+                values[factor]["delimiter"] = delimiter
             if w_keys is not None:
                 values[factor]["whitelist_keys"] = w_keys
             if len(double) > 0:
@@ -144,6 +147,7 @@ def get_factor_values(key, node, filled_object, read_in_whitelists, nested_infos
     w_keys = None
     whitelist_type = None
     double = []
+    delimiter = None
 
     # value is a dictionary and no special case
     if isinstance(node["value"], dict) and not (
@@ -173,6 +177,7 @@ def get_factor_values(key, node, filled_object, read_in_whitelists, nested_infos
                 whitelist_keys,
                 doubled,
                 nested_infos,
+                k_delimiter,
             ) = get_factor_values(
                 k,
                 node["value"][k],
@@ -185,6 +190,9 @@ def get_factor_values(key, node, filled_object, read_in_whitelists, nested_infos
             if header is not None:
                 k_val["headers"] = header
                 key_info["headers"] = header
+            if k_delimiter is not None:
+                k_val["delimiter"] = k_delimiter
+                key_info["delimiter"] = k_delimiter
             if whitelist_keys is not None:
                 k_val["whitelist_keys"] = whitelist_keys
                 key_info["whitelist_keys"] = whitelist_keys
@@ -248,7 +256,7 @@ def get_factor_values(key, node, filled_object, read_in_whitelists, nested_infos
     else:
 
         # read and parse whitelist
-        whitelist, whitelist_type, input_type, headers, w_keys, double = (
+        whitelist, whitelist_type, input_type, headers, w_keys, double, delimiter = (
             whitelist_parsing.parse_whitelist(
                 key, node, filled_object, whitelist_object=read_in_whitelists
             )
@@ -265,7 +273,7 @@ def get_factor_values(key, node, filled_object, read_in_whitelists, nested_infos
             if input_type == "single_autofill":
                 input_type = "multi_autofill"
 
-    return whitelist, whitelist_type, input_type, headers, w_keys, double, nested_infos
+    return whitelist, whitelist_type, input_type, headers, w_keys, double, nested_infos, delimiter
 
 
 def get_conditions(factors, organism_name, key_yaml, read_in_whitelists):

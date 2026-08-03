@@ -79,7 +79,7 @@ def parse_empty(
         ):
 
             # read and parse whitelist
-            whitelist, whitelist_type, input_type, headers, whitelist_keys, double = (
+            whitelist, whitelist_type, input_type, headers, whitelist_keys, double, delimiter = (
                 whitelist_parsing.parse_whitelist(
                     pos.split(":")[-1],
                     node,
@@ -141,6 +141,8 @@ def parse_empty(
             # save headers and whitelist keys in the object if they are defined
             if headers is not None:
                 part_object["headers"] = headers
+            if delimiter is not None:
+                part_object["delimiter"] = delimiter
             if whitelist_keys is not None:
                 part_object["whitelist_keys"] = whitelist_keys
 
@@ -221,7 +223,7 @@ def parse_empty(
     # the key does not contain a dictionary as value
     else:
         # read and parse whitelist
-        whitelist, whitelist_type, input_type, headers, whitelist_keys, double = (
+        whitelist, whitelist_type, input_type, headers, whitelist_keys, double, delimiter = (
             whitelist_parsing.parse_whitelist(
                 pos.split(":")[-1],
                 node,
@@ -268,6 +270,8 @@ def parse_empty(
         # defined
         if headers is not None:
             part_object["headers"] = headers
+        if delimiter is not None:
+            part_object["delimiter"] = delimiter
         if whitelist_keys is not None:
             part_object["whitelist_keys"] = whitelist_keys
 
