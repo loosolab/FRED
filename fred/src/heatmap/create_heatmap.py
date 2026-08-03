@@ -267,12 +267,15 @@ def get_heatmap(
                     my_width = my_cell_width * len(settings[value]["sample_index"])
                 else:
                     my_width = my_cell_width * len(settings[value]["condition_index"])
+            organism_filename = (
+                organisms[value].replace(" ", "_") if organisms[value] else organisms[value]
+            )
             organism_path = os.path.join(
                 os.path.dirname(__file__),
                 "..",
                 "..",
                 "images",
-                f"{organisms[value]}.png",
+                f"{organism_filename}.png",
             )
             images = None
 
