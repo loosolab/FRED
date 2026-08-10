@@ -5,7 +5,7 @@ from functools import partial
 from multiprocessing.pool import Pool
 import time
 from fred.src import validate_yaml
-from fred.src.utils import read_in_yaml
+from fred.src.utils import read_in_yaml, check_metadata_version, MetadataVersionError
 import yaml as yml
 
 
@@ -136,6 +136,11 @@ def validate(
     # test if metafile is valid
     if metafile is not None:
         if not skip_validation:
+            try:
+                check_metadata_version(metafile, ypath, key_yaml)
+            except MetadataVersionError as e:
+                metafile["path"] = ypath
+                return (metafile, True, ([str(e)], [], [], []), 1, None, 0, read_time)
             (
                 valid,
                 missing_mandatory_keys,

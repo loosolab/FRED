@@ -18,7 +18,10 @@ def edit_wi_object(path, key_yaml, read_in_whitelists):
     :return: wi_object: the filled wi object
     """
     # TODO: as Parameter at get_info
-    meta_yaml = utils.read_in_yaml(path)
+    # lets a MetadataVersionError propagate to the caller -- opening an
+    # old-version file for editing must not proceed with current-schema
+    # field assumptions, same reasoning as the CLI 'edit' command
+    meta_yaml = utils.read_metafile(path, key_yaml)
     whitelist_object = {}
 
     if meta_yaml is not None:

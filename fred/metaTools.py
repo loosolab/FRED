@@ -1,6 +1,5 @@
 import argparse
 import copy
-import importlib.metadata
 import pathlib
 import sys
 import os
@@ -83,7 +82,10 @@ class FRED:
                     break
                 print("Invalid entry. Please enter 1 or 2.")
             if choice == "1":
-                self.edit(existing_path, mandatory_only)
+                try:
+                    self.edit(existing_path, mandatory_only)
+                except utils.MetadataVersionError as e:
+                    print(str(e))
                 return
 
         gen = Generate(
@@ -115,43 +117,55 @@ class FRED:
                 whitelist_path=self.whitelist_path,
             )
         else:
-            metafile = utils.read_in_yaml(path)
-            file_reports = {"file": metafile, "error": None, "warning": None}
-            (
-                valid,
-                missing_mandatory_keys,
-                invalid_keys,
-                invalid_entries,
-                invalid_values,
-                logical_warn,
-            ) = validate_yaml.validate_file(
-                metafile,
-                self.structure,
-                self.filename,
-                logical_validation=logical_validation,
-                yaml=copy.deepcopy(self.structure),
-                whitelist_path=self.whitelist_path,
-            )
-            metafile["path"] = str(path)
-            if not valid:
+            try:
+                metafile = utils.read_metafile(path, self.structure)
+            except utils.MetadataVersionError as e:
                 validation_reports["corrupt_files"]["count"] = 1
-                validation_reports["error_count"] += (
-                    len(missing_mandatory_keys)
-                    + len(invalid_keys)
-                    + len(invalid_entries)
-                    + len(invalid_values)
+                validation_reports["error_count"] = 1
+                validation_reports["corrupt_files"]["report"].append(
+                    {
+                        "file": {"path": str(path)},
+                        "error": ([str(e)], [], [], []),
+                        "warning": None,
+                    }
                 )
-                file_reports["error"] = (
+            else:
+                file_reports = {"file": metafile, "error": None, "warning": None}
+                (
+                    valid,
                     missing_mandatory_keys,
                     invalid_keys,
                     invalid_entries,
                     invalid_values,
+                    logical_warn,
+                ) = validate_yaml.validate_file(
+                    metafile,
+                    self.structure,
+                    self.filename,
+                    logical_validation=logical_validation,
+                    yaml=copy.deepcopy(self.structure),
+                    whitelist_path=self.whitelist_path,
                 )
-            if len(logical_warn) > 0:
-                validation_reports["corrupt_files"]["count"] = 1
-                validation_reports["warning_count"] += len(logical_warn)
-                file_reports["warning"] = logical_warn
-            validation_reports["corrupt_files"]["report"].append(file_reports)
+                metafile["path"] = str(path)
+                if not valid:
+                    validation_reports["corrupt_files"]["count"] = 1
+                    validation_reports["error_count"] += (
+                        len(missing_mandatory_keys)
+                        + len(invalid_keys)
+                        + len(invalid_entries)
+                        + len(invalid_values)
+                    )
+                    file_reports["error"] = (
+                        missing_mandatory_keys,
+                        invalid_keys,
+                        invalid_entries,
+                        invalid_values,
+                    )
+                if len(logical_warn) > 0:
+                    validation_reports["corrupt_files"]["count"] = 1
+                    validation_reports["warning_count"] += len(logical_warn)
+                    file_reports["warning"] = logical_warn
+                validation_reports["corrupt_files"]["report"].append(file_reports)
 
         print(f'{validation_reports["all_files"]} files were validated.')
         print(
@@ -282,11 +296,15 @@ class FRED:
 
     def export(self, path, output_dir, filename, mapping_path, settings, fmt="mage-tab"):
         setting_filter = [s.strip() for s in settings.split(",")] if settings else None
+        try:
+            metadata = utils.read_metafile(path, self.structure)
+        except utils.MetadataVersionError as e:
+            print(str(e))
+            return
         if fmt == "geo":
             from fred.src.geo_export import GeoMetadataExporter
             default_mapping = os.path.join(os.path.dirname(__file__), "config", "geo_metadata_mapping.yaml")
             mapping = utils.read_in_yaml(mapping_path or default_mapping)
-            metadata = utils.read_in_yaml(path)
             exporter = GeoMetadataExporter(metadata, mapping, setting_filter)
             xlsx_path = exporter.export(output_dir or self.output_path, filename)
             print(f"GEO metadata spreadsheet saved to: {xlsx_path}")
@@ -294,7 +312,6 @@ class FRED:
             from fred.src.export import MageTabExporter
             default_mapping = os.path.join(os.path.dirname(__file__), "config", "mage_tab_mapping.yaml")
             mapping = utils.read_in_yaml(mapping_path or default_mapping)
-            metadata = utils.read_in_yaml(path)
             exporter = MageTabExporter(metadata, mapping, setting_filter)
             idf_path, sdrf_path = exporter.export(output_dir or self.output_path, filename)
             print(f"IDF saved to: {idf_path}")
@@ -353,7 +370,11 @@ def validate(args):
 
 def plot(args):
     fred_object = FRED(args.config)
-    input_file = utils.read_in_yaml(args.path)
+    try:
+        input_file = utils.read_metafile(args.path, fred_object.structure)
+    except utils.MetadataVersionError as e:
+        print(str(e))
+        return
     plots = create_heatmap.get_heatmap(
         input_file,
         fred_object.structure,
@@ -406,10 +427,7 @@ def export(args):
 
 def main():
 
-    try:
-        version = importlib.metadata.version("fred-metadata")
-    except importlib.metadata.PackageNotFoundError:
-        version = "unknown"
+    version = utils.get_fred_version()
 
     parser = argparse.ArgumentParser(prog="fred")
     parser.add_argument(
@@ -654,6 +672,20 @@ def main():
     )
     plot_function.set_defaults(func=plot)
 
+    # Migrate Function
+    # Note: this subcommand parses its own version-specific arguments
+    # (see the special-cased branch below) since each migration can define
+    # its own extra CLI flags via fred.migrations.base.Migration.add_arguments.
+    migrate_function = subparsers.add_parser(
+        "migrate",
+        help="Run a metadata migration for a specific FRED version",
+    )
+    migrate_function.add_argument(
+        "version",
+        type=str,
+        help="Target FRED version whose migration should run (e.g. 3.0.0)",
+    )
+
     # Export Function
     export_function = subparsers.add_parser(
         "export",
@@ -709,6 +741,24 @@ def main():
         default=os.path.join(os.path.dirname(__file__), "config", "config.yaml"),
     )
     export_function.set_defaults(func=export)
+
+    # The 'migrate' subcommand is special-cased here: each migration can
+    # register its own extra CLI flags (see fred.migrations.base.Migration),
+    # so 'version' is extracted manually (not via migrate_function.parse_args)
+    # and every remaining argument -- including '-h'/'--help' -- is handed
+    # off untouched to that migration's own parser, built in runner.run().
+    if len(sys.argv) > 1 and sys.argv[1] == "migrate":
+        migrate_argv = sys.argv[2:]
+        if not migrate_argv or migrate_argv[0] in ("-h", "--help"):
+            migrate_function.print_help()
+            return
+        version = migrate_argv[0]
+        remaining_argv = migrate_argv[1:]
+
+        from fred.migrations import runner
+
+        runner.run(version, remaining_argv)
+        return
 
     args = parser.parse_args()
 

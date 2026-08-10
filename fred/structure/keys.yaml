@@ -428,7 +428,7 @@ experimental_setting:
                   whitelist: False
                   input_type: number
                 number_of_measurements:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: "Number of Measurements"
                   desc: "Measurements done for one biological/technical replicate (typically 1). Mostly used in combination with a specific technique such as gel slices in proteomics.\n[1]"
@@ -1093,3 +1093,13 @@ technical_details:
       value: null
       whitelist: False
       input_type: short_text
+version:
+  mandatory: True
+  list: False
+  display_name: "FRED Version"
+  desc: "FRED (fred-metadata) package version that generated/last saved this file. Automatically set, not user-editable.\n[3.0.0]"
+  special_case:
+    edit: "not editable"
+  value: null
+  whitelist: False
+  input_type: restricted_short_text

@@ -1,13 +1,15 @@
 import copy
+import importlib.metadata
 import json
 import math
 import os
+import re
 import textwrap
 from Bio import Entrez
 import yaml
 from yaml import CLoader as Loader, CDumper as Dumper
 
-from fred.src.exceptions import WhitelistSplitError, WhitelistJoinError
+from fred.src.exceptions import WhitelistSplitError, WhitelistJoinError, MetadataVersionError
 
 
 def _str_representer(dumper, data):
@@ -136,6 +138,78 @@ def read_in_yaml(yaml_file):
         output = yaml.load(file, Loader=Loader)
     low_output = {k.lower(): v for k, v in output.items()}
     return low_output
+
+
+def get_fred_version():
+    """
+    Returns the installed fred-metadata package version. Falls back to
+    reading the 'version' field straight out of pyproject.toml if the
+    package isn't registered with importlib.metadata at all (e.g. an
+    editable/dev checkout that was never actually pip-installed, or an
+    editable install whose build backend didn't generate proper dist-info)
+    -- pyproject.toml sits right next to the source in exactly those cases.
+    Only falls back to "unknown" if neither source works.
+    """
+    try:
+        return importlib.metadata.version("fred-metadata")
+    except importlib.metadata.PackageNotFoundError:
+        return _read_version_from_pyproject()
+
+
+def _read_version_from_pyproject():
+    pyproject_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "..", "pyproject.toml"
+    )
+    try:
+        with open(pyproject_path) as file:
+            for line in file:
+                match = re.match(r'^\s*version\s*=\s*"([^"]+)"', line)
+                if match:
+                    return match.group(1)
+    except OSError:
+        pass
+    return "unknown"
+
+
+def check_metadata_version(metafile, path, key_yaml):
+    """
+    Raises MetadataVersionError if `metafile`'s recorded 'version' key
+    doesn't share its major component with the installed FRED version.
+    A missing 'version' key is treated as a mismatch (file predates version
+    tracking). No-ops if `key_yaml` (the schema actually in use) doesn't
+    declare a top-level 'version' key at all -- custom/private schemas that
+    never opted into this key are not gated. Also no-ops if the installed
+    version can't be determined (get_fred_version() == "unknown"), since
+    blocking everything because we can't identify our own version would be
+    worse than skipping the check.
+    """
+    if "version" not in key_yaml:
+        return
+
+    installed_version = get_fred_version()
+    if installed_version == "unknown":
+        return
+
+    stored_version = metafile.get("version")
+    installed_major = str(installed_version).split(".")[0]
+    stored_major = str(stored_version).split(".")[0] if stored_version else None
+
+    if stored_major != installed_major:
+        raise MetadataVersionError(path, stored_version)
+
+
+def read_metafile(path, key_yaml):
+    """
+    Reads a metadata file and enforces its version compatibility with the
+    installed FRED version (see check_metadata_version). Intended for
+    call sites that process a single file at a time, where a version
+    mismatch should simply abort -- unlike the batch path in
+    fred.src.file_reading, which catches MetadataVersionError per file so
+    the rest of a directory can still be processed.
+    """
+    metafile = read_in_yaml(path)
+    check_metadata_version(metafile, path, key_yaml)
+    return metafile
 
 
 def read_in_json(json_file):

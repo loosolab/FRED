@@ -7,12 +7,12 @@ import os
 class Edit(Generate):
 
     def create_result_dict(self):
-        self.result_dict = utils.read_in_yaml(self.path)
+        self.result_dict = utils.read_metafile(self.path, self.key_yaml)
         self.id = self.result_dict['project']['id']
         self.setting_ids = list(utils.find_keys(self.result_dict, "setting_id"))
-    
+
     def edit(self):
-        options = [key for key in self.key_yaml]
+        options = [key for key in self.key_yaml if key != "version"]
         print(
         f"Choose the parts you want to edit (1,...,{len(options)}) divided "
         f"by comma.\n"
@@ -33,4 +33,5 @@ class Edit(Generate):
             if fill_val is not None:
                 self.fill_key(elem, fill_val, self.result_dict)
 
+        self.result_dict["version"] = utils.get_fred_version()
         utils.save_as_yaml(self.result_dict, self.path)

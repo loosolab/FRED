@@ -343,6 +343,12 @@ class Generate(Input):
 
         indent = 1
         for part in self.key_yaml:
+            if part == "version":
+                # scalar top-level leaf, not a container -- populated
+                # directly below instead of via the interactive/"generated"
+                # dispatch used for sub-keys of project/experimental_setting/
+                # technical_details
+                continue
             if part in self.result_dict:
                 print(f"\n[Resumed] Section '{part}' already completed, skipping.")
                 self._collect_generate_end(self.key_yaml[part], [part])
@@ -383,6 +389,8 @@ class Generate(Input):
             fill_val = func(Autogenerate(self, elem))
             if fill_val is not None:
                 self.fill_key(elem, fill_val, self.result_dict)
+
+        self.result_dict["version"] = utils.get_fred_version()
 
         # print validation report
         # print(self.get_validation(self.result_dict))

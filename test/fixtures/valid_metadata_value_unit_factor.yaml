@@ -28,6 +28,7 @@ experimental_setting:
             - sample_name: tp1d_b01
               pooled: false
               donor_count: 1
+              number_of_measurements: 1
               technical_replicates:
                 count: 1
                 sample_name: []
@@ -38,6 +39,7 @@ experimental_setting:
             - sample_name: tp1d_b02
               pooled: false
               donor_count: 1
+              number_of_measurements: 1
               technical_replicates:
                 count: 1
                 sample_name: []
@@ -50,3 +52,5 @@ technical_details:
     - setting: exp1
       technique:
         - bulk RNA-seq
+
+version: "3.0.0"

@@ -1,0 +1,25 @@
+# Maps legacy/informal organism_name values (as found in old FRED metadata
+# files) to the current organism whitelist's canonical name. Keys are
+# matched case-insensitively by the v3.0.0 migration. Extend this file if a
+# migration run reports an organism_name it could not resolve.
+human: Homo sapiens
+mouse: Mus musculus
+zebrafish: Danio rerio
+rat: Rattus norvegicus
+pig: Sus scrofa
+swine: Sus scrofa
+medaka: Oryzias latipes
+chicken: Gallus gallus
+fruit fly: Drosophila melanogaster
+fruitfly: Drosophila melanogaster
+drosophila: Drosophila melanogaster
+fly: Drosophila melanogaster
+yeast: Saccharomyces cerevisiae
+baker's yeast: Saccharomyces cerevisiae
+brewer's yeast: Saccharomyces cerevisiae
+c. elegans: Caenorhabditis elegans
+c elegans: Caenorhabditis elegans
+roundworm: Caenorhabditis elegans
+worm: Caenorhabditis elegans
+neurospora: Neurospora crassa
+red bread mold: Neurospora crassa
