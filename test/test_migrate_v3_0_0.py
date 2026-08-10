@@ -21,6 +21,7 @@ class _Args:
         self.apply = True
         self.regenerate_sample_names = False
         self.alias_file = "does-not-exist.yaml"
+        self.sample_field_defaults_file = "does-not-exist.yaml"
         self.output = "print"
         self.filename = "migration_report"
 

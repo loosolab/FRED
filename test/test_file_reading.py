@@ -148,10 +148,12 @@ def test_validate_worker_flags_version_mismatch(key_yaml, tmp_path, monkeypatch)
     assert "fred migrate 3.0.0" in error_reports[0][0]
 
 
-def test_validate_worker_bypasses_version_gate_when_skip_validation(key_yaml, tmp_path, monkeypatch):
-    # skip_validation=True is the flag fred/migrations/v3_0_0/migrate.py relies
-    # on to deliberately process pre-migration files -- it must bypass the
-    # version gate too, not just schema/whitelist validation
+def test_validate_worker_skip_validation_alone_still_enforces_version_gate(key_yaml, tmp_path, monkeypatch):
+    # skip_validation=True skips schema/whitelist validation only. It must NOT
+    # also silently bypass the version gate -- 'fred find -sv' (used by
+    # fred/src/wi_functions.py to list files for the web-interface edit flow)
+    # sets skip_validation=True, and version-mismatched files must still be
+    # flagged there so they aren't offered up for editing.
     monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
     path = tmp_path / "test_metadata.yaml"
     utils.save_as_yaml({"project": {"id": "test_stale"}, "version": "2.0.0"}, str(path))
@@ -159,6 +161,32 @@ def test_validate_worker_bypasses_version_gate_when_skip_validation(key_yaml, tm
     metafile, corrupted, error_reports, error_count, warning_reports, warning_count, _ = (
         file_reading.validate(
             str(path), FILENAME_SUFFIX, key_yaml, False, None, key_yaml, skip_validation=True
+        )
+    )
+
+    assert corrupted is True
+    assert error_count == 1
+    assert "fred migrate 3.0.0" in error_reports[0][0]
+
+
+def test_validate_worker_skip_version_check_bypasses_gate(key_yaml, tmp_path, monkeypatch):
+    # skip_version_check=True is the explicit, separate bypass
+    # fred/migrations/v3_0_0/migrate.py relies on to deliberately process
+    # pre-migration files
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    path = tmp_path / "test_metadata.yaml"
+    utils.save_as_yaml({"project": {"id": "test_stale"}, "version": "2.0.0"}, str(path))
+
+    metafile, corrupted, error_reports, error_count, warning_reports, warning_count, _ = (
+        file_reading.validate(
+            str(path),
+            FILENAME_SUFFIX,
+            key_yaml,
+            False,
+            None,
+            key_yaml,
+            skip_validation=True,
+            skip_version_check=True,
         )
     )
 

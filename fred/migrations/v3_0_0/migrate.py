@@ -578,6 +578,7 @@ class OrganismNameMigration(Migration):
                 filename=filename,
                 whitelist_path=whitelist_path,
                 skip_validation=True,
+                skip_version_check=True,
                 return_false=True,
             )
         else:
