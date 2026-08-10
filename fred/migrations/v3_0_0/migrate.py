@@ -112,18 +112,21 @@ def _get_used_techniques(metafile, setting_id):
     return None
 
 
-# Sample-level fields that became mandatory in FRED 3.0.0 but may be missing
-# from older metadata; each maps to the schema default from keys.yaml that
-# gets filled in when the field is absent. Add further fields here if future
-# schema changes make more of them mandatory.
-SAMPLE_FIELD_DEFAULTS = {
-    "number_of_measurements": 1,
-}
-
-
-def backfill_sample_fields(metafile):
+def _load_sample_field_defaults(defaults_file):
     """
-    Adds any key in SAMPLE_FIELD_DEFAULTS to every sample that's missing it,
+    Loads the {field_name: default_value} table from `defaults_file` (see
+    config/sample_field_defaults.yaml) -- sample-level fields that became
+    mandatory in FRED 3.0.0 but may be missing from older metadata. Extend
+    that file if a future schema change makes more sample fields mandatory.
+    """
+    if not os.path.isfile(defaults_file):
+        return {}
+    return utils.read_in_yaml(str(defaults_file))
+
+
+def backfill_sample_fields(metafile, sample_field_defaults):
+    """
+    Adds any key in sample_field_defaults to every sample that's missing it,
     using the schema's own default value -- runs independently of organism
     migration/sample_name regeneration, since it's a separate completeness
     fix for now-mandatory fields.
@@ -136,7 +139,7 @@ def backfill_sample_fields(metafile):
         for condition in setting.get("conditions", []) or []:
             samples = (condition.get("biological_replicates") or {}).get("samples", []) or []
             for sample in samples:
-                for field, default in SAMPLE_FIELD_DEFAULTS.items():
+                for field, default in sample_field_defaults.items():
                     if field not in sample:
                         changes.append(
                             {
@@ -253,7 +256,9 @@ def resolve_organism_name(value, organism_entries, aliases):
     """
     Resolve a stored organism_name value against the current whitelist.
     Returns (canonical_name, taxonomy_id), or None if it cannot be resolved.
-    Never guesses: only exact/alias/underscore-normalized matches count.
+    Never guesses across different organisms: every step below still
+    requires an exact match once naming-convention differences (informal
+    alias, underscore-vs-space, letter case) are normalized away.
     """
     if value in organism_entries:
         return value, organism_entries[value]
@@ -265,6 +270,14 @@ def resolve_organism_name(value, organism_entries, aliases):
     normalized = value.replace("_", " ")
     if normalized in organism_entries:
         return normalized, organism_entries[normalized]
+
+    # Case-insensitive fallback, e.g. real data had "caenorhabditis_elegans"
+    # (lowercase Latin-with-underscore) against the whitelist's
+    # "Caenorhabditis elegans" -- same organism, only casing differs.
+    lowered = normalized.strip().lower()
+    for canonical_name, taxonomy_id in organism_entries.items():
+        if canonical_name.lower() == lowered:
+            return canonical_name, taxonomy_id
 
     return None
 
@@ -293,10 +306,18 @@ class FileMigrationPlan:
         return bool(self.organism_changes or self.sample_name_changes or self.field_backfills)
 
 
-def plan_file(metafile, organism_entries, abbrev_entries, abbrev_tech_entries, aliases, do_regenerate_sample_names):
+def plan_file(
+    metafile,
+    organism_entries,
+    abbrev_entries,
+    abbrev_tech_entries,
+    aliases,
+    sample_field_defaults,
+    do_regenerate_sample_names,
+):
     plan = FileMigrationPlan(metafile.get("path"))
     plan.publication_flag = bool((metafile.get("project") or {}).get("publication"))
-    plan.field_backfills = backfill_sample_fields(metafile)
+    plan.field_backfills = backfill_sample_fields(metafile, sample_field_defaults)
 
     for setting in metafile.get("experimental_setting", []) or []:
         setting_id = setting.get("setting_id", "?")
@@ -519,6 +540,15 @@ class OrganismNameMigration(Migration):
             help="Path to the informal-name alias table",
         )
         parser.add_argument(
+            "--sample-field-defaults-file",
+            type=pathlib.Path,
+            default=os.path.join(
+                os.path.dirname(__file__), "config", "sample_field_defaults.yaml"
+            ),
+            help="Path to the {field: default_value} table used to backfill "
+            "sample fields that became mandatory but are missing",
+        )
+        parser.add_argument(
             "-o",
             "--output",
             default="print",
@@ -535,6 +565,7 @@ class OrganismNameMigration(Migration):
     def run(self, args):
         structure, whitelist_path, filename, output_path = _load_fred_context(args.config)
         aliases = _load_aliases(args.alias_file)
+        sample_field_defaults = _load_sample_field_defaults(args.sample_field_defaults_file)
         organism_entries = get_organism_entries(whitelist_path)
         abbrev_entries = get_abbrev_entries(whitelist_path)
         abbrev_tech_entries = get_abbrev_technique_entries(whitelist_path)
@@ -563,6 +594,7 @@ class OrganismNameMigration(Migration):
                 abbrev_entries,
                 abbrev_tech_entries,
                 aliases,
+                sample_field_defaults,
                 args.regenerate_sample_names,
             )
             plan.path = file_path

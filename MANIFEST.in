@@ -4,4 +4,5 @@ include fred/images/*
 include fred/src/*.py
 include fred/src/web_interface/*.py
 include fred/src/heatmap/*.py
+recursive-include fred/migrations *.yaml
 include fred/*
