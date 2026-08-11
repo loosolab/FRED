@@ -96,6 +96,10 @@ class Autogenerate:
                     copy.deepcopy(factors[i]["values"][0])
                     if len(factors[i]["values"]) == 1
                     and isinstance(factors[i]["values"][0], dict)
+                    and not (
+                        "special_case" in factor_info
+                        and "value_unit" in factor_info["special_case"]
+                    )
                     else copy.deepcopy(factors[i]["values"])
                 )
                 # if the values of the experimental factor are in a dictionary or the
