@@ -124,8 +124,8 @@ def save_as_yaml(dictionary, file_path):
     :param dictionary: a dictionary that should be saved
     :param file_path: the path of the yaml file to be created
     """
-    with open(file_path, "w") as file:
-        yaml.dump(dictionary, file, sort_keys=False, Dumper=Dumper, encoding='utf-8', allow_unicode=True)
+    with open(file_path, "w", encoding="utf-8") as file:
+        yaml.dump(dictionary, file, sort_keys=False, Dumper=Dumper, allow_unicode=True)
 
 
 def read_in_yaml(yaml_file):
@@ -134,8 +134,14 @@ def read_in_yaml(yaml_file):
     :param yaml_file: the path to the yaml file to be read in
     :return: low_output: a dictionary containing the information of the yaml
     """
-    with open(yaml_file) as file:
-        output = yaml.load(file, Loader=Loader)
+    try:
+        with open(yaml_file, encoding="utf-8") as file:
+            output = yaml.load(file, Loader=Loader)
+    except UnicodeDecodeError:
+        # Some older files were written under a non-UTF-8 locale, leaving
+        # special characters like µ or ö as raw cp1252/Latin-1 bytes.
+        with open(yaml_file, encoding="cp1252") as file:
+            output = yaml.load(file, Loader=Loader)
     low_output = {k.lower(): v for k, v in output.items()}
     return low_output
 

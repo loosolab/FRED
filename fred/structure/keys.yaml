@@ -561,6 +561,33 @@ experimental_setting:
                       value: null
                       whitelist: True
                       input_type: select
+                library_preparation:
+                  mandatory: False
+                  list: True
+                  display_name: "Library Preparation"
+                  desc: "Additional steps applied during sequencing library preparation. [CRISPR rRNA depletion, Ligase]"
+                  factor_desc: "Additional steps applied during sequencing library preparation, e.g. rRNA depletion or presence/absence of a ligation step.\n[CRISPR rRNA depletion, Ligase]"
+                  special_case:
+                    group: "preparation_type"
+                    control:
+                      preparation_status: "not applied"
+                  value:
+                    preparation_status:
+                      mandatory: True
+                      list: False
+                      display_name: "Status"
+                      desc: "Status of the preparation step. [applied, not applied]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    preparation_type:
+                      mandatory: False
+                      list: False
+                      display_name: "Type"
+                      desc: "Type of preparation step. [CRISPR rRNA depletion, Ligase]"
+                      value: null
+                      whitelist: True
+                      input_type: select
                 medical_treatment:
                   mandatory: False
                   list: True
