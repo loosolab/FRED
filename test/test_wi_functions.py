@@ -264,45 +264,54 @@ class TestAddNerd:
         "email": "max@test.com",
     }
 
-    def test_returns_true_on_success(self, metadata_yaml_file):
-        result = wi.add_nerd(str(metadata_yaml_file), self.NERD)
+    def test_returns_true_on_success(self, metadata_yaml_file, key_yaml):
+        result = wi.add_nerd(str(metadata_yaml_file), self.NERD, key_yaml)
         assert result is True
 
-    def test_nerd_written_to_file(self, metadata_yaml_file):
-        wi.add_nerd(str(metadata_yaml_file), self.NERD)
+    def test_nerd_written_to_file(self, metadata_yaml_file, key_yaml):
+        wi.add_nerd(str(metadata_yaml_file), self.NERD, key_yaml)
         saved = utils.read_in_yaml(str(metadata_yaml_file))
         assert "nerd" in saved["project"]
         ldap_names = [n["ldap_name"] for n in saved["project"]["nerd"]]
         assert "mmust" in ldap_names
 
-    def test_returns_false_on_duplicate_ldap(self, metadata_yaml_file):
-        wi.add_nerd(str(metadata_yaml_file), self.NERD)
-        result = wi.add_nerd(str(metadata_yaml_file), self.NERD)
+    def test_returns_false_on_duplicate_ldap(self, metadata_yaml_file, key_yaml):
+        wi.add_nerd(str(metadata_yaml_file), self.NERD, key_yaml)
+        result = wi.add_nerd(str(metadata_yaml_file), self.NERD, key_yaml)
         assert result is False
 
-    def test_no_duplicate_entry_in_file(self, metadata_yaml_file):
-        wi.add_nerd(str(metadata_yaml_file), self.NERD)
-        wi.add_nerd(str(metadata_yaml_file), self.NERD)
+    def test_no_duplicate_entry_in_file(self, metadata_yaml_file, key_yaml):
+        wi.add_nerd(str(metadata_yaml_file), self.NERD, key_yaml)
+        wi.add_nerd(str(metadata_yaml_file), self.NERD, key_yaml)
         saved = utils.read_in_yaml(str(metadata_yaml_file))
         ldap_names = [n["ldap_name"] for n in saved["project"]["nerd"]]
         assert ldap_names.count("mmust") == 1
 
-    def test_creates_nerd_list_when_key_missing(self, tmp_path, valid_metadata_minimal):
+    def test_creates_nerd_list_when_key_missing(self, tmp_path, valid_metadata_minimal, key_yaml):
         meta = copy.deepcopy(valid_metadata_minimal)
         path = tmp_path / "nonerd_metadata.yaml"
         utils.save_as_yaml(meta, str(path))
-        result = wi.add_nerd(str(path), self.NERD)
+        result = wi.add_nerd(str(path), self.NERD, key_yaml)
         assert result is True
         saved = utils.read_in_yaml(str(path))
         assert len(saved["project"]["nerd"]) == 1
 
-    def test_second_nerd_can_be_added(self, metadata_yaml_file):
-        wi.add_nerd(str(metadata_yaml_file), self.NERD)
+    def test_second_nerd_can_be_added(self, metadata_yaml_file, key_yaml):
+        wi.add_nerd(str(metadata_yaml_file), self.NERD, key_yaml)
         second = {**self.NERD, "name": "Doe, Jane", "ldap_name": "jdoe"}
-        result = wi.add_nerd(str(metadata_yaml_file), second)
+        result = wi.add_nerd(str(metadata_yaml_file), second, key_yaml)
         assert result is True
         saved = utils.read_in_yaml(str(metadata_yaml_file))
         assert len(saved["project"]["nerd"]) == 2
+
+    def test_raises_on_version_mismatch(self, tmp_path, valid_metadata_minimal, key_yaml, monkeypatch):
+        monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+        meta = copy.deepcopy(valid_metadata_minimal)
+        meta["version"] = "2.0.0"
+        path = tmp_path / "stale_metadata.yaml"
+        utils.save_as_yaml(meta, str(path))
+        with pytest.raises(utils.MetadataVersionError):
+            wi.add_nerd(str(path), self.NERD, key_yaml)
 
 
 class TestSaveObject:
@@ -331,6 +340,18 @@ class TestSaveObject:
         )
         assert returned_name == custom_name
         assert (tmp_path / custom_name).exists()
+
+    def test_stamps_current_fred_version(self, tmp_path, valid_metadata_minimal, monkeypatch):
+        # save_object is the web interface's only persistence point for both
+        # new files and edits -- without this stamp, a file created/edited
+        # there would carry no version at all and immediately look
+        # pre-3.0.0 to the version gate the next time anyone reads it
+        monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+        meta = copy.deepcopy(valid_metadata_minimal)
+        meta["version"] = "2.0.0"
+        filename, _ = wi.save_object(meta, str(tmp_path), "custom_file.yaml", True)
+        saved = utils.read_in_yaml(str(tmp_path / filename))
+        assert saved["version"] == "3.0.0"
 
 
 class TestSaveFilenames:
@@ -461,6 +482,20 @@ class TestEditWiObject:
         result = wi.edit_wi_object(str(metadata_yaml_file), minimal_pgm_object, {})
         assert "whitelists" in result
 
+    def test_raises_on_version_mismatch(self, tmp_path, valid_metadata_minimal, minimal_pgm_object, monkeypatch):
+        # the version check happens before any whitelist lookups, so this
+        # raises (and is testable) independent of the xfails above -- the
+        # exception must propagate all the way out to the caller uncaught,
+        # per explicit decision: no structured error dict, let it raise like
+        # the CLI does
+        monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+        meta = copy.deepcopy(valid_metadata_minimal)
+        meta["version"] = "2.0.0"
+        path = tmp_path / "stale_metadata.yaml"
+        utils.save_as_yaml(meta, str(path))
+        with pytest.raises(utils.MetadataVersionError):
+            wi.edit_wi_object(str(path), minimal_pgm_object, {})
+
 
 class TestParseObject:
     def test_returns_dict(self, minimal_pgm_object):
@@ -489,6 +524,8 @@ class TestFetchWhitelists:
                 minimal_pgm_object["whitelist_repo"],
                 minimal_pgm_object["whitelist_branch"],
                 minimal_pgm_object["update_whitelists"],
+                minimal_pgm_object["name"],
+                minimal_pgm_object["token"],
             )
 
     def test_returns_version_from_get_whitelists(self, minimal_pgm_object):

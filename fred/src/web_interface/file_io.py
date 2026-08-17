@@ -21,6 +21,11 @@ def save_object(dictionary, path, filename, edit_state):
     if not edit_state:
         filename = f"{project_id}_{filename}_metadata.yaml"
 
+    # stamps every file the web interface creates or re-saves with the
+    # current FRED version, same as CLI generate/edit -- otherwise a file
+    # produced here would carry no version at all and immediately look
+    # pre-3.0.0 to the version gate
+    dictionary["version"] = utils.get_fred_version()
     utils.save_as_yaml(dictionary, os.path.join(path, filename))
 
     return filename, project_id

@@ -34,8 +34,8 @@ class Webinterface:
             self.whitelist_repo,
             self.whitelist_branch,
             self.whitelist_path,
-            self.username,
-            self.password,
+            self.name,
+            self.token,
             structure,
             self.update_whitelists,
             self.output_path,
@@ -55,6 +55,8 @@ def fetch_whitelists(pgm_object):
         pgm_object["whitelist_repo"],
         pgm_object["whitelist_branch"],
         pgm_object["update_whitelists"],
+        pgm_object["name"],
+        pgm_object["token"],
     )
     return whitelist_version
 
@@ -593,7 +595,7 @@ def get_metadata_search_view(metadata_path):
 
     return res
 
-def add_nerd(path, nerd_dict):
+def add_nerd(path, nerd_dict, structure):
     """
     Add a new nerd to the nerd list in a metadata file.
 
@@ -606,16 +608,22 @@ def add_nerd(path, nerd_dict):
                           "department": "AG-mustermann",
                           "email": "max.mustermann@mpi-bn.mpg.de"
                       }
+    :param structure: the schema (pgm_object["structure"]) used to enforce
+                      the version gate -- this writes to the file, so a
+                      version-mismatched file must raise here just like the
+                      CLI, not be silently edited under current-schema
+                      assumptions
     :return: True if the nerd was added, False if a nerd with the same
              ldap_name already exists in the file
     """
-    metadata = utils.read_in_yaml(path)
+    metadata = utils.read_metafile(path, structure)
     if "nerd" not in metadata["project"] or metadata["project"]["nerd"] is None:
         metadata["project"]["nerd"] = []
     existing_usernames = [n["ldap_name"] for n in metadata["project"]["nerd"] if "ldap_name" in n]
     if nerd_dict["ldap_name"] in existing_usernames:
         return False
     metadata["project"]["nerd"].append(nerd_dict)
+    metadata["version"] = utils.get_fred_version()
     utils.save_as_yaml(metadata, path)
     return True
 

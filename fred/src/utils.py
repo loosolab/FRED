@@ -1,11 +1,15 @@
 import copy
+import importlib.metadata
 import json
 import math
 import os
+import re
 import textwrap
 from Bio import Entrez
 import yaml
 from yaml import CLoader as Loader, CDumper as Dumper
+
+from fred.src.exceptions import WhitelistSplitError, WhitelistJoinError, MetadataVersionError
 
 
 def _str_representer(dumper, data):
@@ -31,16 +35,16 @@ def parse_config(config_file):
         whitelist_repo = "https://github.com/loosolab/FRED_whitelists.git"
     if (
         "private_access" in config
-        and "username" in config["private_access"]
-        and "password" in config["private_access"]
-        and config["private_access"]["username"] is not None
-        and config["private_access"]["password"] is not None
+        and "name" in config["private_access"]
+        and "token" in config["private_access"]
+        and config["private_access"]["name"] is not None
+        and config["private_access"]["token"] is not None
     ):
-        username = config["private_access"]["username"]
-        password = config["private_access"]["password"]
+        name = config["private_access"]["name"]
+        token = config["private_access"]["token"]
     else:
-        username = None
-        password = None
+        name = None
+        token = None
     try:
         structure = config["structure"]
         if structure == "fred":
@@ -104,8 +108,8 @@ def parse_config(config_file):
         whitelist_repo,
         whitelist_branch,
         whitelist_path,
-        username,
-        password,
+        name,
+        token,
         structure,
         update_whitelists,
         output_path,
@@ -120,8 +124,8 @@ def save_as_yaml(dictionary, file_path):
     :param dictionary: a dictionary that should be saved
     :param file_path: the path of the yaml file to be created
     """
-    with open(file_path, "w") as file:
-        yaml.dump(dictionary, file, sort_keys=False, Dumper=Dumper, encoding='utf-8', allow_unicode=True)
+    with open(file_path, "w", encoding="utf-8") as file:
+        yaml.dump(dictionary, file, sort_keys=False, Dumper=Dumper, allow_unicode=True)
 
 
 def read_in_yaml(yaml_file):
@@ -130,10 +134,88 @@ def read_in_yaml(yaml_file):
     :param yaml_file: the path to the yaml file to be read in
     :return: low_output: a dictionary containing the information of the yaml
     """
-    with open(yaml_file) as file:
-        output = yaml.load(file, Loader=Loader)
+    try:
+        with open(yaml_file, encoding="utf-8") as file:
+            output = yaml.load(file, Loader=Loader)
+    except UnicodeDecodeError:
+        # Some older files were written under a non-UTF-8 locale, leaving
+        # special characters like µ or ö as raw cp1252/Latin-1 bytes.
+        with open(yaml_file, encoding="cp1252") as file:
+            output = yaml.load(file, Loader=Loader)
     low_output = {k.lower(): v for k, v in output.items()}
     return low_output
+
+
+def get_fred_version():
+    """
+    Returns the installed fred-metadata package version. Falls back to
+    reading the 'version' field straight out of pyproject.toml if the
+    package isn't registered with importlib.metadata at all (e.g. an
+    editable/dev checkout that was never actually pip-installed, or an
+    editable install whose build backend didn't generate proper dist-info)
+    -- pyproject.toml sits right next to the source in exactly those cases.
+    Only falls back to "unknown" if neither source works.
+    """
+    try:
+        return importlib.metadata.version("fred-metadata")
+    except importlib.metadata.PackageNotFoundError:
+        return _read_version_from_pyproject()
+
+
+def _read_version_from_pyproject():
+    pyproject_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "..", "pyproject.toml"
+    )
+    try:
+        with open(pyproject_path) as file:
+            for line in file:
+                match = re.match(r'^\s*version\s*=\s*"([^"]+)"', line)
+                if match:
+                    return match.group(1)
+    except OSError:
+        pass
+    return "unknown"
+
+
+def check_metadata_version(metafile, path, key_yaml):
+    """
+    Raises MetadataVersionError if `metafile`'s recorded 'version' key
+    doesn't share its major component with the installed FRED version.
+    A missing 'version' key is treated as a mismatch (file predates version
+    tracking). No-ops if `key_yaml` (the schema actually in use) doesn't
+    declare a top-level 'version' key at all -- custom/private schemas that
+    never opted into this key are not gated. Also no-ops if the installed
+    version can't be determined (get_fred_version() == "unknown"), since
+    blocking everything because we can't identify our own version would be
+    worse than skipping the check.
+    """
+    if "version" not in key_yaml:
+        return
+
+    installed_version = get_fred_version()
+    if installed_version == "unknown":
+        return
+
+    stored_version = metafile.get("version")
+    installed_major = str(installed_version).split(".")[0]
+    stored_major = str(stored_version).split(".")[0] if stored_version else None
+
+    if stored_major != installed_major:
+        raise MetadataVersionError(path, stored_version)
+
+
+def read_metafile(path, key_yaml):
+    """
+    Reads a metadata file and enforces its version compatibility with the
+    installed FRED version (see check_metadata_version). Intended for
+    call sites that process a single file at a time, where a version
+    mismatch should simply abort -- unlike the batch path in
+    fred.src.file_reading, which catches MetadataVersionError per file so
+    the rest of a directory can still be processed.
+    """
+    metafile = read_in_yaml(path)
+    check_metadata_version(metafile, path, key_yaml)
+    return metafile
 
 
 def read_in_json(json_file):
@@ -248,6 +330,7 @@ def read_grouped_whitelist(
             os.path.dirname(os.path.abspath(__file__)), "..", "metadata_whitelists"
         )
     headers = {}
+    delimiters = {}
     for key in whitelist["whitelist"]:
         if not isinstance(whitelist["whitelist"][key], list):
             new_whitelist = False
@@ -293,6 +376,8 @@ def read_grouped_whitelist(
                     elif whitelist["whitelist"][key]["whitelist_type"] == "plain":
                         if "headers" in whitelist["whitelist"][key]:
                             headers[key] = whitelist["whitelist"][key]["headers"]
+                        if "delimiter" in whitelist["whitelist"][key]:
+                            delimiters[key] = whitelist["whitelist"][key]["delimiter"]
                         whitelist["whitelist"][key] = whitelist["whitelist"][key][
                             "whitelist"
                         ]
@@ -321,6 +406,8 @@ def read_grouped_whitelist(
         whitelist["whitelist_type"] = "plain_group"
     if len(list(headers.keys())) > 0:
         whitelist["headers"] = headers
+    if len(list(delimiters.keys())) > 0:
+        whitelist["delimiter"] = delimiters
     return whitelist
 
 
@@ -400,13 +487,23 @@ def get_whitelist(
             abbrev = True
         elif whitelist["whitelist_type"] == "depend":
             depend = list(find_keys(filled_object, whitelist["ident_key"]))
+            depend_delimiter = " "
             if len(depend) == 0:
                 if whitelist["ident_key"] == "organism_name":
                     depend = list(find_keys(filled_object, "organism"))
+            if whitelist["ident_key"] == "organism_name":
+                organism_whitelist = get_whitelist(
+                    "organism",
+                    filled_object,
+                    whitelist_object=whitelist_object,
+                    whitelist_path=whitelist_path,
+                )
+                if organism_whitelist:
+                    depend_delimiter = organism_whitelist.get("delimiter", " ")
             if len(depend) > 0:
                 whitelist = read_depend_whitelist(
                     whitelist["whitelist"],
-                    depend[0].split(" ")[0],
+                    split_header_value(depend[0], depend_delimiter)[0],
                     whitelist_object=whitelist_object,
                     whitelist_path=whitelist_path,
                 )
@@ -458,6 +555,7 @@ def get_whitelist(
                 if (
                     whitelist["whitelist"][key] is not None
                     and key != "headers"
+                    and key != "delimiter"
                     and key != "whitelist_type"
                     and key != "whitelist_keys"
                 ):
@@ -1308,6 +1406,72 @@ def split_cond(condition):
         conditions[j] = (key, d[key])
 
     return conditions
+
+
+def split_headers(headers):
+    """
+    This function splits a header-whitelist's 'headers' string into a list
+    of column names.
+    :param headers: a string containing header names divided by space
+    :return: a list of header names
+    """
+    return headers.split(" ")
+
+
+def split_header_value(value, delimiter=" "):
+    """
+    This function splits a header-whitelist value into its per-column
+    tokens. This is the single place that performs the actual split of a
+    value string, so that a future change to the splitting mechanism only
+    needs to be made here.
+    :param value: a string value to be split into tokens
+    :param delimiter: the delimiter to split on, defaults to a single space
+        for backwards compatibility. If a non-default delimiter is given,
+        each token is additionally stripped of surrounding whitespace.
+    :return: a list of value tokens
+    """
+    tokens = value.split(delimiter)
+    if delimiter != " ":
+        tokens = [token.strip() for token in tokens]
+    return tokens
+
+
+def header_value_to_dict(value, headers, delimiter=" "):
+    """
+    This function splits a header-whitelist value into a dictionary mapping
+    each header name to its corresponding token.
+    :param value: a string value to be split according to the headers
+    :param headers: a string containing header names divided by space
+    :param delimiter: the delimiter used to split value, defaults to a
+        single space
+    :return: a dictionary mapping header names to their value tokens
+    :raises WhitelistSplitError: if value does not split into exactly as
+        many tokens as there are headers
+    """
+    header_list = split_headers(headers)
+    value_list = split_header_value(value, delimiter)
+    if len(value_list) != len(header_list):
+        raise WhitelistSplitError(headers, value, delimiter, header_list, value_list)
+    return {header_list[i]: value_list[i] for i in range(len(header_list))}
+
+
+def dict_to_header_value(value_dict, headers, delimiter=" "):
+    """
+    This function joins a dictionary mapping header names to values back
+    into a single value string, in the column order given by headers.
+    :param value_dict: a dictionary mapping header names to their values
+    :param headers: a string containing header names divided by space
+    :param delimiter: the delimiter used to join the values, defaults to a
+        single space
+    :return: the joined value string
+    :raises WhitelistJoinError: if value_dict does not contain a value for
+        every header
+    """
+    header_list = split_headers(headers)
+    for header in header_list:
+        if header not in value_dict:
+            raise WhitelistJoinError(headers, value_dict, header_list, header)
+    return delimiter.join(value_dict[header] for header in header_list)
 
 
 def get_publication_object(pubmed_id, email):

@@ -16,6 +16,12 @@ A whitelist of type ``plain`` contains two keys that must be specified. The firs
     whitelist_type: 'plain'
     whitelist:
 
+A ``plain`` whitelist can optionally define a ``headers`` key to split each
+value into multiple named columns (e.g. ``organism_name`` and
+``taxonomy_id``), and an optional ``delimiter`` key to change what character
+values are split on (default: a single space). See :doc:`whitelist` for
+details on both.
+
 group
 ------
 

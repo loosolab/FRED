@@ -428,7 +428,7 @@ experimental_setting:
                   whitelist: False
                   input_type: number
                 number_of_measurements:
-                  mandatory: False
+                  mandatory: True
                   list: False
                   display_name: "Number of Measurements"
                   desc: "Measurements done for one biological/technical replicate (typically 1). Mostly used in combination with a specific technique such as gel slices in proteomics.\n[1]"
@@ -558,6 +558,33 @@ experimental_setting:
                       list: False
                       display_name: "Type"
                       desc: "Type of injury. [sham, amputation]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                library_preparation:
+                  mandatory: False
+                  list: True
+                  display_name: "Library Preparation"
+                  desc: "Additional steps applied during sequencing library preparation. [CRISPR rRNA depletion, Ligase]"
+                  factor_desc: "Additional steps applied during sequencing library preparation, e.g. rRNA depletion or presence/absence of a ligation step.\n[CRISPR rRNA depletion, Ligase]"
+                  special_case:
+                    group: "preparation_type"
+                    control:
+                      preparation_status: "not applied"
+                  value:
+                    preparation_status:
+                      mandatory: True
+                      list: False
+                      display_name: "Status"
+                      desc: "Status of the preparation step. [applied, not applied]"
+                      value: null
+                      whitelist: True
+                      input_type: select
+                    preparation_type:
+                      mandatory: False
+                      list: False
+                      display_name: "Type"
+                      desc: "Type of preparation step. [CRISPR rRNA depletion, Ligase]"
                       value: null
                       whitelist: True
                       input_type: select
@@ -766,14 +793,6 @@ experimental_setting:
                       value: "kg/m2"
                       whitelist: True
                       input_type: select
-                cell_line:
-                  mandatory: False
-                  list: False
-                  display_name: "Cell line"
-                  desc: "Cell line used for sample.\n[HUVEC]"
-                  value: null
-                  whitelist: True
-                  input_type: select
                 cell_type:
                   mandatory: False
                   list: False
@@ -874,6 +893,46 @@ experimental_setting:
                   value: null
                   whitelist: True
                   input_type: select
+                cell_line:
+                  mandatory: False
+                  list: False
+                  display_name: "Cell line"
+                  desc: "Cell line used for sample.\n[HUVEC]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                culture_type:
+                  mandatory: False
+                  list: False
+                  display_name: "Culture Type"
+                  desc: "Cell culture format.\n[adherent, sphere]"
+                  value: null
+                  whitelist: True
+                  input_type: select
+                passage_number:
+                  mandatory: False
+                  list: False
+                  display_name: "Passage Number"
+                  desc: "Number of passages of the cultured cells.\n[5 passages]"
+                  special_case:
+                    value_unit: passage
+                  value:
+                    value:
+                      mandatory: True
+                      list: False
+                      display_name: "Value"
+                      desc: ""
+                      value: null
+                      whitelist: False
+                      input_type: number
+                    unit:
+                      mandatory: True
+                      list: False
+                      display_name: "Unit"
+                      desc: ""
+                      value: "passages"
+                      whitelist: True
+                      input_type: select
                 concentration:
                   mandatory: False
                   list: False
@@ -1061,3 +1120,13 @@ technical_details:
       value: null
       whitelist: False
       input_type: short_text
+version:
+  mandatory: True
+  list: False
+  display_name: "FRED Version"
+  desc: "FRED (fred-metadata) package version that generated/last saved this file. Automatically set, not user-editable.\n[3.0.0]"
+  special_case:
+    edit: "not editable"
+  value: null
+  whitelist: False
+  input_type: restricted_short_text

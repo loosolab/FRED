@@ -407,3 +407,13 @@ container:
           value: null
           whitelist: False
           input_type: short_text
+version:
+  mandatory: True
+  list:  False
+  display_name: 'FRED Version'
+  desc: 'FRED (fred-metadata) package version that generated/last saved this file. Automatically set, not user-editable.'
+  special_case:
+    edit: 'not editable'
+  value: null
+  whitelist: False
+  input_type: short_text

@@ -88,6 +88,7 @@ def parse_whitelist(key_name, node, filled_object, whitelist_object):
              input_type: the type of the input field in the web interface
              headers: a string containing headers
              whitelist_keys: the headings of a grouped whitelist
+             delimiter: the delimiter used to split/join header values
     """
 
     # initialize return values
@@ -97,6 +98,7 @@ def parse_whitelist(key_name, node, filled_object, whitelist_object):
     headers = None
     whitelist_keys = None
     double = []
+    delimiter = None
 
     # whitelist is defined or special case merge
     if ("whitelist" in node and node["whitelist"]) or (
@@ -121,6 +123,7 @@ def parse_whitelist(key_name, node, filled_object, whitelist_object):
                 # input_type
                 whitelist_type = whitelist["whitelist_type"]
                 headers = whitelist["headers"] if "headers" in whitelist else None
+                delimiter = whitelist["delimiter"] if "delimiter" in whitelist else None
                 whitelist_keys = (
                     whitelist["whitelist_keys"]
                     if "whitelist_keys" in whitelist
@@ -196,4 +199,4 @@ def parse_whitelist(key_name, node, filled_object, whitelist_object):
         # set input type as defines in general structure
         input_type = node["input_type"]
 
-    return whitelist, whitelist_type, input_type, headers, whitelist_keys, double
+    return whitelist, whitelist_type, input_type, headers, whitelist_keys, double, delimiter

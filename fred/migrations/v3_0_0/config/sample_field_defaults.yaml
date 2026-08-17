@@ -1,0 +1,6 @@
+# Sample-level fields that became mandatory in FRED 3.0.0 (or were always
+# documented as such in keys.yaml) but may be missing from older metadata.
+# Each entry maps a field name to the schema default from keys.yaml that
+# should be filled in when the field is absent on a sample. Extend this
+# file if a future schema change makes more sample fields mandatory.
+number_of_measurements: 1

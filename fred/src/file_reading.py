@@ -5,7 +5,7 @@ from functools import partial
 from multiprocessing.pool import Pool
 import time
 from fred.src import validate_yaml
-from fred.src.utils import read_in_yaml
+from fred.src.utils import read_in_yaml, check_metadata_version, MetadataVersionError
 import yaml as yml
 
 
@@ -23,6 +23,7 @@ def iterate_dir_metafiles(
     whitelist_path=None,
     return_false=False,
     skip_validation=False,
+    skip_version_check=False,
     show_logs=False,
 ):
     """
@@ -65,6 +66,7 @@ def iterate_dir_metafiles(
             whitelist_path=whitelist_path,
             yaml=copy.deepcopy(key_yaml),
             skip_validation=skip_validation,
+            skip_version_check=skip_version_check,
         ),
         items,
     )
@@ -118,6 +120,7 @@ def validate(
     whitelist_path,
     yaml,
     skip_validation=False,
+    skip_version_check=False,
 ):
     error_reports = None
     warning_reports = None
@@ -135,6 +138,12 @@ def validate(
     read_time = end_read - start
     # test if metafile is valid
     if metafile is not None:
+        if not skip_version_check:
+            try:
+                check_metadata_version(metafile, ypath, key_yaml)
+            except MetadataVersionError as e:
+                metafile["path"] = ypath
+                return (metafile, True, ([str(e)], [], [], []), 1, None, 0, read_time)
         if not skip_validation:
             (
                 valid,

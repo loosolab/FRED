@@ -113,6 +113,31 @@ The key 'whitelist' receives a dictionary whose keys represent the possible valu
           ...
 
 
+Optional: ``delimiter``
+------------------------
+
+By default, the values of a whitelist with ``headers`` are split on a single
+space to match them up with the header columns. This is why multi-word values
+such as organism names currently have to be written with an underscore
+(``Homo_sapiens``) instead of a real space.
+
+If a whitelist needs real spaces (or any other character) inside a value, it
+can set the optional top-level key ``delimiter`` to override the default. Each
+whitelist entry is then split on that delimiter instead, and each resulting
+token is trimmed of surrounding whitespace:
+
+.. code-block:: yaml
+
+   whitelist_type: plain
+   headers: organism_name taxonomy_id
+   delimiter: ","
+   whitelist:
+   - Homo sapiens, 9606
+   - Mus musculus, 10090
+
+Whitelists that do not set ``delimiter`` are unaffected and keep splitting on a
+single space exactly as before.
+
 
 Type 4: abbrev
 --------------------

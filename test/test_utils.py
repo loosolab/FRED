@@ -3,6 +3,8 @@ Tests for fred/src/utils.py — pure utility functions.
 Covers: YAML I/O, find_keys, split_value_unit, split_cond,
         get_condition_combinations, get_combis.
 """
+import importlib.metadata
+
 import pytest
 
 import fred.src.utils as utils
@@ -220,3 +222,89 @@ def test_get_combis_value_unit_format(key_yaml):
     values = ['time_point:"1days"']
     result = utils.get_combis(values, "time_point", {}, key_yaml)
     assert isinstance(result, list)
+
+
+# ---------------------------------------------------------------------------
+# get_fred_version / check_metadata_version / read_metafile
+# ---------------------------------------------------------------------------
+
+
+def test_get_fred_version_falls_back_to_pyproject_toml(monkeypatch):
+    # simulates an editable/dev checkout that was never pip-installed (or
+    # whose editable install didn't register proper dist-info) -- the real
+    # pyproject.toml next to the source is still readable and must win over
+    # "unknown"
+    def raise_not_found(name):
+        raise importlib.metadata.PackageNotFoundError(name)
+
+    monkeypatch.setattr(importlib.metadata, "version", raise_not_found)
+    assert utils.get_fred_version() == "3.0.0"
+
+
+def test_get_fred_version_unknown_when_pyproject_unreadable(monkeypatch):
+    def raise_not_found(name):
+        raise importlib.metadata.PackageNotFoundError(name)
+
+    monkeypatch.setattr(importlib.metadata, "version", raise_not_found)
+    monkeypatch.setattr(utils, "_read_version_from_pyproject", lambda: "unknown")
+    assert utils.get_fred_version() == "unknown"
+
+
+def test_check_metadata_version_matching_major_passes(key_yaml, monkeypatch):
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    utils.check_metadata_version({"version": "3.0.0"}, "some/path.yaml", key_yaml)
+    # a differing minor/patch under the same major is not a mismatch
+    utils.check_metadata_version({"version": "3.4.2"}, "some/path.yaml", key_yaml)
+
+
+def test_check_metadata_version_mismatched_major_raises(key_yaml, monkeypatch):
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    with pytest.raises(utils.MetadataVersionError) as excinfo:
+        utils.check_metadata_version({"version": "2.0.0"}, "some/path.yaml", key_yaml)
+    assert "fred migrate 3.0.0" in str(excinfo.value)
+
+
+def test_check_metadata_version_missing_key_raises(key_yaml, monkeypatch):
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    with pytest.raises(utils.MetadataVersionError) as excinfo:
+        utils.check_metadata_version({}, "some/path.yaml", key_yaml)
+    assert "fred migrate 3.0.0" in str(excinfo.value)
+
+
+def test_check_metadata_version_recommends_next_major_not_installed_version(key_yaml, monkeypatch):
+    # migrations only ever exist for major bumps ("X.0.0") -- the recommended
+    # command must be derived from the file's own stored major + 1, not from
+    # the exact installed version, or it could point at a migration that
+    # doesn't exist (e.g. a patch release like 6.0.1)
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "6.0.1")
+    with pytest.raises(utils.MetadataVersionError) as excinfo:
+        utils.check_metadata_version({"version": "3.2.0"}, "some/path.yaml", key_yaml)
+    assert "fred migrate 4.0.0" in str(excinfo.value)
+
+
+def test_check_metadata_version_noop_when_schema_has_no_version_key(monkeypatch):
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    schema_without_version = {"project": {}}
+    # no exception, even though the metafile has no version at all
+    utils.check_metadata_version({}, "some/path.yaml", schema_without_version)
+
+
+def test_check_metadata_version_noop_when_installed_version_unknown(key_yaml, monkeypatch):
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "unknown")
+    utils.check_metadata_version({}, "some/path.yaml", key_yaml)
+
+
+def test_read_metafile_returns_dict_when_version_matches(key_yaml, tmp_path, monkeypatch):
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    path = tmp_path / "test001_metadata.yaml"
+    utils.save_as_yaml({"project": {"id": "test001"}, "version": "3.0.0"}, str(path))
+    result = utils.read_metafile(str(path), key_yaml)
+    assert result["project"]["id"] == "test001"
+
+
+def test_read_metafile_raises_on_version_mismatch(key_yaml, tmp_path, monkeypatch):
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    path = tmp_path / "test001_metadata.yaml"
+    utils.save_as_yaml({"project": {"id": "test001"}, "version": "2.0.0"}, str(path))
+    with pytest.raises(utils.MetadataVersionError):
+        utils.read_metafile(str(path), key_yaml)

@@ -1,6 +1,7 @@
 """
 Tests for fred/src/file_reading.py — directory iteration and YAML reading.
 """
+import copy
 import sys
 import os
 from unittest.mock import patch
@@ -124,3 +125,96 @@ def test_finds_multiple_metadata_files(key_yaml, tmp_path):
     assert len(metafiles) == 2
     ids = {m["project"]["id"] for m in metafiles}
     assert ids == {"test001", "test002"}
+
+
+# ---------------------------------------------------------------------------
+# version gate (validate())
+# ---------------------------------------------------------------------------
+
+
+def test_validate_worker_flags_version_mismatch(key_yaml, tmp_path, monkeypatch):
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    path = tmp_path / "test_metadata.yaml"
+    utils.save_as_yaml({"project": {"id": "test_stale"}, "version": "2.0.0"}, str(path))
+
+    metafile, corrupted, error_reports, error_count, warning_reports, warning_count, _ = (
+        file_reading.validate(
+            str(path), FILENAME_SUFFIX, key_yaml, False, None, key_yaml, skip_validation=False
+        )
+    )
+
+    assert corrupted is True
+    assert error_count == 1
+    assert "fred migrate 3.0.0" in error_reports[0][0]
+
+
+def test_validate_worker_skip_validation_alone_still_enforces_version_gate(key_yaml, tmp_path, monkeypatch):
+    # skip_validation=True skips schema/whitelist validation only. It must NOT
+    # also silently bypass the version gate -- 'fred find -sv' (used by
+    # fred/src/wi_functions.py to list files for the web-interface edit flow)
+    # sets skip_validation=True, and version-mismatched files must still be
+    # flagged there so they aren't offered up for editing.
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    path = tmp_path / "test_metadata.yaml"
+    utils.save_as_yaml({"project": {"id": "test_stale"}, "version": "2.0.0"}, str(path))
+
+    metafile, corrupted, error_reports, error_count, warning_reports, warning_count, _ = (
+        file_reading.validate(
+            str(path), FILENAME_SUFFIX, key_yaml, False, None, key_yaml, skip_validation=True
+        )
+    )
+
+    assert corrupted is True
+    assert error_count == 1
+    assert "fred migrate 3.0.0" in error_reports[0][0]
+
+
+def test_validate_worker_skip_version_check_bypasses_gate(key_yaml, tmp_path, monkeypatch):
+    # skip_version_check=True is the explicit, separate bypass
+    # fred/migrations/v3_0_0/migrate.py relies on to deliberately process
+    # pre-migration files
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    path = tmp_path / "test_metadata.yaml"
+    utils.save_as_yaml({"project": {"id": "test_stale"}, "version": "2.0.0"}, str(path))
+
+    metafile, corrupted, error_reports, error_count, warning_reports, warning_count, _ = (
+        file_reading.validate(
+            str(path),
+            FILENAME_SUFFIX,
+            key_yaml,
+            False,
+            None,
+            key_yaml,
+            skip_validation=True,
+            skip_version_check=True,
+        )
+    )
+
+    assert corrupted is False
+    assert error_count == 0
+    assert metafile["project"]["id"] == "test_stale"
+
+
+def test_version_mismatch_excluded_from_dir_results(key_yaml, valid_metadata_minimal, tmp_path, monkeypatch):
+    monkeypatch.setattr(utils, "get_fred_version", lambda: "3.0.0")
+    good = copy.deepcopy(valid_metadata_minimal)
+    stale = copy.deepcopy(valid_metadata_minimal)
+    stale["project"]["id"] = "test_stale"
+    stale["version"] = "2.0.0"
+    utils.save_as_yaml(good, str(tmp_path / "test001_metadata.yaml"))
+    utils.save_as_yaml(stale, str(tmp_path / "test_stale_metadata.yaml"))
+
+    with patch("fred.src.utils.get_whitelist", return_value=None):
+        metafiles, reports = file_reading.iterate_dir_metafiles(
+            key_yaml,
+            [str(tmp_path)],
+            filename=FILENAME_SUFFIX,
+            logical_validation=False,
+        )
+
+    # the stale file is excluded from the results, but the good neighbor is
+    # still processed normally
+    ids = {m["project"]["id"] for m in metafiles}
+    assert ids == {"test001"}
+    assert reports["corrupt_files"]["count"] == 1
+    assert reports["error_count"] >= 1

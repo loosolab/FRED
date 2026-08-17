@@ -64,3 +64,5 @@ technical_details:
     - setting: exp1
       technique:
         - bulk RNA-seq
+
+version: "3.0.0"

@@ -135,8 +135,11 @@ def update_graph(value, empty):
     my_height = 50 * len(sorter)
     my_width = my_cell_width * len(settings[value]["sample_index"])
 
+    organism_filename = (
+        organisms[value].replace(" ", "_") if organisms[value] else organisms[value]
+    )
     organism_path = os.path.join(
-        os.path.dirname(__file__), "images", f"{organisms[value]}.png"
+        os.path.dirname(__file__), "images", f"{organism_filename}.png"
     )
     images = None
 

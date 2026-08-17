@@ -1,0 +1,26 @@
+# Maps legacy/informal organism_name values (as found in old FRED metadata
+# files) to the current organism whitelist's canonical name. Keys are
+# matched case-insensitively by the v3.0.0 migration. Curated from an actual
+# scan of every organism_name value used across
+# /mnt/bcu-repository/BCU_REPOSITORY/PROJECTS (638 metadata files) -- only
+# entries that were actually observed are listed, so this only needs
+# extending if a migration run reports a genuinely new organism_name it
+# could not resolve. Latin binomial names (e.g. "Homo_sapiens" or
+# "caenorhabditis_elegans", regardless of case) don't need an alias entry
+# here -- those are already handled generically by the underscore/case
+# normalization in resolve_organism_name().
+human: Homo sapiens
+mouse: Mus musculus
+zebrafish: Danio rerio
+rat: Rattus norvegicus
+pig: Sus scrofa
+medaka: Oryzias latipes
+chicken: Gallus gallus
+drosophila: Drosophila melanogaster
+# "ascomycota" is a fungal phylum, not a species -- it is NOT a general
+# synonym for Neurospora crassa (Saccharomyces cerevisiae is also an
+# ascomycete and has its own whitelist entry). This mapping was manually
+# verified against the one real file that used it (dst288_metadata.yaml,
+# project "H_uth1"). If "ascomycota" shows up in a different file, verify
+# which species it actually refers to before trusting this alias.
+ascomycota: Neurospora crassa

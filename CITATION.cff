@@ -23,7 +23,8 @@ authors:
     given-names: Mario
     affiliation: "Bioinformatics Core Unit, Max Planck Institute for Heart and Lung Research, Bad Nauheim, Germany; Cardio-Pulmonary Institute (CPI), Bad Nauheim, Germany"
     orcid: "https://orcid.org/0000-0003-1495-9530"
-version: "2.0.0"
+version: "3.0.0"
+date-released: "2026-08-17"
 license: MIT
 repository-code: "https://github.com/loosolab/FRED"
 url: "https://loosolab.pages.gwdg.de/software/metadata-organizer/"
@@ -50,5 +51,5 @@ preferred-citation:
     - family-names: Looso
       given-names: Mario
   journal: "Scientific Reports"
-  # year: XXXX      # TODO: nach Publikation eintragen
-  # doi: "10.XXXXX" # TODO: nach Publikation eintragen
+  year: 2026
+  doi: "10.1038/s41598-026-61886-9"

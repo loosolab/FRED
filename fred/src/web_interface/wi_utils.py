@@ -1,6 +1,9 @@
 import pytz
 from dateutil import parser
 
+import fred.src.utils as utils
+from fred.src.exceptions import WhitelistSplitError
+
 
 def pop_key(metafile, key_list, value):
     """
@@ -195,7 +198,7 @@ def str_to_date(value):
     return default_time.strftime("%Y-%m-%dT%X.%fZ")
 
 
-def parse_headers(headers, value, mode="dict"):
+def parse_headers(headers, value, mode="dict", delimiter=" "):
     """
     This function splits a value into a dictionary depending on the header
     :param mode: a string defining the type the split value should be returned
@@ -205,39 +208,39 @@ def parse_headers(headers, value, mode="dict"):
                          ('<key1>:<value1>|<keys2>:<value2>')
     :param headers: a string containing the header keys divided by space
     :param value: a string value to be split at space
+    :param delimiter: the delimiter to split value by, defaults to a single
+                 space
     :return: new_val: the dictionary containing header keys and their values
     """
 
     # define a dictionary or string to save the new value to
     # (depending on mode)
     new_val = {} if mode == "dict" else ""
-    # iterate over the keys in the header
-    if len(value.split(" ")) == len(headers.split(" ")):
-        for key_index in range(len(headers.split(" "))):
 
-            # return a dictionary
-            if mode == "dict":
+    try:
+        value_dict = utils.header_value_to_dict(value, headers, delimiter)
+    except WhitelistSplitError as e:
+        print(f"Warning: {e}")
+        return value
 
-                # save the header and value at index 'key_index' in the dictionary
-                # (header and value split at ' ' -> lists that are indexed)
-                new_val[headers.split(" ")[key_index]] = value.split(" ")[key_index]
+    # return a dictionary
+    if mode == "dict":
+        new_val = value_dict
 
-            # return a string
-            elif mode == "str":
-
-                # add the header and value at index 'key_index' to the string
-                new_val = (
-                    f'{new_val}{"|" if key_index > 0 else ""}'
-                    f'{headers.split(" ")[key_index]}:"'
-                    f'{value.split(" ")[key_index]}"'
-                )
-    else:
-        new_val = value
+    # return a string
+    elif mode == "str":
+        header_list = utils.split_headers(headers)
+        for key_index, header in enumerate(header_list):
+            new_val = (
+                f'{new_val}{"|" if key_index > 0 else ""}'
+                f'{header}:"'
+                f'{value_dict[header]}"'
+            )
 
     return new_val
 
 
-def parse_whitelist_keys(whitelist_keys, value, headers, mode="dict"):
+def parse_whitelist_keys(whitelist_keys, value, headers, mode="dict", delimiter=None):
     """
     This function removes the group-key from the end of the value of a plain
     grouped whitelist and splits the value into a dictionary depending on a
@@ -251,6 +254,9 @@ def parse_whitelist_keys(whitelist_keys, value, headers, mode="dict"):
     :param value: the value that should be converted
     :param headers: a string of keys the value should be split into
                     (might be None if no header is specified)
+    :param delimiter: either a single delimiter string or a dictionary mapping
+                 whitelist keys to their own delimiter (might be None if no
+                 delimiter is specified, in which case a single space is used)
     :return: value: the converted value (dictionary or string depending on
                     weather a header was given)
     """
@@ -264,10 +270,15 @@ def parse_whitelist_keys(whitelist_keys, value, headers, mode="dict"):
 
             # test if wi object contains headers
             if headers is not None and k in headers:
+                k_delimiter = (
+                    delimiter[k]
+                    if isinstance(delimiter, dict) and k in delimiter
+                    else " "
+                )
 
                 # replace the original value with the one split according to
                 # the header
-                value = parse_headers(headers[k], value, mode=mode)
+                value = parse_headers(headers[k], value, mode=mode, delimiter=k_delimiter)
 
             # break since the whitelist key was found in the header
             # -> all other whitelist keys cannot be there too

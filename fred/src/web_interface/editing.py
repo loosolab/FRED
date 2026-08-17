@@ -18,7 +18,10 @@ def edit_wi_object(path, key_yaml, read_in_whitelists):
     :return: wi_object: the filled wi object
     """
     # TODO: as Parameter at get_info
-    meta_yaml = utils.read_in_yaml(path)
+    # lets a MetadataVersionError propagate to the caller -- opening an
+    # old-version file for editing must not proceed with current-schema
+    # field assumptions, same reasoning as the CLI 'edit' command
+    meta_yaml = utils.read_metafile(path, key_yaml)
     whitelist_object = {}
 
     if meta_yaml is not None:
@@ -97,10 +100,13 @@ def new_fill(
 
         if "headers" in wi_object:
             fill_key = "value"
-            filled_value = ""
-            for header in wi_object["headers"].split(" "):
-                filled_value = filled_value + " " + meta_yaml[header]
-            filled_value = filled_value.lstrip(" ").rstrip(" ")
+            try:
+                filled_value = utils.dict_to_header_value(
+                    meta_yaml, wi_object["headers"], wi_object.get("delimiter", " ")
+                )
+            except utils.WhitelistJoinError as e:
+                print(f"Warning: {e}")
+                filled_value = meta_yaml
         else:
             if wi_object["position"].split(":")[-1] == "experimental_setting":
                 fill_key = "input_fields"
@@ -309,7 +315,9 @@ def fill_experimental_setting(
                 else:
 
                     if "headers" in f and isinstance(meta_yaml[key], dict):
-                        new_val = parse_headers(meta_yaml[key], f["headers"])
+                        new_val = parse_headers(
+                            meta_yaml[key], f["headers"], f.get("delimiter")
+                        )
                     else:
                         new_val = meta_yaml[key]
 
@@ -335,22 +343,27 @@ def fill_experimental_setting(
     return filled_object, whitelist_object
 
 
-def parse_headers(value, headers):
+def parse_headers(value, headers, delimiter=None):
 
+    header_str = None
+    header_delimiter = " "
     if isinstance(headers, dict):
-        header = None
         for k in headers:
-            if sorted(headers[k].split(" ")) == sorted(list(value.keys())):
-                header = headers[k].split(" ")
+            if sorted(utils.split_headers(headers[k])) == sorted(list(value.keys())):
+                header_str = headers[k]
+                if isinstance(delimiter, dict) and k in delimiter:
+                    header_delimiter = delimiter[k]
                 break
     else:
-        header = headers.split(" ")
+        header_str = headers
+        if delimiter is not None and not isinstance(delimiter, dict):
+            header_delimiter = delimiter
 
-    if header is not None:
-        val = ""
-        for h in header:
-            val = f'{val}{" " if val != "" else ""}{value[h]}'
-        value = val
+    if header_str is not None:
+        try:
+            value = utils.dict_to_header_value(value, header_str, header_delimiter)
+        except utils.WhitelistJoinError as e:
+            print(f"Warning: {e}")
 
     return value
 
@@ -386,8 +399,10 @@ def get_all_factors(meta_yaml, real_val):
                 if w and "headers" in w:
                     if "headers" not in setting_fac:
                         setting_fac["headers"] = w["headers"]
+                    if "delimiter" in w and "delimiter" not in setting_fac:
+                        setting_fac["delimiter"] = w["delimiter"]
                     if isinstance(elem, dict):
-                        value = parse_headers(value, w["headers"])
+                        value = parse_headers(value, w["headers"], w.get("delimiter"))
 
                 if w and "whitelist_keys" in w:
                     if "whitelist_keys" not in setting_fac:
