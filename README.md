@@ -4,7 +4,7 @@
 [![Publication](https://img.shields.io/badge/Scientific%20Reports-10.1038%2Fs41598--026--61886--9-blue)](https://doi.org/10.1038/s41598-026-61886-9)
 [![PyPI](https://img.shields.io/pypi/v/fred-metadata)](https://pypi.org/project/fred-metadata/)
 [![Release](https://img.shields.io/github/v/release/loosolab/FRED)](https://github.com/loosolab/FRED/releases)
-[![FAIR checklist badge](https://img.shields.io/badge/Software-green?label=FAIR)](https://fairsoftwarechecklist.net/v0.2?f=31&a=32113&i=32011&r=133)
+[![FAIR checklist badge](https://img.shields.io/badge/Software-green?label=FAIR)](https://fairsoftwarechecklist.net/v0.2?f=31&a=32113&i=32100&r=133)
 
 
 # FRED
