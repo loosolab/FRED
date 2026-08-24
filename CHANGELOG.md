@@ -5,6 +5,16 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.1] - 2026-08-24
+
+### Fixed
+
+- The `/searchWhitelist` advanced-search autocomplete now replaces a
+  whitelist's custom `delimiter` (e.g. the `organism` whitelist's `,`) with
+  a whitespace before matching against the typed search string, so typing a
+  space where the delimiter is displayed (e.g. `Homo sapiens 9606` instead
+  of `Homo sapiens, 9606`) no longer prevents a match.
+
 ## [3.0.0] - 2026-08-17
 
 ### Breaking
@@ -61,4 +71,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with manually pinned dependencies.
 - Various internal refactors to whitelist input/parsing functions.
 
+[3.0.1]: https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/compare/v3.0.0...v3.0.1
 [3.0.0]: https://gitlab.gwdg.de/loosolab/software/metadata-organizer/-/compare/v2.0.3...v3.0.0

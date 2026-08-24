@@ -68,7 +68,24 @@ def get_single_whitelist(ob, whitelist_object):
     # test if the whitelist was found and read in correctly and return the list
     # of whitelist values
     if whitelist and "whitelist" in whitelist:
-        return whitelist["whitelist"]
+        values = whitelist["whitelist"]
+
+        # some whitelists (e.g. organism) join multiple header values with a
+        # custom delimiter (e.g. "Homo sapiens, 9606"). The delimiter is only
+        # relevant for splitting the value into its header parts (see
+        # parse_whitelist) and would otherwise prevent a match when typed as
+        # a whitespace in the advanced search, so it is replaced with a
+        # whitespace here for searching
+        delimiter = whitelist.get("delimiter")
+        if isinstance(delimiter, str) and isinstance(values, list):
+            values = [
+                " ".join(value.replace(delimiter, " ").split())
+                if isinstance(value, str)
+                else value
+                for value in values
+            ]
+
+        return values
 
     # return None if no whitelist was found
     else:
